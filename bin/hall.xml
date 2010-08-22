@@ -85,7 +85,7 @@
     								    <ListLabelElement text="张三" />
     								    <ListLabelElement text="张三" />
     							    </Combo>
-    							    <HorizontalLayout>
+    							    <HorizontalLayout mouse="false">
     							        <Edit name="chatEdit" />
     							        <Control width="24" mouse="false"/>
     							    </HorizontalLayout>
@@ -104,7 +104,7 @@
     	    <Control />
     	    <HorizontalLayout height="80" inset="0,10,0,0" >
     	        <Control />
-    	        <VerticalLayout width="180" inset="6,6,6,6" bkcolor="#FF8DD3FF" bkcolor2="#FF60B1FE">
+    	        <VerticalLayout width="180" inset="6,6,6,6" bkimage="file='winbk.bmp' corner='4,48,4,4' mask='#FFFF00FF'">
     	            <Label text="请选择你的操作" height="24" />
     	            <HorizontalLayout inset="0,10,0,0" >
     	                <Control />

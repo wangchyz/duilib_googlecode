@@ -22,7 +22,7 @@
 			<Label text="密码：" float="true" pos="10, 55, 78, 75" />
 			<Edit name="pwdedit" float="true" pos="80, 55, 220, 75" password="true" tooltip="请在这里输入您的密码" />
 			<Button text="{u}{a}找回密码{/a}{/u}" showhtml="true" float="true" pos="230, 55, 300, 75" tooltip="如果你忘记了密码，请点击找回密码"/>
-			<Button name="loginBtn" text="登录" float="true" pos="180, 80, 240, 100" tooltip="点击这里登录游戏" />
+			<Button name="loginBtn" text="登录" float="true" pos="180, 80, 240, 100" tooltip="点击这里登录游戏" normalimage="button_nor.bmp" hotimage="button_over.bmp" pushedimage="button_down.bmp"/>
 		</Container>
     </VerticalLayout>
 </Window>
