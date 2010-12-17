@@ -72,6 +72,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Riched20.lib"
 				OutputFile="../bin/UIlib.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -174,6 +175,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Riched20.lib"
 				OutputFile="../bin/UIlib_d.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -276,6 +278,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Riched20.lib"
 				OutputFile="../bin/UIlib_ud.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -375,6 +378,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Riched20.lib"
 				OutputFile="../bin/UIlib_u.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -872,6 +876,10 @@
 				RelativePath=".\UIRender.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\UIRichEdit.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -923,6 +931,10 @@
 			</File>
 			<File
 				RelativePath=".\UIRender.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UIRichEdit.h"
 				>
 			</File>
 		</Filter>

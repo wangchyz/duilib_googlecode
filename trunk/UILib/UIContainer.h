@@ -68,7 +68,7 @@ public:
 
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-    void SetManager(CPaintManagerUI* pManager, CControlUI* pParent);
+    void SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit = true);
     CControlUI* FindControl(FINDCONTROLPROC Proc, LPVOID pData, UINT uFlags);
 
     virtual SIZE GetScrollPos() const;

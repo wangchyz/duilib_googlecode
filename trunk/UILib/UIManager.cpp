@@ -254,27 +254,11 @@ bool CPaintManagerUI::PreMessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam,
        {
            // Tabbing between controls
            if( wParam == VK_TAB ) {
+               if( m_pFocus && m_pFocus->IsVisible() && m_pFocus->IsEnabled() && _tcsstr(m_pFocus->GetClass(), _T("RichEditUI")) != NULL ) {
+                   if( static_cast<CRichEditUI*>(m_pFocus)->IsWantTab() ) return false;
+               }
                SetNextTabControl(::GetKeyState(VK_SHIFT) >= 0);
                return true;
-           }
-           // Handle default dialog controls OK and CANCEL.
-           // If there are controls named "ok" or "cancel" they
-           // will be activated on keypress.
-           if( wParam == VK_RETURN ) {
-               CControlUI* pControl = FindControl(_T("ok"));
-               if( pControl != NULL && m_pFocus != pControl ) {
-                   if( m_pFocus == NULL || (m_pFocus->GetControlFlags() & UIFLAG_WANTRETURN) == 0 ) {
-                       pControl->Activate();
-                       return true;
-                   }
-               }
-           }
-           if( wParam == VK_ESCAPE ) {
-               CControlUI* pControl = FindControl(_T("cancel"));
-               if( pControl != NULL ) {
-                   pControl->Activate();
-                   return true;
-               }
            }
        }
        break;
@@ -637,6 +621,8 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            if( pControl->GetManager() != this ) break;
            m_pEventClick = pControl;
            pControl->SetFocus();
+           SetCapture();
+           m_bMouseCapture = true;
            TEventUI event = { 0 };
            event.Type = UIEVENT_BUTTONDOWN;
            event.wParam = wParam;
@@ -645,9 +631,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            event.wKeyState = (WORD)wParam;
            event.dwTimestamp = ::GetTickCount();
            pControl->Event(event);
-           // We always capture the mouse
-           ::SetCapture(m_hWndPaint);
-           m_bMouseCapture = true;
        }
        break;
    case WM_LBUTTONUP:
@@ -655,7 +638,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
            m_ptLastMousePos = pt;
            if( m_pEventClick == NULL ) break;
-           ::ReleaseCapture();
+           ReleaseCapture();
            m_bMouseCapture = false;
            TEventUI event = { 0 };
            event.Type = UIEVENT_BUTTONUP;
@@ -675,6 +658,8 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            CControlUI* pControl = FindControl(pt);
            if( pControl == NULL ) break;
            if( pControl->GetManager() != this ) break;
+           ::SetCapture(m_hWndPaint);
+           m_bMouseCapture = true;
            TEventUI event = { 0 };
            event.Type = UIEVENT_DBLCLICK;
            event.ptMouse = pt;
@@ -682,9 +667,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            event.dwTimestamp = ::GetTickCount();
            pControl->Event(event);
            m_pEventClick = pControl;
-           // We always capture the mouse
-           ::SetCapture(m_hWndPaint);
-           m_bMouseCapture = true;
        }
        break;
    case WM_CHAR:
@@ -793,6 +775,16 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
        }
        break;
     }
+    if( m_pFocus && m_pFocus->IsVisible() && m_pFocus->IsEnabled() && _tcsstr(m_pFocus->GetClass(), _T("RichEditUI")) != NULL ) {
+        if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST) 
+            || uMsg == WM_CHAR || uMsg == WM_IME_CHAR ) {
+                LRESULT lResult;
+                HRESULT hr = static_cast<CRichEditUI*>(m_pFocus)->TxSendMessage(uMsg, wParam, lParam, &lResult);
+                if (hr == S_FALSE) return false;
+                lRes = lResult;
+                return true;
+        }       
+    }
     return false;
 }
 
@@ -836,7 +828,7 @@ bool CPaintManagerUI::InitControls(CControlUI* pControl, CControlUI* pParent /*=
 {
     ASSERT(pControl);
     if( pControl == NULL ) return false;
-    pControl->SetManager(this, pParent != NULL ? pParent : pControl->GetParent());
+    pControl->SetManager(this, pParent != NULL ? pParent : pControl->GetParent(), true);
     pControl->FindControl(__FindControlFromNameHash, this, UIFIND_ALL);
     return true;
 }
@@ -971,6 +963,18 @@ bool CPaintManagerUI::KillTimer(CControlUI* pControl, UINT nTimerID)
         }
     }
     return false;
+}
+
+void CPaintManagerUI::SetCapture()
+{
+    ::SetCapture(m_hWndPaint);
+    m_bMouseCapture = true;
+}
+
+void CPaintManagerUI::ReleaseCapture()
+{
+    ::ReleaseCapture();
+    m_bMouseCapture = false;
 }
 
 bool CPaintManagerUI::SetNextTabControl(bool bForward)
@@ -1647,10 +1651,11 @@ CPaintManagerUI* CControlUI::GetManager() const
     return m_pManager;
 }
 
-void CControlUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent)
+void CControlUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit)
 {
     m_pManager = pManager;
     m_pParent = pParent;
+    if( bInit && m_pParent ) Init();
 }
 
 CControlUI* CControlUI::GetParent() const
@@ -2087,6 +2092,11 @@ void CControlUI::NeedParentUpdate()
     }
 
     if( m_pManager != NULL ) m_pManager->NeedUpdate();
+}
+
+void CControlUI::Init()
+{
+
 }
 
 void CControlUI::Event(TEventUI& event)
