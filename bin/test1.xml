@@ -11,7 +11,7 @@
 		<Control height="26"/>
 		<Button name="changefontbtn" height="20" text="更改字体" />
 		<Button name="insertimagebtn" height="20" text="插入图片" />
-		<RichEdit name="testrichedit1" bordercolor="#FF0000" bordersize="2" inset="4,2,4,2" bkcolor="#FFF2F5FA" bkcolor2="#FF00F5DA" font="1" multiline="false" vscrollbar="true" rich="false"/>
+		<RichEdit name="testrichedit1" bordercolor="#FF0000" bordersize="2" inset="4,2,4,2" bkcolor="#FFF2F5FA" bkcolor2="#FF00F5DA" font="1" multiline="false" rich="false"/>
 		<Control />
 	</VerticalLayout>
 </Window>
