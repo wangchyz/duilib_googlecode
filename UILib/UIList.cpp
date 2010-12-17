@@ -2045,10 +2045,10 @@ void CListExpandElementUI::DoPaint(HDC hDC, const RECT& rcPaint)
     }
 }
 
-void CListExpandElementUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent)
+void CListExpandElementUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit)
 {
-    if( m_bExpanded && m_pSubControl != NULL ) m_pSubControl->SetManager(pManager, this);
-    CListTextElementUI::SetManager(pManager, pParent);
+    if( m_bExpanded && m_pSubControl != NULL ) m_pSubControl->SetManager(pManager, this, bInit);
+    CListTextElementUI::SetManager(pManager, pParent, bInit);
 }
 
 CControlUI* CListExpandElementUI::FindControl(FINDCONTROLPROC Proc, LPVOID pData, UINT uFlags)

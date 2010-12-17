@@ -97,7 +97,7 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         // the items back to the righfull owner/manager when the window closes.
         m_pLayout = new CVerticalLayoutUI;
         m_pm.UseParentResource(m_pOwner->GetManager());
-        m_pLayout->SetManager(&m_pm, NULL);
+        m_pLayout->SetManager(&m_pm, NULL, true);
         LPCTSTR pDefaultAttributes = m_pOwner->GetManager()->GetDefaultAttributeList(_T("VerticalLayout"));
         if( pDefaultAttributes ) {
             m_pLayout->ApplyAttributeList(pDefaultAttributes);
@@ -117,7 +117,7 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     else if( uMsg == WM_CLOSE ) {
-        m_pOwner->SetManager(m_pOwner->GetManager(), m_pOwner->GetParent());
+        m_pOwner->SetManager(m_pOwner->GetManager(), m_pOwner->GetParent(), true);
         m_pOwner->SetPos(m_pOwner->GetPos());
         m_pOwner->SetFocus();
     }

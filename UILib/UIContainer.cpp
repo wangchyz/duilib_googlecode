@@ -437,7 +437,7 @@ void CContainerUI::EnableScrollBar(bool bEnableVertical, bool bEnableHorizontal)
     if( bEnableVertical && !m_pVerticalScrollbar ) {
         m_pVerticalScrollbar = new CScrollbarUI;
         m_pVerticalScrollbar->SetOwner(this);
-        m_pVerticalScrollbar->SetManager(m_pManager, NULL);
+        m_pVerticalScrollbar->SetManager(m_pManager, NULL, false);
         if ( m_pManager ) {
             LPCTSTR pDefaultAttributes = m_pManager->GetDefaultAttributeList(_T("VScrollBar"));
             if( pDefaultAttributes ) {
@@ -454,7 +454,7 @@ void CContainerUI::EnableScrollBar(bool bEnableVertical, bool bEnableHorizontal)
         m_pHorizontalScrollbar = new CScrollbarUI;
         m_pHorizontalScrollbar->SetHorizontal(true);
         m_pHorizontalScrollbar->SetOwner(this);
-        m_pHorizontalScrollbar->SetManager(m_pManager, NULL);
+        m_pHorizontalScrollbar->SetManager(m_pManager, NULL, false);
         if ( m_pManager ) {
             LPCTSTR pDefaultAttributes = m_pManager->GetDefaultAttributeList(_T("HScrollBar"));
             if( pDefaultAttributes ) {
@@ -547,15 +547,15 @@ void CContainerUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else CControlUI::SetAttribute(pstrName, pstrValue);
 }
 
-void CContainerUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent)
+void CContainerUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit)
 {
     for( int it = 0; it < m_items.GetSize(); it++ ) {
-        static_cast<CControlUI*>(m_items[it])->SetManager(pManager, this);
+        static_cast<CControlUI*>(m_items[it])->SetManager(pManager, this, bInit);
     }
     
-    if( m_pVerticalScrollbar != NULL ) m_pVerticalScrollbar->SetManager(pManager, this);
-    if( m_pHorizontalScrollbar != NULL ) m_pHorizontalScrollbar->SetManager(pManager, this);
-    CControlUI::SetManager(pManager, pParent);
+    if( m_pVerticalScrollbar != NULL ) m_pVerticalScrollbar->SetManager(pManager, this, bInit);
+    if( m_pHorizontalScrollbar != NULL ) m_pHorizontalScrollbar->SetManager(pManager, this, bInit);
+    CControlUI::SetManager(pManager, pParent, bInit);
 }
 
 CControlUI* CContainerUI::FindControl(FINDCONTROLPROC Proc, LPVOID pData, UINT uFlags)

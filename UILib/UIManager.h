@@ -61,10 +61,6 @@ typedef enum EVENTTYPE_UI
 #define UIFIND_TOP_FIRST     0x00000008
 #define UIFIND_ME_FIRST      0x80000000
 
-// Flags for Draw Style
-#define UIDRAWSTYLE_INPLACE  0x00000001
-#define UIDRAWSTYLE_FOCUS    0x00000002
-
 // Flags for the CDialogLayout stretching
 #define UISTRETCH_NEWGROUP   0x00000001
 #define UISTRETCH_NEWLINE    0x00000002
@@ -228,6 +224,9 @@ public:
     bool SetTimer(CControlUI* pControl, UINT nTimerID, UINT uElapse);
     bool KillTimer(CControlUI* pControl, UINT nTimerID);
 
+    void SetCapture();
+    void ReleaseCapture();
+
     bool AddNotifier(INotifyUI* pControl);
     bool RemoveNotifier(INotifyUI* pControl);   
     void SendNotify(TNotifyUI& Msg);
@@ -338,7 +337,7 @@ public:
 
     virtual bool Activate();
     virtual CPaintManagerUI* GetManager() const;
-    virtual void SetManager(CPaintManagerUI* pManager, CControlUI* pParent);
+    virtual void SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit = true);
     virtual CControlUI* GetParent() const;
 
     // 文本相关
@@ -416,6 +415,7 @@ public:
     void NeedUpdate();
     void NeedParentUpdate();
 
+    virtual void Init();
     virtual void Event(TEventUI& event);
 
     virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);

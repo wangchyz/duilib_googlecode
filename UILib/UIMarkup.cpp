@@ -188,7 +188,7 @@ CMarkup::CMarkup(LPCTSTR pstrXML)
     m_pstrXML = NULL;
     m_pElements = NULL;
     m_nElements = 0;
-    m_bPreserveWhitespace = false;
+    m_bPreserveWhitespace = true;
     if( pstrXML != NULL ) Load(pstrXML);
 }
 

@@ -8,6 +8,8 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
+#include <stddef.h>
+#include <richedit.h>
 #include <tchar.h>
 #include <assert.h>
 #include <crtdbg.h>
@@ -21,6 +23,7 @@
 #include "UICombo.h"
 #include "UIComonControls.h"
 #include "UIActiveX.h"
+#include "UIRichEdit.h"
 
 #include "UIMarkup.h"
 #include "UIDlgBuilder.h"

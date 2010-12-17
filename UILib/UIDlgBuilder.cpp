@@ -221,6 +221,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
             break;
         case 8:
             if( _tcscmp(pstrClass, _T("Progress")) == 0 )               pControl = new CProgressUI;
+            else if(  _tcscmp(pstrClass, _T("RichEdit")) == 0 )         pControl = new CRichEditUI;
         case 9:
             if( _tcscmp(pstrClass, _T("Container")) == 0 )              pControl = new CContainerUI;
             else if( _tcscmp(pstrClass, _T("TabLayout")) == 0 )         pControl = new CTabLayoutUI;
@@ -274,7 +275,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
         }
         // Init default attributes
         if( pManager ) {
-            pControl->SetManager(pManager, NULL);
+            pControl->SetManager(pManager, NULL, false);
             LPCTSTR pDefaultAttributes = pManager->GetDefaultAttributeList(pstrClass);
             if( pDefaultAttributes ) {
                 pControl->ApplyAttributeList(pDefaultAttributes);
@@ -311,7 +312,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
             }
         }
         if( pManager ) {
-            pControl->SetManager(NULL, NULL);
+            pControl->SetManager(NULL, NULL, false);
         }
         // Return first item
         if( pReturn == NULL ) pReturn = pControl;
