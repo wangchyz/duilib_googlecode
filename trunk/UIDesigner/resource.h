@@ -42,6 +42,8 @@
 #define IDS_CLASS_VIEW                  156
 #define IDS_RESOURCE_VIEW               157
 #define IDS_PROPERTIES_WND              158
+#define IDS_TOOLBOX_WND                 159
+#define ID_VIEW_TOOLBOX                 160
 #define IDI_FILE_VIEW                   161
 #define IDI_FILE_VIEW_HC                162
 #define IDI_CLASS_VIEW                  163
@@ -77,20 +79,18 @@
 #define ID_VIEW_APPLOOK_OFF_2007_AQUA   218
 #define IDS_EXPLORER                    305
 #define IDS_EDIT_MENU                   306
-#define IDB_BITMAP1                     310
 #define IDB_RESOURCE_VIEW               310
 #define IDR_POPUP_RESOURCE              311
-#define IDB_BITMAP2                     311
 #define IDB_RESOURCE_VIEW24             311
 #define IDI_RES_VIEW                    313
-#define IDI_ICON2                       314
 #define IDI_RES_VIEW_HC                 314
+#define IDI_TOOLBOX_WND_HC              316
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        315
+#define _APS_NEXT_RESOURCE_VALUE        317
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310

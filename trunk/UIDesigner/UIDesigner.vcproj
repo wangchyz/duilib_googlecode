@@ -230,6 +230,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ToolBoxCtrl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ToolBoxWnd.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UIDesigner.cpp"
 				>
 			</File>
@@ -285,6 +293,14 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ToolBoxCtrl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ToolBoxWnd.h"
 				>
 			</File>
 			<File
@@ -350,6 +366,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\icon1.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\menuimages.bmp"
 				>
 			</File>
@@ -403,6 +423,10 @@
 			</File>
 			<File
 				RelativePath=".\res\Toolbar256.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\toolbox_wnd_hc.ico"
 				>
 			</File>
 			<File
