@@ -7,6 +7,7 @@
 #include "ClassView.h"
 #include "PropertiesWnd.h"
 #include "ResourceView.h"
+#include "ToolBoxWnd.h"
 
 class CMainFrame : public CMDIFrameWndEx
 {
@@ -42,6 +43,7 @@ protected:  // 控件条嵌入成员
 	CClassView        m_wndClassView;
 	CResourceViewBar m_wndResourceView;
 	CPropertiesWnd    m_wndProperties;
+	CToolBoxWnd       m_wndToolBox;
 
 // 生成的消息映射函数
 protected:

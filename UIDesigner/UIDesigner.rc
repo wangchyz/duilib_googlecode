@@ -83,6 +83,7 @@ IDI_PROPERTIES_WND      ICON                    "res\\properties_wnd.ico"
 IDI_PROPERTIES_WND_HC   ICON                    "res\\properties_wnd_hc.ico"
 IDI_RES_VIEW            ICON                    "res\\res_view.ico"
 IDI_RES_VIEW_HC         ICON                    "res\\res_view_hc.ico"
+IDI_TOOLBOX_WND_HC      ICON                    "res\\toolbox_wnd_hc.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -582,6 +583,7 @@ BEGIN
     IDS_CLASS_VIEW          "类视图"
     IDS_RESOURCE_VIEW       "资源视图"
     IDS_PROPERTIES_WND      "属性"
+    IDS_TOOLBOX_WND         "工具箱"
 END
 
 STRINGTABLE 
