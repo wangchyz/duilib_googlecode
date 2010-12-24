@@ -871,8 +871,8 @@ void CTxtWinHost::SetClientRect(RECT *prc)
     sizelExtent.cx = DXtoHimetricX(rcClient.right - rcClient.left, xPerInch);
     sizelExtent.cy = DYtoHimetricY(rcClient.bottom - rcClient.top, yPerInch);
 
-    pserv->OnTxPropertyBitsChange(TXTBIT_CLIENTRECTCHANGE, 
-        TXTBIT_CLIENTRECTCHANGE);
+    pserv->OnTxPropertyBitsChange(TXTBIT_CLIENTRECTCHANGE | TXTBIT_VIEWINSETCHANGE, 
+        TXTBIT_CLIENTRECTCHANGE | TXTBIT_VIEWINSETCHANGE);
     resized = TRUE;
 }
 
