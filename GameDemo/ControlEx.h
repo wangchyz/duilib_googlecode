@@ -156,7 +156,7 @@ public:
         //else pListElement->SetFixedHeight(24);
         pListElement->SetTag((UINT_PTR)node);
         if( node->data()._level == 0 ) {
-            pListElement->SetBkImage(_T("file='tree_top.png' fade='100'"));
+            pListElement->SetBkImage(_T("file='tree_top.png' corner='2,1,2,1' fade='100'"));
         }
 
         int index = 0;

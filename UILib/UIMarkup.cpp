@@ -223,18 +223,18 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
 #ifdef _UNICODE
     if (encoding == XMLFILE_ENCODING_UTF8)
     {
-        DWORD nWide = MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
+        DWORD nWide = ::MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
 
         m_pstrXML = static_cast<LPTSTR>(malloc((nWide + 1)*sizeof(TCHAR)));
-        MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, m_pstrXML, nWide );
+        ::MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, m_pstrXML, nWide );
         m_pstrXML[nWide] = _T('\0');
     }
     else if (encoding == XMLFILE_ENCODING_ASNI)
     {
-        DWORD nWide = MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
+        DWORD nWide = ::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
 
         m_pstrXML = static_cast<LPTSTR>(malloc((nWide + 1)*sizeof(TCHAR)));
-        MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pByte, dwSize, m_pstrXML, nWide );
+        ::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pByte, dwSize, m_pstrXML, nWide );
         m_pstrXML[nWide] = _T('\0');
     }
     else
@@ -260,7 +260,7 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
             }
 
             m_pstrXML = static_cast<LPTSTR>(malloc((dwSize + 1)*sizeof(TCHAR)));
-            CopyMemory( m_pstrXML, pByte, dwSize * sizeof(TCHAR) );
+            ::CopyMemory( m_pstrXML, pByte, dwSize * sizeof(TCHAR) );
             m_pstrXML[dwSize] = _T('\0');
 
             pByte -= 2;
@@ -269,16 +269,16 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
 #else // !_UNICODE
     if (encoding == XMLFILE_ENCODING_UTF8)
     {
-        DWORD nWide = MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
+        DWORD nWide = ::MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
 
         LPWSTR w_str = static_cast<LPWSTR>(malloc((nWide + 1)*sizeof(WCHAR)));
-        MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, w_str, nWide );
+        ::MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, w_str, nWide );
         w_str[nWide] = L'\0';
 
-        DWORD wide = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)w_str, nWide, NULL, 0, NULL, NULL);
+        DWORD wide = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)w_str, nWide, NULL, 0, NULL, NULL);
 
         m_pstrXML = static_cast<LPTSTR>(malloc((wide + 1)*sizeof(TCHAR)));
-        WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)w_str, nWide, m_pstrXML, wide, NULL, NULL);
+        ::WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)w_str, nWide, m_pstrXML, wide, NULL, NULL);
         m_pstrXML[wide] = _T('\0');
 
         free(w_str);
@@ -305,9 +305,9 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
                 pByte += 2;
             }
 
-            DWORD nWide = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)pByte, dwSize, NULL, 0, NULL, NULL);
+            DWORD nWide = ::WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)pByte, dwSize, NULL, 0, NULL, NULL);
             m_pstrXML = static_cast<LPTSTR>(malloc((nWide + 1)*sizeof(TCHAR)));
-            WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)pByte, dwSize, m_pstrXML, nWide, NULL, NULL);
+            ::WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)pByte, dwSize, m_pstrXML, nWide, NULL, NULL);
             m_pstrXML[nWide] = _T('\0');
 
             pByte -= 2;
@@ -316,7 +316,7 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
     else
     {
         m_pstrXML = static_cast<LPTSTR>(malloc((dwSize + 1)*sizeof(TCHAR)));
-        CopyMemory( m_pstrXML, pByte, dwSize * sizeof(TCHAR) );
+        ::CopyMemory( m_pstrXML, pByte, dwSize * sizeof(TCHAR) );
         m_pstrXML[dwSize] = _T('\0');
     }
 #endif // _UNICODE
@@ -393,9 +393,11 @@ bool CMarkup::_Parse(LPTSTR& pstrText, ULONG iParent)
     for( ; ; ) 
     {
         if( *pstrText == _T('\0') && iParent <= 1 ) return true;
+        _SkipWhitespace(pstrText);
         if( *pstrText != _T('<') ) return _Failed(_T("Expected start tag"), pstrText);
         if( pstrText[1] == _T('/') ) return true;
         *pstrText++ = _T('\0');
+        _SkipWhitespace(pstrText);
         // Skip comment or processing directive
         if( *pstrText == _T('!') || *pstrText == _T('?') ) {
             TCHAR ch = *pstrText;
@@ -448,10 +450,12 @@ bool CMarkup::_Parse(LPTSTR& pstrText, ULONG iParent)
                 *pstrDest = _T('\0');
                 *pstrText = _T('\0');
                 pstrText += 2;
+                _SkipWhitespace(pstrText);
                 SIZE_T cchName = pstrNameEnd - pstrName;
                 if( _tcsncmp(pstrText, pstrName, cchName) != 0 ) return _Failed(_T("Unmatched closing tag"), pstrText);
-                if( pstrText[cchName] != _T('>') ) return _Failed(_T("Unmatched closing tag"), pstrText);
-                pstrText += cchName + 1;
+                pstrText += cchName;
+                _SkipWhitespace(pstrText);
+                if( *pstrText++ != _T('>') ) return _Failed(_T("Unmatched closing tag"), pstrText);
             }
         }
         *pstrNameEnd = _T('\0');
@@ -498,9 +502,11 @@ bool CMarkup::_ParseAttributes(LPTSTR& pstrText)
     _SkipWhitespace(pstrText);
     while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('/') ) {
         _SkipIdentifier(pstrText);
+        LPTSTR pstrIdentifierEnd = pstrText;
         _SkipWhitespace(pstrText);
         if( *pstrText != _T('=') ) return _Failed(_T("Error while parsing attributes"), pstrText);
-        *pstrText++ = _T('\0');
+        *pstrText++ = _T(' ');
+        *pstrIdentifierEnd = _T('\0');
         _SkipWhitespace(pstrText);
         if( *pstrText++ != _T('\"') ) return _Failed(_T("Expected attribute value"), pstrText);
         LPTSTR pstrDest = pstrText;
