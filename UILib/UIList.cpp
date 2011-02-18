@@ -110,11 +110,9 @@ bool CListUI::Add(CControlUI* pControl)
     if( pControl->GetInterface(_T("ListHeader")) != NULL ) {
         if( m_pHeader != pControl && m_pHeader->GetCount() == 0 ) {
             CVerticalLayoutUI::Remove(m_pHeader);
-            delete m_pHeader;
             m_pHeader = static_cast<CListHeaderUI*>(pControl);
         }
-
-        return CVerticalLayoutUI::Add(pControl);
+        return CVerticalLayoutUI::AddAt(pControl, 0);
     }
     // We also need to recognize header sub-items
     if( _tcsstr(pControl->GetClass(), _T("ListHeaderItemUI")) != NULL ) return m_pHeader->Add(pControl);
