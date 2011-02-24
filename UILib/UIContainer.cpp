@@ -986,6 +986,9 @@ void CHorizontalLayoutUI::SetPos(RECT rc)
         iPosX += sz.cx + m_iChildPadding + rcPadding.left + rcPadding.right;
         szRemaining.cx -= sz.cx + m_iChildPadding + rcPadding.right;
     }
+
+    // Process the scrollbar
+    ProcessScrollbar(rc, 0, 0);
 }
 
 void CHorizontalLayoutUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
