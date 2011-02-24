@@ -252,9 +252,10 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
     return data;
 }
 
+
 void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RECT& rcPaint,
                                     const RECT& rcBmpPart, const RECT& rcCorners, bool alphaChannel, 
-                                    BYTE uFade, bool hole)
+                                    BYTE uFade, bool hole, bool xtiled, bool ytiled)
 {
     ASSERT(::GetObjectType(hDC)==OBJ_DC || ::GetObjectType(hDC)==OBJ_MEMDC);
 
@@ -281,31 +282,73 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
             rcDest.right += rcDest.left;
             rcDest.bottom += rcDest.top;
             if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
-                rcDest.right -= rcDest.left;
-                rcDest.bottom -= rcDest.top;
-                lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
-                    rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
-                    rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right, \
-                    rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, bf);
-
-                //if( rcTemp.left == rcDest.left && rcTemp.right == rcDest.right && \
-                //    rcTemp.top == rcDest.top && rcTemp.bottom == rcDest.bottom) {
-                //    lpAlphaBlend(hDC, rcTemp.left, rcTemp.top, rcTemp.right - rcTemp.left, \
-                //        rcTemp.bottom - rcTemp.top, hCloneDC, rcBmpPart.left + rcCorners.left, \
-                //        rcBmpPart.top + rcCorners.top, rcBmpPart.right - rcBmpPart.left - rcCorners.left - \
-                //        rcCorners.right, rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, bf);
-                //}
-                //else {
-                //    float fScaleX = ((float)rcBmpPart.right - rcBmpPart.left - rcCorners.left - \
-                //        rcCorners.right) / (rc.right - rc.left - rcCorners.left - rcCorners.right); 
-                //    float fScaleY = ((float)rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - \
-                //        rcCorners.bottom) / (rc.bottom - rc.top - rcCorners.top - rcCorners.bottom); 
-                //    lpAlphaBlend(hDC, rcTemp.left, rcTemp.top, rcTemp.right - rcTemp.left, \
-                //        rcTemp.bottom - rcTemp.top, hCloneDC, rcBmpPart.left + rcCorners.left + \
-                //        (rcTemp.left - rc.left - rcCorners.left) * fScaleX + 0.5, rcBmpPart.top + rcCorners.top + \
-                //        (rcTemp.top - rc.top - rcCorners.top) * fScaleY + 0.5, (rcTemp.right - rcTemp.left) * fScaleX - 0.5, \
-                //        (rcTemp.bottom - rcTemp.top) * fScaleY - 0.5, bf);
-                //}
+                if( !xtiled && !ytiled ) {
+                    rcDest.right -= rcDest.left;
+                    rcDest.bottom -= rcDest.top;
+                    lpAlphaBlend(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
+                        rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
+                        rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right, \
+                        rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, bf);
+                }
+                else if( xtiled && ytiled ) {
+                    LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right;
+                    LONG lHeight = rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom;
+                    int iTimesX = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
+                    int iTimesY = (rcDest.bottom - rcDest.top + lHeight - 1) / lHeight;
+                    for( int j = 0; j < iTimesY; ++j ) {
+                        LONG lDestTop = rcDest.top + lHeight * j;
+                        LONG lDestBottom = rcDest.top + lHeight * (j + 1);
+                        LONG lDrawHeight = lHeight;
+                        if( lDestBottom > rcDest.bottom ) {
+                            lDrawHeight -= lDestBottom - rcDest.bottom;
+                            lDestBottom = rcDest.bottom;
+                        }
+                        for( int i = 0; i < iTimesX; ++i ) {
+                            LONG lDestLeft = rcDest.left + lWidth * i;
+                            LONG lDestRight = rcDest.left + lWidth * (i + 1);
+                            LONG lDrawWidth = lWidth;
+                            if( lDestRight > rcDest.right ) {
+                                lDrawWidth -= lDestRight - rcDest.right;
+                                lDestRight = rcDest.right;
+                            }
+                            lpAlphaBlend(hDC, rcDest.left + lWidth * i, rcDest.top + lHeight * j, 
+                                lDestRight - lDestLeft, lDestBottom - lDestTop, hCloneDC, 
+                                rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, lDrawWidth, lDrawHeight, bf);
+                        }
+                    }
+                }
+                else if( xtiled ) {
+                    LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right;
+                    int iTimes = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
+                    for( int i = 0; i < iTimes; ++i ) {
+                        LONG lDestLeft = rcDest.left + lWidth * i;
+                        LONG lDestRight = rcDest.left + lWidth * (i + 1);
+                        LONG lDrawWidth = lWidth;
+                        if( lDestRight > rcDest.right ) {
+                            lDrawWidth -= lDestRight - rcDest.right;
+                            lDestRight = rcDest.right;
+                        }
+                        lpAlphaBlend(hDC, lDestLeft, rcDest.top, lDestRight - lDestLeft, rcDest.bottom, 
+                            hCloneDC, rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
+                            lDrawWidth, rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, bf);
+                    }
+                }
+                else { // ytiled
+                    LONG lHeight = rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom;
+                    int iTimes = (rcDest.bottom - rcDest.top + lHeight - 1) / lHeight;
+                    for( int i = 0; i < iTimes; ++i ) {
+                        LONG lDestTop = rcDest.top + lHeight * i;
+                        LONG lDestBottom = rcDest.top + lHeight * (i + 1);
+                        LONG lDrawHeight = lHeight;
+                        if( lDestBottom > rcDest.bottom ) {
+                            lDrawHeight -= lDestBottom - rcDest.bottom;
+                            lDestBottom = rcDest.bottom;
+                        }
+                        lpAlphaBlend(hDC, rcDest.left, rcDest.top + lHeight * i, rcDest.right, lDestBottom - lDestTop, 
+                            hCloneDC, rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
+                            rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right, lDrawHeight, bf);                    
+                    }
+                }
             }
         }
 
@@ -457,32 +500,73 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
                 rcDest.right += rcDest.left;
                 rcDest.bottom += rcDest.top;
                 if( ::IntersectRect(&rcTemp, &rcPaint, &rcDest) ) {
-                    rcDest.right -= rcDest.left;
-                    rcDest.bottom -= rcDest.top;
-                    ::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
-                        rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
-                        rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right, \
-                        rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, SRCCOPY);
-
-                    //if( rcTemp.left == rcDest.left && rcTemp.right == rcDest.right && \
-                    //    rcTemp.top == rcDest.top && rcTemp.bottom == rcDest.bottom) {
-                    //        ::StretchBlt(hDC, rcTemp.left, rcTemp.top, rcTemp.right - rcTemp.left, \
-                    //            rcTemp.bottom - rcTemp.top, hCloneDC, rcBmpPart.left + rcCorners.left, \
-                    //            rcBmpPart.top + rcCorners.top, rcBmpPart.right - rcBmpPart.left - rcCorners.left - \
-                    //            rcCorners.right, rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, SRCCOPY);
-                    //}
-                    //else {
-                    //    float fScaleX = ((float)rcBmpPart.right - rcBmpPart.left - rcCorners.left - \
-                    //        rcCorners.right) / (rc.right - rc.left -rcCorners.left - rcCorners.right); 
-                    //    float fScaleY = ((float)rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - \
-                    //        rcCorners.bottom) / (rc.bottom - rc.top - rcCorners.top - rcCorners.bottom); 
-                    //    ::StretchBlt(hDC, rcTemp.left, rcTemp.top, rcTemp.right - rcTemp.left, \
-                    //        rcTemp.bottom - rcTemp.top, hCloneDC, rcBmpPart.left + rcCorners.left + \
-                    //        (rcTemp.left - rc.left) * fScaleX - 0.5 / fScaleX, rcBmpPart.top + rcCorners.top + \
-                    //        (rcTemp.top - rc.top) * fScaleY - 0.5 / fScaleY, (rcTemp.right - rcTemp.left - rcCorners.left - \
-                    //        rcCorners.right) * fScaleX + 1 / fScaleX, (rcTemp.bottom - rcTemp.top - rcCorners.top - \
-                    //        rcCorners.bottom) * fScaleY + 1 / fScaleY, SRCCOPY);
-                    //}
+                    if( !xtiled && !ytiled ) {
+                        rcDest.right -= rcDest.left;
+                        rcDest.bottom -= rcDest.top;
+                        ::StretchBlt(hDC, rcDest.left, rcDest.top, rcDest.right, rcDest.bottom, hCloneDC, \
+                            rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
+                            rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right, \
+                            rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, SRCCOPY);
+                    }
+                    else if( xtiled && ytiled ) {
+                        LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right;
+                        LONG lHeight = rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom;
+                        int iTimesX = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
+                        int iTimesY = (rcDest.bottom - rcDest.top + lHeight - 1) / lHeight;
+                        for( int j = 0; j < iTimesY; ++j ) {
+                            LONG lDestTop = rcDest.top + lHeight * j;
+                            LONG lDestBottom = rcDest.top + lHeight * (j + 1);
+                            LONG lDrawHeight = lHeight;
+                            if( lDestBottom > rcDest.bottom ) {
+                                lDrawHeight -= lDestBottom - rcDest.bottom;
+                                lDestBottom = rcDest.bottom;
+                            }
+                            for( int i = 0; i < iTimesX; ++i ) {
+                                LONG lDestLeft = rcDest.left + lWidth * i;
+                                LONG lDestRight = rcDest.left + lWidth * (i + 1);
+                                LONG lDrawWidth = lWidth;
+                                if( lDestRight > rcDest.right ) {
+                                    lDrawWidth -= lDestRight - rcDest.right;
+                                    lDestRight = rcDest.right;
+                                }
+                                ::BitBlt(hDC, rcDest.left + lWidth * i, rcDest.top + lHeight * j, \
+                                    lDestRight - lDestLeft, lDestBottom - lDestTop, hCloneDC, \
+                                    rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, SRCCOPY);
+                            }
+                        }
+                    }
+                    else if( xtiled ) {
+                        LONG lWidth = rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right;
+                        int iTimes = (rcDest.right - rcDest.left + lWidth - 1) / lWidth;
+                        for( int i = 0; i < iTimes; ++i ) {
+                            LONG lDestLeft = rcDest.left + lWidth * i;
+                            LONG lDestRight = rcDest.left + lWidth * (i + 1);
+                            LONG lDrawWidth = lWidth;
+                            if( lDestRight > rcDest.right ) {
+                                lDrawWidth -= lDestRight - rcDest.right;
+                                lDestRight = rcDest.right;
+                            }
+                            ::StretchBlt(hDC, lDestLeft, rcDest.top, lDestRight - lDestLeft, rcDest.bottom, 
+                                hCloneDC, rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
+                                lDrawWidth, rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom, SRCCOPY);
+                        }
+                    }
+                    else { // ytiled
+                        LONG lHeight = rcBmpPart.bottom - rcBmpPart.top - rcCorners.top - rcCorners.bottom;
+                        int iTimes = (rcDest.bottom - rcDest.top + lHeight - 1) / lHeight;
+                        for( int i = 0; i < iTimes; ++i ) {
+                            LONG lDestTop = rcDest.top + lHeight * i;
+                            LONG lDestBottom = rcDest.top + lHeight * (i + 1);
+                            LONG lDrawHeight = lHeight;
+                            if( lDestBottom > rcDest.bottom ) {
+                                lDrawHeight -= lDestBottom - rcDest.bottom;
+                                lDestBottom = rcDest.bottom;
+                            }
+                            ::StretchBlt(hDC, rcDest.left, rcDest.top + lHeight * i, rcDest.right, lDestBottom - lDestTop, 
+                                hCloneDC, rcBmpPart.left + rcCorners.left, rcBmpPart.top + rcCorners.top, \
+                                rcBmpPart.right - rcBmpPart.left - rcCorners.left - rcCorners.right, lDrawHeight, SRCCOPY);                    
+                        }
+                    }
                 }
             }
             
@@ -623,8 +707,7 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
 {
     // 1、aaa.jpg
     // 2、file='aaa.jpg' res='' restype='0' dest='0,0,0,0' source='0,0,0,0' corner='0,0,0,0' 
-    // mask='#FF0000' fade='255' hole='false'
-    // 字符格式必须紧凑，不能有多余空格或tab，图片本身是否带有alpha通道看图片类型
+    // mask='#FF0000' fade='255' hole='false' xtiled='false' ytiled='false'
 
     CStdString sImageName = pStrImage;
     CStdString sImageResType;
@@ -634,6 +717,8 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
     DWORD dwMask = 0;
     BYTE bFade = 0xFF;
     bool bHole = false;
+    bool bTiledX = false;
+    bool bTiledY = false;
 
     CStdString sItem;
     CStdString sValue;
@@ -648,13 +733,16 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
         while( *pStrImage != _T('\0') ) {
             sItem.Empty();
             sValue.Empty();
-            while( *pStrImage != _T('\0') && *pStrImage != _T('=') ) {
+            while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
+            while( *pStrImage != _T('\0') && *pStrImage != _T('=') && *pStrImage > _T(' ') ) {
                 LPTSTR pstrTemp = ::CharNext(pStrImage);
                 while( pStrImage < pstrTemp) {
                     sItem += *pStrImage++;
                 }
             }
+            while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
             if( *pStrImage++ != _T('=') ) break;
+            while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
             if( *pStrImage++ != _T('\'') ) break;
             while( *pStrImage != _T('\0') && *pStrImage != _T('\'') ) {
                 LPTSTR pstrTemp = ::CharNext(pStrImage);
@@ -698,13 +786,19 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
                 else if( sItem == _T("hole") ) {
                     bHole = (_tcscmp(sValue.GetData(), _T("true")) == 0);
                 }
+                else if( sItem == _T("xtiled") ) {
+                    bTiledX = (_tcscmp(sValue.GetData(), _T("true")) == 0);
+                }
+                else if( sItem == _T("ytiled") ) {
+                    bTiledY = (_tcscmp(sValue.GetData(), _T("true")) == 0);
+                }
             }
             if( *pStrImage++ != _T(' ') ) break;
         }
     }
 
 
-    TImageInfo* data = NULL;
+    const TImageInfo* data = NULL;
     if( sImageResType.IsEmpty() ) {
         data = pManager->GetImageEx((LPCTSTR)sImageName, NULL, dwMask);
     }
@@ -723,7 +817,7 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
     RECT rcTemp;
     if( !::IntersectRect(&rcTemp, &rcItem, &rc) ) return true;
     if( !::IntersectRect(&rcTemp, &rcItem, &rcPaint) ) return true;
-    DrawImage(hDC, data->hBitmap, rcItem, rcPaint, rcBmpPart, rcCorner, data->alphaChannel, bFade, bHole);
+    DrawImage(hDC, data->hBitmap, rcItem, rcPaint, rcBmpPart, rcCorner, data->alphaChannel, bFade, bHole, bTiledX, bTiledY);
     return true;
 }
 
