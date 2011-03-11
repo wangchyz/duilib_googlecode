@@ -167,10 +167,14 @@ public:
     void SetMinMaxInfo(int cx, int cy);
     void SetShowUpdateRect(bool show);
 
-    static HINSTANCE GetResourceInstance();
-    static HINSTANCE GetLanguageInstance();
-    static void SetResourceInstance(HINSTANCE hInst);
-    static void SetLanguageInstance(HINSTANCE hInst);
+    static HINSTANCE GetInstance();
+    static HINSTANCE GetResourceDll();
+    static const CStdString& GetResourcePath();
+    static const CStdString& GetResourceZip();
+    static void SetInstance(HINSTANCE hInst);
+    static void SetResourceDll(HINSTANCE hInst);
+    static void SetResourcePath(LPCTSTR pStrPath);
+    static void SetResourceZip(LPCTSTR pStrZip);
 
     bool UseParentResource(CPaintManagerUI* pm);
     CPaintManagerUI* GetParentResource() const;
@@ -311,8 +315,10 @@ private:
     CStdStringPtrMap m_mImageHash;
     CStdStringPtrMap m_DefaultAttrHash;
     //
-    static HINSTANCE m_hLangInst;
     static HINSTANCE m_hInstance;
+    static HINSTANCE m_hResourceInstance;
+    static CStdString m_pStrResourcePath;
+    static CStdString m_pStrResourceZip;
     static CStdPtrArray m_aPreMessages;
 };
 

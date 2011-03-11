@@ -3,6 +3,52 @@
 #include "UIBase.h"
 #include "UIRender.h"
 
+///////////////////////////////////////////////////////////////////////////////////////
+DECLARE_HANDLE(HZIP);	// An HZIP identifies a zip file that has been opened
+typedef DWORD ZRESULT;
+typedef struct
+{ 
+    int index;                 // index of this file within the zip
+    char name[MAX_PATH];       // filename within the zip
+    DWORD attr;                // attributes, as in GetFileAttributes.
+    FILETIME atime,ctime,mtime;// access, create, modify filetimes
+    long comp_size;            // sizes of item, compressed and uncompressed. These
+    long unc_size;             // may be -1 if not yet known (e.g. being streamed in)
+} ZIPENTRY;
+typedef struct
+{ 
+    int index;                 // index of this file within the zip
+    TCHAR name[MAX_PATH];      // filename within the zip
+    DWORD attr;                // attributes, as in GetFileAttributes.
+    FILETIME atime,ctime,mtime;// access, create, modify filetimes
+    long comp_size;            // sizes of item, compressed and uncompressed. These
+    long unc_size;             // may be -1 if not yet known (e.g. being streamed in)
+} ZIPENTRYW;
+#define OpenZip OpenZipU
+#define CloseZip(hz) CloseZipU(hz)
+extern HZIP OpenZipU(void *z,unsigned int len,DWORD flags);
+extern ZRESULT CloseZipU(HZIP hz);
+#ifdef _UNICODE
+#define ZIPENTRY ZIPENTRYW
+#define GetZipItem GetZipItemW
+#define FindZipItem FindZipItemW
+#else
+#define GetZipItem GetZipItemA
+#define FindZipItem FindZipItemA
+#endif
+extern ZRESULT GetZipItemA(HZIP hz, int index, ZIPENTRY *ze);
+extern ZRESULT GetZipItemW(HZIP hz, int index, ZIPENTRYW *ze);
+extern ZRESULT FindZipItemA(HZIP hz, const TCHAR *name, bool ic, int *index, ZIPENTRY *ze);
+extern ZRESULT FindZipItemW(HZIP hz, const TCHAR *name, bool ic, int *index, ZIPENTRYW *ze);
+extern ZRESULT UnzipItem(HZIP hz, int index, void *dst, unsigned int len, DWORD flags);
+///////////////////////////////////////////////////////////////////////////////////////
+
+extern "C"
+{
+    extern unsigned char *stbi_load_from_memory(unsigned char const *buffer, int len, int *x, int *y, \
+        int *comp, int req_comp);
+};
+
 /////////////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -149,48 +195,59 @@ static BOOL WINAPI AlphaBitBlt(HDC hDC, int nDestX, int nDestY, int dwWidth, int
 //
 //
 
-extern "C"
-{
-    extern unsigned char *stbi_load_from_memory(unsigned char const *buffer, int len, int *x, int *y, \
-        int *comp, int req_comp);
-};
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-//
-
 TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD mask)
 {
     LPBYTE pData = NULL;
     DWORD dwSize = 0;
 
     if( HIWORD(bitmap.m_lpstr) != NULL ) {
-        HANDLE hFile = ::CreateFile(bitmap.m_lpstr, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
-            FILE_ATTRIBUTE_NORMAL, NULL);
-        if( hFile == INVALID_HANDLE_VALUE ) return NULL;
-        dwSize = ::GetFileSize(hFile, NULL);
-        if( dwSize == 0 ) return NULL;
+        CStdString sFile = CPaintManagerUI::GetResourcePath();
+        if( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
+            sFile += bitmap.m_lpstr;
+            HANDLE hFile = ::CreateFile(sFile.GetData(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
+                FILE_ATTRIBUTE_NORMAL, NULL);
+            if( hFile == INVALID_HANDLE_VALUE ) return NULL;
+            dwSize = ::GetFileSize(hFile, NULL);
+            if( dwSize == 0 ) return NULL;
 
-        DWORD dwRead = 0;
-        pData = new BYTE[ dwSize ];
-        ::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
-        ::CloseHandle( hFile );
+            DWORD dwRead = 0;
+            pData = new BYTE[ dwSize ];
+            ::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
+            ::CloseHandle( hFile );
 
-        if( dwRead != dwSize ) {
-            delete[] pData;
-            return NULL;
+            if( dwRead != dwSize ) {
+                delete[] pData;
+                return NULL;
+            }
+        }
+        else {
+            sFile += CPaintManagerUI::GetResourceZip();
+            HZIP hz = OpenZip((void*)sFile.GetData(), 0, 2);
+            ZIPENTRY ze; 
+            int i; 
+            if( FindZipItem(hz, bitmap.m_lpstr, false, &i, &ze) != 0 ) return NULL;
+            dwSize = ze.unc_size;
+            if( dwSize == 0 ) return NULL;
+            pData = new BYTE[ dwSize ];
+            int res = UnzipItem(hz, i, pData, dwSize, 3);
+            if( res != 0x00000000 && res != 0x00000600) {
+                delete[] pData;
+                CloseZip(hz);
+                return NULL;
+            }
+            CloseZip(hz);
         }
     }
     else {
-        HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceInstance(), bitmap.m_lpstr, type.m_lpstr);
+        HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), bitmap.m_lpstr, type.m_lpstr);
         if( hResource == NULL ) return NULL;
-        HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceInstance(), hResource);
+        HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceDll(), hResource);
         if( hGlobal == NULL ) {
             FreeResource(hResource);
             return NULL;
         }
 
-        dwSize = ::SizeofResource(CPaintManagerUI::GetResourceInstance(), hResource);
+        dwSize = ::SizeofResource(CPaintManagerUI::GetResourceDll(), hResource);
         if( dwSize == 0 ) return NULL;
         pData = new BYTE[ dwSize ];
         ::CopyMemory(pData, (LPBYTE)::LockResource(hGlobal), dwSize);
@@ -204,7 +261,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
     if( !pImage ) return NULL;
 
     BITMAPINFO bmi;
-    ZeroMemory(&bmi, sizeof(BITMAPINFO));
+    ::ZeroMemory(&bmi, sizeof(BITMAPINFO));
     bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = x;
     bmi.bmiHeader.biHeight = -y;
@@ -251,7 +308,6 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
     data->alphaChannel = bAlphaChannel;
     return data;
 }
-
 
 void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RECT& rcPaint,
                                     const RECT& rcBmpPart, const RECT& rcCorners, bool alphaChannel, 

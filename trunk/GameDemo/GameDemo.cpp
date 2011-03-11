@@ -5,6 +5,9 @@
 #include <exdisp.h>
 #include <comdef.h>
 
+#include "MiniDumper.h"
+CMiniDumper g_miniDumper( true );
+
 #include "ControlEx.h"
 
 class CLoginFrameWnd : public CWindowWnd, public INotifyUI
@@ -531,7 +534,9 @@ private:
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow)
 {
-    CPaintManagerUI::SetResourceInstance(hInstance);
+    CPaintManagerUI::SetInstance(hInstance);
+    CPaintManagerUI::SetResourcePath(_T("skin"));
+    CPaintManagerUI::SetResourceZip(_T("GameRes.zip"));
 
     HRESULT Hr = ::CoInitialize(NULL);
     if( FAILED(Hr) ) return 0;
