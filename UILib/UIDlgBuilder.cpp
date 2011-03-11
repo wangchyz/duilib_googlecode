@@ -16,16 +16,16 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
     }
     else {
 
-        HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceInstance(), xml.m_lpstr, type.m_lpstr);
+        HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), xml.m_lpstr, type.m_lpstr);
         if( hResource == NULL ) return NULL;
-        HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceInstance(), hResource);
+        HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceDll(), hResource);
         if( hGlobal == NULL ) {
             FreeResource(hResource);
             return NULL;
         }
 
         m_pCallback = pCallback;
-        if( !m_xml.LoadFromMem((BYTE*)::LockResource(hGlobal), ::SizeofResource(CPaintManagerUI::GetResourceInstance(), hResource) )) return NULL;
+        if( !m_xml.LoadFromMem((BYTE*)::LockResource(hGlobal), ::SizeofResource(CPaintManagerUI::GetResourceDll(), hResource) )) return NULL;
         ::FreeResource(hResource);
     }
 

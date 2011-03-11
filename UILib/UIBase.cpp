@@ -912,7 +912,7 @@ HWND CWindowWnd::Create(HWND hwndParent, LPCTSTR pstrName, DWORD dwStyle, DWORD 
 {
     if( GetSuperClassName() != NULL && !RegisterSuperclass() ) return NULL;
     if( GetSuperClassName() == NULL && !RegisterWindowClass() ) return NULL;
-    m_hWnd = ::CreateWindowEx(dwExStyle, GetWindowClassName(), pstrName, dwStyle, x, y, cx, cy, hwndParent, hMenu, CPaintManagerUI::GetResourceInstance(), this);
+    m_hWnd = ::CreateWindowEx(dwExStyle, GetWindowClassName(), pstrName, dwStyle, x, y, cx, cy, hwndParent, hMenu, CPaintManagerUI::GetInstance(), this);
     ASSERT(m_hWnd!=NULL);
     return m_hWnd;
 }
@@ -1003,10 +1003,10 @@ void CWindowWnd::CenterWindow()
 
 void CWindowWnd::SetIcon(UINT nRes)
 {
-    HICON hIcon = (HICON)::LoadImage(CPaintManagerUI::GetResourceInstance(), MAKEINTRESOURCE(nRes), IMAGE_ICON, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
+    HICON hIcon = (HICON)::LoadImage(CPaintManagerUI::GetInstance(), MAKEINTRESOURCE(nRes), IMAGE_ICON, ::GetSystemMetrics(SM_CXICON), ::GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
     ASSERT(hIcon);
     ::SendMessage(m_hWnd, WM_SETICON, (WPARAM) TRUE, (LPARAM) hIcon);
-    hIcon = (HICON)::LoadImage(CPaintManagerUI::GetResourceInstance(), MAKEINTRESOURCE(nRes), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+    hIcon = (HICON)::LoadImage(CPaintManagerUI::GetInstance(), MAKEINTRESOURCE(nRes), IMAGE_ICON, ::GetSystemMetrics(SM_CXSMICON), ::GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
     ASSERT(hIcon);
     ::SendMessage(m_hWnd, WM_SETICON, (WPARAM) FALSE, (LPARAM) hIcon);
 }
@@ -1019,7 +1019,7 @@ bool CWindowWnd::RegisterWindowClass()
     wc.cbWndExtra = 0;
     wc.hIcon = NULL;
     wc.lpfnWndProc = CWindowWnd::__WndProc;
-    wc.hInstance = CPaintManagerUI::GetResourceInstance();
+    wc.hInstance = CPaintManagerUI::GetInstance();
     wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = NULL;
     wc.lpszMenuName  = NULL;
@@ -1036,14 +1036,14 @@ bool CWindowWnd::RegisterSuperclass()
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEX);
     if( !::GetClassInfoEx(NULL, GetSuperClassName(), &wc) ) {
-        if( !::GetClassInfoEx(CPaintManagerUI::GetResourceInstance(), GetSuperClassName(), &wc) ) {
+        if( !::GetClassInfoEx(CPaintManagerUI::GetInstance(), GetSuperClassName(), &wc) ) {
             ASSERT(!"Unable to locate window class");
             return NULL;
         }
     }
     m_OldWndProc = wc.lpfnWndProc;
     wc.lpfnWndProc = CWindowWnd::__ControlProc;
-    wc.hInstance = CPaintManagerUI::GetResourceInstance();
+    wc.hInstance = CPaintManagerUI::GetInstance();
     wc.lpszClassName = GetWindowClassName();
     ATOM ret = ::RegisterClassEx(&wc);
     ASSERT(ret!=NULL || ::GetLastError()==ERROR_CLASS_ALREADY_EXISTS);

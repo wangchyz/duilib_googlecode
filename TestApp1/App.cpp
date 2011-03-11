@@ -48,7 +48,7 @@ public:
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow)
 {
-    CPaintManagerUI::SetResourceInstance(hInstance);
+    CPaintManagerUI::SetInstance(hInstance);
 
     HRESULT Hr = ::CoInitialize(NULL);
     if( FAILED(Hr) ) return 0;

@@ -46,7 +46,9 @@ typedef struct tagTIMERINFO
 
 HPEN m_hUpdateRectPen = NULL;
 HINSTANCE CPaintManagerUI::m_hInstance = NULL;
-HINSTANCE CPaintManagerUI::m_hLangInst = NULL;
+HINSTANCE CPaintManagerUI::m_hResourceInstance = NULL;
+CStdString CPaintManagerUI::m_pStrResourcePath;
+CStdString CPaintManagerUI::m_pStrResourceZip;
 CStdPtrArray CPaintManagerUI::m_aPreMessages;
 
 
@@ -150,25 +152,48 @@ void CPaintManagerUI::Init(HWND hWnd)
     m_aPreMessages.Add(this);
 }
 
-HINSTANCE CPaintManagerUI::GetResourceInstance()
+HINSTANCE CPaintManagerUI::GetInstance()
 {
     return m_hInstance;
 }
 
-HINSTANCE CPaintManagerUI::GetLanguageInstance()
+HINSTANCE CPaintManagerUI::GetResourceDll()
 {
-    return m_hLangInst;
+    if( m_hResourceInstance == NULL ) return m_hInstance;
+    return m_hResourceInstance;
 }
 
-void CPaintManagerUI::SetResourceInstance(HINSTANCE hInst)
+const CStdString& CPaintManagerUI::GetResourcePath()
+{
+    return m_pStrResourcePath;
+}
+
+const CStdString& CPaintManagerUI::GetResourceZip()
+{
+    return m_pStrResourceZip;
+}
+
+void CPaintManagerUI::SetInstance(HINSTANCE hInst)
 {
     m_hInstance = hInst;
-    if( m_hLangInst == NULL ) m_hLangInst = hInst;
 }
 
-void CPaintManagerUI::SetLanguageInstance(HINSTANCE hInst)
+void CPaintManagerUI::SetResourceDll(HINSTANCE hInst)
 {
-    m_hLangInst = hInst;
+    m_hResourceInstance = hInst;
+}
+
+void CPaintManagerUI::SetResourcePath(LPCTSTR pStrPath)
+{
+    m_pStrResourcePath = pStrPath;
+    if( m_pStrResourcePath.IsEmpty() ) return;
+    TCHAR cEnd = m_pStrResourcePath.GetAt(m_pStrResourcePath.GetLength() - 1);
+    if( cEnd != _T('\\') && cEnd != _T('/') ) m_pStrResourcePath += _T('\\');
+}
+
+void CPaintManagerUI::SetResourceZip(LPCTSTR pStrPath)
+{
+    m_pStrResourceZip = pStrPath;
 }
 
 HWND CPaintManagerUI::GetPaintWindow() const
