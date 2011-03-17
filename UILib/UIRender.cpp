@@ -300,6 +300,8 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
             bAlphaChannel = true;
         }
     }
+	free(pImage);
+	pImage = NULL;
 
     TImageInfo* data = new TImageInfo;
     data->hBitmap = hBitmap;

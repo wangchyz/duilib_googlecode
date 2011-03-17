@@ -1522,9 +1522,9 @@ bool CPaintManagerUI::RemoveDefaultAttributeList(LPCTSTR pStrControlName)
 void CPaintManagerUI::RemoveAllDefaultAttributeList()
 {
     CStdString* pDefaultAttr;
-    for( int i = 0; i< m_mImageHash.GetSize(); i++ ) {
-        if(LPCTSTR key = m_mImageHash.GetAt(i)) {
-            pDefaultAttr = static_cast<CStdString*>(m_mImageHash.Find(key));
+    for( int i = 0; i< m_DefaultAttrHash.GetSize(); i++ ) {
+        if(LPCTSTR key = m_DefaultAttrHash.GetAt(i)) {
+            pDefaultAttr = static_cast<CStdString*>(m_DefaultAttrHash.Find(key));
             delete pDefaultAttr;
         }
     }
