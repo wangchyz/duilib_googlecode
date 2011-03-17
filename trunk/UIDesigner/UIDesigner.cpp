@@ -1,4 +1,3 @@
-
 // UIDesigner.cpp : 定义应用程序的类行为。
 //
 
@@ -74,8 +73,9 @@ BOOL CUIDesignerApp::InitInstance()
 	// 更改用于存储设置的注册表项
 	// TODO: 应适当修改该字符串，
 	// 例如修改为公司或组织名
-	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
-	LoadStdProfileSettings(4);  // 加载标准 INI 文件选项(包括 MRU)
+	SetRegistryKey(_T(""));
+	LoadStdProfileSettings();  // 加载标准 INI 文件选项(包括 MRU)
+	SetRegistryBase(_T("Settings"));
 
 	InitContextMenuManager();
 
@@ -89,14 +89,15 @@ BOOL CUIDesignerApp::InitInstance()
 
 	// 注册应用程序的文档模板。文档模板
 	// 将用作文档、框架窗口和视图之间的连接
-	CMultiDocTemplate* pDocTemplate;
-	pDocTemplate = new CMultiDocTemplate(IDR_UIDesignerTYPE,
+
+	CMultiDocTemplate* pUIDocTemplate = NULL;
+	pUIDocTemplate = new CMultiDocTemplate(IDR_UIDesignerTYPE,
 		RUNTIME_CLASS(CUIDesignerDoc),
 		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
 		RUNTIME_CLASS(CUIDesignerView));
-	if (!pDocTemplate)
+	if (!pUIDocTemplate)
 		return FALSE;
-	AddDocTemplate(pDocTemplate);
+	AddDocTemplate(pUIDocTemplate);
 
 	// 创建主 MDI 框架窗口
 	CMainFrame* pMainFrame = new CMainFrame;
@@ -115,15 +116,6 @@ BOOL CUIDesignerApp::InitInstance()
 	EnableShellOpen();
 	RegisterShellFileTypes(TRUE);
 
-	// 分析标准外壳命令、DDE、打开文件操作的命令行
-	CCommandLineInfo cmdInfo;
-	ParseCommandLine(cmdInfo);
-
-
-	// 调度在命令行中指定的命令。如果
-	// 用 /RegServer、/Register、/Unregserver 或 /Unregister 启动应用程序，则返回 FALSE。
-	if (!ProcessShellCommand(cmdInfo))
-		return FALSE;
 	// 主窗口已初始化，因此显示它并对其进行更新
 	pMainFrame->ShowWindow(SW_SHOWMAXIMIZED);
 	pMainFrame->UpdateWindow();
@@ -182,6 +174,9 @@ void CUIDesignerApp::PreLoadState()
 	bNameValid = strName.LoadString(IDS_EXPLORER);
 	ASSERT(bNameValid);
 	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EXPLORER);
+	bNameValid = strName.LoadString(IDS_RESOURCE);
+	ASSERT(bNameValid);
+	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_RESOURCE);
 }
 
 void CUIDesignerApp::LoadCustomState()
@@ -192,7 +187,12 @@ void CUIDesignerApp::SaveCustomState()
 {
 }
 
+//////////////////////////////////////////////////////////////////////////
 // CUIDesignerApp 消息处理程序
 
+int CUIDesignerApp::ExitInstance()
+{
+	// TODO: 在此添加专用代码和/或调用基类
 
-
+	return CWinAppEx::ExitInstance();
+}

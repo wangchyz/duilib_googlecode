@@ -9,6 +9,7 @@
 
 #define visualManager CMFCVisualManager::GetInstance()
 
+//////////////////////////////////////////////////////////////////////////
 //CToolElement
 
 IMPLEMENT_DYNAMIC(CToolElement, CObject)
@@ -21,7 +22,8 @@ CToolElement::CToolElement(const CString& strTabName):m_strName(strTabName)
 	Init();
 }
 
-CToolElement::CToolElement(const CString& strName,UINT nIDIcon):m_strName(strName)
+CToolElement::CToolElement(const CString& strName,int nClass,UINT nIDIcon):m_strName(strName),
+m_nClass(nClass)
 {
 	m_bTab=FALSE;
 	m_bExpanded=FALSE;
@@ -140,6 +142,24 @@ void CToolElement::Expand(BOOL bExpand)
 
 		m_pWndList->RedrawWindow(rectRedraw);
 	}
+}
+
+CToolElement* CToolElement::GetTool(int nClass) const
+{
+	ASSERT_VALID(this);
+
+	for (POSITION pos = m_lstSubTools.GetHeadPosition(); pos != NULL;)
+	{
+		CToolElement* pTool = m_lstSubTools.GetNext(pos);
+		ASSERT_VALID(pTool);
+
+		if (pTool->GetClass()==nClass)
+		{
+			return pTool;
+		}
+	}
+
+	return NULL;
 }
 
 BOOL CToolElement::IsSubTool(CToolElement* pSubTool) const
@@ -355,7 +375,6 @@ void CToolElement::Reposition(int& y)
 }
 
 ///////////////////////////////////////////////////////////////
-
 // CToolBoxCtrl
 
 IMPLEMENT_DYNAMIC(CToolBoxCtrl, CWnd)
@@ -394,6 +413,7 @@ BEGIN_MESSAGE_MAP(CToolBoxCtrl, CWnd)
 	ON_WM_LBUTTONUP()
 	ON_WM_ERASEBKGND()
 	ON_WM_MOUSELEAVE()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -515,7 +535,34 @@ void CToolBoxCtrl::SetCurSel(CToolElement* pTool, BOOL bRedraw/* = TRUE*/)
 
 	m_pSel=pTool;
 	if(bRedraw)
-	m_pSel->Redraw();	
+	m_pSel->Redraw();
+}
+
+void CToolBoxCtrl::SetCurSel(int nClass,BOOL bRedraw/*=TRUE*/)
+{
+	ASSERT_VALID(this);
+
+	CToolElement* pTool=NULL;
+	for (POSITION pos = m_lstToolTabs.GetHeadPosition(); pos != NULL;)
+	{
+		CToolElement* pToolTab = m_lstToolTabs.GetNext(pos);
+		ASSERT_VALID(pToolTab);
+
+		pTool=pToolTab->GetTool(nClass);
+		if(pTool)
+		{
+			CToolElement* pOldSel=m_pSel;
+			m_pSel=pTool;
+			if(bRedraw)
+			{
+				if(pOldSel)
+					pOldSel->Redraw();
+				m_pSel->Redraw();
+			}
+
+			return;
+		}
+	}
 }
 
 void CToolBoxCtrl::ExpandAll(BOOL bExpand/* = TRUE*/)
@@ -1029,4 +1076,16 @@ void CToolBoxCtrl::OnMouseLeave()
 	}
 
 	CWnd::OnMouseLeave();
+}
+
+void CToolBoxCtrl::OnDestroy()
+{
+	while (!m_lstToolTabs.IsEmpty())
+	{
+		delete m_lstToolTabs.RemoveHead();
+	}
+
+	m_pSel = NULL;
+
+	CWnd::OnDestroy();
 }

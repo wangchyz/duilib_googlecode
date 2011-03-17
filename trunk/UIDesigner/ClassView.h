@@ -1,17 +1,26 @@
-
 #pragma once
-
 #include "ViewTree.h"
+#include "..\UIlib\UIlib.h"
 
-class CClassToolBar : public CMFCToolBar
+//////////////////////////////////////////////////////////////////////////
+//CClassViewTree
+
+class CClassViewTree : public CViewTree
 {
-	virtual void OnUpdateCmdUI(CFrameWnd* /*pTarget*/, BOOL bDisableIfNoHndler)
-	{
-		CMFCToolBar::OnUpdateCmdUI((CFrameWnd*) GetOwner(), bDisableIfNoHndler);
-	}
+// ππ‘Ï
+public:
+	CClassViewTree();
+	virtual ~CClassViewTree();
 
-	virtual BOOL AllowShowOnList() const { return FALSE; }
+protected:
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnTvnSelChanged(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
+
+//////////////////////////////////////////////////////////////////////////
+//CClassView
 
 class CClassView : public CDockablePane
 {
@@ -22,13 +31,19 @@ public:
 	void AdjustLayout();
 	void OnChangeVisualStyle();
 
-protected:
-	CClassToolBar m_wndToolBar;
-	CViewTree m_wndClassView;
-	CImageList m_ClassViewImages;
-	UINT m_nCurrSort;
+public:
+	void InsertUITreeItem(CControlUI* pControl,LPCTSTR pstrName=NULL);
+	BOOL RemoveUITreeItem(CControlUI* pControl);
+	BOOL RemoveUITreeItem(HTREEITEM hItem);
+	void SelectUITreeItem(CControlUI* pControl);
 
-	void FillClassView();
+protected:
+	BOOL RemoveTreeItem(CControlUI* pControl);
+	BOOL RemoveTreeItem(HTREEITEM hItem);
+
+private:
+	CClassViewTree m_wndClassView;
+	CImageList m_ClassViewImages;
 
 // ÷ÿ–¥
 public:
@@ -38,16 +53,8 @@ protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-	afx_msg void OnClassAddMemberFunction();
-	afx_msg void OnClassAddMemberVariable();
-	afx_msg void OnClassDefinition();
-	afx_msg void OnClassProperties();
-	afx_msg void OnNewFolder();
 	afx_msg void OnPaint();
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
-	afx_msg LRESULT OnChangeActiveTab(WPARAM, LPARAM);
-	afx_msg void OnSort(UINT id);
-	afx_msg void OnUpdateSort(CCmdUI* pCmdUI);
 
 	DECLARE_MESSAGE_MAP()
 };

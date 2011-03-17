@@ -5,15 +5,14 @@
 #include "UIDesigner.h"
 #include "ToolBoxWnd.h"
 
-#include <memory>
-
+//////////////////////////////////////////////////////////////////////////
 // CToolBoxWnd
 
 IMPLEMENT_DYNAMIC(CToolBoxWnd, CDockablePane)
 
 CToolBoxWnd::CToolBoxWnd()
 {
-
+	g_pToolBoxWnd=this;
 }
 
 CToolBoxWnd::~CToolBoxWnd()
@@ -71,33 +70,28 @@ void CToolBoxWnd::AdjustLayout()
 
 void CToolBoxWnd::InitToolList()
 {
-	std::auto_ptr<CToolElement> apTab1(new CToolElement(_T("对话框")));
-	CToolElement* pTool=new CToolElement(_T("指针1"),IDI_PROPERTIES_WND_HC);
-	apTab1->AddSubTool(pTool);
-	apTab1->AddSubTool(new CToolElement(_T("指针2"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针3"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针4"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针5"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针6"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针7"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针8"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针9"),IDI_PROPERTIES_WND_HC));
-	apTab1->AddSubTool(new CToolElement(_T("指针10"),IDI_PROPERTIES_WND_HC));
+	CToolElement* pControlTab=new CToolElement(_T("控件"));
+	pControlTab->AddSubTool(new CToolElement(_T("指针"),classPointer,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("按钮"),classButton,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("基础控件"),classControl,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("标签"),classLabel,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("文本框"),classText,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("编辑框"),classEdit,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("复选框"),classOption,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("组合框"),classCombo,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("进度条"),classProgress,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("滑块"),classSlider,IDI_PROPERTIES_WND_HC));
+	pControlTab->AddSubTool(new CToolElement(_T("ActiveX控件"),classActiveX,IDI_PROPERTIES_WND_HC));
+	m_ctlToolList.AddToolTab(pControlTab);
 
-	m_ctlToolList.AddToolTab(apTab1.release());
+	CToolElement* pLayoutTab=new CToolElement(_T("布局"));
+	pLayoutTab->AddSubTool(new CToolElement(_T("垂直布局"),classVerticalLayout,IDI_PROPERTIES_WND_HC));
+	pLayoutTab->AddSubTool(new CToolElement(_T("水平布局"),classHorizontalLayout,IDI_PROPERTIES_WND_HC));
+	pLayoutTab->AddSubTool(new CToolElement(_T("容器"),classContainer,IDI_PROPERTIES_WND_HC));
+	pLayoutTab->AddSubTool(new CToolElement(_T("对话框布局"),classDialogLayout,IDI_PROPERTIES_WND_HC));
+	pLayoutTab->AddSubTool(new CToolElement(_T("并列布局"),classTileLayout,IDI_PROPERTIES_WND_HC));
+	pLayoutTab->AddSubTool(new CToolElement(_T("选项页布局"),classTabLayout,IDI_PROPERTIES_WND_HC));
+	m_ctlToolList.AddToolTab(pLayoutTab);
 
-	std::auto_ptr<CToolElement> apTab2(new CToolElement(_T("对话框")));
-	apTab2->AddSubTool(new CToolElement(_T("指针1"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针2"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针3"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针4"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针5"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针6"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针7"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针8"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针9"),IDI_PROPERTIES_WND_HC));
-	apTab2->AddSubTool(new CToolElement(_T("指针10"),IDI_PROPERTIES_WND_HC));
-
-	m_ctlToolList.AddToolTab(apTab2.release());
-	m_ctlToolList.SetCurSel(pTool);
+	m_ctlToolList.SetCurSel(classPointer);
 }
