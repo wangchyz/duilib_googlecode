@@ -23,10 +23,15 @@ static char THIS_FILE[] = __FILE__;
 
 CResourceViewBar::CResourceViewBar()
 {
+	g_pResourceView=this;
+
+	m_hRoot=NULL;
+	m_arrImage.RemoveAll();
 }
 
 CResourceViewBar::~CResourceViewBar()
 {
+	m_arrImage.RemoveAll();
 }
 
 BEGIN_MESSAGE_MAP(CResourceViewBar, CDockablePane)
@@ -66,7 +71,7 @@ int CResourceViewBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndResourceView.SetImageList(&m_ResourceViewImages, TVSIL_NORMAL);
 
 	// Fill view context(dummy code, don't seek here something magic :-)):
-	FillResourceView();
+	InitResourceView();
 
 	OnChangeVisualStyle();
 	return 0;
@@ -82,41 +87,10 @@ void CResourceViewBar::OnSize(UINT nType, int cx, int cy)
 	}
 }
 
-void CResourceViewBar::FillResourceView()
+void CResourceViewBar::InitResourceView()
 {
-	HTREEITEM hRoot = m_wndResourceView.InsertItem(_T("Hello resources"), 0, 0);
-	m_wndResourceView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
-
-	HTREEITEM hFolder = m_wndResourceView.InsertItem(_T("Accelerator"), 0, 0, hRoot);
-	m_wndResourceView.InsertItem(_T("IDR_MAINFRAME"), 1, 1, hFolder);
-
-	m_wndResourceView.Expand(hRoot, TVE_EXPAND);
-
-	hFolder = m_wndResourceView.InsertItem(_T("Dialog"), 0, 0, hRoot);
-	m_wndResourceView.InsertItem(_T("IDD_ABOUTBOX"), 3, 3, hFolder);
-
-	hFolder = m_wndResourceView.InsertItem(_T("Icon"), 0, 0, hRoot);
-	m_wndResourceView.InsertItem(_T("IDR_HELLO"), 4, 4, hFolder);
-	m_wndResourceView.InsertItem(_T("IDR_MAINFRAME"), 4, 4, hFolder);
-
-	m_wndResourceView.Expand(hFolder, TVE_EXPAND);
-
-	hFolder = m_wndResourceView.InsertItem(_T("Menu"), 0, 0, hRoot);
-	m_wndResourceView.InsertItem(_T("IDR_CONTEXT_MENU"), 5, 5, hFolder);
-	m_wndResourceView.InsertItem(_T("IDR_HELLO"), 5, 5, hFolder);
-	m_wndResourceView.InsertItem(_T("IDR_MAINFRAME"), 5, 5, hFolder);
-	m_wndResourceView.InsertItem(_T("IDR_POPUP_TOOLBAR"), 5, 5, hFolder);
-
-	m_wndResourceView.Expand(hFolder, TVE_EXPAND);
-
-	hFolder = m_wndResourceView.InsertItem(_T("String Table"), 0, 0, hRoot);
-	m_wndResourceView.InsertItem(_T("String Table"), 6, 6, hFolder);
-
-	hFolder = m_wndResourceView.InsertItem(_T("Toolbar"), 0, 0, hRoot);
-	m_wndResourceView.InsertItem(_T("IDR_MAINFRAME"), 7, 7, hFolder);
-
-	hFolder = m_wndResourceView.InsertItem(_T("Version"), 0, 0, hRoot);
-	m_wndResourceView.InsertItem(_T("VS_VERSION_INFO"), 8, 8, hFolder);
+	m_hRoot = m_wndResourceView.InsertItem(_T("×ÊÔ´"), 0, 0);
+	m_wndResourceView.SetItemState(m_hRoot, TVIS_BOLD, TVIS_BOLD);
 }
 
 void CResourceViewBar::OnContextMenu(CWnd* pWnd, CPoint point)
@@ -217,3 +191,19 @@ void CResourceViewBar::OnChangeVisualStyle()
 	m_wndResourceView.SetImageList(&m_ResourceViewImages, TVSIL_NORMAL);
 }
 
+void CResourceViewBar::InsertImage(LPCTSTR pstrImage)
+{
+	if(pstrImage==NULL||*pstrImage==_T('\0'))
+		return;
+	for(int i=0;i<m_arrImage.GetSize();i++)
+	{
+		if(m_arrImage.GetAt(i)==pstrImage)
+			return;//already have the image
+	}
+
+	LPTSTR pszFileName=_tcsrchr((LPTSTR)pstrImage,_T('\\'))+1;
+	HTREEITEM hItem=m_wndResourceView.InsertItem(pszFileName,0,0,m_hRoot);
+
+	//save the image full path
+	m_arrImage.Add(pstrImage);
+}

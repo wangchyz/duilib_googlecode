@@ -26,6 +26,9 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
 	ON_COMMAND_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnApplicationLook)
 	ON_UPDATE_COMMAND_UI_RANGE(ID_VIEW_APPLOOK_WIN_2000, ID_VIEW_APPLOOK_OFF_2007_AQUA, &CMainFrame::OnUpdateApplicationLook)
+	ON_REGISTERED_MESSAGE(AFX_WM_ON_GET_TAB_TOOLTIP, OnGetTabToolTip)
+	ON_REGISTERED_MESSAGE(AFX_WM_CHANGE_ACTIVE_TAB, OnChangeActiveTab)
+	ON_COMMAND(ID_PROJECT_NEW, &CMainFrame::OnProjectNew)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -41,6 +44,8 @@ static UINT indicators[] =
 CMainFrame::CMainFrame()
 {
 	// TODO: 在此添加成员初始化代码
+	g_pMainFrame=this;
+
 	theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2005);
 }
 
@@ -64,6 +69,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	mdiTabParams.m_bAutoColor = FALSE;    // 设置为 FALSE 将禁用 MDI 选项卡的自动着色
 	mdiTabParams.m_bDocumentMenu = TRUE; // 在选项卡区域的右边缘启用文档菜单
 	mdiTabParams.m_bEnableTabSwap = TRUE; //启用选项卡交换
+	mdiTabParams.m_bTabCustomTooltips = TRUE;
 	EnableMDITabbedGroups(TRUE, mdiTabParams);
 
 	if (!m_wndMenuBar.Create(this))
@@ -78,10 +84,17 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CMFCPopupMenu::SetForceMenuFocus(FALSE);
 
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
-		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MAINFRAME_256 : IDR_MAINFRAME))
+		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MAINFRAME_HC : IDR_MAINFRAME))
 	{
 		TRACE0("未能创建工具栏\n");
 		return -1;      // 未能创建
+	}
+
+	// Create FormEdit toolbar:
+	if (!m_wndToolbarFormEdit.Create(this, WS_CHILD|WS_VISIBLE|CBRS_TOP|CBRS_TOOLTIPS|CBRS_FLYBY|CBRS_HIDE_INPLACE|CBRS_SIZE_DYNAMIC| CBRS_GRIPPER | CBRS_BORDER_3D, ID_VIEW_FORMEDIT_TOOLBAR) || !m_wndToolbarFormEdit.LoadToolBar(IDR_FORMEDIT))
+	{
+		TRACE0("未能创建窗口编辑工具栏\n");
+		return FALSE;      // 未能创建
 	}
 
 	CString strToolBarName;
@@ -93,6 +106,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	bNameValid = strCustomize.LoadString(IDS_TOOLBAR_CUSTOMIZE);
 	ASSERT(bNameValid);
 	m_wndToolBar.EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
+
+	CString strFormEditToolBarName;
+	bNameValid = strFormEditToolBarName.LoadString(IDS_TOOLBAR_FORMEDIT);
+	ASSERT(bNameValid);
+	m_wndToolbarFormEdit.SetWindowText(strFormEditToolBarName);
+	m_wndToolbarFormEdit.EnableCustomizeButton(TRUE, ID_VIEW_CUSTOMIZE, strCustomize);
 
 	// 允许用户定义的工具栏操作:
 	InitUserToolbars(NULL, uiFirstUserToolBarId, uiLastUserToolBarId);
@@ -107,10 +126,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// TODO: 如果您不希望工具栏和菜单栏可停靠，请删除这五行
 	m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
+	m_wndToolbarFormEdit.EnableDocking(CBRS_ALIGN_ANY);
 	EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndMenuBar);
 	DockPane(&m_wndToolBar);
-
+	DockPane(&m_wndToolbarFormEdit);
+	DockPaneLeftOf(&m_wndToolBar, &m_wndToolbarFormEdit);
 
 	// 启用 Visual Studio 2005 样式停靠窗口行为
 	CDockingManager::SetDockingMode(DT_SMART);
@@ -429,4 +450,69 @@ void CMainFrame::OnUpdateFrameTitle(BOOL bAddToTitle)
 
 	//禁止更新标题
 // 	CMDIFrameWndEx::OnUpdateFrameTitle(bAddToTitle);
+}
+
+CUIDesignerView* CMainFrame::GetActiveUIView() const
+{
+	CMDIChildWnd* pFrame=MDIGetActive();
+	if(!pFrame)
+		return NULL;
+
+	return DYNAMIC_DOWNCAST(CUIDesignerView,pFrame->GetActiveView());
+}
+
+LRESULT CMainFrame::OnGetTabToolTip(WPARAM /*wp*/, LPARAM lp)
+{
+	CMFCTabToolTipInfo* pInfo = (CMFCTabToolTipInfo*) lp;
+	ASSERT(pInfo != NULL);
+	if (!pInfo)
+	{
+		return 0;
+	}
+
+	ASSERT_VALID(pInfo->m_pTabWnd);
+
+	if (!pInfo->m_pTabWnd->IsMDITab())
+	{
+		return 0;
+	}
+
+	CFrameWnd* pFrame = DYNAMIC_DOWNCAST(CFrameWnd, pInfo->m_pTabWnd->GetTabWnd(pInfo->m_nTabIndex));
+	if (pFrame == NULL)
+	{
+		return 0;
+	}
+
+	CDocument* pDoc = pFrame->GetActiveDocument();
+	if (pDoc == NULL)
+	{
+		return 0;
+	}
+
+	pInfo->m_strText = pDoc->GetPathName();
+	if(pInfo->m_strText.IsEmpty())
+		pInfo->m_strText=pDoc->GetTitle();
+
+	return 0;
+}
+
+LRESULT CMainFrame::OnChangeActiveTab(WPARAM wp,LPARAM lp)
+{
+	int nTabIndex=wp;
+	CMFCBaseTabCtrl* pTabWnd=(CMFCBaseTabCtrl*)lp;
+	CFrameWnd* pFrame=DYNAMIC_DOWNCAST(CFrameWnd,pTabWnd->GetTabWnd(nTabIndex));
+	if(pFrame==NULL)
+		return FALSE;
+	CUIDesignerView* pUIView=DYNAMIC_DOWNCAST(CUIDesignerView,pFrame->GetActiveView());
+	if(pUIView==NULL)
+		return FALSE;
+
+	pUIView->OnActivated();
+
+	return TRUE;
+}
+
+void CMainFrame::OnProjectNew()
+{
+
 }

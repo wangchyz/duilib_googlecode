@@ -8,6 +8,7 @@
 #include "PropertiesWnd.h"
 #include "ResourceView.h"
 #include "ToolBoxWnd.h"
+#include "UIDesignerView.h"
 
 class CMainFrame : public CMDIFrameWndEx
 {
@@ -34,6 +35,9 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
+public:
+	CUIDesignerView* GetActiveUIView() const;
+
 protected:  // 控件条嵌入成员
 	CMFCMenuBar       m_wndMenuBar;
 	CMFCToolBar       m_wndToolBar;
@@ -45,6 +49,8 @@ protected:  // 控件条嵌入成员
 	CPropertiesWnd    m_wndProperties;
 	CToolBoxWnd       m_wndToolBox;
 
+	CMFCToolBar m_wndToolbarFormEdit;
+
 // 生成的消息映射函数
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
@@ -53,6 +59,9 @@ protected:
 	afx_msg LRESULT OnToolbarCreateNew(WPARAM wp, LPARAM lp);
 	afx_msg void OnApplicationLook(UINT id);
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
+	afx_msg LRESULT OnGetTabToolTip(WPARAM wp, LPARAM lp);
+	afx_msg LRESULT OnChangeActiveTab(WPARAM wp,LPARAM lp);
+	afx_msg void OnProjectNew();
 	DECLARE_MESSAGE_MAP()
 
 	BOOL CreateDockingWindows();

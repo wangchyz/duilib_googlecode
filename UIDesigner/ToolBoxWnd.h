@@ -14,6 +14,10 @@ public:
 protected:
 	CToolBoxCtrl m_ctlToolList;
 
+public:
+	CToolElement* GetCurSel() const { return m_ctlToolList.GetCurSel(); }
+	void SetCurSel(int nClass,BOOL bRedraw=TRUE) { m_ctlToolList.SetCurSel(nClass,bRedraw); }
+
 protected:
 	void AdjustLayout();
 	void InitToolList();

@@ -67,6 +67,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\bin\UIDesigner_d.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -147,6 +148,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				OutputFile="..\bin\UIDesigner.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -198,11 +200,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HookAPI.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ImageDialog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ImagePreview.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LayoutManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MainFrm.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\MultiControlTracker.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PropertiesWnd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PropertyTabLayoutUI.cpp"
 				>
 			</File>
 			<File
@@ -272,11 +298,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HookAPI.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ImageDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ImagePreview.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LayoutManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MainFrm.h"
 				>
 			</File>
 			<File
+				RelativePath=".\MultiControlTracker.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PropertiesWnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PropertyTabLayoutUI.h"
 				>
 			</File>
 			<File
@@ -366,6 +416,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\formedit.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\formedit_hc.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\res\icon1.ico"
 				>
 			</File>
@@ -375,6 +433,10 @@
 			</File>
 			<File
 				RelativePath=".\res\menuimages_hc.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\movehandle.bmp"
 				>
 			</File>
 			<File
@@ -422,7 +484,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\toolbar1.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\res\Toolbar256.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Toolbar_hc.bmp"
 				>
 			</File>
 			<File
@@ -460,5 +530,9 @@
 		</File>
 	</Files>
 	<Globals>
+		<Global
+			Name="RESOURCE_FILE"
+			Value="UIDesigner.rc"
+		/>
 	</Globals>
 </VisualStudioProject>

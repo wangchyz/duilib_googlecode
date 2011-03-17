@@ -1,5 +1,6 @@
 #pragma once
 
+//////////////////////////////////////////////////////////////////////////
 // CToolElement
 
 class CToolElement : public CObject
@@ -10,7 +11,7 @@ class CToolElement : public CObject
 
 public:
 	CToolElement(const CString& strTabName);
-	CToolElement(const CString& strName,UINT nIDIcon);
+	CToolElement(const CString& strName,int nClass,UINT nIDIcon);
 	virtual ~CToolElement();
 
 public:
@@ -20,6 +21,9 @@ public:
 	BOOL IsExpanded() const { return m_bExpanded; }
 	BOOL IsEnabled() const { return m_bEnabled; }
 	BOOL IsVisible() const { return m_bIsVisible; }
+	void SetClass(int nClass) { m_nClass=nClass; }
+	CToolElement* GetTool(int nClass) const;
+	int GetClass() const { return m_nClass; }
 	virtual BOOL IsSelected() const;
 	virtual BOOL IsHovered() const;
 	BOOL IsParentExpanded() const;
@@ -40,6 +44,7 @@ protected:
 
 protected:
 	CString m_strName;//Tool Name
+	int m_nClass;//Tool Class
 	BOOL    m_bTab;//Is ToolTab?
 	HICON   m_hIcon;//Tool Icon
 	CRect m_Rect;//Tool rectangle (in the ToolBox.list coordinates)
@@ -54,7 +59,6 @@ protected:
 };
 
 ////////////////////////////////////////////////////////////
-
 // CToolBoxCtrl
 
 class CToolBoxCtrl : public CWnd
@@ -77,6 +81,7 @@ public:
 	int GetToolTabCount() const { return (int) m_lstToolTabs.GetCount(); }
 
 	void SetCurSel(CToolElement* pTool, BOOL bRedraw = TRUE);
+	void SetCurSel(int nClass,BOOL bRedraw=TRUE);
 	CToolElement* GetCurSel() const { return m_pSel; }
 	void ExpandAll(BOOL bExpand = TRUE);
 
@@ -138,6 +143,7 @@ public:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnMouseLeave();
+	afx_msg void OnDestroy();
 };
 
 

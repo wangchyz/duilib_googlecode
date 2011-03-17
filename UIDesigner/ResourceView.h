@@ -23,8 +23,15 @@ protected:
 public:
 	void OnChangeVisualStyle();
 
+	void InsertImage(LPCTSTR pstrImage);
+	const CStringArray* GetAllImage() { return &m_arrImage; }
+
 protected:
-	void FillResourceView();
+	void InitResourceView();
+
+private:
+	HTREEITEM m_hRoot;
+	CStringArray m_arrImage;
 
 // Implementation
 public:

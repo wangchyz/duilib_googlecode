@@ -4,6 +4,7 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
+#define IDS_TOOLBAR_FORMEDIT            101
 #define IDR_POPUP_EDIT                  119
 #define ID_STATUSBAR_PANE1              120
 #define ID_STATUSBAR_PANE2              121
@@ -13,7 +14,7 @@
 #define IDS_TOOLBAR_CUSTOMIZE           125
 #define ID_VIEW_CUSTOMIZE               126
 #define IDR_MAINFRAME                   128
-#define IDR_MAINFRAME_256               129
+#define IDR_MAINFRAME_HC                129
 #define IDR_UIDesignerTYPE              130
 #define ID_WINDOW_MANAGER               131
 #define IDS_WINDOWS_MANAGER             132
@@ -34,10 +35,8 @@
 #define ID_SORTING_SORTBYTYPE           147
 #define ID_SORTING_SORTBYACCESS         148
 #define ID_VIEW_PROPERTIESWND           150
-#define ID_SORTPROPERTIES               151
-#define ID_PROPERTIES1                  152
-#define ID_PROPERTIES2                  153
-#define ID_EXPAND_ALL                   154
+#define ID_PROPERTIES_TOOLBAR_ALPHABETIC 151
+#define ID_PROPERTIES_TOOLBAR_SORT      152
 #define IDS_FILE_VIEW                   155
 #define IDS_CLASS_VIEW                  156
 #define IDS_RESOURCE_VIEW               157
@@ -79,20 +78,74 @@
 #define ID_VIEW_APPLOOK_OFF_2007_AQUA   218
 #define IDS_EXPLORER                    305
 #define IDS_EDIT_MENU                   306
+#define IDS_RESOURCE                    307
 #define IDB_RESOURCE_VIEW               310
 #define IDR_POPUP_RESOURCE              311
 #define IDB_RESOURCE_VIEW24             311
+#define IDD_DIALOG_IMAGE                312
 #define IDI_RES_VIEW                    313
 #define IDI_RES_VIEW_HC                 314
+#define IDD_PROPERTY_TABLAYOUTUI        315
 #define IDI_TOOLBOX_WND_HC              316
+#define IDB_BITMAP_MOVEHANDLE           317
+#define ID_VIEW_FORMEDIT_TOOLBAR        318
+#define IDR_FORMEDIT                    319
+#define ID_FORMEDIT_TEST                320
+#define ID_FORMEDIT_ALIGN_LEFT          321
+#define IDR_MENU_UI                     321
+#define ID_FORMEDIT_ALIGN_RIGHT         322
+#define ID_FORMEDIT_ALIGN_TOP           323
+#define ID_FORMEDIT_ALIGN_BOTTOM        324
+#define ID_FORMEDIT_ALIGN_CENTER_VERTICALLY 325
+#define ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY 326
+#define ID_FORMEDIT_ALIGN_HORIZONTAL    327
+#define ID_FORMEDIT_ALIGN_VERTICAL      328
+#define ID_FORMEDIT_ALIGN_SAME_WIDTH    329
+#define ID_FORMEDIT_ALIGN_SAME_HEIGHT   330
+#define ID_FORMEDIT_ALIGN_SAME_SIZE     331
+#define ID_FORMEDIT_SHOW_GRID           332
+#define ID_FORMEDIT_SHOW_AUXBORDER      333
+#define ID_PROJECT_NEW                  334
+#define ID_FILE_SAVE_ALL                335
+#define IDC_BUTTON_IMAGE_IMPORT         1000
+#define IDC_BUTTON_IMAGE_CLEAR          1001
+#define IDC_LIST_IMAGE_RESOURCE         1002
+#define IDC_EDIT_IMAGE_DEST             1003
+#define IDC_EDIT_IMAGE_CORNER           1004
+#define IDC_EDIT_IMAGE_SOURCE           1005
+#define IDC_BUTTON_IMAGE_MASK           1006
+#define IDC_SLIDER_IMAGE_FADE           1007
+#define IDC_EDIT_IMAGE_FADE             1008
+#define IDC_STATIC_IMAGE_PRE            1010
+#define IDC_STATIC_IMAGE_PREVIEW        1010
+#define IDC_RADIO_IMAGE_HOLE_FALSE      1011
+#define IDC_RADIO_IMAGE_HOLE_TRUE       1012
+#define IDC_LIST_TABLAYOUTUI_TAB        1012
+#define IDC_BUTTON_TABLAYOUTUI_ADD      1013
+#define ID_UI_CONTROL_BUTTON            32793
+#define ID_UI_CONTROL_CONTROL           32794
+#define ID_UI_CONTROL_LABEL             32795
+#define ID_UI_CONTROL_TEXT              32796
+#define ID_UI_CONTROL_EDIT              32797
+#define ID_UI_CONTROL_OPTION            32798
+#define ID_UI_CONTROL_COMBO             32799
+#define ID_UI_CONTROL_PROGRESS          32800
+#define ID_UI_CONTROL_SLIDER            32801
+#define ID_UI_CONTROL_ACTIVEX           32802
+#define ID_UI_LAYOUT_VERTICAL           32804
+#define ID_UI_LAYOUT_HORIZONTAL         32806
+#define ID_UI_LAYOUT_CONTAINER          32808
+#define ID_UI_LAYOUT_DIALOG             32810
+#define ID_UI_LAYOUT_TILE               32812
+#define ID_UI_LAYOUT_TAB                32814
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        317
-#define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1000
-#define _APS_NEXT_SYMED_VALUE           310
+#define _APS_NEXT_RESOURCE_VALUE        322
+#define _APS_NEXT_COMMAND_VALUE         32815
+#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_SYMED_VALUE           316
 #endif
 #endif

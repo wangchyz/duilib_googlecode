@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中文(中华人民共和国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -91,7 +91,7 @@ IDI_TOOLBOX_WND_HC      ICON                    "res\\toolbox_wnd_hc.ico"
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
-IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+IDR_MAINFRAME_HC        BITMAP                  "res\\Toolbar_hc.bmp"
 IDR_SORT                BITMAP                  "res\\sort.bmp"
 IDB_SORT_24             BITMAP                  "res\\sort_hc.bmp"
 IDB_FILE_VIEW           BITMAP                  "res\\fileview.bmp"
@@ -106,6 +106,8 @@ IDR_PROPERTIES          BITMAP                  "res\\properties.bmp"
 IDB_PROPERTIES_HC       BITMAP                  "res\\properties_hc.bmp"
 IDB_RESOURCE_VIEW       BITMAP                  "res\\resource.bmp"
 IDB_RESOURCE_VIEW24     BITMAP                  "res\\resource24.bmp"
+IDB_BITMAP_MOVEHANDLE   BITMAP                  "res\\movehandle.bmp"
+IDR_FORMEDIT            BITMAP                  "res\\formedit_hc.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -126,17 +128,21 @@ BEGIN
     BUTTON      ID_APP_ABOUT
 END
 
-IDR_MAINFRAME_256 TOOLBAR  16, 16
+IDR_MAINFRAME_HC TOOLBAR  16, 16
 BEGIN
+    BUTTON      ID_PROJECT_NEW
     BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
     BUTTON      ID_FILE_SAVE
+    BUTTON      ID_FILE_SAVE_ALL
     SEPARATOR
     BUTTON      ID_EDIT_CUT
     BUTTON      ID_EDIT_COPY
     BUTTON      ID_EDIT_PASTE
     SEPARATOR
-    BUTTON      ID_FILE_PRINT
+    BUTTON      ID_EDIT_UNDO
+    BUTTON      ID_EDIT_REDO
+    SEPARATOR
     BUTTON      ID_APP_ABOUT
 END
 
@@ -166,10 +172,31 @@ END
 
 IDR_PROPERTIES TOOLBAR  16, 16
 BEGIN
-    BUTTON      ID_EXPAND_ALL
-    BUTTON      ID_SORTPROPERTIES
-    BUTTON      ID_PROPERTIES1
-    BUTTON      ID_PROPERTIES2
+    BUTTON      ID_PROPERTIES_TOOLBAR_SORT
+    BUTTON      ID_PROPERTIES_TOOLBAR_ALPHABETIC
+END
+
+IDR_FORMEDIT TOOLBAR  16, 16
+BEGIN
+    BUTTON      ID_FORMEDIT_TEST
+    SEPARATOR
+    BUTTON      ID_FORMEDIT_ALIGN_LEFT
+    BUTTON      ID_FORMEDIT_ALIGN_RIGHT
+    BUTTON      ID_FORMEDIT_ALIGN_TOP
+    BUTTON      ID_FORMEDIT_ALIGN_BOTTOM
+    SEPARATOR
+    BUTTON      ID_FORMEDIT_ALIGN_CENTER_VERTICALLY
+    BUTTON      ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY
+    SEPARATOR
+    BUTTON      ID_FORMEDIT_ALIGN_HORIZONTAL
+    BUTTON      ID_FORMEDIT_ALIGN_VERTICAL
+    SEPARATOR
+    BUTTON      ID_FORMEDIT_ALIGN_SAME_WIDTH
+    BUTTON      ID_FORMEDIT_ALIGN_SAME_HEIGHT
+    BUTTON      ID_FORMEDIT_ALIGN_SAME_SIZE
+    SEPARATOR
+    BUTTON      ID_FORMEDIT_SHOW_GRID
+    BUTTON      ID_FORMEDIT_SHOW_AUXBORDER
 END
 
 
@@ -290,17 +317,6 @@ BEGIN
     END
 END
 
-IDR_POPUP_SORT MENU 
-BEGIN
-    POPUP "排序"
-    BEGIN
-        MENUITEM "按字母顺序排序(&S)",                 ID_SORTING_SORTALPHABETIC
-        MENUITEM "按类型排序(&T)",                   ID_SORTING_SORTBYTYPE
-        MENUITEM "按访问排序(&E)",                   ID_SORTING_SORTBYACCESS
-        MENUITEM "按类型分组(&Y)",                   ID_SORTING_GROUPBYTYPE
-    END
-END
-
 IDR_POPUP_EXPLORER MENU 
 BEGIN
     POPUP "文件管理器"
@@ -337,6 +353,41 @@ BEGIN
     MENUITEM "Office 2007 (水绿色样式)(&A)",     ID_VIEW_APPLOOK_OFF_2007_AQUA
 END
 
+IDR_POPUP_SORT MENU 
+BEGIN
+    POPUP "排序"
+    BEGIN
+        MENUITEM "按字母顺序排序(&S)",                 ID_SORTING_SORTALPHABETIC
+        MENUITEM "按类型排序(&T)",                   ID_SORTING_SORTBYTYPE
+        MENUITEM "按访问排序(&E)",                   ID_SORTING_SORTBYACCESS
+        MENUITEM "按类型分组(&Y)",                   ID_SORTING_GROUPBYTYPE
+    END
+END
+
+IDR_MENU_UI MENU 
+BEGIN
+    POPUP "UI"
+    BEGIN
+        MENUITEM "按钮",                          ID_UI_CONTROL_BUTTON
+        MENUITEM "标准控件",                        ID_UI_CONTROL_CONTROL
+        MENUITEM "标签",                          ID_UI_CONTROL_LABEL
+        MENUITEM "文本框",                         ID_UI_CONTROL_TEXT
+        MENUITEM "编辑框",                         ID_UI_CONTROL_EDIT
+        MENUITEM "复选框",                         ID_UI_CONTROL_OPTION
+        MENUITEM "组合框",                         ID_UI_CONTROL_COMBO
+        MENUITEM "进度条",                         ID_UI_CONTROL_PROGRESS
+        MENUITEM "滑块",                          ID_UI_CONTROL_SLIDER
+        MENUITEM "ActiveX控件",                   ID_UI_CONTROL_ACTIVEX
+        MENUITEM SEPARATOR
+        MENUITEM "垂直布局",                        ID_UI_LAYOUT_VERTICAL
+        MENUITEM "水平布局",                        ID_UI_LAYOUT_HORIZONTAL
+        MENUITEM "容器",                          ID_UI_LAYOUT_CONTAINER
+        MENUITEM "对话框布局",                       ID_UI_LAYOUT_DIALOG
+        MENUITEM "并列布局",                        ID_UI_LAYOUT_TILE
+        MENUITEM "选项页布局",                       ID_UI_LAYOUT_TAB
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -345,20 +396,21 @@ END
 
 IDR_MAINFRAME ACCELERATORS 
 BEGIN
-    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
-    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
-    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
-    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL
-    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
-    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
-    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
-    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
-    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
-    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
-    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
-    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
-    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
-    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    "P",            ID_PROJECT_NEW,         VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -376,6 +428,45 @@ BEGIN
     LTEXT           "UIDesigner，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2010",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
+END
+
+IDD_DIALOG_IMAGE DIALOGEX 0, 0, 316, 250
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "选择图片"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,169,229,50,14
+    PUSHBUTTON      "取消",IDCANCEL,235,229,50,14
+    GROUPBOX        "图片资源",IDC_STATIC,7,7,122,211
+    PUSHBUTTON      "导入(&M)...",IDC_BUTTON_IMAGE_IMPORT,12,20,50,14
+    PUSHBUTTON      "清除(&C)",IDC_BUTTON_IMAGE_CLEAR,75,20,50,14
+    LISTBOX         IDC_LIST_IMAGE_RESOURCE,14,41,109,61,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "dest",IDC_STATIC,19,111,15,8
+    LTEXT           "source",IDC_STATIC,12,129,22,8
+    LTEXT           "corner",IDC_STATIC,12,147,22,8
+    LTEXT           "mask",IDC_STATIC,17,165,17,8
+    LTEXT           "fade",IDC_STATIC,18,184,16,8
+    LTEXT           "hole",IDC_STATIC,20,200,14,8
+    EDITTEXT        IDC_EDIT_IMAGE_DEST,36,108,87,14,ES_AUTOHSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDIT_IMAGE_CORNER,36,144,87,14,ES_AUTOHSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDIT_IMAGE_SOURCE,36,126,87,14,ES_AUTOHSCROLL | ES_WANTRETURN
+    PUSHBUTTON      "Mask",IDC_BUTTON_IMAGE_MASK,36,162,87,14
+    CONTROL         "",IDC_SLIDER_IMAGE_FADE,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,36,180,65,15
+    EDITTEXT        IDC_EDIT_IMAGE_FADE,104,180,19,14,ES_AUTOHSCROLL | ES_WANTRETURN
+    LTEXT           "Static",IDC_STATIC_IMAGE_PREVIEW,134,7,175,211
+    CONTROL         "false",IDC_RADIO_IMAGE_HOLE_FALSE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,47,200,31,10
+    CONTROL         "true",IDC_RADIO_IMAGE_HOLE_TRUE,"Button",BS_AUTORADIOBUTTON,85,200,29,10
+END
+
+IDD_PROPERTY_TABLAYOUTUI DIALOGEX 0, 0, 320, 200
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,209,179,50,14
+    PUSHBUTTON      "取消",IDCANCEL,263,179,50,14
+    LISTBOX         IDC_LIST_TABLAYOUTUI_TAB,42,25,105,68,LBS_SORT | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "添加Tab",IDC_BUTTON_TABLAYOUTUI_ADD,198,42,50,14
 END
 
 
@@ -433,6 +524,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 55
     END
+
+    IDD_DIALOG_IMAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 243
+    END
+
+    IDD_PROPERTY_TABLAYOUTUI, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 313
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 193
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -445,6 +552,7 @@ END
 STRINGTABLE 
 BEGIN
     IDP_OLE_INIT_FAILED     "OLE 初始化失败。请确保 OLE 库是正确的版本。"
+    IDS_TOOLBAR_FORMEDIT    "窗口编辑"
 END
 
 STRINGTABLE 
@@ -566,11 +674,6 @@ END
 
 STRINGTABLE 
 BEGIN
-    AFX_IDS_PREVIEW_CLOSE   "关闭打印预览模式\n取消预览"
-END
-
-STRINGTABLE 
-BEGIN
     IDS_STATUS_PANE1        "窗格 1"
     IDS_STATUS_PANE2        "窗格 2"
     IDS_TOOLBAR_STANDARD    "标准"
@@ -579,6 +682,8 @@ END
 
 STRINGTABLE 
 BEGIN
+    ID_PROPERTIES_TOOLBAR_ALPHABETIC "\n按字母顺序"
+    ID_PROPERTIES_TOOLBAR_SORT "\n按分类顺序"
     IDS_FILE_VIEW           "文件视图"
     IDS_CLASS_VIEW          "类视图"
     IDS_RESOURCE_VIEW       "资源视图"
@@ -588,11 +693,38 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDS_EXPLORER            "资源管理器"
+    IDS_EXPLORER            "文件"
     IDS_EDIT_MENU           "编辑"
+    IDS_RESOURCE            "资源"
+    ID_VIEW_FORMEDIT_TOOLBAR "窗口格式编辑\n窗口编辑"
 END
 
-#endif    // Chinese (P.R.C.) resources
+STRINGTABLE 
+BEGIN
+    ID_FORMEDIT_TEST        "\n测试窗口"
+    ID_FORMEDIT_ALIGN_LEFT  "\n左对齐"
+    ID_FORMEDIT_ALIGN_RIGHT "\n右对齐"
+    ID_FORMEDIT_ALIGN_TOP   "\n顶端对齐"
+    ID_FORMEDIT_ALIGN_BOTTOM "\n底端对齐"
+    ID_FORMEDIT_ALIGN_CENTER_VERTICALLY "\n垂直"
+    ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY "\n水平"
+    ID_FORMEDIT_ALIGN_HORIZONTAL "\n横向"
+    ID_FORMEDIT_ALIGN_VERTICAL "\n纵向"
+    ID_FORMEDIT_ALIGN_SAME_WIDTH "\n使宽度相同"
+    ID_FORMEDIT_ALIGN_SAME_HEIGHT "\n使高度相同"
+    ID_FORMEDIT_ALIGN_SAME_SIZE "\n使大小相同"
+    ID_FORMEDIT_SHOW_GRID   "\n显示网格"
+    ID_FORMEDIT_SHOW_AUXBORDER "\n显示辅助边框"
+    ID_PROJECT_NEW          "创建新项目\n新建工程"
+    ID_FILE_SAVE_ALL        "保存全部活动文档\n保存全部"
+END
+
+STRINGTABLE 
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "关闭打印预览模式\n取消预览"
+END
+
+#endif    // 中文(中华人民共和国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
