@@ -52,6 +52,7 @@ public:
     SIZEL* GetExtent();
     void SetExtent(SIZEL *psizelExtent);
     void LimitText(LONG nChars);
+    BOOL IsCaptured();
 
     BOOL GetAllowBeep();
     void SetAllowBeep(BOOL fAllowBeep);
@@ -143,6 +144,7 @@ private:
     unsigned	fInplaceActive		:1; // Whether control is inplace active
     unsigned	fTransparent		:1; // Whether control is transparent
     unsigned	fTimer				:1;	// A timer is set
+    unsigned    fCaptured           :1;
 
     LONG		lSelBarWidth;			// Width of the selection bar
     LONG  		cchTextMost;			// maximum text size
@@ -545,6 +547,7 @@ void CTxtWinHost::TxSetCapture(BOOL fCapture)
 {
     if (fCapture) m_re->GetManager()->SetCapture();
     else m_re->GetManager()->ReleaseCapture();
+    fCaptured = fCapture;
 }
 
 void CTxtWinHost::TxSetFocus()
@@ -813,6 +816,11 @@ void CTxtWinHost::LimitText(LONG nChars)
     pserv->OnTxPropertyBitsChange(TXTBIT_MAXLENGTHCHANGE, TXTBIT_MAXLENGTHCHANGE);
 }
 
+BOOL CTxtWinHost::IsCaptured()
+{
+    return fCaptured;
+}
+
 BOOL CTxtWinHost::GetAllowBeep()
 {
     return fAllowBeep;
@@ -1036,7 +1044,10 @@ CRichEditUI::CRichEditUI() : m_pTwh(NULL), m_bWantTab(true), m_bWantReturn(true)
 
 CRichEditUI::~CRichEditUI()
 {
-    if( m_pTwh ) m_pTwh->Release();
+    if( m_pTwh ) {
+        m_pTwh->Release();
+        m_pManager->RemoveMessageFilter(this);
+    }
 }
 
 LPCTSTR CRichEditUI::GetClass() const
@@ -1484,7 +1495,10 @@ void CRichEditUI::Init()
     cs.cx = 0;
     cs.lpszName = m_sText.GetData();
     CreateHost(this, &cs, &m_pTwh);
-    if( m_pTwh ) m_pTwh->SetTransparent(TRUE);
+    if( m_pTwh ) {
+        m_pTwh->SetTransparent(TRUE);
+        m_pManager->AddMessageFilter(this);
+    }
 }
 
 HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plresult) const
@@ -1498,12 +1512,6 @@ HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESU
                 if( !m_bWantReturn ) return S_OK;
                 if( ::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn ) return S_OK;
             }
-        }
-        if( msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK || msg == WM_RBUTTONDOWN ) {
-            RECT rc;
-            m_pTwh->GetControlRect(&rc);
-            POINT pt = { GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam) };
-            if( !PtInRect(&rc, pt) ) return S_OK;
         }
         return m_pTwh->GetTextServices()->TxSendMessage(msg, wparam, lparam, plresult);
     }
@@ -1870,6 +1878,45 @@ void CRichEditUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         SetTextColor(clrColor);
     }
     else CContainerUI::SetAttribute(pstrName, pstrValue);
+}
+
+LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
+{
+    if( !IsVisible() || !IsEnabled() ) return 0;
+    bool bWasHandled = true;
+    if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR )
+    {
+        // Mouse message only go when captured or inside rect
+        DWORD dwHitResult = m_pTwh->IsCaptured() ? HITRESULT_HIT : HITRESULT_OUTSIDE;
+        if( dwHitResult == HITRESULT_OUTSIDE ) {
+            RECT rc;
+            m_pTwh->GetControlRect(&rc);
+            POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+            if( PtInRect(&rc, pt) ) dwHitResult = HITRESULT_HIT;
+        }
+        if( dwHitResult != HITRESULT_HIT ) return 0;
+        if( uMsg == WM_SETCURSOR ) bWasHandled = false;
+    }
+    else if( uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST )
+    {
+        // Keyboard messages just go when we have focus
+        if( !IsFocused() ) return 0;
+    }
+    else
+    {
+        switch( uMsg ) {
+        case WM_HELP:
+        case WM_CONTEXTMENU:
+            bWasHandled = false;
+            break;
+        default:
+            return 0;
+        }
+    }
+    LRESULT lResult = 0;
+    HRESULT Hr = TxSendMessage(uMsg, wParam, lParam, &lResult);
+    if( Hr == S_OK ) bHandled = bWasHandled;
+    return lResult;
 }
 
 } // namespace DuiLib

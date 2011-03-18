@@ -7,7 +7,7 @@ namespace DuiLib {
 
 class CTxtWinHost;
 
-class UILIB_API CRichEditUI : public CContainerUI
+class UILIB_API CRichEditUI : public CContainerUI, public IMessageFilterUI
 {
 public:
     CRichEditUI();
@@ -98,6 +98,8 @@ public:
     void DoPaint(HDC hDC, const RECT& rcPaint);
 
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+
+    LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled);
 
 protected:
     CTxtWinHost* m_pTwh;

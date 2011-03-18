@@ -355,12 +355,16 @@ public:
     void SetBkColor(DWORD dwBackColor);
     DWORD GetBkColor2() const;
     void SetBkColor2(DWORD dwBackColor);
+    DWORD GetBkColor3() const;
+    void SetBkColor3(DWORD dwBackColor);
     LPCTSTR GetBkImage();
     void SetBkImage(LPCTSTR pStrImage);
     DWORD GetBorderColor() const;
     void SetBorderColor(DWORD dwBorderColor);
     int GetBorderSize() const;
     void SetBorderSize(int nSize);
+    SIZE GetBorderRound() const;
+    void SetBorderRound(SIZE cxyRound);
     bool DrawImage(HDC hDC, LPCTSTR pStrImage, LPCTSTR pStrModify = NULL);
 
     // Œª÷√œ‡πÿ
@@ -464,9 +468,11 @@ protected:
 
     DWORD m_dwBackColor;
     DWORD m_dwBackColor2;
+    DWORD m_dwBackColor3;
     CStdString m_sBkImage;
     DWORD m_dwBorderColor;
     int m_nBorderSize;
+    SIZE m_cxyBorderRound;
     RECT m_rcPaint;
 };
 

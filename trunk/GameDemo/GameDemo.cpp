@@ -105,13 +105,9 @@ public:
         if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
             RECT rcClient;
             ::GetClientRect(*this, &rcClient);
-            RECT rc = { rcClient.left, rcClient.top + szRoundCorner.cx, rcClient.right, rcClient.bottom };
-            HRGN hRgn1 = ::CreateRectRgnIndirect( &rc );
-            HRGN hRgn2 = ::CreateRoundRectRgn(rcClient.left, rcClient.top, rcClient.right + 1, rcClient.bottom - szRoundCorner.cx, szRoundCorner.cx, szRoundCorner.cy);
-            ::CombineRgn( hRgn1, hRgn1, hRgn2, RGN_OR );
-            ::SetWindowRgn(*this, hRgn1, TRUE);
-            ::DeleteObject(hRgn1);
-            ::DeleteObject(hRgn2);
+            HRGN hRgn = ::CreateRoundRectRgn(rcClient.left, rcClient.top, rcClient.right + 1, rcClient.bottom + 1, szRoundCorner.cx, szRoundCorner.cy);
+            ::SetWindowRgn(*this, hRgn, TRUE);
+            ::DeleteObject(hRgn);
         }
 
         bHandled = FALSE;
