@@ -302,6 +302,8 @@ public:
     int GetLineSize() const;
     void SetLineSize(int nSize);
 
+    bool GetShowButton1();
+    void SetShowButton1(bool bShow);
     LPCTSTR GetButton1NormalImage();
     void SetButton1NormalImage(LPCTSTR pStrImage);
     LPCTSTR GetButton1HotImage();
@@ -311,6 +313,8 @@ public:
     LPCTSTR GetButton1DisabledImage();
     void SetButton1DisabledImage(LPCTSTR pStrImage);
 
+    bool GetShowButton2();
+    void SetShowButton2(bool bShow);
     LPCTSTR GetButton2NormalImage();
     void SetButton2NormalImage(LPCTSTR pStrImage);
     LPCTSTR GetButton2HotImage();
@@ -381,6 +385,7 @@ protected:
     CStdString m_sBkPushedImage;
     CStdString m_sBkDisabledImage;
 
+    bool m_bShowButton1;
     RECT m_rcButton1;
     UINT m_uButton1State;
     CStdString m_sButton1NormalImage;
@@ -388,6 +393,7 @@ protected:
     CStdString m_sButton1PushedImage;
     CStdString m_sButton1DisabledImage;
 
+    bool m_bShowButton2;
     RECT m_rcButton2;
     UINT m_uButton2State;
     CStdString m_sButton2NormalImage;
