@@ -432,14 +432,11 @@ public:
         oMonitor.cbSize = sizeof(oMonitor);
         ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
         CRect rcWork = oMonitor.rcWork;
-        rcWork.Offset(-rcWork.left, -rcWork.top);
-
         LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
-        lpMMI->ptMaxPosition.x	= rcWork.left;
-        lpMMI->ptMaxPosition.y	= rcWork.top;
-        lpMMI->ptMaxSize.x		= rcWork.right;
-        lpMMI->ptMaxSize.y		= rcWork.bottom;
-
+        lpMMI->ptMaxPosition.x = rcWork.left;
+        lpMMI->ptMaxPosition.y = rcWork.top;
+        lpMMI->ptMaxSize.x = rcWork.right - rcWork.left;
+        lpMMI->ptMaxSize.y = rcWork.bottom - rcWork.top;
         bHandled = FALSE;
         return 0;
     }
