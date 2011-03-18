@@ -1,6 +1,7 @@
 
 #include "StdAfx.h"
 #include "UIManager.h"
+#include <zmouse.h>
 
 namespace DuiLib {
 
