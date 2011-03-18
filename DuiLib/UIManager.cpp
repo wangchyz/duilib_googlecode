@@ -801,16 +801,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
        }
        break;
     }
-    if( m_pFocus && m_pFocus->IsVisible() && m_pFocus->IsEnabled() && _tcsstr(m_pFocus->GetClass(), _T("RichEditUI")) != NULL ) {
-        if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST) 
-            || uMsg == WM_CHAR || uMsg == WM_IME_CHAR ) {
-                LRESULT lResult;
-                HRESULT hr = static_cast<CRichEditUI*>(m_pFocus)->TxSendMessage(uMsg, wParam, lParam, &lResult);
-                if (hr == S_FALSE) return false;
-                lRes = lResult;
-                return true;
-        }       
-    }
+
     return false;
 }
 
@@ -1622,6 +1613,7 @@ m_chShortcut('\0'),
 m_pTag(NULL),
 m_dwBackColor(0),
 m_dwBackColor2(0),
+m_dwBackColor3(0),
 m_dwBorderColor(0),
 m_nBorderSize(1)
 {
@@ -1629,6 +1621,7 @@ m_nBorderSize(1)
     m_cxyFixed.cx = m_cxyFixed.cy = 0;
     m_cxyMin.cx = m_cxyMin.cy = 0;
     m_cxyMax.cx = m_cxyMax.cy = 9999;
+    m_cxyBorderRound.cx = m_cxyBorderRound.cy = 0;
 
     ::ZeroMemory(&m_rcPadding, sizeof(m_rcPadding));
     ::ZeroMemory(&m_rcItem, sizeof(RECT));
@@ -1700,14 +1693,9 @@ void CControlUI::SetText(LPCTSTR pstrText)
     m_sText = pstrText;
 }
 
-COLORREF CControlUI::GetBkColor() const
+DWORD CControlUI::GetBkColor() const
 {
     return m_dwBackColor;
-}
-
-COLORREF CControlUI::GetBkColor2() const
-{
-    return m_dwBackColor2;
 }
 
 void CControlUI::SetBkColor(DWORD dwBackColor)
@@ -1718,11 +1706,29 @@ void CControlUI::SetBkColor(DWORD dwBackColor)
     Invalidate();
 }
 
+DWORD CControlUI::GetBkColor2() const
+{
+    return m_dwBackColor2;
+}
+
 void CControlUI::SetBkColor2(DWORD dwBackColor)
 {
     if( m_dwBackColor2 == dwBackColor ) return;
 
     m_dwBackColor2 = dwBackColor;
+    Invalidate();
+}
+
+DWORD CControlUI::GetBkColor3() const
+{
+    return m_dwBackColor3;
+}
+
+void CControlUI::SetBkColor3(DWORD dwBackColor)
+{
+    if( m_dwBackColor3 == dwBackColor ) return;
+
+    m_dwBackColor3 = dwBackColor;
     Invalidate();
 }
 
@@ -1762,6 +1768,17 @@ void CControlUI::SetBorderSize(int nSize)
     if( m_nBorderSize == nSize ) return;
 
     m_nBorderSize = nSize;
+    Invalidate();
+}
+
+SIZE CControlUI::GetBorderRound() const
+{
+    return m_cxyBorderRound;
+}
+
+void CControlUI::SetBorderRound(SIZE cxyRound)
+{
+    m_cxyBorderRound = cxyRound;
     Invalidate();
 }
 
@@ -2176,17 +2193,26 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         rcPadding.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);    
         SetPadding(rcPadding);
     }
-    else if( _tcscmp(pstrName, _T("bkcolor")) == 0 ) {
+    else if( _tcscmp(pstrName, _T("bkcolor")) == 0 || _tcscmp(pstrName, _T("bkcolor1")) == 0 ) {
+        while( *pstrValue > _T('\0') && *pstrValue <= _T(' ') ) pstrValue = ::CharNext(pstrValue);
         if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
         LPTSTR pstr = NULL;
         DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
         SetBkColor(clrColor);
     }
     else if( _tcscmp(pstrName, _T("bkcolor2")) == 0 ) {
+        while( *pstrValue > _T('\0') && *pstrValue <= _T(' ') ) pstrValue = ::CharNext(pstrValue);
         if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
         LPTSTR pstr = NULL;
         DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
         SetBkColor2(clrColor);
+    }
+    else if( _tcscmp(pstrName, _T("bkcolor3")) == 0 ) {
+        while( *pstrValue > _T('\0') && *pstrValue <= _T(' ') ) pstrValue = ::CharNext(pstrValue);
+        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+        LPTSTR pstr = NULL;
+        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+        SetBkColor3(clrColor);
     }
     else if( _tcscmp(pstrName, _T("bordercolor")) == 0 ) {
         if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
@@ -2195,6 +2221,13 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         SetBorderColor(clrColor);
     }
     else if( _tcscmp(pstrName, _T("bordersize")) == 0 ) SetBorderSize(_ttoi(pstrValue));
+    else if( _tcscmp(pstrName, _T("borderround")) == 0 ) {
+        SIZE cxyRound = { 0 };
+        LPTSTR pstr = NULL;
+        cxyRound.cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+        cxyRound.cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);     
+        SetBorderRound(cxyRound);
+    }
     else if( _tcscmp(pstrName, _T("bkimage")) == 0 ) SetBkImage(pstrValue);
     else if( _tcscmp(pstrName, _T("width")) == 0 ) SetFixedWidth(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("height")) == 0 ) SetFixedHeight(_ttoi(pstrValue));
@@ -2264,7 +2297,18 @@ void CControlUI::DoPaint(HDC hDC, const RECT& rcPaint)
 void CControlUI::PaintBkColor(HDC hDC)
 {
     if( m_dwBackColor != 0 ) {
-        if( m_dwBackColor2 != 0 ) CRenderEngine::DrawGradient(hDC, m_rcItem, m_dwBackColor, m_dwBackColor2, true, 16);
+        if( m_dwBackColor2 != 0 ) {
+            if( m_dwBackColor3 != 0 ) {
+                RECT rc = m_rcItem;
+                rc.bottom = (rc.bottom + rc.top) / 2;
+                CRenderEngine::DrawGradient(hDC, rc, m_dwBackColor, m_dwBackColor2, true, 8);
+                rc.top = rc.bottom;
+                rc.bottom = m_rcItem.bottom;
+                CRenderEngine::DrawGradient(hDC, rc, m_dwBackColor2, m_dwBackColor3, true, 8);
+            }
+            else 
+                CRenderEngine::DrawGradient(hDC, m_rcItem, m_dwBackColor, m_dwBackColor2, true, 16);
+        }
         else if( m_dwBackColor >= 0xFF000000 ) CRenderEngine::DrawColor(hDC, m_rcPaint, m_dwBackColor);
         else CRenderEngine::DrawColor(hDC, m_rcItem, m_dwBackColor);
     }
@@ -2288,8 +2332,11 @@ void CControlUI::PaintText(HDC hDC)
 
 void CControlUI::PaintBorder(HDC hDC)
 {
-    if( m_dwBorderColor != 0 && m_nBorderSize > 0 ) 
-        CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, m_dwBorderColor);
+    if( m_dwBorderColor != 0 && m_nBorderSize > 0 ) {
+        if( m_cxyBorderRound.cx > 0 || m_cxyBorderRound.cy > 0 )
+            CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, m_dwBorderColor);
+        else CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, m_dwBorderColor);
+    }
 }
 
 void CControlUI::DoPostPaint(HDC hDC, const RECT& rcPaint)

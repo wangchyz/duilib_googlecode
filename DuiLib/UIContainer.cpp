@@ -77,7 +77,8 @@ bool CContainerUI::Add(CControlUI* pControl)
     if( pControl == NULL) return false;
 
     if( m_pManager != NULL ) m_pManager->InitControls(pControl, this);
-    NeedUpdate();
+    if( IsVisible() ) NeedUpdate();
+    else pControl->SetInternVisible(false);
     return m_items.Add(pControl);
 }
 
@@ -86,7 +87,8 @@ bool CContainerUI::AddAt(CControlUI* pControl, int iIndex)
     if( pControl == NULL) return false;
 
     if( m_pManager != NULL ) m_pManager->InitControls(pControl, this);
-    NeedUpdate();
+    if( IsVisible() ) NeedUpdate();
+    else pControl->SetInternVisible(false);
     return m_items.InsertAt(iIndex, pControl);
 }
 
@@ -585,16 +587,33 @@ CControlUI* CContainerUI::FindControl(FINDCONTROLPROC Proc, LPVOID pData, UINT u
         CControlUI* pControl = CControlUI::FindControl(Proc, pData, uFlags);
         if( pControl != NULL ) return pControl;
     }
+    RECT rc = m_rcItem;
+    rc.left += m_rcInset.left;
+    rc.top += m_rcInset.top;
+    rc.right -= m_rcInset.right;
+    rc.bottom -= m_rcInset.bottom;
+    if( m_pVerticalScrollbar && m_pVerticalScrollbar->IsVisible() ) rc.right -= m_pVerticalScrollbar->GetFixedWidth();
+    if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) rc.bottom -= m_pHorizontalScrollbar->GetFixedHeight();
     if( (uFlags & UIFIND_TOP_FIRST) != 0 ) {
         for( int it = m_items.GetSize() - 1; it >= 0; it-- ) {
             CControlUI* pControl = static_cast<CControlUI*>(m_items[it])->FindControl(Proc, pData, uFlags);
-            if( pControl != NULL ) return pControl;
+            if( pControl != NULL ) {
+                if( (uFlags & UIFIND_HITTEST) != 0 && !pControl->IsFloat() && !::PtInRect(&rc, *(static_cast<LPPOINT>(pData))) )
+                    continue;
+                else 
+                    return pControl;
+            }            
         }
     }
     else {
         for( int it = 0; it < m_items.GetSize(); it++ ) {
             CControlUI* pControl = static_cast<CControlUI*>(m_items[it])->FindControl(Proc, pData, uFlags);
-            if( pControl != NULL ) return pControl;
+            if( pControl != NULL ) {
+                if( (uFlags & UIFIND_HITTEST) != 0 && !pControl->IsFloat() && !::PtInRect(&rc, *(static_cast<LPPOINT>(pData))) )
+                    continue;
+                else 
+                    return pControl;
+            } 
         }
     }
 
