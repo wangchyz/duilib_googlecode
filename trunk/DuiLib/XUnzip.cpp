@@ -91,7 +91,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-#define _USE_32BIT_TIME_T	//+++1.2
+//#define _USE_32BIT_TIME_T	//+++1.2
 
 
 #define STRICT
@@ -4025,15 +4025,15 @@ ZRESULT TUnzip::Get(int index,ZIPENTRY *ze)
     bool hasctime = (flags&4)!=0;
     epos+=5;
     if (hasmtime)
-    { time_t mtime = *(time_t*)(extra+epos); epos+=4;
+    { time_t mtime = *(__time32_t*)(extra+epos); epos+=4;
       ze->mtime = timet2filetime(mtime);
     }
     if (hasatime)
-    { time_t atime = *(time_t*)(extra+epos); epos+=4;
+    { time_t atime = *(__time32_t*)(extra+epos); epos+=4;
       ze->atime = timet2filetime(atime);
     }
     if (hasctime)
-    { time_t ctime = *(time_t*)(extra+epos); 
+    { time_t ctime = *(__time32_t*)(extra+epos); 
       ze->ctime = timet2filetime(ctime);
     }
     break;
