@@ -1434,7 +1434,7 @@ void CEditUI::PaintText(HDC hDC)
 
 CScrollbarUI::CScrollbarUI() : m_bHorizontal(false), m_nRange(100), m_nScrollPos(0), m_nLineSize(8), 
 m_pOwner(NULL), m_nLastScrollPos(0), m_nLastScrollOffset(0), m_nScrollRepeatDelay(0), m_uButton1State(0), \
-m_uButton2State(0), m_uThumbState(0)
+m_uButton2State(0), m_uThumbState(0), m_bShowButton1(true), m_bShowButton2(true)
 {
     m_cxyFixed.cx = DEFAULT_SCROLLBAR_SIZE;
     ptLastMouse.x = ptLastMouse.y = 0;
@@ -1540,6 +1540,17 @@ void CScrollbarUI::SetLineSize(int nSize)
     m_nLineSize = nSize;
 }
 
+bool CScrollbarUI::GetShowButton1()
+{
+    return m_bShowButton1;
+}
+
+void CScrollbarUI::SetShowButton1(bool bShow)
+{
+    m_bShowButton1 = bShow;
+    SetPos(m_rcItem);
+}
+
 LPCTSTR CScrollbarUI::GetButton1NormalImage()
 {
     return m_sButton1NormalImage;
@@ -1582,6 +1593,17 @@ void CScrollbarUI::SetButton1DisabledImage(LPCTSTR pStrImage)
 {
     m_sButton1DisabledImage = pStrImage;
     Invalidate();
+}
+
+bool CScrollbarUI::GetShowButton2()
+{
+    return m_bShowButton2;
+}
+
+void CScrollbarUI::SetShowButton2(bool bShow)
+{
+    m_bShowButton2 = bShow;
+    SetPos(m_rcItem);
 }
 
 LPCTSTR CScrollbarUI::GetButton2NormalImage()
@@ -1766,17 +1788,31 @@ void CScrollbarUI::SetPos(RECT rc)
     rc = m_rcItem;
 
     if( m_bHorizontal ) {
-        int cx = rc.right - rc.left - 2 * m_cxyFixed.cy;
+        int cx = rc.right - rc.left;
+        if( m_bShowButton1 ) cx -= m_cxyFixed.cy;
+        if( m_bShowButton2 ) cx -= m_cxyFixed.cy;
         if( cx > m_cxyFixed.cy ) {
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
-            m_rcButton1.right = rc.left + m_cxyFixed.cy;
-            m_rcButton1.bottom = rc.top + m_cxyFixed.cy;
+            if( m_bShowButton1 ) {
+                m_rcButton1.right = rc.left + m_cxyFixed.cy;
+                m_rcButton1.bottom = rc.top + m_cxyFixed.cy;
+            }
+            else {
+                m_rcButton1.right = m_rcButton1.left;
+                m_rcButton1.bottom = m_rcButton1.top;
+            }
 
-            m_rcButton2.left = rc.right - m_cxyFixed.cy;
             m_rcButton2.top = rc.top;
             m_rcButton2.right = rc.right;
-            m_rcButton2.bottom = rc.top + m_cxyFixed.cy;
+            if( m_bShowButton2 ) {
+                m_rcButton2.left = rc.right - m_cxyFixed.cy;
+                m_rcButton2.bottom = rc.top + m_cxyFixed.cy;
+            }
+            else {
+                m_rcButton2.left = m_rcButton2.right;
+                m_rcButton2.bottom = m_rcButton2.top;
+            }
 
             m_rcThumb.top = rc.top;
             m_rcThumb.bottom = rc.top + m_cxyFixed.cy;
@@ -1801,29 +1837,55 @@ void CScrollbarUI::SetPos(RECT rc)
             if( cxButton > m_cxyFixed.cy ) cxButton = m_cxyFixed.cy;
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
-            m_rcButton1.right = rc.left + cxButton;
-            m_rcButton1.bottom = rc.top + m_cxyFixed.cy;
+            if( m_bShowButton1 ) {
+                m_rcButton1.right = rc.left + cxButton;
+                m_rcButton1.bottom = rc.top + m_cxyFixed.cy;
+            }
+            else {
+                m_rcButton1.right = m_rcButton1.left;
+                m_rcButton1.bottom = m_rcButton1.top;
+            }
 
-            m_rcButton2.left = rc.right - cxButton;
             m_rcButton2.top = rc.top;
             m_rcButton2.right = rc.right;
-            m_rcButton2.bottom = rc.top + m_cxyFixed.cy;
+            if( m_bShowButton2 ) {
+                m_rcButton2.left = rc.right - cxButton;
+                m_rcButton2.bottom = rc.top + m_cxyFixed.cy;
+            }
+            else {
+                m_rcButton2.left = m_rcButton2.right;
+                m_rcButton2.bottom = m_rcButton2.top;
+            }
 
             ::ZeroMemory(&m_rcThumb, sizeof(m_rcThumb));
         }
     }
     else {
-        int cy = rc.bottom - rc.top - 2 * m_cxyFixed.cx;
+        int cy = rc.bottom - rc.top;
+        if( m_bShowButton1 ) cy -= m_cxyFixed.cx;
+        if( m_bShowButton2 ) cy -= m_cxyFixed.cx;
         if( cy > m_cxyFixed.cx ) {
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
-            m_rcButton1.right = rc.left + m_cxyFixed.cx;
-            m_rcButton1.bottom = rc.top + m_cxyFixed.cx;
+            if( m_bShowButton1 ) {
+                m_rcButton1.right = rc.left + m_cxyFixed.cx;
+                m_rcButton1.bottom = rc.top + m_cxyFixed.cx;
+            }
+            else {
+                m_rcButton1.right = m_rcButton1.left;
+                m_rcButton1.bottom = m_rcButton1.top;
+            }
 
             m_rcButton2.left = rc.left;
-            m_rcButton2.top = rc.bottom - m_cxyFixed.cx;
-            m_rcButton2.right = rc.left + m_cxyFixed.cx;
             m_rcButton2.bottom = rc.bottom;
+            if( m_bShowButton2 ) {
+                m_rcButton2.top = rc.bottom - m_cxyFixed.cx;
+                m_rcButton2.right = rc.left + m_cxyFixed.cx;
+            }
+            else {
+                m_rcButton2.top = m_rcButton2.bottom;
+                m_rcButton2.right = m_rcButton2.left;
+            }
 
             m_rcThumb.left = rc.left;
             m_rcThumb.right = rc.left + m_cxyFixed.cx;
@@ -1848,14 +1910,26 @@ void CScrollbarUI::SetPos(RECT rc)
             if( cyButton > m_cxyFixed.cx ) cyButton = m_cxyFixed.cx;
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
-            m_rcButton1.right = rc.left + m_cxyFixed.cx;
-            m_rcButton1.bottom = rc.top + cyButton;
-            
+            if( m_bShowButton1 ) {
+                m_rcButton1.right = rc.left + m_cxyFixed.cx;
+                m_rcButton1.bottom = rc.top + cyButton;
+            }
+            else {
+                m_rcButton1.right = m_rcButton1.left;
+                m_rcButton1.bottom = m_rcButton1.top;
+            }
+
             m_rcButton2.left = rc.left;
-            m_rcButton2.top = rc.bottom - cyButton;
-            m_rcButton2.right = rc.left + m_cxyFixed.cx;
             m_rcButton2.bottom = rc.bottom;
-            
+            if( m_bShowButton2 ) {
+                m_rcButton2.top = rc.bottom - cyButton;
+                m_rcButton2.right = rc.left + m_cxyFixed.cx;
+            }
+            else {
+                m_rcButton2.top = m_rcButton2.bottom;
+                m_rcButton2.right = m_rcButton2.left;
+            }
+
             ::ZeroMemory(&m_rcThumb, sizeof(m_rcThumb));
         }
     }
@@ -2101,6 +2175,8 @@ void CScrollbarUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("linesize")) == 0 ) SetLineSize(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("range")) == 0 ) SetScrollRange(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("value")) == 0 ) SetScrollPos(_ttoi(pstrValue));
+    else if( _tcscmp(pstrName, _T("showbutton1")) == 0 ) SetShowButton1(_tcscmp(pstrValue, _T("true")) == 0);
+    else if( _tcscmp(pstrName, _T("showbutton2")) == 0 ) SetShowButton2(_tcscmp(pstrValue, _T("true")) == 0);
     else CControlUI::SetAttribute(pstrName, pstrValue);
 }
 

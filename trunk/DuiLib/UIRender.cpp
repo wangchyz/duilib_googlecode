@@ -303,6 +303,8 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
         }
     }
 
+    free(pImage);
+
     TImageInfo* data = new TImageInfo;
     data->hBitmap = hBitmap;
     data->nX = x;
