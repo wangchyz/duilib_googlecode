@@ -833,14 +833,6 @@ void CComboUI::PaintStatusImage(HDC hDC)
         if( !DrawImage(hDC, (LPCTSTR)m_sNormalImage) ) m_sNormalImage.Empty();
         else return;
     }
-
-    DWORD dwBorderColor = 0xFF4EA0D1;
-    int nBorderSize = 1;
-    if( (m_uButtonState & UISTATE_HOT) != 0 ) {
-        dwBorderColor = 0xFF85E4FF;
-        nBorderSize = 2;
-    }
-    CRenderEngine::DrawRect(hDC, m_rcItem, nBorderSize, dwBorderColor);
 }
 
 void CComboUI::PaintText(HDC hDC)
