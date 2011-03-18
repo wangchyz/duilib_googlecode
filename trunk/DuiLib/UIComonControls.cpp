@@ -1189,6 +1189,7 @@ void CEditUI::Event(TEventUI& event)
                 pt.y -= m_rcItem.top + m_rcTextPadding.top;
                 ::SendMessage(*m_pWindow, WM_LBUTTONDOWN, event.wParam, MAKELPARAM(pt.x, pt.y));
             }
+            GetManager()->ReleaseCapture();
         }
         return;
     }
