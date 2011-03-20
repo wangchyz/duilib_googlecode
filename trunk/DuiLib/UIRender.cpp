@@ -1211,7 +1211,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                         imageListIndex = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
                     }
 
-                    if( !sName.IsEmpty() ) pImageInfo = pManager->GetImage((LPCTSTR)sName);
+                    if( !sName.IsEmpty() ) pImageInfo = pManager->GetImageEx((LPCTSTR)sName);
                     if( pImageInfo ) {
                         iWidth = pImageInfo->nX;
                         iHeight = pImageInfo->nY;

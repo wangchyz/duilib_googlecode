@@ -1046,6 +1046,11 @@ void CEditWnd::Init(CEditUI* pOwner)
     rcPos.top += rcInset.top;
     rcPos.right -= rcInset.right;
     rcPos.bottom -= rcInset.bottom;
+    LONG lEditHeight = pOwner->GetManager()->GetDefaultFontInfo().tmHeight;
+    if( lEditHeight < rcPos.GetHeight() ) {
+        rcPos.top += (rcPos.GetHeight() - lEditHeight) / 2;
+        rcPos.bottom = rcPos.top + lEditHeight;
+    }
     UINT uStyle = WS_CHILD | ES_AUTOHSCROLL;
     if( pOwner->IsPasswordMode() ) uStyle |= ES_PASSWORD;
     Create(pOwner->GetManager()->GetPaintWindow(), NULL, uStyle, 0, rcPos);
