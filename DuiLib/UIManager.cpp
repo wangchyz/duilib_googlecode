@@ -159,6 +159,25 @@ HINSTANCE CPaintManagerUI::GetInstance()
     return m_hInstance;
 }
 
+CStdString CPaintManagerUI::GetInstancePath()
+{
+    if( m_hInstance == NULL ) return _T('\0');
+    
+    TCHAR tszModule[MAX_PATH + 1] = { 0 };
+    ::GetModuleFileName(m_hInstance, tszModule, MAX_PATH);
+    CStdString sInstancePath = tszModule;
+    int pos = sInstancePath.ReverseFind(_T('\\'));
+    sInstancePath = sInstancePath.Left(pos);
+    return sInstancePath;
+}
+
+CStdString CPaintManagerUI::GetCurrentPath()
+{
+    TCHAR tszModule[MAX_PATH + 1] = { 0 };
+    ::GetCurrentDirectory(MAX_PATH, tszModule);
+    return tszModule;
+}
+
 HINSTANCE CPaintManagerUI::GetResourceDll()
 {
     if( m_hResourceInstance == NULL ) return m_hInstance;
@@ -178,6 +197,11 @@ const CStdString& CPaintManagerUI::GetResourceZip()
 void CPaintManagerUI::SetInstance(HINSTANCE hInst)
 {
     m_hInstance = hInst;
+}
+
+void CPaintManagerUI::SetCurrentPath(LPCTSTR pStrPath)
+{
+    ::SetCurrentDirectory(pStrPath);
 }
 
 void CPaintManagerUI::SetResourceDll(HINSTANCE hInst)
@@ -1995,7 +2019,7 @@ void CControlUI::SetShortcut(TCHAR ch)
     m_chShortcut = ch;
 }
 
-CStdString CControlUI::GetUserData() const
+const CStdString& CControlUI::GetUserData()
 {
     return m_sUserData;
 }

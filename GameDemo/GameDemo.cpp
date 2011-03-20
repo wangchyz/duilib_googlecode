@@ -137,7 +137,7 @@ public:
     CPaintManagerUI m_pm;
 };
 
-class CGameFrameWnd : public CWindowWnd, public INotifyUI
+class CGameFrameWnd : public CWindowWnd, public INotifyUI, public IListCallbackUI
 {
 public:
     CGameFrameWnd() { };
@@ -196,6 +196,13 @@ public:
         for( int i = 0; i < 8; ++i )
         {
             pGameList->AddNode(_T("∑…––∆Â"), pCategoryNode);
+        }
+
+        CListUI* pUserList = static_cast<CListUI*>(m_pm.FindControl(_T("userlist")));
+        pUserList->SetTextCallback(this);      
+        for( int i = 0; i < 400; i++ ) {
+            CListTextElementUI* pListElement = new CListTextElementUI;
+            pUserList->Add(pListElement);
         }
 
         CLoginFrameWnd* pLoginFrame = new CLoginFrameWnd();
@@ -321,6 +328,21 @@ public:
             }
 
         }
+    }
+
+    LPCTSTR GetItemText(CControlUI* pControl, int iIndex, int iSubItem)
+    {
+        if( pControl->GetParent()->GetParent()->GetName() == _T("userlist") ) {
+            if( iSubItem == 0 ) return _T("<i vip.png>");
+            if( iSubItem == 1 ) return _T("<i vip.png>");
+            if( iSubItem == 2 ) return _T("¥À»ÀÍ«≥∆");
+            if( iSubItem == 3 ) return _T("5");
+            if( iSubItem == 4 ) return _T("50%");
+            if( iSubItem == 5 ) return _T("0%");
+            if( iSubItem == 6 ) return _T("100");
+        }
+
+        return _T("");
     }
 
     LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -524,7 +546,7 @@ private:
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*lpCmdLine*/, int nCmdShow)
 {
     CPaintManagerUI::SetInstance(hInstance);
-    CPaintManagerUI::SetResourcePath(_T("skin"));
+    CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath() + _T("\\skin"));
     CPaintManagerUI::SetResourceZip(_T("GameRes.zip"));
 
     HRESULT Hr = ::CoInitialize(NULL);

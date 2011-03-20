@@ -168,10 +168,13 @@ public:
     void SetShowUpdateRect(bool show);
 
     static HINSTANCE GetInstance();
+    static CStdString GetInstancePath();
+    static CStdString GetCurrentPath();
     static HINSTANCE GetResourceDll();
     static const CStdString& GetResourcePath();
     static const CStdString& GetResourceZip();
     static void SetInstance(HINSTANCE hInst);
+    static void SetCurrentPath(LPCTSTR pStrPath);
     static void SetResourceDll(HINSTANCE hInst);
     static void SetResourcePath(LPCTSTR pStrPath);
     static void SetResourceZip(LPCTSTR pStrZip);
@@ -400,7 +403,7 @@ public:
     virtual void SetShortcut(TCHAR ch);
 
     // 用户属性
-    virtual CStdString GetUserData() const; // 辅助函数，供用户使用
+    virtual const CStdString& GetUserData(); // 辅助函数，供用户使用
     virtual void SetUserData(LPCTSTR pstrText); // 辅助函数，供用户使用
     virtual UINT_PTR GetTag() const; // 辅助函数，供用户使用
     virtual void SetTag(UINT_PTR pTag); // 辅助函数，供用户使用
