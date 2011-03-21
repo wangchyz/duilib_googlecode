@@ -1020,6 +1020,11 @@ void CPaintManagerUI::ReleaseCapture()
     m_bMouseCapture = false;
 }
 
+bool CPaintManagerUI::IsCaptured()
+{
+    return m_bMouseCapture;
+}
+
 bool CPaintManagerUI::SetNextTabControl(bool bForward)
 {
     // If we're in the process of restructuring the layout we can delay the
