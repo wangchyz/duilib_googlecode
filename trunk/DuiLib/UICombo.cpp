@@ -59,7 +59,6 @@ void CComboWnd::Init(CComboUI* pOwner)
     oMonitor.cbSize = sizeof(oMonitor);
     ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
     CRect rcWork = oMonitor.rcWork;
-    rcWork.Offset(-rcWork.left, -rcWork.top);
     if( rc.bottom > rcWork.bottom ) {
         rc.left = rcOwner.left;
         rc.right = rcOwner.right;
@@ -451,11 +450,9 @@ void CComboUI::Event(TEventUI& event)
     }
     if( event.Type == UIEVENT_MOUSELEAVE )
     {
-        if( !::PtInRect(&m_rcItem, event.ptMouse ) ) {
-            if( (m_uButtonState & UISTATE_HOT) != 0 ) {
-                m_uButtonState &= ~UISTATE_HOT;
-                Invalidate();
-            }
+        if( (m_uButtonState & UISTATE_HOT) != 0 ) {
+            m_uButtonState &= ~UISTATE_HOT;
+            Invalidate();
         }
         return;
     }

@@ -1123,7 +1123,7 @@ LRESULT CEditWnd::OnEditChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 CEditUI::CEditUI() : m_pWindow(NULL), m_uMaxChar(255), m_bReadOnly(false), 
 m_bPasswordMode(false), m_cPasswordChar(_T('*')), m_uButtonState(0)
 {
-    SetTextPadding(CRect(4, 4, 4, 4));
+    SetTextPadding(CRect(4, 3, 4, 3));
     SetBkColor(0xFFFFFFFF);
 }
 
@@ -1181,6 +1181,7 @@ void CEditUI::Event(TEventUI& event)
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK ) 
     {
         if( IsEnabled() ) {
+            GetManager()->ReleaseCapture();
             if( IsFocused() && m_pWindow == NULL )
             {
                 m_pWindow = new CEditWnd();
@@ -1194,7 +1195,6 @@ void CEditUI::Event(TEventUI& event)
                 pt.y -= m_rcItem.top + m_rcTextPadding.top;
                 ::SendMessage(*m_pWindow, WM_LBUTTONDOWN, event.wParam, MAKELPARAM(pt.x, pt.y));
             }
-            GetManager()->ReleaseCapture();
         }
         return;
     }

@@ -265,7 +265,7 @@ class DeskUI : public CContainerUI
 class DeskListUI : public CTileLayoutUI
 {
 public:
-    DeskListUI()
+    DeskListUI() : m_uButtonState(0)
     {
         //for(int i = 0; i < 50; ++i) 
         //{
@@ -300,6 +300,46 @@ public:
         }
     }
 
+    void Event(TEventUI& event) 
+    {
+        if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
+            if( m_pParent != NULL ) m_pParent->Event(event);
+            else CTileLayoutUI::Event(event);
+            return;
+        }
+
+        if( event.Type == UIEVENT_BUTTONDOWN && IsEnabled() )
+        {
+            m_uButtonState |= UISTATE_CAPTURED;
+            m_ptLastMouse = event.ptMouse;
+            m_dwLastTime = event.dwTimestamp;
+            ::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)));
+            return;
+        }
+        if( event.Type == UIEVENT_BUTTONUP )
+        {
+            if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
+                m_uButtonState &= ~UISTATE_CAPTURED;
+                ::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW)));
+            }
+            return;
+        }
+        if( event.Type == UIEVENT_MOUSEMOVE )
+        {
+            if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
+                LONG cy = (event.ptMouse.y - m_ptLastMouse.y) * ((event.dwTimestamp - m_dwLastTime) / 20.0 + 1);
+                m_ptLastMouse = event.ptMouse;
+                m_dwLastTime = event.dwTimestamp;
+                SIZE sz = GetScrollPos();
+                sz.cy -= cy;
+                SetScrollPos(sz);   
+            }
+            return;
+        }
+
+        CTileLayoutUI::Event(event);
+    }
+
     void SetPos(RECT rc)
     {
         if( GetCount() > 0 ) {
@@ -311,6 +351,11 @@ public:
 
         CTileLayoutUI::SetPos(rc);
     }
+
+private:
+    UINT m_uButtonState;
+    POINT m_ptLastMouse;
+    DWORD m_dwLastTime;
 };
 
 
