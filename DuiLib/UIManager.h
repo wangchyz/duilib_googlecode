@@ -233,6 +233,7 @@ public:
 
     void SetCapture();
     void ReleaseCapture();
+    bool IsCaptured();
 
     bool AddNotifier(INotifyUI* pControl);
     bool RemoveNotifier(INotifyUI* pControl);   
