@@ -248,11 +248,15 @@ public:
                     m_pm.SetDefaultFont(m_pm.GetFont(3));
                     m_pm.SetDefaultBoldFont(m_pm.GetFont(4));
                     m_pm.SetDefaultLinkFont(m_pm.GetFont(5));
+                    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
+                    if( pRichEdit ) pRichEdit->SetFont(3);
                 }
                 else {
                     m_pm.SetDefaultFont(m_pm.GetFont(0));
                     m_pm.SetDefaultBoldFont(m_pm.GetFont(1));
                     m_pm.SetDefaultLinkFont(m_pm.GetFont(2));
+                    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
+                    if( pRichEdit ) pRichEdit->SetFont(0);
                 }
                 m_pm.GetRoot()->NeedUpdate();
             }
@@ -265,17 +269,42 @@ public:
                 }
             }
             else if( name == _T("sendbtn") ) {
-                CVerticalLayoutUI* pControl = static_cast<CVerticalLayoutUI*>(m_pm.FindControl(_T("chatmsglist")));
-                CTextUI* text = new CTextUI;
-                text->SetText(_T("7月22日消息，盛大网络旗下盛大在线宣布，目前已与酷6网就其旗下的PHPCMS业务整体移交一事达成一致，交接工作正在进行中。这也意味着盛大开始在站长行业进行战略布局。"));
-                text->SetTextColor(0xFF0000CF);
-                pControl->Add(text);
-                pControl->SetPos(pControl->GetPos());
-                pControl->EndDown();
-            }
-            else if( name == _T("deletebtn") ) {
-                CVerticalLayoutUI* pControl = static_cast<CVerticalLayoutUI*>(m_pm.FindControl(_T("chatmsglist")));
-                pControl->RemoveAt(pControl->GetCount() - 1);
+                CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
+                if( pChatEdit == NULL || pChatEdit->GetText().IsEmpty() ) return;
+
+                CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
+                if( pRichEdit == NULL ) return;
+                long lSelBegin = 0, lSelEnd = 0;
+                CHARFORMAT2 cf;
+                ZeroMemory(&cf, sizeof(CHARFORMAT2));
+                cf.cbSize = sizeof(cf);
+                cf.dwReserved = 0;
+                cf.dwMask = CFM_COLOR;
+                cf.crTextColor = RGB(220, 0, 0);
+
+                lSelEnd = lSelBegin = pRichEdit->GetTextLength();
+                pRichEdit->SetSel(lSelEnd, lSelEnd);
+                pRichEdit->ReplaceSel(_T("某人"), false);
+                lSelEnd = pRichEdit->GetTextLength();
+                pRichEdit->SetSel(lSelBegin, lSelEnd);
+                pRichEdit->SetSelectionCharFormat(cf);
+
+                lSelBegin = lSelEnd;
+                pRichEdit->SetSel(-1, -1);
+                pRichEdit->ReplaceSel(_T("说:"), false);
+
+                pRichEdit->SetSel(-1, -1);
+                pRichEdit->ReplaceSel(pChatEdit->GetText(), false);
+                pChatEdit->SetText(_T(""));
+                pChatEdit->SetFocus();
+
+                pRichEdit->SetSel(-1, -1);
+                pRichEdit->ReplaceSel(_T("\n"), false);
+
+                cf.crTextColor = RGB(0, 0, 0);
+                lSelEnd = pRichEdit->GetTextLength();
+                pRichEdit->SetSel(lSelBegin, lSelEnd);
+                pRichEdit->SetSelectionCharFormat(cf);
             }
         }
         else if( msg.sType == _T("selectchanged") ) {
@@ -288,8 +317,20 @@ public:
                 CTabLayoutUI* pControl = static_cast<CTabLayoutUI*>(m_pm.FindControl(_T("switch")));
                 if( pControl && pControl->GetCurSel() != 1 ) {
                     pControl->SelectItem(1);
-                    CVerticalLayoutUI* pChatMsgList = static_cast<CVerticalLayoutUI*>(m_pm.FindControl(_T("chatmsglist")));
-                    if( pChatMsgList ) pChatMsgList->RemoveAll();
+                    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
+                    if( pRichEdit ) {
+                        pRichEdit->SetText(_T("欢迎进入XXX游戏，祝游戏愉快！\n\n"));
+                        long lSelBegin = 0, lSelEnd = 0;
+                        CHARFORMAT2 cf;
+                        ZeroMemory(&cf, sizeof(CHARFORMAT2));
+                        cf.cbSize = sizeof(cf);
+                        cf.dwReserved = 0;
+                        cf.dwMask = CFM_COLOR;
+                        cf.crTextColor = RGB(255, 0, 0);
+                        lSelEnd = pRichEdit->GetTextLength();
+                        pRichEdit->SetSel(lSelBegin, lSelEnd);
+                        pRichEdit->SetSelectionCharFormat(cf);
+                    }
                 }
             }
         }
@@ -327,6 +368,12 @@ public:
                 }
             }
 
+        }
+        else if( msg.sType == _T("itemselect") ) {
+            if( msg.pSender->GetName() == _T("chatCombo") ) {
+                CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
+                if( pChatEdit ) pChatEdit->SetText(msg.pSender->GetText());
+            }
         }
     }
 
