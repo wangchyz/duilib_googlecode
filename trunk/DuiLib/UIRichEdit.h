@@ -36,7 +36,7 @@ public:
     void SetTextColor(DWORD dwTextColor);
     int GetLimitText();
     void SetLimitText(int iChars);
-    long GetTextLength(DWORD dwFlags) const;
+    long GetTextLength(DWORD dwFlags = GTL_DEFAULT) const;
     CStdString GetText() const;
     void SetText(LPCTSTR pstrText);
     bool GetModify() const;
