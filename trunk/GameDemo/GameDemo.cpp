@@ -305,6 +305,8 @@ public:
                 lSelEnd = pRichEdit->GetTextLength();
                 pRichEdit->SetSel(lSelBegin, lSelEnd);
                 pRichEdit->SetSelectionCharFormat(cf);
+
+                pRichEdit->EndDown();
             }
         }
         else if( msg.sType == _T("selectchanged") ) {
