@@ -118,7 +118,7 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     else if( uMsg == WM_CLOSE ) {
-        m_pOwner->SetManager(m_pOwner->GetManager(), m_pOwner->GetParent(), true);
+        m_pOwner->SetManager(m_pOwner->GetManager(), m_pOwner->GetParent(), false);
         m_pOwner->SetPos(m_pOwner->GetPos());
         m_pOwner->SetFocus();
     }
