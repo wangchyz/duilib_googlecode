@@ -240,6 +240,12 @@ CStdPtrArray::CStdPtrArray(int iPreallocSize) : m_ppVoid(NULL), m_nCount(0), m_n
     if( iPreallocSize > 0 ) m_ppVoid = static_cast<LPVOID*>(malloc(iPreallocSize * sizeof(LPVOID)));
 }
 
+CStdPtrArray::CStdPtrArray(const CStdPtrArray& src) : m_ppVoid(NULL), m_nCount(0), m_nAllocated(0)
+{
+	for(int i=0; i<src.GetSize(); i++)
+		Add(src.GetAt(i));
+}
+
 CStdPtrArray::~CStdPtrArray()
 {
     if( m_ppVoid != NULL ) free(m_ppVoid);

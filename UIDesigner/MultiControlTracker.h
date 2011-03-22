@@ -1,6 +1,8 @@
 #pragma once
 #include "resource.h"
-#include "..\UIlib\UIlib.h"
+#include "..\DuiLib\UIlib.h"
+using DuiLib::CControlUI;
+using DuiLib::INotifyUI;
 
 /////////////////////////////////////////////////////////////////////////////
 // CControlTracker - Modified according to CRectTracker

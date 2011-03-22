@@ -24,14 +24,19 @@ namespace DuiLib {
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
-
+#ifndef ASSERT
 #define ASSERT(expr)  _ASSERTE(expr)
+#endif
 
 #ifdef _DEBUG
+#ifndef TRACE
 #define TRACE __Trace
+#endif
 #define TRACEMSG __TraceMsg
 #else
+#ifndef TRACE
 #define TRACE
+#endif
 #define TRACEMSG _T("")
 #endif
 
@@ -107,6 +112,7 @@ class UILIB_API CStdPtrArray
 {
 public:
     CStdPtrArray(int iPreallocSize = 0);
+	CStdPtrArray(const CStdPtrArray& src);
     ~CStdPtrArray();
 
     void Empty();

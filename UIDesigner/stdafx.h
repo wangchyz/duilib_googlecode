@@ -51,15 +51,15 @@
 
 #ifdef _DEBUG
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\bin\\UIlib_ud.lib")
+#       pragma comment(lib, "..\\bin\\DuiLib_ud.lib")
 #   else
-#       pragma comment(lib, "..\\bin\\UIlib_d.lib")
+#       pragma comment(lib, "..\\bin\\DuiLib_d.lib")
 #   endif
 #else
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\bin\\UIlib_u.lib")
+#       pragma comment(lib, "..\\bin\\DuiLib_u.lib")
 #   else
-#       pragma comment(lib, "..\\bin\\UIlib.lib")
+#       pragma comment(lib, "..\\bin\\DuiLib.lib")
 #   endif
 #endif
 
@@ -127,13 +127,41 @@ typedef struct tagExtendedAttributes
 //////////////////////////////////////////////////////////////////////////
 //Global variables
 
-#include "..\UIlib\UIlib.h"
+#include "..\DuiLib\UIlib.h"
 #include "MainFrm.h"
 #include "ToolBoxWnd.h"
 #include "PropertiesWnd.h"
 #include "ClassView.h"
 #include "ResourceView.h"
 #include "HookAPI.h"
+
+using DuiLib::CStdString;
+using DuiLib::TListInfoUI;
+using DuiLib::CRenderEngine;
+using DuiLib::CDialogBuilder;
+using DuiLib::CControlUI;
+using DuiLib::CButtonUI;
+using DuiLib::CEditUI;
+using DuiLib::CLabelUI;
+using DuiLib::CTextUI;
+using DuiLib::COptionUI;
+using DuiLib::CComboUI;
+using DuiLib::CListUI;
+using DuiLib::CSliderUI;
+using DuiLib::CProgressUI;
+using DuiLib::CActiveXUI;
+using DuiLib::CContainerUI;
+using DuiLib::CVerticalLayoutUI;
+using DuiLib::CHorizontalLayoutUI;
+using DuiLib::CDialogLayoutUI;
+using DuiLib::CTabLayoutUI;
+using DuiLib::CTileLayoutUI;
+using DuiLib::CListHeaderUI;
+using DuiLib::CListHeaderItemUI;
+using DuiLib::CListTextElementUI;
+using DuiLib::CListLabelElementUI;
+using DuiLib::CListExpandElementUI;
+using DuiLib::CListContainerElementUI;
 
 extern CMainFrame* g_pMainFrame;
 extern CToolBoxWnd* g_pToolBoxWnd;

@@ -114,6 +114,7 @@ public:
     CVerticalLayoutUI();
 
     LPCTSTR GetClass() const;
+	LPVOID GetInterface(LPCTSTR pstrName);
     void SetPos(RECT rc);
 };
 
@@ -131,7 +132,9 @@ public:
     UINT GetControlFlags() const;
     
     void SetSepWidth(int iWidth);
+	int GetSepWidth() const;
     void SetSepImmMode(bool bImmediately);
+	bool IsSepImmMode() const;
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     void Event(TEventUI& event);
 

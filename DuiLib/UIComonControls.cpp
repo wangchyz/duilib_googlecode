@@ -31,9 +31,19 @@ void CLabelUI::SetTextStyle(UINT uStyle)
     Invalidate();
 }
 
+UINT CLabelUI::GetTextStyle() const
+{
+	return m_uTextStyle;
+}
+
 void CLabelUI::SetTextColor(DWORD dwTextColor)
 {
     m_dwTextColor = dwTextColor;
+}
+
+DWORD CLabelUI::GetTextColor() const
+{
+	return m_dwTextColor;
 }
 
 void CLabelUI::SetDisabledTextColor(DWORD dwTextColor)
@@ -41,9 +51,19 @@ void CLabelUI::SetDisabledTextColor(DWORD dwTextColor)
     m_dwDisabledTextColor = dwTextColor;
 }
 
+DWORD CLabelUI::GetDisabledTextColor() const
+{
+	return m_dwDisabledTextColor;
+}
+
 void CLabelUI::SetFont(int index)
 {
     m_iFont = index;
+}
+
+int CLabelUI::GetFont() const
+{
+	return m_iFont;
 }
 
 RECT CLabelUI::GetTextPadding() const

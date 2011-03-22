@@ -1,7 +1,7 @@
 // UIDesignerView.h : CUIDesignerView 类的接口
 //
 #pragma once
-#include "..\UIlib\UIlib.h"
+#include "..\DuiLib\UIlib.h"
 #include "UIDesignerDoc.h"
 #include "MultiControlTracker.h"
 #include "LayoutManager.h"

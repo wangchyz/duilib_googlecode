@@ -286,11 +286,21 @@ void CPaintManagerUI::SetRoundCorner(int cx, int cy)
     m_szRoundCorner.cy = cy;
 }
 
+SIZE CPaintManagerUI::GetMinMaxInfo() const
+{
+	return m_szMinWindow;
+}
+
 void CPaintManagerUI::SetMinMaxInfo(int cx, int cy)
 {
     ASSERT(cx>=0 && cy>=0);
     m_szMinWindow.cx = cx;
     m_szMinWindow.cy = cy;
+}
+
+bool CPaintManagerUI::IsShowUpdateRect() const
+{
+	return m_bShowUpdateRect;
 }
 
 void CPaintManagerUI::SetShowUpdateRect(bool show)
@@ -1656,6 +1666,7 @@ m_nBorderSize(1)
     ::ZeroMemory(&m_rcPadding, sizeof(m_rcPadding));
     ::ZeroMemory(&m_rcItem, sizeof(RECT));
     ::ZeroMemory(&m_rcPaint, sizeof(RECT));
+	::ZeroMemory(&m_tRelativePos, sizeof(TRelativePosUI));
 }
 
 CControlUI::~CControlUI()
@@ -2003,6 +2014,30 @@ void CControlUI::SetMaxHeight(int cy)
     else NeedUpdate();
 }
 
+void CControlUI::SetRelativePos(SIZE szMove,SIZE szZoom)
+{
+	m_tRelativePos.bRelative = TRUE;
+	m_tRelativePos.nMoveXPercent = szMove.cx;
+	m_tRelativePos.nMoveYPercent = szMove.cy;
+	m_tRelativePos.nZoomXPercent = szZoom.cx;
+	m_tRelativePos.nZoomYPercent = szZoom.cy;
+}
+
+void CControlUI::SetRelativeParentSize(SIZE sz)
+{
+	m_tRelativePos.szParent = sz;
+}
+
+TRelativePosUI CControlUI::GetRelativePos() const
+{
+	return m_tRelativePos;
+}
+
+bool CControlUI::IsRelativePos() const
+{
+	return m_tRelativePos.bRelative;
+}
+
 CStdString CControlUI::GetToolTip() const
 {
     return m_sToolTip;
@@ -2214,6 +2249,15 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         SetFixedWidth(rcPos.right - rcPos.left);
         SetFixedHeight(rcPos.bottom - rcPos.top);
     }
+	else if( _tcscmp(pstrName, _T("relativepos")) == 0 ) {
+		SIZE szMove,szZoom;
+		LPTSTR pstr = NULL;
+		szMove.cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+		szMove.cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
+		szZoom.cx = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
+		szZoom.cy = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr); 
+		SetRelativePos(szMove,szZoom);
+	}
     else if( _tcscmp(pstrName, _T("padding")) == 0 ) {
         RECT rcPadding = { 0 };
         LPTSTR pstr = NULL;

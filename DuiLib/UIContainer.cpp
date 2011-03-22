@@ -713,6 +713,21 @@ void CContainerUI::SetFloatPos(int iIndex)
         rcCtrl.top = m_rcItem.bottom + szXY.cy - sz.cy;
         rcCtrl.bottom = m_rcItem.bottom + szXY.cy;
     }
+	if( pControl->IsRelativePos() )
+	{
+		TRelativePosUI tRelativePos = pControl->GetRelativePos();
+		SIZE szParent = {m_rcItem.right-m_rcItem.left,m_rcItem.bottom-m_rcItem.top};
+		if(tRelativePos.szParent.cx != 0)
+		{
+			int nIncrementX = szParent.cx-tRelativePos.szParent.cx;
+			int nIncrementY = szParent.cy-tRelativePos.szParent.cy;
+			rcCtrl.left += (nIncrementX*tRelativePos.nMoveXPercent/100);
+			rcCtrl.top += (nIncrementY*tRelativePos.nMoveYPercent/100);
+			rcCtrl.right = rcCtrl.left+sz.cx+(nIncrementX*tRelativePos.nZoomXPercent/100);
+			rcCtrl.bottom = rcCtrl.top+sz.cy+(nIncrementY*tRelativePos.nZoomYPercent/100);
+		}
+		pControl->SetRelativeParentSize(szParent);
+	}
     pControl->SetPos(rcCtrl);
 }
 
@@ -774,7 +789,13 @@ CVerticalLayoutUI::CVerticalLayoutUI()
 
 LPCTSTR CVerticalLayoutUI::GetClass() const
 {
-    return _T("VertialLayoutUI");
+    return _T("VerticalLayoutUI");
+}
+
+LPVOID CVerticalLayoutUI::GetInterface(LPCTSTR pstrName)
+{
+	if( _tcscmp(pstrName, _T("VerticalLayout")) == 0 ) return static_cast<CVerticalLayoutUI*>(this);
+	return CContainerUI::GetInterface(pstrName);
 }
 
 void CVerticalLayoutUI::SetPos(RECT rc)
@@ -1025,6 +1046,11 @@ void CHorizontalLayoutUI::SetSepWidth(int iWidth)
     m_iSepWidth = iWidth;
 }
 
+int CHorizontalLayoutUI::GetSepWidth() const
+{
+	return m_iSepWidth;
+}
+
 void CHorizontalLayoutUI::SetSepImmMode(bool bImmediately)
 {
     if( m_bImmMode == bImmediately ) return;
@@ -1033,6 +1059,11 @@ void CHorizontalLayoutUI::SetSepImmMode(bool bImmediately)
     }
 
     m_bImmMode = bImmediately;
+}
+
+bool CHorizontalLayoutUI::IsSepImmMode() const
+{
+	return m_bImmMode;
 }
 
 void CHorizontalLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
