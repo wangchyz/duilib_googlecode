@@ -333,6 +333,7 @@ bool CListUI::SelectItem(int iIndex)
 
         m_iCurSel = -1;
     }
+    if( iIndex < 0 ) return false;
 
     CControlUI* pControl = GetItemAt(iIndex);
     if( pControl == NULL ) return false;

@@ -375,6 +375,7 @@ public:
             if( msg.pSender->GetName() == _T("chatCombo") ) {
                 CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
                 if( pChatEdit ) pChatEdit->SetText(msg.pSender->GetText());
+                static_cast<CComboUI*>(msg.pSender)->SelectItem(-1);
             }
         }
     }
