@@ -820,6 +820,14 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            return true;
        }
        break;
+   case  WM_CTLCOLOREDIT:
+       {
+           if( lParam == 0 ) break;
+           HWND hWndChild = (HWND) lParam;
+           lRes = ::SendMessage(hWndChild, OCM__BASE + uMsg, wParam, lParam);
+           return true;
+       }
+       break;
    default:
        if( uMsg == WM_MOUSEWHEEL && m_pFocus != NULL )
        {
