@@ -2,6 +2,7 @@
 #define __CONTROLEX_H__
 
 #include <vector>
+#include <math.h>
 
 // category(0)->game(1)->server(2)->room(3)
 class GameListUI : public CListUI
@@ -257,31 +258,21 @@ private:
     Node* _root;
 };
 
-class DeskUI : public CContainerUI
-{
-
-};
+inline double CalculateDelay(double state) {
+    if(state < 0.5) {
+        return pow(state * 2, 2) / 2.0;
+    }
+    return 1.0 - (pow((state - 1.0) * 2, 2) / 2.0);
+}
 
 class DeskListUI : public CTileLayoutUI
 {
 public:
-    DeskListUI() : m_uButtonState(0)
-    {
-        //for(int i = 0; i < 50; ++i) 
-        //{
-        //    CContainerUI* pDesk = new CContainerUI;
-        //    pDesk->SetFixedWidth(182);
-        //    pDesk->SetFixedHeight(152);
-        //    pDesk->SetInset(CRect(2, 2, 2, 2));
-        //    pDesk->SetBorderColor(0xFF1B4876);
-        //    pDesk->Add((new CButtonUI())->ApplyAttributeList(_T("float=\"true\" bkcolor=\"#FF1B4876\" pos=\"66,6,118,48\"")));
-        //    pDesk->Add((new CButtonUI())->ApplyAttributeList(_T("float=\"true\" bkcolor=\"#FF1B4876\" pos=\"22,78,74,120\"")));
-        //    pDesk->Add((new CButtonUI())->ApplyAttributeList(_T("float=\"true\" bkcolor=\"#FF1B4876\" pos=\"108,78,160,120\"")));
-        //    pDesk->Add((new CLabelUI())->ApplyAttributeList(_T("float=\"true\" text=\"001\" textcolor=\"#FFDDDDDD\" align=\"center\" pos=\"70,132,116,150\"")));
-        //    this->Add(pDesk);
-        //}
+    enum { SCROLL_TIMERID = 10 };
 
-        for(int i = 0; i < 100; ++i) 
+    DeskListUI() : m_uButtonState(0), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
+    {
+        for(int i = 0; i < 500; ++i) 
         {
             CDialogBuilder builder;
             CContainerUI* pDesk = static_cast<CContainerUI*>(builder.Create(_T("desk.xml"), (UINT)0));
@@ -308,12 +299,37 @@ public:
             return;
         }
 
+        if( event.Type == UIEVENT_TIMER && event.wParam == SCROLL_TIMERID )
+        {
+            if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
+                POINT pt = m_pManager->GetMousePos();
+                LONG cy = (pt.y - m_ptLastMouse.y);
+                m_ptLastMouse = pt;
+                SIZE sz = GetScrollPos();
+                sz.cy -= cy;
+                SetScrollPos(sz);
+            }
+            else if( m_dwDelayLeft > 0 ) {
+                --m_dwDelayLeft;
+                SIZE sz = GetScrollPos();
+                if( sz.cy == 0 || sz.cy == GetScrollRange().cy) m_pManager->KillTimer(this, SCROLL_TIMERID);
+                sz.cy -= (DWORD)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
+                SetScrollPos(sz);
+            }
+            else {
+                m_pManager->KillTimer(this, SCROLL_TIMERID);
+            }
+            return;
+        }
         if( event.Type == UIEVENT_BUTTONDOWN && IsEnabled() )
         {
             m_uButtonState |= UISTATE_CAPTURED;
             m_ptLastMouse = event.ptMouse;
-            m_dwLastTime = event.dwTimestamp;
+            m_dwDelayDeltaY = 0;
+            m_dwDelayNum = 0;
+            m_dwDelayLeft = 0;
             ::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)));
+            m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
             return;
         }
         if( event.Type == UIEVENT_BUTTONUP )
@@ -321,18 +337,15 @@ public:
             if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
                 m_uButtonState &= ~UISTATE_CAPTURED;
                 ::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW)));
-            }
-            return;
-        }
-        if( event.Type == UIEVENT_MOUSEMOVE )
-        {
-            if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
-                LONG cy = (event.ptMouse.y - m_ptLastMouse.y) * ((event.dwTimestamp - m_dwLastTime) / 20.0 + 1);
-                m_ptLastMouse = event.ptMouse;
-                m_dwLastTime = event.dwTimestamp;
-                SIZE sz = GetScrollPos();
-                sz.cy -= cy;
-                SetScrollPos(sz);   
+                if( m_ptLastMouse.y != event.ptMouse.y ) {
+                    m_dwDelayDeltaY = (event.ptMouse.y - m_ptLastMouse.y);
+                    if( m_dwDelayDeltaY > 120 ) m_dwDelayDeltaY = 120;
+                    else if( m_dwDelayDeltaY < -120 ) m_dwDelayDeltaY = -120;
+                    m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 5;
+                    m_dwDelayLeft = m_dwDelayNum;
+                }
+                else 
+                    m_pManager->KillTimer(this, SCROLL_TIMERID);
             }
             return;
         }
@@ -355,7 +368,9 @@ public:
 private:
     UINT m_uButtonState;
     POINT m_ptLastMouse;
-    DWORD m_dwLastTime;
+    LONG m_dwDelayDeltaY;
+    DWORD m_dwDelayNum;
+    DWORD m_dwDelayLeft;
 };
 
 

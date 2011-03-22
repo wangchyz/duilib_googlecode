@@ -264,6 +264,10 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
 #ifdef _UNICODE
     if (encoding == XMLFILE_ENCODING_UTF8)
     {
+        if( dwSize >= 3 && pByte[0] == 0xEF && pByte[1] == 0xBB && pByte[1] == 0xBF ) 
+        {
+            pByte += 3; dwSize -= 3;
+        }
         DWORD nWide = ::MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
 
         m_pstrXML = static_cast<LPTSTR>(malloc((nWide + 1)*sizeof(TCHAR)));
@@ -310,6 +314,10 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
 #else // !_UNICODE
     if (encoding == XMLFILE_ENCODING_UTF8)
     {
+        if( dwSize >= 3 && pByte[0] == 0xEF && pByte[1] == 0xBB && pByte[1] == 0xBF ) 
+        {
+            pByte += 3; dwSize -= 3;
+        }
         DWORD nWide = ::MultiByteToWideChar( CP_UTF8, 0, (LPCSTR)pByte, dwSize, NULL, 0 );
 
         LPWSTR w_str = static_cast<LPWSTR>(malloc((nWide + 1)*sizeof(WCHAR)));
@@ -389,7 +397,7 @@ bool CMarkup::LoadFromFile(LPCTSTR pstrFilename, int encoding)
             Release();
             return _Failed(_T("Could not read file"));
         }
-        bool ret = LoadFromMem(encoding==XMLFILE_ENCODING_UTF8?pByte+3:pByte, dwSize, encoding);
+        bool ret = LoadFromMem(pByte, dwSize, encoding);
         delete[] pByte;
 
         return ret;
@@ -411,7 +419,7 @@ bool CMarkup::LoadFromFile(LPCTSTR pstrFilename, int encoding)
             return _Failed(_T("Could not unzip file"));
         }
         CloseZip(hz);
-        bool ret = LoadFromMem(encoding==XMLFILE_ENCODING_UTF8?pByte+3:pByte, dwSize, encoding);
+        bool ret = LoadFromMem(pByte, dwSize, encoding);
         delete[] pByte;
 
         return ret;
