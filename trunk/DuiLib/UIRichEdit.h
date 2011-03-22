@@ -61,7 +61,7 @@ public:
     void Cut();
     void Paste();
     int GetLineCount() const;
-    CPoint GetCharPos(long lChar) const;
+	CPoint GetCharPos(long lChar) const;
     long LineFromChar(long nIndex) const;
     CPoint PosFromChar(UINT nChar) const;
     int CharFromPos(CPoint pt) const;

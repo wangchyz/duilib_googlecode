@@ -1,5 +1,9 @@
 #pragma once
-#include "..\UIlib\UIlib.h"
+#include "..\DuiLib\UIlib.h"
+using DuiLib::CContainerUI;
+using DuiLib::CPaintManagerUI;
+using DuiLib::CWindowWnd;
+using DuiLib::TNotifyUI;
 
 //////////////////////////////////////////////////////////////////////////
 //CFormUI

@@ -860,6 +860,12 @@ LPCTSTR CActiveXUI::GetClass() const
     return _T("ActiveXUI");
 }
 
+LPVOID CActiveXUI::GetInterface(LPCTSTR pstrName)
+{
+	if( _tcscmp(pstrName, _T("ActiveX")) == 0 ) return static_cast<CActiveXUI*>(this);
+	return CControlUI::GetInterface(pstrName);
+}
+
 static void PixelToHiMetric(const SIZEL* lpSizeInPix, LPSIZEL lpSizeInHiMetric)
 {
 #define HIMETRIC_PER_INCH   2540
@@ -1081,6 +1087,11 @@ HRESULT CActiveXUI::GetControl(const IID iid, LPVOID* ppRet)
     if( ppRet == NULL ) return E_POINTER;
     if( m_pUnk == NULL ) return E_PENDING;
     return m_pUnk->QueryInterface(iid, (LPVOID*) ppRet);
+}
+
+CLSID CActiveXUI::GetClisd() const
+{
+	return m_clsid;
 }
 
 } // namespace DuiLib

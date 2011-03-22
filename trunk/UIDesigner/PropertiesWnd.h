@@ -1,5 +1,5 @@
 #pragma once
-#include "../UILib/UIlib.h"
+#include "../DuiLib/UIlib.h"
 
 //////////////////////////////////////////////////////////////////////////
 //CMFCPropertyGridColor32Property
@@ -75,6 +75,7 @@ enum PropertyTag
 	tagName=tagControl,
 	tagText,
 	tagPos,
+	tagRelativePos,
 	tagSize,
 	tagMinSize,
 	tagMaxSize,
@@ -117,7 +118,6 @@ enum PropertyTag
 	//Option
 	tagOption,
 	tagSelectedImage=tagOption,
-	tagSelectedTextColor,
 	tagSelected,
 	tagGroup,
 

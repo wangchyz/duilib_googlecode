@@ -1,5 +1,5 @@
 #pragma once
-#include "../UILib/UIRender.h"
+#include "../DuiLib/UIRender.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CImagePreview

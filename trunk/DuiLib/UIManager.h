@@ -122,6 +122,17 @@ typedef struct tagTNotifyUI
     LPARAM lParam;
 } TNotifyUI;
 
+// Structure for relative position to the parent
+typedef struct tagTRelativePosUI
+{
+	bool bRelative;
+	SIZE szParent;
+	int nMoveXPercent;
+	int nMoveYPercent;
+	int nZoomXPercent;
+	int nZoomYPercent;
+}TRelativePosUI;
+
 // Listener interface
 class INotifyUI
 {
@@ -164,7 +175,9 @@ public:
     void SetCaptionRect(RECT& rcCaption);
     SIZE GetRoundCorner() const;
     void SetRoundCorner(int cx, int cy);
+	SIZE GetMinMaxInfo() const;
     void SetMinMaxInfo(int cx, int cy);
+	bool IsShowUpdateRect() const;
     void SetShowUpdateRect(bool show);
 
     static HINSTANCE GetInstance();
@@ -394,6 +407,10 @@ public:
     virtual void SetMinHeight(int cy);
     virtual int GetMaxHeight() const;
     virtual void SetMaxHeight(int cy);
+	virtual void SetRelativePos(SIZE szMove,SIZE szZoom);
+	virtual void SetRelativeParentSize(SIZE sz);
+	virtual TRelativePosUI GetRelativePos() const;
+	virtual bool IsRelativePos() const;
 
     // 鼠标提示
     virtual CStdString GetToolTip() const;
@@ -463,6 +480,7 @@ protected:
     bool m_bFocused;
     bool m_bFloat;
     bool m_bFloatSetPos; // 防止SetPos循环调用
+	TRelativePosUI m_tRelativePos;
 
     CStdString m_sText;
     CStdString m_sToolTip;

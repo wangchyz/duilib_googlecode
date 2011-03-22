@@ -1,6 +1,7 @@
 #pragma once
 #include "ViewTree.h"
-#include "..\UIlib\UIlib.h"
+#include "..\DuiLib\UIlib.h"
+using DuiLib::CControlUI;
 
 //////////////////////////////////////////////////////////////////////////
 //CClassViewTree

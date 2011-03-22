@@ -32,10 +32,12 @@ public:
     virtual ~CActiveXUI();
 
     LPCTSTR GetClass() const;
+	LPVOID GetInterface(LPCTSTR pstrName);
 
     bool CreateControl(const CLSID clsid, bool bDelayedCreate = false);
     bool CreateControl(LPCTSTR pstrCLSID, bool bDelayedCreate = false);
     HRESULT GetControl(const IID iid, LPVOID* ppRet);
+	CLSID GetClisd() const;
 
     void SetVisible(bool bVisible = true);
     void SetInternVisible(bool bVisible = true);

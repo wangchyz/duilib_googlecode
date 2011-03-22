@@ -389,7 +389,7 @@ bool CMarkup::LoadFromFile(LPCTSTR pstrFilename, int encoding)
             Release();
             return _Failed(_T("Could not read file"));
         }
-        bool ret = LoadFromMem(pByte, dwSize, encoding);
+        bool ret = LoadFromMem(encoding==XMLFILE_ENCODING_UTF8?pByte+3:pByte, dwSize, encoding);
         delete[] pByte;
 
         return ret;
@@ -411,7 +411,7 @@ bool CMarkup::LoadFromFile(LPCTSTR pstrFilename, int encoding)
             return _Failed(_T("Could not unzip file"));
         }
         CloseZip(hz);
-        bool ret = LoadFromMem(pByte, dwSize, encoding);
+        bool ret = LoadFromMem(encoding==XMLFILE_ENCODING_UTF8?pByte+3:pByte, dwSize, encoding);
         delete[] pByte;
 
         return ret;

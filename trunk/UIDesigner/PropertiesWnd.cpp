@@ -7,6 +7,8 @@
 #include "UIDesignerView.h"
 #include "ImageDialog.h"
 
+using DuiLib::TRelativePosUI;
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -320,6 +322,17 @@ void CPropertiesWnd::InitPropList()
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
+	pValueList=new CMFCPropertyGridProperty(_T("RelativePos"),tagRelativePos,TRUE);//relativepos
+	pProp=new CMFCPropertyGridProperty(_T("MoveX"),(_variant_t)(LONG)0,_T("控件的水平位移"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("MoveY"),(_variant_t)(LONG)0,_T("控件的垂直位移"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("ZoomX"),(_variant_t)(LONG)0,_T("控件的水平比例"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("ZoomY"),(_variant_t)(LONG)0,_T("控件的垂直比例"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
 	pValueList=new CMFCPropertyGridProperty(_T("Size"),tagSize,TRUE);//size
 	pProp=new CMFCPropertyGridProperty(_T("Width"),(_variant_t)(LONG)0,_T("控件的宽度"));
 	pValueList->AddSubItem(pProp);
@@ -476,11 +489,6 @@ void CPropertiesWnd::InitPropList()
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("SelectedImage"),_T(""),_T("指定复选框被选择后的图片"),tagSelectedImage);//selectedimage
 	pPropUI->AddSubItem(pPropImage);
-
-	pPropColor=new CMFCPropertyGridColorProperty(_T("SelectedTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定被选中后文本的颜色"),tagSelectedTextColor);//selectedtextcolor
-	pPropColor->EnableOtherButton(_T("其他..."));
-	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
-	pPropUI->AddSubItem(pPropColor);
 
 	pProp=new CMFCPropertyGridProperty(_T("Selected"),(_variant_t)false,_T("指示是否已被选中"),tagSelected);//selected
 	pPropUI->AddSubItem(pProp);
@@ -894,6 +902,13 @@ void CPropertiesWnd::ShowControlProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)szXY.cy);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)(szXY.cx+nWidth));
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)(szXY.cy+nHeight));
+	//relativepos
+	TRelativePosUI posRelative=pControl->GetRelativePos();
+	pValueList=pPropControl->GetSubItem(tagRelativePos-tagControl);
+	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)posRelative.nMoveXPercent);
+	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)posRelative.nMoveYPercent);
+	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)posRelative.nZoomXPercent);
+	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)posRelative.nZoomYPercent);
 	//size
 	pValueList=pPropControl->GetSubItem(tagSize-tagControl);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pControl->GetWidth());
@@ -1041,8 +1056,6 @@ void CPropertiesWnd::ShowOptionProperty(CControlUI* pControl)
 
 	//selectedimage
 	pPropOption->GetSubItem(tagSelectedImage-tagOption)->SetValue((_variant_t)pOption->GetSelectedImage());
-	//selectedtextcolor
-	static_cast<CMFCPropertyGridColor32Property*>(pPropOption->GetSubItem(tagSelectedTextColor-tagOption))->SetColor((_variant_t)(LONG)(pOption->GetSelectedTextColor()));
 	//selected
 	pPropOption->GetSubItem(tagSelected-tagOption)->SetValue((_variant_t)pOption->IsSelected());
 	//group

@@ -18,28 +18,28 @@ HOOKSTRUCT CHookAPI::m_GetImageExHookInfo={0};
 CHookAPI::CHookAPI(void)
 {
 #ifdef _DEBUG
-	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("UIlib_ud.dll")));
+	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("Duilib_ud.dll")));
 	EnableCreateFile(true);
 
-	HookAPI(_T("UIlib_ud.dll"),LPCSTR("?Invalidate@CPaintManagerUI@@UAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
+	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
 	EnableInvalidate(true);
 
-	HookAPI(_T("UIlib_ud.dll"),LPCSTR("?AddImage@CPaintManagerUI@@QAEPAUtagTImageInfo@@PB_W0K@Z"),(FARPROC)Hook_AddImage,m_AddImageHookInfo);
+	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?AddImage@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_AddImage,m_AddImageHookInfo);
 	EnableAddImage(true);
 
-	HookAPI(_T("UIlib_ud.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@@QAEPAUtagTImageInfo@@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
+	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
 	EnableGetImageEx(true);
 #else
-	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("UIlib_u.dll")));
+	CreateFileAPI=(pfnCreateFile)HookAPI(_T("KERNEL32.dll"),LPCSTR("CreateFileW"),(FARPROC)Hook_CreateFile,GetModuleHandle(_T("Duilib_u.dll")));
 	EnableCreateFile(true);
 
-	HookAPI(_T("UIlib_u.dll"),LPCSTR("?Invalidate@CPaintManagerUI@@UAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
+	HookAPI(_T("Duilib_u.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
 	EnableInvalidate(true);
 
-	HookAPI(_T("UIlib_u.dll"),LPCSTR("?AddImage@CPaintManagerUI@@QAEPAUtagTImageInfo@@PB_W0K@Z"),(FARPROC)Hook_AddImage,m_AddImageHookInfo);
+	HookAPI(_T("Duilib_u.dll"),LPCSTR("?AddImage@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_AddImage,m_AddImageHookInfo);
 	EnableAddImage(true);
 
-	HookAPI(_T("UIlib_u.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@@QAEPAUtagTImageInfo@@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
+	HookAPI(_T("Duilib_u.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
 	EnableGetImageEx(true);
 #endif
 }
@@ -50,6 +50,9 @@ CHookAPI::~CHookAPI(void)
 
 FARPROC CHookAPI::HookAPI(LPCTSTR pstrDllName,LPCSTR pstrFuncName,FARPROC pfnNewFunc,HMODULE hModCaller)
 {
+	if(hModCaller==NULL)
+		return NULL;
+
 	ULONG size;
 	//获取指向PE文件中的Import中IMAGE_DIRECTORY_DESCRIPTOR数组的指针
 	PIMAGE_IMPORT_DESCRIPTOR pImportDesc=(PIMAGE_IMPORT_DESCRIPTOR)
