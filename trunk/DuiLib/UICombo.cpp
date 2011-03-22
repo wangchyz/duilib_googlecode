@@ -253,8 +253,8 @@ bool CComboUI::SelectItem(int iIndex)
         if( pListItem != NULL ) pListItem->Select(false);
         m_iCurSel = -1;
     }
+    if( iIndex < 0 ) return false;
     if( m_items.GetSize() == 0 ) return false;
-    if( iIndex < 0 ) iIndex = 0;
     if( iIndex >= m_items.GetSize() ) iIndex = m_items.GetSize() - 1;
     CControlUI* pControl = static_cast<CControlUI*>(m_items[iIndex]);
     if( !pControl || !pControl->IsVisible() || !pControl->IsEnabled() ) return false;
