@@ -308,17 +308,22 @@ public:
                 SIZE sz = GetScrollPos();
                 sz.cy -= cy;
                 SetScrollPos(sz);
+                return;
             }
             else if( m_dwDelayLeft > 0 ) {
                 --m_dwDelayLeft;
                 SIZE sz = GetScrollPos();
-                if( sz.cy == 0 || sz.cy == GetScrollRange().cy) m_pManager->KillTimer(this, SCROLL_TIMERID);
-                sz.cy -= (DWORD)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
-                SetScrollPos(sz);
+                LONG lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
+                if( sz.cy != 0 && sz.cy != GetScrollRange().cy && lDeltaY != 0 )  {
+                    sz.cy -= lDeltaY;
+                    SetScrollPos(sz);
+                    return;
+                }
             }
-            else {
-                m_pManager->KillTimer(this, SCROLL_TIMERID);
-            }
+            m_dwDelayDeltaY = 0;
+            m_dwDelayNum = 0;
+            m_dwDelayLeft = 0;
+            m_pManager->KillTimer(this, SCROLL_TIMERID);
             return;
         }
         if( event.Type == UIEVENT_BUTTONDOWN && IsEnabled() )
@@ -349,7 +354,24 @@ public:
             }
             return;
         }
-
+        if( event.Type == UIEVENT_SCROLLWHEEL )
+        {
+            switch( LOWORD(event.wParam) ) {
+                case SB_LINEUP:
+                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY += 4;
+                    else m_dwDelayDeltaY += 10;
+                    break;
+                case SB_LINEDOWN:
+                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY -= 4;
+                    else m_dwDelayDeltaY -= 10;
+                    break;
+            }
+            if( m_dwDelayDeltaY > 80 ) m_dwDelayDeltaY = 80;
+            else if( m_dwDelayDeltaY < -80 ) m_dwDelayDeltaY = -80;
+            m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 5;
+            m_dwDelayLeft = m_dwDelayNum;
+            m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
+        }
         CTileLayoutUI::Event(event);
     }
 
