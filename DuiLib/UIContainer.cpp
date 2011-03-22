@@ -361,7 +361,7 @@ void CContainerUI::LineDown()
 void CContainerUI::PageUp()
 {
     SIZE sz = GetScrollPos();
-    int iOffset = m_rcItem.right - m_rcItem.left - m_rcInset.left - m_rcInset.right;
+    int iOffset = m_rcItem.bottom - m_rcItem.top - m_rcInset.top - m_rcInset.bottom;
     if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) iOffset -= m_pHorizontalScrollbar->GetFixedHeight();
     sz.cy -= iOffset;
     SetScrollPos(sz);
@@ -370,7 +370,7 @@ void CContainerUI::PageUp()
 void CContainerUI::PageDown()
 {
     SIZE sz = GetScrollPos();
-    int iOffset = m_rcItem.right - m_rcItem.left - m_rcInset.left - m_rcInset.right;
+    int iOffset = m_rcItem.bottom - m_rcItem.top - m_rcInset.top - m_rcInset.bottom;
     if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) iOffset -= m_pHorizontalScrollbar->GetFixedHeight();
     sz.cy += iOffset;
     SetScrollPos(sz);
