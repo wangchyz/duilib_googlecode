@@ -1051,10 +1051,11 @@ public:
 
 protected:
     CEditUI* m_pOwner;
+    HBRUSH m_hBkBrush;
 };
 
 
-CEditWnd::CEditWnd() : m_pOwner(NULL)
+CEditWnd::CEditWnd() : m_pOwner(NULL), m_hBkBrush(NULL)
 {
 }
 
@@ -1082,9 +1083,9 @@ void CEditWnd::Init(CEditUI* pOwner)
     SendMessage(EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, MAKELPARAM(0, 0));
     Edit_Enable(m_hWnd, pOwner->IsEnabled() == true);
     Edit_SetReadOnly(m_hWnd, pOwner->IsReadOnly() == true);
+    m_pOwner = pOwner;
     ::ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
     ::SetFocus(m_hWnd);
-    m_pOwner = pOwner;
 }
 
 LPCTSTR CEditWnd::GetWindowClassName() const
@@ -1100,6 +1101,7 @@ LPCTSTR CEditWnd::GetSuperClassName() const
 void CEditWnd::OnFinalMessage(HWND /*hWnd*/)
 {
     // Clear reference and die
+    if( m_hBkBrush != NULL ) ::DeleteObject(m_hBkBrush);
     m_pOwner->m_pWindow = NULL;
     delete this;
 }
@@ -1110,6 +1112,15 @@ LRESULT CEditWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     BOOL bHandled = TRUE;
     if( uMsg == WM_KILLFOCUS ) lRes = OnKillFocus(uMsg, wParam, lParam, bHandled);
     else if( uMsg == OCM_COMMAND && GET_WM_COMMAND_CMD(wParam, lParam) == EN_CHANGE ) lRes = OnEditChanged(uMsg, wParam, lParam, bHandled);
+    else if( uMsg == OCM__BASE + WM_CTLCOLOREDIT ) {
+        if( m_pOwner->GetNativeEditBkColor() == 0xFFFFFFFF ) return NULL;
+        ::SetBkMode((HDC)wParam, TRANSPARENT);
+        if( m_hBkBrush == NULL ) {
+            DWORD clrColor = m_pOwner->GetNativeEditBkColor();
+            m_hBkBrush = ::CreateSolidBrush(RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
+        }
+        return (LRESULT)m_hBkBrush;
+    }
     else bHandled = FALSE;
     if( !bHandled ) return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
     return lRes;
@@ -1141,7 +1152,7 @@ LRESULT CEditWnd::OnEditChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 //
 
 CEditUI::CEditUI() : m_pWindow(NULL), m_uMaxChar(255), m_bReadOnly(false), 
-m_bPasswordMode(false), m_cPasswordChar(_T('*')), m_uButtonState(0)
+m_bPasswordMode(false), m_cPasswordChar(_T('*')), m_uButtonState(0), m_dwEditbkColor(0xFFFFFFFF)
 {
     SetTextPadding(CRect(4, 3, 4, 3));
     SetBkColor(0xFFFFFFFF);
@@ -1354,6 +1365,16 @@ void CEditUI::SetDisabledImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
+void CEditUI::SetNativeEditBkColor(DWORD dwBkColor)
+{
+    m_dwEditbkColor = dwBkColor;
+}
+
+DWORD CEditUI::GetNativeEditBkColor() const
+{
+    return m_dwEditbkColor;
+}
+
 void CEditUI::SetVisible(bool bVisible)
 {
     CControlUI::SetVisible(bVisible);
@@ -1375,10 +1396,17 @@ void CEditUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("readonly")) == 0 ) SetReadOnly(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("password")) == 0 ) SetPasswordMode(_tcscmp(pstrValue, _T("true")) == 0);
+    else if( _tcscmp(pstrName, _T("maxchar")) == 0 ) SetMaxChar(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("normalimage")) == 0 ) SetNormalImage(pstrValue);
     else if( _tcscmp(pstrName, _T("hotimage")) == 0 ) SetHotImage(pstrValue);
     else if( _tcscmp(pstrName, _T("focusedimage")) == 0 ) SetFocusedImage(pstrValue);
     else if( _tcscmp(pstrName, _T("disabledimage")) == 0 ) SetDisabledImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("nativebkcolor")) == 0 ) {
+        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+        LPTSTR pstr = NULL;
+        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+        SetNativeEditBkColor(clrColor);
+    }
     else CLabelUI::SetAttribute(pstrName, pstrValue);
 }
 

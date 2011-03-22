@@ -257,6 +257,8 @@ public:
     void SetFocusedImage(LPCTSTR pStrImage);
     LPCTSTR GetDisabledImage();
     void SetDisabledImage(LPCTSTR pStrImage);
+    void SetNativeEditBkColor(DWORD dwBkColor);
+    DWORD GetNativeEditBkColor() const;
 
     void SetVisible(bool bVisible = true);
     void SetInternVisible(bool bVisible = true);
@@ -279,6 +281,7 @@ protected:
     CStdString m_sHotImage;
     CStdString m_sFocusedImage;
     CStdString m_sDisabledImage;
+    DWORD m_dwEditbkColor;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
