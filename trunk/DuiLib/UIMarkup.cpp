@@ -264,7 +264,7 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
 #ifdef _UNICODE
     if (encoding == XMLFILE_ENCODING_UTF8)
     {
-        if( dwSize >= 3 && pByte[0] == 0xEF && pByte[1] == 0xBB && pByte[1] == 0xBF ) 
+        if( dwSize >= 3 && pByte[0] == 0xEF && pByte[1] == 0xBB && pByte[2] == 0xBF ) 
         {
             pByte += 3; dwSize -= 3;
         }
@@ -314,7 +314,7 @@ bool CMarkup::LoadFromMem(BYTE* pByte, DWORD dwSize, int encoding)
 #else // !_UNICODE
     if (encoding == XMLFILE_ENCODING_UTF8)
     {
-        if( dwSize >= 3 && pByte[0] == 0xEF && pByte[1] == 0xBB && pByte[1] == 0xBF ) 
+        if( dwSize >= 3 && pByte[0] == 0xEF && pByte[1] == 0xBB && pByte[2] == 0xBF ) 
         {
             pByte += 3; dwSize -= 3;
         }
