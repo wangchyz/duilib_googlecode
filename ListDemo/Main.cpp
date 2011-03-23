@@ -236,6 +236,14 @@ public:
 
     LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
+        LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
+        styleValue &= ~WS_CAPTION;
+        ::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
+        RECT rcClient;
+        ::GetClientRect(*this, &rcClient);
+        ::SetWindowPos(*this, NULL, rcClient.left, rcClient.top, rcClient.right - rcClient.left, \
+            rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
+
         m_pm.Init(m_hWnd);
         CDialogBuilder builder;
         CControlUI* pRoot = builder.Create(_T("skin.xml"), (UINT)0, NULL, &m_pm);
