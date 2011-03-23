@@ -1520,6 +1520,12 @@ void CScrollbarUI::SetEnabled(bool bEnable)
     }
 }
 
+void CScrollbarUI::SetFocus()
+{
+    if( m_pOwner != NULL ) m_pOwner->SetFocus();
+    else CControlUI::SetFocus();
+}
+
 bool CScrollbarUI::IsHorizontal()
 {
     return m_bHorizontal;

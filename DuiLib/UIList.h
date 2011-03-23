@@ -188,6 +188,7 @@ public:
 
     void SetScrollPos(SIZE szPos);
     void SetPos(RECT rc);
+    void Event(TEventUI& event);
 
 protected:
     CListUI* m_pOwner;
