@@ -4,10 +4,19 @@
 #include <vector>
 #include <math.h>
 
+inline double CalculateDelay(double state) {
+    if(state < 0.5) {
+        return pow(state * 2, 2) / 2.0;
+    }
+    return 1.0 - (pow((state - 1.0) * 2, 2) / 2.0);
+}
+
 // category(0)->game(1)->server(2)->room(3)
 class GameListUI : public CListUI
 {
 public:
+    enum { SCROLL_TIMERID = 10 };
+
     struct NodeData
     {
         int _level;
@@ -67,7 +76,7 @@ public:
         }
     };	
 
-    GameListUI() : _root(NULL)
+    GameListUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
     {
         SetItemShowHtml(true);
 
@@ -116,6 +125,57 @@ public:
         _root->data()._level = -1;
         _root->data()._child_visible = true;
         _root->data()._pListElement = NULL;
+    }
+
+    void Event(TEventUI& event) 
+    {
+        if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
+            if( m_pParent != NULL ) m_pParent->Event(event);
+            else CVerticalLayoutUI::Event(event);
+            return;
+        }
+
+        if( event.Type == UIEVENT_TIMER && event.wParam == SCROLL_TIMERID )
+        {
+            if( m_dwDelayLeft > 0 ) {
+                --m_dwDelayLeft;
+                SIZE sz = GetScrollPos();
+                LONG lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
+                if( (lDeltaY > 0 && sz.cy != 0)  || (lDeltaY < 0 && sz.cy != GetScrollRange().cy ) ) {
+                    sz.cy -= lDeltaY;
+                    SetScrollPos(sz);
+                    return;
+                }
+            }
+            m_dwDelayDeltaY = 0;
+            m_dwDelayNum = 0;
+            m_dwDelayLeft = 0;
+            m_pManager->KillTimer(this, SCROLL_TIMERID);
+            return;
+        }
+        if( event.Type == UIEVENT_SCROLLWHEEL )
+        {
+            LONG lDeltaY = 0;
+            if( m_dwDelayNum > 0 ) lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
+            switch( LOWORD(event.wParam) ) {
+                case SB_LINEUP:
+                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY = lDeltaY + 10;
+                    else m_dwDelayDeltaY = lDeltaY + 16;
+                    break;
+                case SB_LINEDOWN:
+                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY = lDeltaY - 10;
+                    else m_dwDelayDeltaY = lDeltaY - 16;
+                    break;
+            }
+            if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
+            else if( m_dwDelayDeltaY < -100 ) m_dwDelayDeltaY = -100;
+            m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 4;
+            m_dwDelayLeft = m_dwDelayNum;
+            m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
+            return;
+        }
+
+        CListUI::Event(event);
     }
 
     Node* GetRoot() { return _root; }
@@ -256,14 +316,11 @@ public:
 
 private:
     Node* _root;
-};
 
-inline double CalculateDelay(double state) {
-    if(state < 0.5) {
-        return pow(state * 2, 2) / 2.0;
-    }
-    return 1.0 - (pow((state - 1.0) * 2, 2) / 2.0);
-}
+    LONG m_dwDelayDeltaY;
+    DWORD m_dwDelayNum;
+    DWORD m_dwDelayLeft;
+};
 
 class DeskListUI : public CTileLayoutUI
 {
@@ -314,7 +371,7 @@ public:
                 --m_dwDelayLeft;
                 SIZE sz = GetScrollPos();
                 LONG lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
-                if( sz.cy != 0 && sz.cy != GetScrollRange().cy && lDeltaY != 0 )  {
+                if( (lDeltaY > 0 && sz.cy != 0)  || (lDeltaY < 0 && sz.cy != GetScrollRange().cy ) ) {
                     sz.cy -= lDeltaY;
                     SetScrollPos(sz);
                     return;
@@ -346,7 +403,7 @@ public:
                     m_dwDelayDeltaY = (event.ptMouse.y - m_ptLastMouse.y);
                     if( m_dwDelayDeltaY > 120 ) m_dwDelayDeltaY = 120;
                     else if( m_dwDelayDeltaY < -120 ) m_dwDelayDeltaY = -120;
-                    m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 5;
+                    m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 4;
                     m_dwDelayLeft = m_dwDelayNum;
                 }
                 else 
@@ -356,21 +413,24 @@ public:
         }
         if( event.Type == UIEVENT_SCROLLWHEEL )
         {
+            LONG lDeltaY = 0;
+            if( m_dwDelayNum > 0 ) lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
             switch( LOWORD(event.wParam) ) {
                 case SB_LINEUP:
-                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY += 4;
-                    else m_dwDelayDeltaY += 10;
+                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY = lDeltaY + 10;
+                    else m_dwDelayDeltaY = lDeltaY + 16;
                     break;
                 case SB_LINEDOWN:
-                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY -= 4;
-                    else m_dwDelayDeltaY -= 10;
+                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY = lDeltaY - 10;
+                    else m_dwDelayDeltaY = lDeltaY - 16;
                     break;
             }
-            if( m_dwDelayDeltaY > 80 ) m_dwDelayDeltaY = 80;
-            else if( m_dwDelayDeltaY < -80 ) m_dwDelayDeltaY = -80;
-            m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 5;
+            if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
+            else if( m_dwDelayDeltaY < -100 ) m_dwDelayDeltaY = -100;
+            m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 4;
             m_dwDelayLeft = m_dwDelayNum;
             m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
+            return;
         }
         CTileLayoutUI::Event(event);
     }

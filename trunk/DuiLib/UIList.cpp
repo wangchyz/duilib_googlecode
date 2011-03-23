@@ -944,6 +944,18 @@ void CListBodyUI::SetPos(RECT rc)
     // Process the scrollbar
     ProcessScrollbar(rc, cxNeeded, cyNeeded);
 }
+
+void CListBodyUI::Event(TEventUI& event)
+{
+    if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
+        if( m_pOwner != NULL ) m_pOwner->Event(event);
+        else CControlUI::Event(event);
+        return;
+    }
+
+    if( m_pOwner != NULL ) m_pOwner->Event(event); else CControlUI::Event(event);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 //
 //

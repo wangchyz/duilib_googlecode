@@ -299,6 +299,7 @@ public:
     void SetOwner(CContainerUI* pOwner);
 
     void SetEnabled(bool bEnable = true);
+    void SetFocus();
 
     bool IsHorizontal();
     void SetHorizontal(bool bHorizontal = true);
