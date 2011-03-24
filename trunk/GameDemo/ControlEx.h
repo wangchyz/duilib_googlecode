@@ -169,7 +169,7 @@ public:
             }
             if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
             else if( m_dwDelayDeltaY < -100 ) m_dwDelayDeltaY = -100;
-            m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 4;
+            m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 4;
             m_dwDelayLeft = m_dwDelayNum;
             m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
             return;
@@ -403,7 +403,7 @@ public:
                     m_dwDelayDeltaY = (event.ptMouse.y - m_ptLastMouse.y);
                     if( m_dwDelayDeltaY > 120 ) m_dwDelayDeltaY = 120;
                     else if( m_dwDelayDeltaY < -120 ) m_dwDelayDeltaY = -120;
-                    m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 4;
+                    m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 4;
                     m_dwDelayLeft = m_dwDelayNum;
                 }
                 else 
@@ -427,7 +427,7 @@ public:
             }
             if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
             else if( m_dwDelayDeltaY < -100 ) m_dwDelayDeltaY = -100;
-            m_dwDelayNum = sqrt((double)abs(m_dwDelayDeltaY)) * 4;
+            m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 4;
             m_dwDelayLeft = m_dwDelayNum;
             m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
             return;

@@ -227,7 +227,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
             HZIP hz = OpenZip((void*)sFile.GetData(), 0, 2);
             ZIPENTRY ze; 
             int i; 
-            if( FindZipItem(hz, bitmap.m_lpstr, false, &i, &ze) != 0 ) return NULL;
+            if( FindZipItem(hz, bitmap.m_lpstr, true, &i, &ze) != 0 ) return NULL;
             dwSize = ze.unc_size;
             if( dwSize == 0 ) return NULL;
             pData = new BYTE[ dwSize ];
@@ -1020,6 +1020,7 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
     //   Y Indent:         <y i>                where i = ver indent in pixels 
 
     ASSERT(::GetObjectType(hDC)==OBJ_DC || ::GetObjectType(hDC)==OBJ_MEMDC);
+    if( pstrText == NULL ) return;
     if( ::IsRectEmpty(&rc) ) return;
 
     bool bDraw = (uStyle & DT_CALCRECT) == 0;

@@ -1739,7 +1739,10 @@ CStdString CControlUI::GetText() const
 
 void CControlUI::SetText(LPCTSTR pstrText)
 {
+    if( m_sText == pstrText ) return;
+
     m_sText = pstrText;
+    Invalidate();
 }
 
 DWORD CControlUI::GetBkColor() const
