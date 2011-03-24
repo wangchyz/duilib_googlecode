@@ -562,15 +562,17 @@ const CStdString& CStdString::operator=(const TCHAR ch)
 
 CStdString CStdString::operator+(const CStdString& src)
 {
-    Append(src);
-    return *this;
+    CStdString sTemp = *this;
+    sTemp.Append(src);
+    return sTemp;
 }
 
 CStdString CStdString::operator+(LPCTSTR lpStr)
 {
     ASSERT(!::IsBadStringPtr(lpStr,-1));
-    Append(lpStr);
-    return *this;
+    CStdString sTemp = *this;
+    sTemp.Append(lpStr);
+    return sTemp;
 }
 
 const CStdString& CStdString::operator+=(const CStdString& src)
