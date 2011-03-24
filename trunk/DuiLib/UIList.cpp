@@ -1846,7 +1846,7 @@ void CListTextElementUI::DrawItemText(HDC hDC, const RECT& rcItem)
         rcItem.bottom -= pInfo->rcTextPadding.bottom;
 
         LPCTSTR pstrText = NULL;
-        if( pCallback ) pCallback->GetItemText(this, m_iIndex, i);
+        if( pCallback ) pstrText = pCallback->GetItemText(this, m_iIndex, i);
         else pstrText = GetText(i);
 
         if( pInfo->bShowHtml )
