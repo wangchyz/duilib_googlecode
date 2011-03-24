@@ -335,10 +335,14 @@ class UILIB_API CListTextElementUI : public CListLabelElementUI
 {
 public:
     CListTextElementUI();
+    ~CListTextElementUI();
 
     LPCTSTR GetClass() const;
     LPVOID GetInterface(LPCTSTR pstrName);
     UINT GetControlFlags() const;
+
+    LPCTSTR GetText(int iIndex) const;
+    void SetText(int iIndex, LPCTSTR pstrText);
 
     void SetOwner(CControlUI* pOwner);
     CStdString* GetLinkContent(int iIndex);
@@ -355,6 +359,7 @@ protected:
     CStdString m_sLinks[MAX_LINK];
     int m_nHoverLink;
     IListUI* m_pOwner;
+    CStdPtrArray m_aTexts;
 };
 
 

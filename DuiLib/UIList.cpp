@@ -113,10 +113,15 @@ bool CListUI::Add(CControlUI* pControl)
             CVerticalLayoutUI::Remove(m_pHeader);
             m_pHeader = static_cast<CListHeaderUI*>(pControl);
         }
+        m_ListInfo.nColumns = MIN(m_pHeader->GetCount(), UILIST_MAX_COLUMNS);
         return CVerticalLayoutUI::AddAt(pControl, 0);
     }
     // We also need to recognize header sub-items
-    if( _tcsstr(pControl->GetClass(), _T("ListHeaderItemUI")) != NULL ) return m_pHeader->Add(pControl);
+    if( _tcsstr(pControl->GetClass(), _T("ListHeaderItemUI")) != NULL ) {
+        bool ret = m_pHeader->Add(pControl);
+        m_ListInfo.nColumns = MIN(m_pHeader->GetCount(), UILIST_MAX_COLUMNS);
+        return ret;
+    }
     // The list items should know about us
     IListItemUI* pListItem = static_cast<IListItemUI*>(pControl->GetInterface(_T("ListItem")));
     if( pListItem != NULL ) {
@@ -131,10 +136,20 @@ bool CListUI::AddAt(CControlUI* pControl, int iIndex)
     // Override the AddAt() method so we can add items specifically to
     // the intended widgets. Headers and are assumed to be
     // answer the correct interface so we can add multiple list headers.
-    if( pControl->GetInterface(_T("ListHeader")) != NULL ) return CVerticalLayoutUI::AddAt(pControl, iIndex);
+    if( pControl->GetInterface(_T("ListHeader")) != NULL ) {
+        if( m_pHeader != pControl && m_pHeader->GetCount() == 0 ) {
+            CVerticalLayoutUI::Remove(m_pHeader);
+            m_pHeader = static_cast<CListHeaderUI*>(pControl);
+        }
+        m_ListInfo.nColumns = MIN(m_pHeader->GetCount(), UILIST_MAX_COLUMNS);
+        return CVerticalLayoutUI::AddAt(pControl, 0);
+    }
     // We also need to recognize header sub-items
-    if( _tcsstr(pControl->GetClass(), _T("ListHeaderItemUI")) != NULL ) return m_pHeader->AddAt(pControl, iIndex);
-
+    if( _tcsstr(pControl->GetClass(), _T("ListHeaderItemUI")) != NULL ) {
+        bool ret = m_pHeader->AddAt(pControl, iIndex);
+        m_ListInfo.nColumns = MIN(m_pHeader->GetCount(), UILIST_MAX_COLUMNS);
+        return ret;
+    }
     if (!m_pList->AddAt(pControl, iIndex)) return false;
 
     // The list items should know about us
@@ -1680,6 +1695,16 @@ CListTextElementUI::CListTextElementUI() : m_nLinks(0), m_nHoverLink(-1), m_pOwn
     ::ZeroMemory(&m_rcLinks, sizeof(m_rcLinks));
 }
 
+CListTextElementUI::~CListTextElementUI()
+{
+    CStdString* pText;
+    for( int it = 0; it < m_aTexts.GetSize(); it++ ) {
+        pText = static_cast<CStdString*>(m_aTexts[it]);
+        delete pText;
+    }
+    m_aTexts.Empty();
+}
+
 LPCTSTR CListTextElementUI::GetClass() const
 {
     return _T("ListTextElementUI");
@@ -1694,6 +1719,28 @@ LPVOID CListTextElementUI::GetInterface(LPCTSTR pstrName)
 UINT CListTextElementUI::GetControlFlags() const
 {
     return UIFLAG_WANTRETURN | ( (IsEnabled() && m_nLinks > 0) ? UIFLAG_SETCURSOR : 0);
+}
+
+LPCTSTR CListTextElementUI::GetText(int iIndex) const
+{
+    CStdString* pText = static_cast<CStdString*>(m_aTexts.GetAt(iIndex));
+    if( pText ) return pText->GetData();
+    return NULL;
+}
+
+void CListTextElementUI::SetText(int iIndex, LPCTSTR pstrText)
+{
+    if( m_pOwner == NULL ) return;
+    TListInfoUI* pInfo = m_pOwner->GetListInfo();
+    if( iIndex < 0 || iIndex >= pInfo->nColumns ) return;
+    if( m_aTexts.GetSize() != pInfo->nColumns ) m_aTexts.Resize(pInfo->nColumns);
+
+    CStdString* pText = static_cast<CStdString*>(m_aTexts[iIndex]);
+    if( pText && *pText == pstrText ) return;
+
+    if( pText ) delete pText;
+    m_aTexts.SetAt(iIndex, new CStdString(pstrText));
+    Invalidate();
 }
 
 void CListTextElementUI::SetOwner(CControlUI* pOwner)
@@ -1786,8 +1833,8 @@ void CListTextElementUI::DrawItemText(HDC hDC, const RECT& rcItem)
         iTextColor = pInfo->dwDisabledTextColor;
     }
     IListCallbackUI* pCallback = m_pOwner->GetTextCallback();
-    ASSERT(pCallback);
-    if( pCallback == NULL ) return;
+    //ASSERT(pCallback);
+    //if( pCallback == NULL ) return;
     m_nLinks = 0;
     int nLinks = lengthof(m_rcLinks);
     for( int i = 0; i < pInfo->nColumns; i++ )
@@ -1797,7 +1844,10 @@ void CListTextElementUI::DrawItemText(HDC hDC, const RECT& rcItem)
         rcItem.right -= pInfo->rcTextPadding.right;
         rcItem.top += pInfo->rcTextPadding.top;
         rcItem.bottom -= pInfo->rcTextPadding.bottom;
-        LPCTSTR pstrText = pCallback->GetItemText(this, m_iIndex, i);
+
+        LPCTSTR pstrText = NULL;
+        if( pCallback ) pCallback->GetItemText(this, m_iIndex, i);
+        else pstrText = GetText(i);
 
         if( pInfo->bShowHtml )
             CRenderEngine::DrawHtmlText(hDC, m_pManager, rcItem, pstrText, iTextColor, \
