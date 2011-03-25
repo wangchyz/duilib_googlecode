@@ -1700,7 +1700,7 @@ CListTextElementUI::~CListTextElementUI()
     CStdString* pText;
     for( int it = 0; it < m_aTexts.GetSize(); it++ ) {
         pText = static_cast<CStdString*>(m_aTexts[it]);
-        delete pText;
+        if( pText ) delete pText;
     }
     m_aTexts.Empty();
 }
@@ -1733,10 +1733,10 @@ void CListTextElementUI::SetText(int iIndex, LPCTSTR pstrText)
     if( m_pOwner == NULL ) return;
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
     if( iIndex < 0 || iIndex >= pInfo->nColumns ) return;
-    if( m_aTexts.GetSize() != pInfo->nColumns ) m_aTexts.Resize(pInfo->nColumns);
+    while( m_aTexts.GetSize() < pInfo->nColumns ) { m_aTexts.Add(NULL); }
 
     CStdString* pText = static_cast<CStdString*>(m_aTexts[iIndex]);
-    if( pText && *pText == pstrText ) return;
+    if( (pText == NULL && pstrText == NULL) || (pText && *pText == pstrText) ) return;
 
     if( pText ) delete pText;
     m_aTexts.SetAt(iIndex, new CStdString(pstrText));
