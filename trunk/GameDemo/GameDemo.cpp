@@ -244,21 +244,26 @@ public:
                 if( pControl ) pControl->SetVisible(false);
             }
             else if( name == _T("fontswitch") ) {
-                if( m_pm.GetDefaultFont() == m_pm.GetFont(0) ) {
-                    m_pm.SetDefaultFont(m_pm.GetFont(3));
-                    m_pm.SetDefaultBoldFont(m_pm.GetFont(4));
-                    m_pm.SetDefaultLinkFont(m_pm.GetFont(5));
-                    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
-                    if( pRichEdit ) pRichEdit->SetFont(3);
-                }
-                else {
-                    m_pm.SetDefaultFont(m_pm.GetFont(0));
-                    m_pm.SetDefaultBoldFont(m_pm.GetFont(1));
-                    m_pm.SetDefaultLinkFont(m_pm.GetFont(2));
-                    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
-                    if( pRichEdit ) pRichEdit->SetFont(0);
-                }
-                m_pm.GetRoot()->NeedUpdate();
+                CGameFrameWnd*	pWindow = new CGameFrameWnd();
+
+                pWindow->Create(GetHWND(), _T("widdndows"), UI_WNDSTYLE_FRAME, 0L, 0, 0, 650,490, NULL);
+                pWindow->CenterWindow();
+                pWindow->ShowWindow(SW_SHOW);
+                //if( m_pm.GetDefaultFont() == m_pm.GetFont(0) ) {
+                //    m_pm.SetDefaultFont(m_pm.GetFont(3));
+                //    m_pm.SetDefaultBoldFont(m_pm.GetFont(4));
+                //    m_pm.SetDefaultLinkFont(m_pm.GetFont(5));
+                //    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
+                //    if( pRichEdit ) pRichEdit->SetFont(3);
+                //}
+                //else {
+                //    m_pm.SetDefaultFont(m_pm.GetFont(0));
+                //    m_pm.SetDefaultBoldFont(m_pm.GetFont(1));
+                //    m_pm.SetDefaultLinkFont(m_pm.GetFont(2));
+                //    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
+                //    if( pRichEdit ) pRichEdit->SetFont(0);
+                //}
+                //m_pm.GetRoot()->NeedUpdate();
             }
             else if( name == _T("leaveBtn") ) {
                 COptionUI* pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("hallswitch")));
@@ -433,6 +438,7 @@ public:
 
     LRESULT OnNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
+        bHandled = FALSE;
         return (wParam == 0) ? TRUE : FALSE;
     }
 

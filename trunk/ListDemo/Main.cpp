@@ -281,6 +281,7 @@ public:
 
     LRESULT OnNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
+        bHandled = FALSE;
         return (wParam == 0) ? TRUE : FALSE;
     }
 
