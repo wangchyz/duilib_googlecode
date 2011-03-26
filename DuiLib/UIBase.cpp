@@ -958,12 +958,13 @@ bool CWindowWnd::ShowModal()
 {
     ASSERT(::IsWindow(m_hWnd));
     HWND hWndParent = GetWindowOwner(m_hWnd);
+    ::ShowWindow(m_hWnd, SW_SHOWNORMAL);
+    ::EnableWindow(hWndParent, FALSE);
     MSG msg = { 0 };
     while( ::IsWindow(m_hWnd) && ::GetMessage(&msg, NULL, 0, 0) ) {
-        if( msg.hwnd == hWndParent ) {
-            if( (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) ) continue;
-            if( msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST ) continue;
-            if( msg.message == WM_SETCURSOR ) continue;
+        if( msg.message == WM_CLOSE ) {
+            ::EnableWindow(hWndParent, TRUE);
+            ::SetFocus(hWndParent);
         }
         if( !CPaintManagerUI::TranslateMessage(&msg) ) {
             ::TranslateMessage(&msg);
@@ -971,6 +972,8 @@ bool CWindowWnd::ShowModal()
         }
         if( msg.message == WM_QUIT ) break;
     }
+    ::EnableWindow(hWndParent, TRUE);
+    ::SetFocus(hWndParent);
     if( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
     return true;
 }
