@@ -27,6 +27,7 @@ using namespace DuiLib;
 #   endif
 #endif
 
+#define WM_ADDLISTITEM WM_USER + 50
 /*
 * 存放第二列数据
 */
@@ -40,6 +41,7 @@ std::vector<std::string> desc;
 */
 struct Prama
 {
+    HWND hWnd;
     CListUI* pList;
     CButtonUI* pSearch;
     CStdString tDomain;
@@ -97,11 +99,11 @@ public:
             ss.clear();
             ss << "it's " << i;
             desc.push_back(ss.str());
-            CListExpandElementUI* pListElement = new CListExpandElementUI;
+            CListTextElementUI* pListElement = new CListTextElementUI;
             pListElement->SetTag(i);
             if (pListElement != NULL)
             {
-                pList->Add(pListElement);
+                ::PostMessage(prama->hWnd, WM_ADDLISTITEM, 0L, (LPARAM)pListElement);
             }
             /*
             *	Sleep 为了展示添加的动态效果，故放慢了添加速度，同时可以看到添加过程中界面仍然可以响应
@@ -109,6 +111,7 @@ public:
             ::Sleep(100);
         }
         //------------------------------------------
+        delete prama;
 
         pSearch->SetEnabled(true);
         return 0;
@@ -130,6 +133,7 @@ public:
         DWORD dwThreadID = 0;
         pList->SetTextCallback(this);//[1]
 
+        prama->hWnd = GetHWND();
         prama->pList = pList;
         prama->pSearch = m_pSearch;
         prama->tDomain = input;
@@ -232,6 +236,14 @@ public:
 #endif
             ::MessageBox(NULL, sMessage.GetData(), _T("提示(by tojen)"), MB_OK);
         }
+    }
+
+    LRESULT OnAddListItem(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        CListTextElementUI* pListElement = (CListTextElementUI*)lParam;
+        CListUI* pList = static_cast<CListUI*>(m_pm.FindControl(_T("domainlist")));
+        if( pList ) pList->Add(pListElement);
+        return 0;
     }
 
     LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -365,7 +377,7 @@ public:
             return 0;
         }
         BOOL bZoomed = ::IsZoomed(*this);
-        LRESULT lRes = __super::HandleMessage(uMsg, wParam, lParam);
+        LRESULT lRes = CWindowWnd::HandleMessage(uMsg, wParam, lParam);
         if( ::IsZoomed(*this) != bZoomed ) {
             if( !bZoomed ) {
                 CControlUI* pControl = static_cast<CControlUI*>(m_pm.FindControl(_T("maxbtn")));
@@ -388,6 +400,7 @@ public:
         LRESULT lRes = 0;
         BOOL bHandled = TRUE;
         switch( uMsg ) {
+            case WM_ADDLISTITEM:   lRes = OnAddListItem(uMsg, wParam, lParam, bHandled); break;
             case WM_CREATE:        lRes = OnCreate(uMsg, wParam, lParam, bHandled); break;
             case WM_CLOSE:         lRes = OnClose(uMsg, wParam, lParam, bHandled); break;
             case WM_DESTROY:       lRes = OnDestroy(uMsg, wParam, lParam, bHandled); break;
@@ -426,8 +439,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 
     ListMainForm* pFrame = new ListMainForm();
     if( pFrame == NULL ) return 0;
-    pFrame->Create(NULL, _T("ListDemo"), UI_WNDSTYLE_FRAME, WS_EX_STATICEDGE | WS_EX_APPWINDOW, 0, 0, 600, 320);
+    pFrame->Create(NULL, _T("ListDemo"), UI_WNDSTYLE_FRAME, WS_EX_STATICEDGE | WS_EX_APPWINDOW | WS_EX_LAYERED, 0, 0, 600, 320);
     pFrame->CenterWindow();
+    ::SetLayeredWindowAttributes(*pFrame, 0, 200, LWA_ALPHA);
     ::ShowWindow(*pFrame, SW_SHOW);
 
     CPaintManagerUI::MessageLoop();
