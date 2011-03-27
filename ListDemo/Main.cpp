@@ -440,9 +440,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 
     ListMainForm* pFrame = new ListMainForm();
     if( pFrame == NULL ) return 0;
-    pFrame->Create(NULL, _T("ListDemo"), UI_WNDSTYLE_FRAME, WS_EX_STATICEDGE | WS_EX_APPWINDOW | WS_EX_LAYERED, 0, 0, 600, 320);
+    pFrame->Create(NULL, _T("ListDemo"), UI_WNDSTYLE_FRAME, WS_EX_STATICEDGE | WS_EX_APPWINDOW /*| WS_EX_LAYERED*/, 0, 0, 600, 320);
     pFrame->CenterWindow();
-    ::SetLayeredWindowAttributes(*pFrame, 0, 200, LWA_ALPHA);
+    //::SetLayeredWindowAttributes(*pFrame, 0, 200, LWA_ALPHA);
     ::ShowWindow(*pFrame, SW_SHOW);
 
     CPaintManagerUI::MessageLoop();
