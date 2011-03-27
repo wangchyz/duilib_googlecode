@@ -1,6 +1,6 @@
 /*
 * Code By Tojen (qq:342269237)
-* 界面设计图片资源80%原创，布局完全原创,学习作品，不好请拍砖
+* 陆莽脙忙脡猫录脝脥录脝卢脳脢脭麓80%脭颅麓麓拢卢虏录戮脰脥锚脠芦脭颅麓麓,脩搂脧掳脳梅脝路拢卢虏禄潞脙脟毛脜脛脳漏
 */
 #include <objbase.h>
 #include <zmouse.h>
@@ -29,15 +29,15 @@ using namespace DuiLib;
 
 #define WM_ADDLISTITEM WM_USER + 50
 /*
-* 存放第二列数据
+* 麓忙路脜碌脷露镁脕脨脢媒戮脻
 */
 std::vector<std::string> domain;
 /*
-* 存放第三列数据
+* 麓忙路脜碌脷脠媒脕脨脢媒戮脻
 */
 std::vector<std::string> desc;
 /*
-*  线程函数中传入的结构体变量，使用线程为了使界面线程立即返回，防止卡，住你们懂得。
+*  脧脽鲁脤潞炉脢媒脰脨麓芦脠毛碌脛陆谩鹿鹿脤氓卤盲脕驴拢卢脢鹿脫脙脧脽鲁脤脦陋脕脣脢鹿陆莽脙忙脧脽鲁脤脕垄录麓路碌禄脴拢卢路脌脰鹿驴篓拢卢脳隆脛茫脙脟露庐碌脙隆拢
 */
 struct Prama
 {
@@ -89,7 +89,7 @@ public:
         CStdString tDomain = prama->tDomain;
         //-------------------------------------
         /*
-        * 添加数据循环
+        * 脤铆录脫脢媒戮脻脩颅禄路
         */
         for(int i=0; i<100; i++)
         {
@@ -106,7 +106,7 @@ public:
                 ::PostMessage(prama->hWnd, WM_ADDLISTITEM, 0L, (LPARAM)pListElement);
             }
             /*
-            *	Sleep 为了展示添加的动态效果，故放慢了添加速度，同时可以看到添加过程中界面仍然可以响应
+            *	Sleep 脦陋脕脣脮鹿脢戮脤铆录脫碌脛露炉脤卢脨搂鹿没拢卢鹿脢路脜脗媒脕脣脤铆录脫脣脵露脠拢卢脥卢脢卤驴脡脪脭驴麓碌陆脤铆录脫鹿媒鲁脤脰脨陆莽脙忙脠脭脠禄驴脡脪脭脧矛脫娄
             */
             ::Sleep(100);
         }
@@ -141,7 +141,7 @@ public:
         HANDLE hThread = CreateThread(NULL,0,&ListMainForm::Search, (LPVOID)prama,  0,&dwThreadID);
     }
     /*
-    * 关键的回调函数，IListCallbackUI 中的一个虚函数，渲染时候会调用,在[1]中设置了回调对象
+    * 鹿脴录眉碌脛禄脴碌梅潞炉脢媒拢卢IListCallbackUI 脰脨碌脛脪禄赂枚脨茅潞炉脢媒拢卢盲脰脠戮脢卤潞貌禄谩碌梅脫脙,脭脷[1]脰脨脡猫脰脙脕脣禄脴碌梅露脭脧贸
     */
     LPCTSTR GetItemText(CControlUI* pControl, int iIndex, int iSubItem)
     {
@@ -234,7 +234,7 @@ public:
             sMessage += domain[iIndex].c_str();
 
 #endif
-            ::MessageBox(NULL, sMessage.GetData(), _T("提示(by tojen)"), MB_OK);
+            ::MessageBox(NULL, sMessage.GetData(), _T("脤谩脢戮(by tojen)"), MB_OK);
         }
     }
 
@@ -281,7 +281,7 @@ public:
 
     LRESULT OnNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        bHandled = FALSE;
+        if( ::IsIconic(*this) ) bHandled = FALSE;
         return (wParam == 0) ? TRUE : FALSE;
     }
 
@@ -371,7 +371,7 @@ public:
 
     LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        // 有时会在收到WM_NCDESTROY后收到wParam为SC_CLOSE的WM_SYSCOMMAND
+        // 脫脨脢卤禄谩脭脷脢脮碌陆WM_NCDESTROY潞贸脢脮碌陆wParam脦陋SC_CLOSE碌脛WM_SYSCOMMAND
         if( wParam == SC_CLOSE ) {
             ::PostQuitMessage(0L);
             bHandled = TRUE;
