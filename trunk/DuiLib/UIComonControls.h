@@ -101,6 +101,8 @@ public:
 
     LPCTSTR GetSelectedImage();
     void SetSelectedImage(LPCTSTR pStrImage);
+	LPCTSTR GetForeImage();
+	void SetForeImage(LPCTSTR pStrImage);
 
     bool IsGroup() const;
     void SetGroup(bool bGroup);
@@ -117,6 +119,7 @@ protected:
     bool m_bGroup;
 
     CStdString m_sSelectedImage;
+	CStdString m_sForeImage;
 };
 
 

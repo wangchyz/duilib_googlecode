@@ -123,17 +123,25 @@ void CLabelUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("align")) == 0 ) {
         if( _tcsstr(pstrValue, _T("left")) != NULL ) {
-            m_uTextStyle &= ~(DT_CENTER | DT_RIGHT);
+            m_uTextStyle &= ~(DT_CENTER | DT_RIGHT | DT_TOP | DT_BOTTOM);
             m_uTextStyle |= DT_LEFT;
         }
         if( _tcsstr(pstrValue, _T("center")) != NULL ) {
-            m_uTextStyle &= ~(DT_LEFT | DT_RIGHT);
+            m_uTextStyle &= ~(DT_LEFT | DT_RIGHT | DT_TOP | DT_BOTTOM);
             m_uTextStyle |= DT_CENTER;
         }
         if( _tcsstr(pstrValue, _T("right")) != NULL ) {
-            m_uTextStyle &= ~(DT_LEFT | DT_CENTER);
+            m_uTextStyle &= ~(DT_LEFT | DT_CENTER | DT_TOP | DT_BOTTOM);
             m_uTextStyle |= DT_RIGHT;
         }
+		if( _tcsstr(pstrValue, _T("top")) != NULL ) {
+			m_uTextStyle &= ~(DT_BOTTOM | DT_VCENTER | DT_LEFT | DT_RIGHT);
+			m_uTextStyle |= DT_TOP;
+		}
+		if( _tcsstr(pstrValue, _T("bottom")) != NULL ) {
+			m_uTextStyle &= ~(DT_TOP | DT_VCENTER | DT_LEFT | DT_RIGHT);
+			m_uTextStyle |= DT_BOTTOM;
+		}
     }
     else if( _tcscmp(pstrName, _T("font")) == 0 ) SetFont(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("textcolor")) == 0 ) {
@@ -503,6 +511,17 @@ void COptionUI::SetSelectedImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
+LPCTSTR COptionUI::GetForeImage()
+{
+	return m_sForeImage;
+}
+
+void COptionUI::SetForeImage(LPCTSTR pStrImage)
+{
+	m_sForeImage = pStrImage;
+	Invalidate();
+}
+
 SIZE COptionUI::EstimateSize(SIZE szAvailable)
 {
     if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo().tmHeight + 8);
@@ -514,6 +533,7 @@ void COptionUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     if( _tcscmp(pstrName, _T("group")) == 0 ) SetGroup(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("selected")) == 0 ) Selected(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("selectedimage")) == 0 ) SetSelectedImage(pstrValue);
+	else if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
     else CButtonUI::SetAttribute(pstrName, pstrValue);
 }
 
@@ -524,11 +544,16 @@ void COptionUI::PaintStatusImage(HDC hDC)
     if( (m_uButtonState & UISTATE_SELECTED) != 0 ) {
         if( !m_sSelectedImage.IsEmpty() ) {
             if( !DrawImage(hDC, (LPCTSTR)m_sSelectedImage) ) m_sSelectedImage.Empty();
-            else return;
+            else goto Label_ForeImage;
         }
     }
 
-    return CButtonUI::PaintStatusImage(hDC);
+    CButtonUI::PaintStatusImage(hDC);
+
+Label_ForeImage:
+	if( !m_sForeImage.IsEmpty() ) {
+		if( !DrawImage(hDC, (LPCTSTR)m_sForeImage) ) m_sForeImage.Empty();
+	}
 }
 
 
