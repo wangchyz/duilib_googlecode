@@ -1042,3 +1042,259 @@ void CLayoutManager::MicoMoveRight(CArray<CControlUI*,CControlUI*>& arrSelected,
 	}
 	DelayPos.Repos();
 }
+
+#if defined(EXPORT_UI_SCRIPT)
+void CLayoutManager::CControlUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+{
+	TCHAR szBuf[MAX_PATH] = {0};
+
+	pNode->SetAttribute("name", StringConvertor::TcharToUtf8(pControlUI->GetName()));
+	pNode->SetAttribute("text", StringConvertor::TcharToUtf8(pControlUI->GetText()));
+	pNode->SetAttribute("tooltip", StringConvertor::TcharToUtf8(pControlUI->GetToolTip()));
+	pNode->SetAttribute("float", pControlUI->IsFloat()?"true":"false");
+
+	_stprintf(szBuf, _T("%d"),pControlUI->GetBorderSize());
+	pNode->SetAttribute("bordersize", StringConvertor::TcharToUtf8(szBuf));
+
+	if (pControlUI->IsFloat())
+	{
+		_stprintf(szBuf, _T("%d,%d,%d,%d"), pControlUI->GetFixedXY().cx, pControlUI->GetFixedXY().cy, pControlUI->GetFixedXY().cx + pControlUI->GetFixedWidth(), pControlUI->GetFixedXY().cy + pControlUI->GetFixedHeight());
+		pNode->SetAttribute("pos", StringConvertor::TcharToUtf8(szBuf));
+	}
+	else if ((pControlUI->GetFixedHeight() > 0) && (pControlUI->GetFixedWidth() > 0))
+	{
+		_stprintf(szBuf, _T("%d"), pControlUI->GetFixedWidth(), pControlUI->GetFixedHeight());
+		pNode->SetAttribute("width", StringConvertor::TcharToUtf8(szBuf));
+
+		_stprintf(szBuf, _T("%d"), pControlUI->GetFixedHeight());
+		pNode->SetAttribute("height", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	RECT rcPadding = pControlUI->GetPadding();
+	if (!IsRectEmpty(&rcPadding))
+	{
+		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcPadding.left, rcPadding.top, rcPadding.right, rcPadding.bottom);
+		pNode->SetAttribute("padding", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetBkImage() && _tcslen(pControlUI->GetBkImage()) > 0)
+	{
+		pNode->SetAttribute("bkimage", StringConvertor::TcharToUtf8(pControlUI->GetBkImage()));
+	}
+
+	if (pControlUI->GetBkColor() != 0)
+	{
+		DWORD dwBkColor = pControlUI->GetBkColor();					
+		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwBkColor)), static_cast<BYTE>(GetBValue(dwBkColor)), GetGValue(dwBkColor), GetRValue(dwBkColor));
+		pNode->SetAttribute("bkcolor", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetBkColor2() != 0)
+	{
+		DWORD dwBkColor = pControlUI->GetBkColor2();
+		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwBkColor)), static_cast<BYTE>(GetBValue(dwBkColor)), GetGValue(dwBkColor), GetRValue(dwBkColor));
+
+		pNode->SetAttribute("bkcolor2", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetBorderColor() != 0)
+	{
+		DWORD dwBkColor = pControlUI->GetBorderColor();					
+		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwBkColor)), static_cast<BYTE>(GetBValue(dwBkColor)), GetGValue(dwBkColor), GetRValue(dwBkColor));
+		pNode->SetAttribute("bordercolor", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetFocusBorderColor() != 0)
+	{
+		DWORD dwBkColor = pControlUI->GetFocusBorderColor();					
+		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwBkColor)), static_cast<BYTE>(GetBValue(dwBkColor)), GetGValue(dwBkColor), GetRValue(dwBkColor));
+		pNode->SetAttribute("focusbordercolor", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetMaxHeight() != 9999)
+	{
+		_stprintf(szBuf, _T("%d"), pControlUI->GetMaxHeight());
+		pNode->SetAttribute("maxheight", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetMaxWidth() != 9999)
+	{
+		_stprintf(szBuf, _T("%d"), pControlUI->GetMaxWidth());
+		pNode->SetAttribute("maxwidth", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetMinWidth() != 0)
+	{
+		_stprintf(szBuf, _T("%d"), pControlUI->GetMinWidth());
+		pNode->SetAttribute("minwidth", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pControlUI->GetMinHeight() != 0)
+	{
+		_stprintf(szBuf, _T("minheight=\"%d\" "), pControlUI->GetMinHeight());
+		pNode->SetAttribute("minheight", StringConvertor::TcharToUtf8(szBuf));
+	}
+}
+
+void CLayoutManager::CLabelUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+{
+	CControlUI_Properties(pControlUI, pNode);
+
+	CLabelUI* pLabelUI = static_cast<CLabelUI*>(pControlUI->GetInterface(_T("Label")));
+
+	TCHAR szBuf[MAX_PATH] = {0};
+
+	RECT rcTextPadding = pLabelUI->GetTextPadding();
+	if (!IsRectEmpty(&rcTextPadding))
+	{
+		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcTextPadding.left, rcTextPadding.top, rcTextPadding.right, rcTextPadding.bottom);
+		pNode->SetAttribute("textpadding", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pLabelUI->GetTextColor() != 0)
+	{
+		DWORD dwColor = pLabelUI->GetTextColor();					
+		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), GetGValue(dwColor), GetRValue(dwColor));
+		pNode->SetAttribute("textcolor", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pLabelUI->GetDisabledTextColor() != 0)
+	{
+		DWORD dwColor = pLabelUI->GetDisabledTextColor();					
+		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), GetGValue(dwColor), GetRValue(dwColor));
+		pNode->SetAttribute("disabledtextcolor", StringConvertor::TcharToUtf8(szBuf));
+	}
+}
+
+void CLayoutManager::CButtonUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+{
+	CLabelUI_Properties(pControlUI, pNode);
+
+	CButtonUI* pButtonUI = static_cast<CButtonUI*>(pControlUI->GetInterface(_T("Button")));
+	if (pButtonUI->GetNormalImage() && _tcslen(pButtonUI->GetNormalImage()) > 0)
+		pNode->SetAttribute("normalimage", StringConvertor::TcharToUtf8(pButtonUI->GetNormalImage()));
+
+	if (pButtonUI->GetHotImage() && _tcslen(pButtonUI->GetHotImage()) > 0)
+		pNode->SetAttribute("hotimage", StringConvertor::TcharToUtf8(pButtonUI->GetHotImage()));
+
+	if (pButtonUI->GetPushedImage() && _tcslen(pButtonUI->GetPushedImage()) > 0)
+		pNode->SetAttribute("pushedimage", StringConvertor::TcharToUtf8(pButtonUI->GetPushedImage()));
+
+	if (pButtonUI->GetFocusedImage() && _tcslen(pButtonUI->GetFocusedImage()) > 0)
+		pNode->SetAttribute("focusedimage", StringConvertor::TcharToUtf8(pButtonUI->GetFocusedImage()));
+
+	if (pButtonUI->GetDisabledImage() && _tcslen(pButtonUI->GetDisabledImage()) > 0)
+		pNode->SetAttribute("disabledimage", StringConvertor::TcharToUtf8(pButtonUI->GetDisabledImage()));
+
+	if (pButtonUI->GetForeImage() && _tcslen(pButtonUI->GetForeImage()) > 0)
+		pNode->SetAttribute("foreimage", StringConvertor::TcharToUtf8(pButtonUI->GetForeImage()));
+}
+
+
+void CLayoutManager::COptionUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+{
+	CButtonUI_Properties(pControlUI, pNode);
+	COptionUI* pOptionUI = static_cast<COptionUI*>(pControlUI->GetInterface(_T("Option")));
+
+	TCHAR szBuf[MAX_PATH] = {0};
+
+	if (pOptionUI->IsGroup())
+		pNode->SetAttribute("group", pOptionUI->IsGroup()?"true":"false");
+
+	if (pOptionUI->IsSelected())
+		pNode->SetAttribute("selected", pOptionUI->IsSelected()?"true":"false");
+
+	if (pOptionUI->GetSelectedTextColor() != 0)
+	{
+		DWORD dwColor = pOptionUI->GetSelectedTextColor();					
+		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), GetGValue(dwColor), GetRValue(dwColor));
+		pNode->SetAttribute("selectedtextcolor", StringConvertor::TcharToUtf8(szBuf));
+	}
+
+	if (pOptionUI->GetSelectedImage() && _tcslen(pOptionUI->GetSelectedImage()) > 0)
+		pNode->SetAttribute("selectedimage", StringConvertor::TcharToUtf8(pOptionUI->GetSelectedImage()));
+
+}
+
+void CLayoutManager::CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+{
+	CControlUI_Properties(pControlUI, pNode);
+
+	CContainerUI* pContainerUI = static_cast<CContainerUI*>(pControlUI->GetInterface(_T("Container")));
+	for( int it = 0; it < pContainerUI->GetCount(); it++ )
+	{
+		CControlUI* pControl = static_cast<CControlUI*>(pContainerUI->GetItemAt(it));
+
+		TiXmlElement* pNodeChild = new TiXmlElement(StringConvertor::TcharToUtf8(pControl->GetTypeName()));
+		SaveProperties(pControl, pNodeChild);
+		TiXmlNode* pNodeElement = pNode->InsertEndChild(*pNodeChild);
+		delete pNodeChild;
+		pNodeChild = NULL;
+	}
+}
+
+
+void CLayoutManager::SaveContainerProperties(CControlUI* pControlUI, TiXmlElement* pParentNode)
+{
+	TiXmlElement* pNode = NULL;
+	if ((static_cast<IContainerUI*>(pControlUI->GetInterface(_T("IContainer"))) != NULL) && (static_cast<IContainerUI*>(pControlUI->GetInterface(_T("Container"))) != NULL))
+	{
+		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CContainerUI_Properties(pControlUI, pNode);
+		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
+		delete pNode;
+		pNode = NULL;
+
+	}
+}
+
+void CLayoutManager::SaveSingleProperties(CControlUI* pControlUI, TiXmlElement* pParentNode)
+{
+	TiXmlElement* pNode = NULL;
+	if (_tcsicmp(pControlUI->GetClass(), _T("ControlUI")) == 0)
+	{
+		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CControlUI_Properties(pControlUI, pNode);
+		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
+	}
+	else if (_tcsicmp(pControlUI->GetClass(), _T("LabelUI")) == 0)
+	{
+		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CLabelUI_Properties(pControlUI, pNode);
+		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
+	}
+	else if (_tcsicmp(pControlUI->GetClass(), _T("ButtonUI")) == 0)
+	{
+		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CButtonUI_Properties(pControlUI, pNode);
+		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
+	}
+	else if (_tcsicmp(pControlUI->GetClass(), _T("OptionUI")) == 0)
+	{
+		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		COptionUI_Properties(pControlUI, pNode);
+		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
+	}
+
+	if (pNode)
+	{
+		delete pNode;
+		pNode = NULL;
+	}
+}
+
+void CLayoutManager::SaveProperties(CControlUI* pControlUI, TiXmlElement* pParentNode)
+{
+	if ((pControlUI != NULL) && (pParentNode != NULL))
+	{
+		if ((static_cast<IContainerUI*>(pControlUI->GetInterface(_T("IContainer"))) != NULL) && (static_cast<IContainerUI*>(pControlUI->GetInterface(_T("Container"))) != NULL))
+		{
+			SaveContainerProperties(pControlUI, pParentNode);
+		}
+		else
+		{
+			SaveSingleProperties(pControlUI, pParentNode);
+		}
+	}
+}
+#endif
