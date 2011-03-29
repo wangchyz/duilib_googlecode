@@ -5,6 +5,12 @@ using DuiLib::CPaintManagerUI;
 using DuiLib::CWindowWnd;
 using DuiLib::TNotifyUI;
 
+//#define EXPORT_UI_SCRIPT
+
+#if defined(EXPORT_UI_SCRIPT)
+#include "tinyxml.h"
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //CFormUI
 
@@ -135,6 +141,19 @@ public:
 protected:
 	CControlUI* CopyControls(CControlUI* pControl);
 	CControlUI* CopyControl(CControlUI* pControl);
+
+#if defined(EXPORT_UI_SCRIPT)
+	void SaveProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
+	void SaveSingleProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
+	void SaveContainerProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
+
+	void CControlUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void CLabelUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void CButtonUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void COptionUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+
+	void CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+#endif
 
 private:
 	CPaintManagerUI m_Manager;
