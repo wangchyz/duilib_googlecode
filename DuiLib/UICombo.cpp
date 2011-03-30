@@ -589,8 +589,13 @@ void CComboUI::SetItemFont(int index)
 
 void CComboUI::SetItemTextStyle(UINT uStyle)
 {
-    m_ListInfo.uTextStyle = uStyle;
-    Invalidate();
+	m_ListInfo.uTextStyle = uStyle;
+	Invalidate();
+}
+
+RECT CComboUI::GetItemTextPadding() const
+{
+	return m_ListInfo.rcTextPadding;
 }
 
 void CComboUI::SetItemTextPadding(RECT rc)
@@ -615,6 +620,21 @@ void CComboUI::SetItemImage(LPCTSTR pStrImage)
     m_ListInfo.sImage = pStrImage;
 }
 
+DWORD CComboUI::GetItemTextColor() const
+{
+	return m_ListInfo.dwTextColor;
+}
+
+DWORD CComboUI::GetItemBkColor() const
+{
+	return m_ListInfo.dwBkColor;
+}
+
+LPCTSTR CComboUI::GetItemImage() const
+{
+	return m_ListInfo.sImage;
+}
+
 void CComboUI::SetSelectedItemTextColor(DWORD dwTextColor)
 {
     m_ListInfo.dwSelectedTextColor = dwTextColor;
@@ -627,7 +647,22 @@ void CComboUI::SetSelectedItemBkColor(DWORD dwBkColor)
 
 void CComboUI::SetSelectedItemImage(LPCTSTR pStrImage)
 {
-    m_ListInfo.sSelectedImage = pStrImage;
+	m_ListInfo.sSelectedImage = pStrImage;
+}
+
+DWORD CComboUI::GetSelectedItemTextColor() const
+{
+	return m_ListInfo.dwSelectedTextColor;
+}
+
+DWORD CComboUI::GetSelectedItemBkColor() const
+{
+	return m_ListInfo.dwSelectedBkColor;
+}
+
+LPCTSTR CComboUI::GetSelectedItemImage() const
+{
+	return m_ListInfo.sSelectedImage;
 }
 
 void CComboUI::SetHotItemTextColor(DWORD dwTextColor)
@@ -645,6 +680,20 @@ void CComboUI::SetHotItemImage(LPCTSTR pStrImage)
     m_ListInfo.sHotImage = pStrImage;
 }
 
+DWORD CComboUI::GetHotItemTextColor() const
+{
+	return m_ListInfo.dwHotTextColor;
+}
+DWORD CComboUI::GetHotItemBkColor() const
+{
+	return m_ListInfo.dwHotBkColor;
+}
+
+LPCTSTR CComboUI::GetHotItemImage() const
+{
+	return m_ListInfo.sHotImage;
+}
+
 void CComboUI::SetDisabledItemTextColor(DWORD dwTextColor)
 {
     m_ListInfo.dwDisabledTextColor = dwTextColor;
@@ -658,6 +707,26 @@ void CComboUI::SetDisabledItemBkColor(DWORD dwBkColor)
 void CComboUI::SetDisabledItemImage(LPCTSTR pStrImage)
 {
     m_ListInfo.sDisabledImage = pStrImage;
+}
+
+DWORD CComboUI::GetDisabledItemTextColor() const
+{
+	return m_ListInfo.dwDisabledTextColor;
+}
+
+DWORD CComboUI::GetDisabledItemBkColor() const
+{
+	return m_ListInfo.dwDisabledBkColor;
+}
+
+LPCTSTR CComboUI::GetDisabledItemImage() const
+{
+	return m_ListInfo.sDisabledImage;
+}
+
+DWORD CComboUI::GetItemLineColor() const
+{
+	return m_ListInfo.dwLineColor;
 }
 
 void CComboUI::SetItemLineColor(DWORD dwLineColor)

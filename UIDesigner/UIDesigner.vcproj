@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\third_party\tinyxml"
+				AdditionalIncludeDirectories=".\third_party\tinyxml"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -53,6 +53,7 @@
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -127,7 +128,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\third_party\tinyxml"
+				AdditionalIncludeDirectories=".\third_party\tinyxml"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
@@ -135,6 +136,7 @@
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -534,7 +536,7 @@
 			Name="tinyxml"
 			>
 			<File
-				RelativePath="..\third_party\tinyxml\tinystr.cpp"
+				RelativePath=".\third_party\tinyxml\tinystr.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -554,35 +556,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\third_party\tinyxml\tinystr.h"
+				RelativePath=".\third_party\tinyxml\tinystr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\third_party\tinyxml\tinyxml.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\third_party\tinyxml\tinyxml.h"
-				>
-			</File>
-			<File
-				RelativePath="..\third_party\tinyxml\tinyxmlerror.cpp"
+				RelativePath=".\third_party\tinyxml\tinyxml.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -602,7 +580,31 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\third_party\tinyxml\tinyxmlparser.cpp"
+				RelativePath=".\third_party\tinyxml\tinyxml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\third_party\tinyxml\tinyxmlerror.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\third_party\tinyxml\tinyxmlparser.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
