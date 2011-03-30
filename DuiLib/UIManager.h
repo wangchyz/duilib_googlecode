@@ -37,8 +37,6 @@ typedef enum EVENTTYPE_UI
     UIEVENT_SETFOCUS,
     UIEVENT_WINDOWSIZE,
     UIEVENT_SETCURSOR,
-    UIEVENT_MEASUREITEM,
-    UIEVENT_DRAWITEM,
     UIEVENT_TIMER,
     UIEVENT_NOTIFY,
     UIEVENT_COMMAND,
@@ -177,6 +175,8 @@ public:
     void SetRoundCorner(int cx, int cy);
 	SIZE GetMinMaxInfo() const;
     void SetMinMaxInfo(int cx, int cy);
+    void SetTransparent(int nOpacity);
+    void SetBackgroundTransparent(bool bTrans);
 	bool IsShowUpdateRect() const;
     void SetShowUpdateRect(bool show);
 
@@ -283,7 +283,9 @@ private:
     HWND m_hWndPaint;
     HDC m_hDcPaint;
     HDC m_hDcOffscreen;
+    HDC m_hDcBackground;
     HBITMAP m_hbmpOffscreen;
+    HBITMAP m_hbmpBackground;
     HWND m_hwndTooltip;
     TOOLINFO m_ToolTip;
     bool m_bShowUpdateRect;
@@ -305,6 +307,7 @@ private:
     bool m_bUpdateNeeded;
     bool m_bFocusNeeded;
     bool m_bOffscreenPaint;
+    bool m_bAlphaBackground;
     bool m_bMouseTracking;
     bool m_bMouseCapture;
     //

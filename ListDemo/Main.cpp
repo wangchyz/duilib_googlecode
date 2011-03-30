@@ -257,6 +257,7 @@ public:
             rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
 
         m_pm.Init(m_hWnd);
+        m_pm.SetTransparent(100);
         CDialogBuilder builder;
         CControlUI* pRoot = builder.Create(_T("skin.xml"), (UINT)0, NULL, &m_pm);
         ASSERT(pRoot && "Failed to parse XML");
@@ -440,9 +441,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 
     ListMainForm* pFrame = new ListMainForm();
     if( pFrame == NULL ) return 0;
-    pFrame->Create(NULL, _T("ListDemo"), UI_WNDSTYLE_FRAME, WS_EX_STATICEDGE | WS_EX_APPWINDOW /*| WS_EX_LAYERED*/, 0, 0, 600, 320);
+    pFrame->Create(NULL, _T("ListDemo"), UI_WNDSTYLE_FRAME, WS_EX_STATICEDGE | WS_EX_APPWINDOW , 0, 0, 600, 320);
     pFrame->CenterWindow();
-    //::SetLayeredWindowAttributes(*pFrame, 0, 200, LWA_ALPHA);
     ::ShowWindow(*pFrame, SW_SHOW);
 
     CPaintManagerUI::MessageLoop();

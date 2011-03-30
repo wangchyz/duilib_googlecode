@@ -44,6 +44,7 @@ public:
         DWORD dwTextColor, int iFont, UINT uStyle);
     static void DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTSTR pstrText, 
         DWORD dwTextColor, RECT* pLinks, CStdString* sLinks, int& nLinkRects, UINT uStyle);
+    static HBITMAP GenerateBitmap(CPaintManagerUI* pManager, CControlUI* pControl, RECT rc);
 };
 
 } // namespace DuiLib
