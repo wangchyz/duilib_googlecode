@@ -596,10 +596,16 @@ bool CMarkup::_ParseAttributes(LPTSTR& pstrText)
 bool CMarkup::_ParseData(LPTSTR& pstrText, LPTSTR& pstrDest, char cEnd)
 {
     while( *pstrText != _T('\0') && *pstrText != cEnd ) {
-        while (*pstrText == _T('&'))
-        {
-            _ParseMetaChar(++pstrText, pstrDest);
-        }
+		if (*pstrText == _T('&'))
+		{
+			while (*pstrText == _T('&'))
+			{
+				_ParseMetaChar(++pstrText, pstrDest);
+			}
+
+			if (*pstrText == cEnd)
+				break;
+		}
 
         if( *pstrText == _T(' ') ) {
             *pstrDest++ = *pstrText++;
