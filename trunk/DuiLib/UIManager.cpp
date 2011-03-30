@@ -58,7 +58,9 @@ CPaintManagerUI::CPaintManagerUI() :
 m_hWndPaint(NULL),
 m_hDcPaint(NULL),
 m_hDcOffscreen(NULL),
+m_hDcBackground(NULL),
 m_hbmpOffscreen(NULL),
+m_hbmpBackground(NULL),
 m_hwndTooltip(NULL),
 m_bShowUpdateRect(false),
 m_uTimerID(0x1000),
@@ -73,6 +75,7 @@ m_bUpdateNeeded(false),
 m_bMouseTracking(false),
 m_bMouseCapture(false),
 m_bOffscreenPaint(true),
+m_bAlphaBackground(false),
 m_pParentResourcePM(NULL)
 {
     m_dwDefalutDisabledColor = 0xFFA7A6AA;
@@ -139,7 +142,9 @@ CPaintManagerUI::~CPaintManagerUI()
     // Reset other parts...
     if( m_hwndTooltip != NULL ) ::DestroyWindow(m_hwndTooltip);
     if( m_hDcOffscreen != NULL ) ::DeleteDC(m_hDcOffscreen);
+    if( m_hDcBackground != NULL ) ::DeleteDC(m_hDcBackground);
     if( m_hbmpOffscreen != NULL ) ::DeleteObject(m_hbmpOffscreen);
+    if( m_hbmpBackground != NULL ) ::DeleteObject(m_hbmpBackground);
     if( m_hDcPaint != NULL ) ::ReleaseDC(m_hWndPaint, m_hDcPaint);
     m_aPreMessages.Remove(m_aPreMessages.Find(this));
 }
@@ -298,6 +303,34 @@ void CPaintManagerUI::SetMinMaxInfo(int cx, int cy)
     m_szMinWindow.cy = cy;
 }
 
+void CPaintManagerUI::SetTransparent(int nOpacity)
+{
+    if( m_hWndPaint != NULL ) {
+        typedef BOOL (__stdcall *PFUNCSETLAYEREDWINDOWATTR)(HWND, COLORREF, BYTE, DWORD);
+        PFUNCSETLAYEREDWINDOWATTR fSetLayeredWindowAttributes;
+
+        HMODULE hUser32 = ::GetModuleHandle(_T("User32.dll"));
+        if (hUser32)
+        {
+            fSetLayeredWindowAttributes = 
+                (PFUNCSETLAYEREDWINDOWATTR)::GetProcAddress(hUser32, "SetLayeredWindowAttributes");
+            if( fSetLayeredWindowAttributes == NULL ) return;
+        }
+
+        DWORD dwStyle = ::GetWindowLong(m_hWndPaint, GWL_EXSTYLE);
+        DWORD dwNewStyle = dwStyle;
+        if( nOpacity >= 0 && nOpacity < 256 ) dwNewStyle |= WS_EX_LAYERED;
+        else dwNewStyle &= ~WS_EX_LAYERED;
+        if(dwStyle != dwNewStyle) ::SetWindowLong(m_hWndPaint, GWL_EXSTYLE, dwNewStyle);
+        fSetLayeredWindowAttributes(m_hWndPaint, 0, nOpacity, LWA_ALPHA);
+    }
+}
+
+void CPaintManagerUI::SetBackgroundTransparent(bool bTrans)
+{
+    m_bAlphaBackground = bTrans;
+}
+
 bool CPaintManagerUI::IsShowUpdateRect() const
 {
 	return m_bShowUpdateRect;
@@ -434,9 +467,13 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
                    if( m_pRoot->IsUpdateNeeded() ) {
                        m_pRoot->SetPos(rcClient);
                        if( m_hDcOffscreen != NULL ) ::DeleteDC(m_hDcOffscreen);
+                       if( m_hDcBackground != NULL ) ::DeleteDC(m_hDcBackground);
                        if( m_hbmpOffscreen != NULL ) ::DeleteObject(m_hbmpOffscreen);
+                       if( m_hbmpBackground != NULL ) ::DeleteObject(m_hbmpBackground);
                        m_hDcOffscreen = NULL;
+                       m_hDcBackground = NULL;
                        m_hbmpOffscreen = NULL;
+                       m_hbmpBackground = NULL;
                    }
                    else {
                        CControlUI* pControl = NULL;
@@ -475,28 +512,33 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            ::BeginPaint(m_hWndPaint, &ps);
            if( m_bOffscreenPaint )
            {
-               // We have an offscreen device to paint on for flickerfree display.
                HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(m_hDcOffscreen, m_hbmpOffscreen);
-               // Paint the image on the offscreen bitmap
                int iSaveDC = ::SaveDC(m_hDcOffscreen);
+               if( m_bAlphaBackground ) {
+                   if( m_hbmpBackground == NULL ) {
+                       RECT rcClient = { 0 };
+                       ::GetClientRect(m_hWndPaint, &rcClient);
+                       m_hDcBackground = ::CreateCompatibleDC(m_hDcPaint);;
+                       m_hbmpBackground = ::CreateCompatibleBitmap(m_hDcPaint, rcClient.right - rcClient.left, rcClient.bottom - rcClient.top); 
+                       ASSERT(m_hDcBackground);
+                       ASSERT(m_hbmpBackground);
+                       ::SelectObject(m_hDcBackground, m_hbmpBackground);
+                       ::BitBlt(m_hDcBackground, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left,
+                           ps.rcPaint.bottom - ps.rcPaint.top, ps.hdc, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
+                   }
+                   else
+                       ::SelectObject(m_hDcBackground, m_hbmpBackground);
+                   ::BitBlt(m_hDcOffscreen, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left,
+                       ps.rcPaint.bottom - ps.rcPaint.top, m_hDcBackground, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
+               }
                m_pRoot->DoPaint(m_hDcOffscreen, ps.rcPaint);
-               ::RestoreDC(m_hDcOffscreen, iSaveDC);
-
                for( int i = 0; i < m_aPostPaintControls.GetSize(); i++ ) {
                    CControlUI* pPostPaintControl = static_cast<CControlUI*>(m_aPostPaintControls[i]);
                    pPostPaintControl->DoPostPaint(m_hDcOffscreen, ps.rcPaint);
                }
-
-               // Blit offscreen bitmap back to display
-               ::BitBlt(ps.hdc, 
-                   ps.rcPaint.left, 
-                   ps.rcPaint.top, 
-                   ps.rcPaint.right - ps.rcPaint.left,
-                   ps.rcPaint.bottom - ps.rcPaint.top,
-                   m_hDcOffscreen,
-                   ps.rcPaint.left,
-                   ps.rcPaint.top,
-                   SRCCOPY);
+               ::RestoreDC(m_hDcOffscreen, iSaveDC);
+               ::BitBlt(ps.hdc, ps.rcPaint.left, ps.rcPaint.top, ps.rcPaint.right - ps.rcPaint.left,
+                   ps.rcPaint.bottom - ps.rcPaint.top, m_hDcOffscreen, ps.rcPaint.left, ps.rcPaint.top, SRCCOPY);
                ::SelectObject(m_hDcOffscreen, hOldBitmap);
 
                if( m_bShowUpdateRect ) {
@@ -692,6 +734,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            event.wKeyState = (WORD)wParam;
            event.dwTimestamp = ::GetTickCount();
            pControl->Event(event);
+           
        }
        break;
    case WM_LBUTTONUP:
@@ -714,6 +757,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
        break;
    case WM_LBUTTONDBLCLK:
        {
+           ::SetFocus(m_hWndPaint);
            POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
            m_ptLastMousePos = pt;
            CControlUI* pControl = FindControl(pt);
@@ -728,6 +772,40 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            event.dwTimestamp = ::GetTickCount();
            pControl->Event(event);
            m_pEventClick = pControl;
+       }
+       break;
+   case WM_MOUSEWHEEL:
+       {
+           if( m_pFocus == NULL ) break;
+           int zDelta = (int) (short) HIWORD(wParam);
+           TEventUI event = { 0 };
+           event.Type = UIEVENT_SCROLLWHEEL;
+           event.wParam = MAKELPARAM(zDelta < 0 ? SB_LINEDOWN : SB_LINEUP, 0);
+           event.lParam = lParam;
+           event.wKeyState = MapKeyState();
+           event.dwTimestamp = ::GetTickCount();
+           m_pFocus->Event(event);
+
+           // Let's make sure that the scroll item below the cursor is the same as before...
+           ::SendMessage(m_hWndPaint, WM_MOUSEMOVE, 0, (LPARAM) MAKELPARAM(m_ptLastMousePos.x, m_ptLastMousePos.y));
+       }
+       break;
+   case WM_CONTEXTMENU:
+       {
+           ::SetFocus(m_hWndPaint);
+           POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+           m_ptLastMousePos = pt;
+           CControlUI* pControl = FindControl(pt);
+           if( pControl == NULL ) break;
+           if( pControl->GetManager() != this ) break;
+           m_pEventClick = pControl;
+           pControl->SetFocus();
+           TEventUI event = { 0 };
+           event.Type = UIEVENT_CONTEXTMENU;
+           event.ptMouse = pt;
+           event.wKeyState = (WORD)wParam;
+           event.dwTimestamp = ::GetTickCount();
+           pControl->Event(event);
        }
        break;
    case WM_CHAR:
@@ -789,22 +867,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            pControl->Event(event);
        }
        return true;
-   case WM_MEASUREITEM:
-       {
-           if( wParam == 0 ) break;
-           HWND hWndChild = ::GetDlgItem(m_hWndPaint, ((LPMEASUREITEMSTRUCT) lParam)->CtlID);
-           lRes = ::SendMessage(hWndChild, OCM__BASE + uMsg, wParam, lParam);
-           return true;
-       }
-       break;
-   case WM_DRAWITEM:
-       {
-           if( wParam == 0 ) break;
-           HWND hWndChild = ((LPDRAWITEMSTRUCT) lParam)->hwndItem;
-           lRes = ::SendMessage(hWndChild, OCM__BASE + uMsg, wParam, lParam);
-           return true;
-       }
-       break;
    case WM_NOTIFY:
        {
            LPNMHDR lpNMHDR = (LPNMHDR) lParam;
@@ -829,19 +891,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
        }
        break;
    default:
-       if( uMsg == WM_MOUSEWHEEL && m_pFocus != NULL )
-       {
-           int zDelta = (int) (short) HIWORD(wParam);
-           TEventUI event = { 0 };
-           event.Type = UIEVENT_SCROLLWHEEL;
-           event.wParam = MAKELPARAM(zDelta < 0 ? SB_LINEDOWN : SB_LINEUP, 0);
-           event.lParam = lParam;
-           event.dwTimestamp = ::GetTickCount();
-           m_pFocus->Event(event);
-
-           // Let's make sure that the scroll item below the cursor is the same as before...
-           ::SendMessage(m_hWndPaint, WM_MOUSEMOVE, 0, (LPARAM) MAKELPARAM(m_ptLastMousePos.x, m_ptLastMousePos.y));
-       }
        break;
     }
 
@@ -944,7 +993,7 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
     // Paint manager window has focus?
     if( ::GetFocus() != m_hWndPaint ) ::SetFocus(m_hWndPaint);
     // Already has focus?
-    if( pControl == m_pFocus ) return;
+    if( pControl == NULL || pControl == m_pFocus ) return;
     // Remove focus from old control
     if( m_pFocus != NULL ) 
     {

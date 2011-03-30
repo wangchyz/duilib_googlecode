@@ -173,6 +173,12 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
                     else if( _tcscmp(pstrName, _T("showdirty")) == 0 ) {
                         pManager->SetShowUpdateRect(_tcscmp(pstrValue, _T("true")) == 0);
                     } 
+                    else if( _tcscmp(pstrName, _T("alpha")) == 0 ) {
+                        pManager->SetTransparent(_ttoi(pstrValue));
+                    } 
+                    else if( _tcscmp(pstrName, _T("bktrans")) == 0 ) {
+                        pManager->SetBackgroundTransparent(_tcscmp(pstrValue, _T("true")) == 0);
+                    } 
                 }
             }
         }

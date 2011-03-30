@@ -97,7 +97,8 @@ public:
 
 	LRESULT OnNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
-		return (wParam == 0) ? TRUE : FALSE;
+        if( ::IsIconic(*this) ) bHandled = FALSE;
+        return (wParam == 0) ? TRUE : FALSE;
 	}
 
 	LRESULT OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

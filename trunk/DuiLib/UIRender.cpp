@@ -1413,4 +1413,46 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
     ::SelectObject(hDC, hOldFont);
 }
 
+HBITMAP CRenderEngine::GenerateBitmap(CPaintManagerUI* pManager, CControlUI* pControl, RECT rc)
+{
+    int cx = rc.right - rc.left;
+    int cy = rc.bottom - rc.top;
+
+    HDC hPaintDC = ::CreateCompatibleDC(pManager->GetPaintDC());
+    HBITMAP hPaintBitmap = ::CreateCompatibleBitmap(pManager->GetPaintDC(), rc.right, rc.bottom);
+    ASSERT(hPaintDC);
+    ASSERT(hPaintBitmap);
+    HBITMAP hOldPaintBitmap = (HBITMAP) ::SelectObject(hPaintDC, hPaintBitmap);
+    pControl->DoPaint(hPaintDC, rc);
+
+    BITMAPINFO bmi = { 0 };
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = cx;
+    bmi.bmiHeader.biHeight = cy;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+    bmi.bmiHeader.biSizeImage = cx * cy * sizeof(DWORD);
+    LPDWORD pDest = NULL;
+    HDC hCloneDC = ::CreateCompatibleDC(pManager->GetPaintDC());
+    HBITMAP hBitmap = ::CreateDIBSection(pManager->GetPaintDC(), &bmi, DIB_RGB_COLORS, (LPVOID*) &pDest, NULL, 0);
+    ASSERT(hCloneDC);
+    ASSERT(hBitmap);
+    if( hBitmap != NULL )
+    {
+        HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(hCloneDC, hBitmap);
+        ::BitBlt(hCloneDC, 0, 0, cx, cy, hPaintDC, rc.left, rc.top, SRCCOPY);
+        ::SelectObject(hCloneDC, hOldBitmap);
+        ::DeleteDC(hCloneDC);  
+        ::GdiFlush();
+    }
+
+    // Cleanup
+    ::SelectObject(hPaintDC, hOldPaintBitmap);
+    ::DeleteObject(hPaintBitmap);
+    ::DeleteDC(hPaintDC);
+
+    return hBitmap;
+}
+
 } // namespace DuiLib
