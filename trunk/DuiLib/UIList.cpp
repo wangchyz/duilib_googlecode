@@ -403,6 +403,11 @@ void CListUI::SetItemTextPadding(RECT rc)
     NeedUpdate();
 }
 
+RECT CListUI::GetItemTextPadding() const
+{
+	return m_ListInfo.rcTextPadding;
+}
+
 void CListUI::SetItemTextColor(DWORD dwTextColor)
 {
     m_ListInfo.dwTextColor = dwTextColor;
@@ -419,6 +424,21 @@ void CListUI::SetItemImage(LPCTSTR pStrImage)
 {
     m_ListInfo.sImage = pStrImage;
     Invalidate();
+}
+
+DWORD CListUI::GetItemTextColor() const
+{
+	return m_ListInfo.dwTextColor;
+}
+
+DWORD CListUI::GetItemBkColor() const
+{
+	return m_ListInfo.dwBkColor;
+}
+
+LPCTSTR CListUI::GetItemImage() const
+{
+	return m_ListInfo.sImage;
 }
 
 void CListUI::SetSelectedItemTextColor(DWORD dwTextColor)
@@ -439,6 +459,21 @@ void CListUI::SetSelectedItemImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
+DWORD CListUI::GetSelectedItemTextColor() const
+{
+	return m_ListInfo.dwSelectedTextColor;
+}
+
+DWORD CListUI::GetSelectedItemBkColor() const
+{
+	return m_ListInfo.dwSelectedBkColor;
+}
+
+LPCTSTR CListUI::GetSelectedItemImage() const
+{
+	return m_ListInfo.sSelectedImage;
+}
+
 void CListUI::SetHotItemTextColor(DWORD dwTextColor)
 {
     m_ListInfo.dwHotTextColor = dwTextColor;
@@ -457,6 +492,20 @@ void CListUI::SetHotItemImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
+DWORD CListUI::GetHotItemTextColor() const
+{
+	return m_ListInfo.dwHotTextColor;
+}
+DWORD CListUI::GetHotItemBkColor() const
+{
+	return m_ListInfo.dwHotBkColor;
+}
+
+LPCTSTR CListUI::GetHotItemImage() const
+{
+	return m_ListInfo.sHotImage;
+}
+
 void CListUI::SetDisabledItemTextColor(DWORD dwTextColor)
 {
     m_ListInfo.dwDisabledTextColor = dwTextColor;
@@ -473,6 +522,26 @@ void CListUI::SetDisabledItemImage(LPCTSTR pStrImage)
 {
     m_ListInfo.sDisabledImage = pStrImage;
     Invalidate();
+}
+
+DWORD CListUI::GetDisabledItemTextColor() const
+{
+	return m_ListInfo.dwDisabledTextColor;
+}
+
+DWORD CListUI::GetDisabledItemBkColor() const
+{
+	return m_ListInfo.dwDisabledBkColor;
+}
+
+LPCTSTR CListUI::GetDisabledItemImage() const
+{
+	return m_ListInfo.sDisabledImage;
+}
+
+DWORD CListUI::GetItemLineColor() const
+{
+	return m_ListInfo.dwLineColor;
 }
 
 void CListUI::SetItemLineColor(DWORD dwLineColor)

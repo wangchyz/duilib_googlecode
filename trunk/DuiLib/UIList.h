@@ -137,6 +137,20 @@ public:
     void SetItemLineColor(DWORD dwLineColor);
     bool IsItemShowHtml();
     void SetItemShowHtml(bool bShowHtml = true);
+	RECT GetItemTextPadding() const;
+	DWORD GetItemTextColor() const;
+	DWORD GetItemBkColor() const;
+	LPCTSTR GetItemImage() const;
+	DWORD GetSelectedItemTextColor() const;
+	DWORD GetSelectedItemBkColor() const;
+	LPCTSTR GetSelectedItemImage() const;
+	DWORD GetHotItemTextColor() const;
+	DWORD GetHotItemBkColor() const;
+	LPCTSTR GetHotItemImage() const;
+	DWORD GetDisabledItemTextColor() const;
+	DWORD GetDisabledItemBkColor() const;
+	LPCTSTR GetDisabledItemImage() const;
+	DWORD GetItemLineColor() const;
 
     void SetExpanding(bool bExpandable);
     void SetMultiExpanding(bool bMultiExpandable); 
