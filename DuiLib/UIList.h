@@ -241,6 +241,8 @@ public:
     void SetSepWidth(int iWidth);
     void SetTextStyle(UINT uStyle);
     void SetTextColor(DWORD dwTextColor);
+	void SetTextPadding(RECT rc);
+	RECT GetTextPadding() const;
     void SetFont(int index);
     bool IsShowHtml();
     void SetShowHtml(bool bShowHtml = true);
@@ -272,6 +274,7 @@ protected:
     int m_iFont;
     UINT m_uTextStyle;
     bool m_bShowHtml;
+	RECT m_rcTextPadding;
     CStdString m_sNormalImage;
     CStdString m_sHotImage;
     CStdString m_sPushedImage;
