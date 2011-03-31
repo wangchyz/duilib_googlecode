@@ -29,7 +29,7 @@ public:
     void SetShowHtml(bool bShowHtml = true);
 
     SIZE EstimateSize(SIZE szAvailable);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
     void PaintText(HDC hDC);
@@ -57,7 +57,7 @@ public:
 
     bool Activate();
     void SetEnabled(bool bEnable = true);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
 
     LPCTSTR GetNormalImage();
     void SetNormalImage(LPCTSTR pStrImage);
@@ -138,7 +138,7 @@ public:
 
     CStdString* GetLinkContent(int iIndex);
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
 
     void PaintText(HDC hDC);
@@ -211,7 +211,7 @@ public:
     LPCTSTR GetThumbPushedImage() const;
     void SetThumbPushedImage(LPCTSTR pStrImage);
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     void PaintStatusImage(HDC hDC);
 
@@ -266,7 +266,7 @@ public:
     void SetVisible(bool bVisible = true);
     void SetInternVisible(bool bVisible = true);
     SIZE EstimateSize(SIZE szAvailable);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
     void PaintStatusImage(HDC hDC);
@@ -363,7 +363,7 @@ public:
     void SetBkDisabledImage(LPCTSTR pStrImage);
 
     void SetPos(RECT rc);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
     void DoPaint(HDC hDC, const RECT& rcPaint);

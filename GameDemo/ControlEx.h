@@ -127,11 +127,11 @@ public:
         _root->data()._pListElement = NULL;
     }
 
-    void Event(TEventUI& event) 
+    void DoEvent(TEventUI& event) 
     {
         if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-            if( m_pParent != NULL ) m_pParent->Event(event);
-            else CVerticalLayoutUI::Event(event);
+            if( m_pParent != NULL ) m_pParent->DoEvent(event);
+            else CVerticalLayoutUI::DoEvent(event);
             return;
         }
 
@@ -175,7 +175,7 @@ public:
             return;
         }
 
-        CListUI::Event(event);
+        CListUI::DoEvent(event);
     }
 
     Node* GetRoot() { return _root; }
@@ -348,11 +348,11 @@ public:
         }
     }
 
-    void Event(TEventUI& event) 
+    void DoEvent(TEventUI& event) 
     {
         if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-            if( m_pParent != NULL ) m_pParent->Event(event);
-            else CTileLayoutUI::Event(event);
+            if( m_pParent != NULL ) m_pParent->DoEvent(event);
+            else CTileLayoutUI::DoEvent(event);
             return;
         }
 
@@ -432,7 +432,7 @@ public:
             m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
             return;
         }
-        CTileLayoutUI::Event(event);
+        CTileLayoutUI::DoEvent(event);
     }
 
     void SetPos(RECT rc)

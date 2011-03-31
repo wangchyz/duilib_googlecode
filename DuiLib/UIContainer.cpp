@@ -1,5 +1,4 @@
 #include "StdAfx.h"
-#include "UIContainer.h"
 
 namespace DuiLib {
 
@@ -193,11 +192,11 @@ void CContainerUI::SetMouseEnabled(bool bEnabled)
     CControlUI::SetMouseEnabled(bEnabled);
 }
 
-void CContainerUI::Event(TEventUI& event)
+void CContainerUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CControlUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CControlUI::DoEvent(event);
         return;
     }
 
@@ -284,7 +283,7 @@ void CContainerUI::Event(TEventUI& event)
             }
         }
     }
-    CControlUI::Event(event);
+    CControlUI::DoEvent(event);
 }
 
 SIZE CContainerUI::GetScrollPos() const
@@ -1073,7 +1072,7 @@ void CHorizontalLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else CContainerUI::SetAttribute(pstrName, pstrValue);
 }
 
-void CHorizontalLayoutUI::Event(TEventUI& event)
+void CHorizontalLayoutUI::DoEvent(TEventUI& event)
 {
     if( m_iSepWidth != 0 ) {
         if( event.Type == UIEVENT_BUTTONDOWN && IsEnabled() )
@@ -1155,7 +1154,7 @@ void CHorizontalLayoutUI::Event(TEventUI& event)
             }
         }
     }
-    CContainerUI::Event(event);
+    CContainerUI::DoEvent(event);
 }
 
 RECT CHorizontalLayoutUI::GetThumbRect(bool bUseNew) const

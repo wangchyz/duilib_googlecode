@@ -1,6 +1,5 @@
 /*
 * Code By Tojen (qq:342269237)
-* ½çÃæÉè¼ÆÍ¼Æ¬×ÊÔ´80%Ô­´´£¬²¼¾ÖÍêÈ«Ô­´´,Ñ§Ï°×÷Æ·£¬²»ºÃÇëÅÄ×©
 */
 #include <objbase.h>
 #include <zmouse.h>
@@ -28,17 +27,9 @@ using namespace DuiLib;
 #endif
 
 #define WM_ADDLISTITEM WM_USER + 50
-/*
-* ´æ·ÅµÚ¶þÁÐÊý¾Ý
-*/
+
 std::vector<std::string> domain;
-/*
-* ´æ·ÅµÚÈýÁÐÊý¾Ý
-*/
 std::vector<std::string> desc;
-/*
-*  Ïß³Ìº¯ÊýÖÐ´«ÈëµÄ½á¹¹Ìå±äÁ¿£¬Ê¹ÓÃÏß³ÌÎªÁËÊ¹½çÃæÏß³ÌÁ¢¼´·µ»Ø£¬·ÀÖ¹¿¨£¬×¡ÄãÃÇ¶®µÃ¡£
-*/
 struct Prama
 {
     HWND hWnd;
@@ -87,10 +78,7 @@ public:
         CListUI* pList = prama->pList;
         CButtonUI* pSearch = prama->pSearch;
         CStdString tDomain = prama->tDomain;
-        //-------------------------------------
-        /*
-        * Ìí¼ÓÊý¾ÝÑ­»·
-        */
+
         for(int i=0; i<100; i++)
         {
             std::stringstream ss;
@@ -105,9 +93,7 @@ public:
             {
                 ::PostMessage(prama->hWnd, WM_ADDLISTITEM, 0L, (LPARAM)pListElement);
             }
-            /*
-            *	Sleep ÎªÁËÕ¹Ê¾Ìí¼ÓµÄ¶¯Ì¬Ð§¹û£¬¹Ê·ÅÂýÁËÌí¼ÓËÙ¶È£¬Í¬Ê±¿ÉÒÔ¿´µ½Ìí¼Ó¹ý³ÌÖÐ½çÃæÈÔÈ»¿ÉÒÔÏìÓ¦
-            */
+
             ::Sleep(100);
         }
         //------------------------------------------
@@ -140,9 +126,7 @@ public:
 
         HANDLE hThread = CreateThread(NULL,0,&ListMainForm::Search, (LPVOID)prama,  0,&dwThreadID);
     }
-    /*
-    * ¹Ø¼üµÄ»Øµ÷º¯Êý£¬IListCallbackUI ÖÐµÄÒ»¸öÐéº¯Êý£¬äÖÈ¾Ê±ºò»áµ÷ÓÃ,ÔÚ[1]ÖÐÉèÖÃÁË»Øµ÷¶ÔÏó
-    */
+
     LPCTSTR GetItemText(CControlUI* pControl, int iIndex, int iSubItem)
     {
         TCHAR szBuf[MAX_PATH] = {0};
@@ -234,7 +218,7 @@ public:
             sMessage += domain[iIndex].c_str();
 
 #endif
-            ::MessageBox(NULL, sMessage.GetData(), _T("ÌáÊ¾(by tojen)"), MB_OK);
+            ::MessageBox(NULL, sMessage.GetData(), _T("测试(by tojen)"), MB_OK);
         }
     }
 
@@ -372,7 +356,6 @@ public:
 
     LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        // ÓÐÊ±»áÔÚÊÕµ½WM_NCDESTROYºóÊÕµ½wParamÎªSC_CLOSEµÄWM_SYSCOMMAND
         if( wParam == SC_CLOSE ) {
             ::PostQuitMessage(0L);
             bHandled = TRUE;

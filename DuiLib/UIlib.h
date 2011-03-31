@@ -17,14 +17,16 @@
 
 #include "UIBase.h"
 #include "UIManager.h"
-#include "UIRender.h"
+#include "UIDelegate.h"
+#include "UIControl.h"
 #include "UIContainer.h"
+#include "UIComonControls.h"
 #include "UIList.h"
 #include "UICombo.h"
-#include "UIComonControls.h"
 #include "UIActiveX.h"
 #include "UIRichEdit.h"
 
 #include "UIMarkup.h"
 #include "UIDlgBuilder.h"
+#include "UIRender.h"
 

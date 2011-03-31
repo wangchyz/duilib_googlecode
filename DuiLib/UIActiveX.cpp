@@ -1,6 +1,4 @@
-
 #include "StdAfx.h"
-#include "UIActiveX.h"
 
 namespace DuiLib {
 

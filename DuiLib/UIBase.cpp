@@ -1,6 +1,4 @@
-
 #include "StdAfx.h"
-#include "UIBase.h"
 
 #ifdef _DEBUG
 #include <shlwapi.h>

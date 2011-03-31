@@ -1,6 +1,4 @@
-
 #include "stdafx.h"
-#include "UIRichEdit.h"
 
 // These constants are for backward compatibility. They are the 
 // sizes used for initialization and reset in RichEdit 1.0
@@ -148,7 +146,7 @@ private:
 
     LONG		lSelBarWidth;			// Width of the selection bar
     LONG  		cchTextMost;			// maximum text size
-    DWORD		dwEventMask;			// Event mask to pass on to parent window
+    DWORD		dwEventMask;			// DoEvent mask to pass on to parent window
     LONG		icf;
     LONG		ipf;
     RECT		rcClient;				// Client Rect for this control
@@ -1485,7 +1483,7 @@ long CRichEditUI::StreamOut(int nFormat, EDITSTREAM &es)
     return (long)lResult; 
 }
 
-void CRichEditUI::Init()
+void CRichEditUI::DoInit()
 {
     CREATESTRUCT cs;
     cs.style = m_lTwhStyle;
@@ -1630,11 +1628,11 @@ void CRichEditUI::EndRight()
     TxSendMessage(WM_HSCROLL, SB_RIGHT, 0L, 0);
 }
 
-void CRichEditUI::Event(TEventUI& event)
+void CRichEditUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CControlUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CControlUI::DoEvent(event);
         return;
     }
 
@@ -1691,7 +1689,7 @@ void CRichEditUI::Event(TEventUI& event)
     {
         return;
     }
-    CContainerUI::Event(event);
+    CContainerUI::DoEvent(event);
 }
 
 SIZE CRichEditUI::EstimateSize(SIZE szAvailable)

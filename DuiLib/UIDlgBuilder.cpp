@@ -1,6 +1,4 @@
-
 #include "StdAfx.h"
-#include "UIDlgBuilder.h"
 
 namespace DuiLib {
 
