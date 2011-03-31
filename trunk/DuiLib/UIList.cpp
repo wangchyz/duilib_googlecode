@@ -1080,6 +1080,7 @@ SIZE CListHeaderUI::EstimateSize(SIZE szAvailable)
 CListHeaderItemUI::CListHeaderItemUI() : m_bDragable(true), m_uButtonState(0), m_iSepWidth(4),
 m_uTextStyle(DT_VCENTER | DT_CENTER | DT_SINGLELINE), m_dwTextColor(0), m_iFont(-1), m_bShowHtml(false)
 {
+	SetTextPadding(CDuiRect(2, 0, 2, 0));
     ptLastMouse.x = ptLastMouse.y = 0;
     SetMinWidth(16);
 }
@@ -1129,6 +1130,17 @@ void CListHeaderItemUI::SetTextStyle(UINT uStyle)
 void CListHeaderItemUI::SetTextColor(DWORD dwTextColor)
 {
     m_dwTextColor = dwTextColor;
+}
+
+RECT CListHeaderItemUI::GetTextPadding() const
+{
+	return m_rcTextPadding;
+}
+
+void CListHeaderItemUI::SetTextPadding(RECT rc)
+{
+	m_rcTextPadding = rc;
+	Invalidate();
 }
 
 void CListHeaderItemUI::SetFont(int index)
@@ -1224,6 +1236,15 @@ void CListHeaderItemUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
         SetTextColor(clrColor);
     }
+	else if( _tcscmp(pstrName, _T("textpadding")) == 0 ) {
+		RECT rcTextPadding = { 0 };
+		LPTSTR pstr = NULL;
+		rcTextPadding.left = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+		rcTextPadding.top = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
+		rcTextPadding.right = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
+		rcTextPadding.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);    
+		SetTextPadding(rcTextPadding);
+	}
     else if( _tcscmp(pstrName, _T("showhtml")) == 0 ) SetShowHtml(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("normalimage")) == 0 ) SetNormalImage(pstrValue);
     else if( _tcscmp(pstrName, _T("hotimage")) == 0 ) SetHotImage(pstrValue);
@@ -1378,13 +1399,19 @@ void CListHeaderItemUI::PaintText(HDC hDC)
 {
     if( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
 
+	RECT rcText = m_rcItem;
+	rcText.left += m_rcTextPadding.left;
+	rcText.top += m_rcTextPadding.top;
+	rcText.right -= m_rcTextPadding.right;
+	rcText.bottom -= m_rcTextPadding.bottom;
+
     if( m_sText.IsEmpty() ) return;
     int nLinks = 0;
     if( m_bShowHtml )
-        CRenderEngine::DrawHtmlText(hDC, m_pManager, m_rcItem, m_sText, m_dwTextColor, \
+        CRenderEngine::DrawHtmlText(hDC, m_pManager, rcText, m_sText, m_dwTextColor, \
         NULL, NULL, nLinks, DT_SINGLELINE | m_uTextStyle);
     else
-        CRenderEngine::DrawText(hDC, m_pManager, m_rcItem, m_sText, m_dwTextColor, \
+        CRenderEngine::DrawText(hDC, m_pManager, rcText, m_sText, m_dwTextColor, \
         m_iFont, DT_SINGLELINE | m_uTextStyle);
 }
 
