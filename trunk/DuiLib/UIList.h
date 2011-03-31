@@ -237,22 +237,26 @@ public:
 
     void SetEnabled(bool bEnable = true);
 
+	bool IsDragable() const;
     void SetDragable(bool bDragable);
+	DWORD GetSepWidth() const;
     void SetSepWidth(int iWidth);
+	DWORD GetTextStyle() const;
     void SetTextStyle(UINT uStyle);
+	DWORD GetTextColor() const;
     void SetTextColor(DWORD dwTextColor);
 	void SetTextPadding(RECT rc);
 	RECT GetTextPadding() const;
     void SetFont(int index);
     bool IsShowHtml();
     void SetShowHtml(bool bShowHtml = true);
-    LPCTSTR GetNormalImage();
+    LPCTSTR GetNormalImage() const;
     void SetNormalImage(LPCTSTR pStrImage);
-    LPCTSTR GetHotImage();
+    LPCTSTR GetHotImage() const;
     void SetHotImage(LPCTSTR pStrImage);
-    LPCTSTR GetPushedImage();
+    LPCTSTR GetPushedImage() const;
     void SetPushedImage(LPCTSTR pStrImage);
-    LPCTSTR GetFocusedImage();
+    LPCTSTR GetFocusedImage() const;
     void SetFocusedImage(LPCTSTR pStrImage);
     LPCTSTR GetSepImage() const;
     void SetSepImage(LPCTSTR pStrImage);

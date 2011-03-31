@@ -1587,8 +1587,14 @@ void CPaintManagerUI::RemoveAllImages()
 
 void CPaintManagerUI::AddDefaultAttributeList(LPCTSTR pStrControlName, LPCTSTR pStrControlAttrList)
 {
-    CStdString *pDefaultAttr = new CStdString(pStrControlAttrList);
-    m_DefaultAttrHash.Set(pStrControlName, (LPVOID)pDefaultAttr);
+	CStdString* pDefaultAttr = new CStdString(pStrControlAttrList);
+	if (pDefaultAttr != NULL)
+	{
+		if (m_DefaultAttrHash.Find(pStrControlName) == NULL)
+			m_DefaultAttrHash.Set(pStrControlName, (LPVOID)pDefaultAttr);
+		else
+			delete pDefaultAttr;
+	}
 }
 
 LPCTSTR CPaintManagerUI::GetDefaultAttributeList(LPCTSTR pStrControlName) const

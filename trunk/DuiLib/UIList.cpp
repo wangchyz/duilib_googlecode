@@ -1110,10 +1110,20 @@ void CListHeaderItemUI::SetEnabled(bool bEnable)
     }
 }
 
+bool CListHeaderItemUI::IsDragable() const
+{
+	return m_bDragable;
+}
+
 void CListHeaderItemUI::SetDragable(bool bDragable)
 {
     m_bDragable = bDragable;
     if ( !m_bDragable ) m_uButtonState &= ~UISTATE_CAPTURED;
+}
+
+DWORD CListHeaderItemUI::GetSepWidth() const
+{
+	return m_iSepWidth;
 }
 
 void CListHeaderItemUI::SetSepWidth(int iWidth)
@@ -1121,11 +1131,22 @@ void CListHeaderItemUI::SetSepWidth(int iWidth)
     m_iSepWidth = iWidth;
 }
 
+DWORD CListHeaderItemUI::GetTextStyle() const
+{
+	return m_uTextStyle;
+}
+
 void CListHeaderItemUI::SetTextStyle(UINT uStyle)
 {
     m_uTextStyle = uStyle;
     Invalidate();
 }
+
+DWORD CListHeaderItemUI::GetTextColor() const
+{
+	return m_dwTextColor;
+}
+
 
 void CListHeaderItemUI::SetTextColor(DWORD dwTextColor)
 {
@@ -1161,13 +1182,18 @@ void CListHeaderItemUI::SetShowHtml(bool bShowHtml)
     Invalidate();
 }
 
+LPCTSTR CListHeaderItemUI::GetNormalImage() const
+{
+	return m_sNormalImage;
+}
+
 void CListHeaderItemUI::SetNormalImage(LPCTSTR pStrImage)
 {
     m_sNormalImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CListHeaderItemUI::GetHotImage()
+LPCTSTR CListHeaderItemUI::GetHotImage() const
 {
     return m_sHotImage;
 }
@@ -1178,7 +1204,7 @@ void CListHeaderItemUI::SetHotImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
-LPCTSTR CListHeaderItemUI::GetPushedImage()
+LPCTSTR CListHeaderItemUI::GetPushedImage() const
 {
     return m_sPushedImage;
 }
@@ -1189,7 +1215,7 @@ void CListHeaderItemUI::SetPushedImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
-LPCTSTR CListHeaderItemUI::GetFocusedImage()
+LPCTSTR CListHeaderItemUI::GetFocusedImage() const
 {
     return m_sFocusedImage;
 }
