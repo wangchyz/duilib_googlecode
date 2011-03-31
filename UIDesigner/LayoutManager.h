@@ -159,6 +159,8 @@ protected:
 	void CScrollbarUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
 	void CListUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
 	void CComboUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void CListHeaderItemUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void CListElementUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
 
 	void CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
 #endif
