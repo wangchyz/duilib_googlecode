@@ -1,6 +1,4 @@
-
 #include "StdAfx.h"
-#include "UIlist.h"
 
 namespace DuiLib {
 
@@ -252,11 +250,11 @@ void CListUI::SetPos(RECT rc)
     }
 }
 
-void CListUI::Event(TEventUI& event)
+void CListUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CVerticalLayoutUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CVerticalLayoutUI::DoEvent(event);
         return;
     }
 
@@ -316,7 +314,7 @@ void CListUI::Event(TEventUI& event)
         }
         break;
     }
-    CControlUI::Event(event);
+    CControlUI::DoEvent(event);
 }
 
 CListHeaderUI* CListUI::GetHeader() const
@@ -1029,15 +1027,15 @@ void CListBodyUI::SetPos(RECT rc)
     ProcessScrollbar(rc, cxNeeded, cyNeeded);
 }
 
-void CListBodyUI::Event(TEventUI& event)
+void CListBodyUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pOwner != NULL ) m_pOwner->Event(event);
-        else CControlUI::Event(event);
+        if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+        else CControlUI::DoEvent(event);
         return;
     }
 
-    if( m_pOwner != NULL ) m_pOwner->Event(event); else CControlUI::Event(event);
+    if( m_pOwner != NULL ) m_pOwner->DoEvent(event); else CControlUI::DoEvent(event);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1280,11 +1278,11 @@ void CListHeaderItemUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else CControlUI::SetAttribute(pstrName, pstrValue);
 }
 
-void CListHeaderItemUI::Event(TEventUI& event)
+void CListHeaderItemUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CControlUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CControlUI::DoEvent(event);
         return;
     }
 
@@ -1370,7 +1368,7 @@ void CListHeaderItemUI::Event(TEventUI& event)
         }
         return;
     }
-    CControlUI::Event(event);
+    CControlUI::DoEvent(event);
 }
 
 SIZE CListHeaderItemUI::EstimateSize(SIZE szAvailable)
@@ -1588,11 +1586,11 @@ bool CListElementUI::Expand(bool /*bExpand = true*/)
     return false;
 }
 
-void CListElementUI::Event(TEventUI& event)
+void CListElementUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pOwner != NULL ) m_pOwner->Event(event);
-        else CControlUI::Event(event);
+        if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+        else CControlUI::DoEvent(event);
         return;
     }
 
@@ -1615,7 +1613,7 @@ void CListElementUI::Event(TEventUI& event)
     // An important twist: The list-item will send the event not to its immediate
     // parent but to the "attached" list. A list may actually embed several components
     // in its path to the item, but key-presses etc. needs to go to the actual list.
-    if( m_pOwner != NULL ) m_pOwner->Event(event); else CControlUI::Event(event);
+    if( m_pOwner != NULL ) m_pOwner->DoEvent(event); else CControlUI::DoEvent(event);
 }
 
 void CListElementUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
@@ -1699,11 +1697,11 @@ LPVOID CListLabelElementUI::GetInterface(LPCTSTR pstrName)
     return CListElementUI::GetInterface(pstrName);
 }
 
-void CListLabelElementUI::Event(TEventUI& event)
+void CListLabelElementUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pOwner != NULL ) m_pOwner->Event(event);
-        else CListElementUI::Event(event);
+        if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+        else CListElementUI::DoEvent(event);
         return;
     }
 
@@ -1740,7 +1738,7 @@ void CListLabelElementUI::Event(TEventUI& event)
         }
         return;
     }
-    CListElementUI::Event(event);
+    CListElementUI::DoEvent(event);
 }
 
 SIZE CListLabelElementUI::EstimateSize(SIZE szAvailable)
@@ -1877,11 +1875,11 @@ CStdString* CListTextElementUI::GetLinkContent(int iIndex)
     return NULL;
 }
 
-void CListTextElementUI::Event(TEventUI& event)
+void CListTextElementUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pOwner != NULL ) m_pOwner->Event(event);
-        else CListLabelElementUI::Event(event);
+        if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+        else CListLabelElementUI::DoEvent(event);
         return;
     }
 
@@ -1922,7 +1920,7 @@ void CListTextElementUI::Event(TEventUI& event)
             m_nHoverLink = -1;
         }
     }
-    CListLabelElementUI::Event(event);
+    CListLabelElementUI::DoEvent(event);
 }
 
 SIZE CListTextElementUI::EstimateSize(SIZE szAvailable)
@@ -2080,11 +2078,11 @@ void CListExpandElementUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else CListTextElementUI::SetAttribute(pstrName, pstrValue);
 }
 
-void CListExpandElementUI::Event(TEventUI& event)
+void CListExpandElementUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pOwner != NULL ) m_pOwner->Event(event);
-        else CListTextElementUI::Event(event);
+        if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+        else CListTextElementUI::DoEvent(event);
         return;
     }
     if( event.Type == UIEVENT_BUTTONDOWN )
@@ -2136,7 +2134,7 @@ void CListExpandElementUI::Event(TEventUI& event)
         }
         return;
     }
-    CListTextElementUI::Event(event);
+    CListTextElementUI::DoEvent(event);
 }
 
 SIZE CListExpandElementUI::EstimateSize(SIZE szAvailable)
@@ -2439,11 +2437,11 @@ bool CListContainerElementUI::Expand(bool /*bExpand = true*/)
     return false;
 }
 
-void CListContainerElementUI::Event(TEventUI& event)
+void CListContainerElementUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pOwner != NULL ) m_pOwner->Event(event);
-        else CContainerUI::Event(event);
+        if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+        else CContainerUI::DoEvent(event);
         return;
     }
 
@@ -2500,7 +2498,7 @@ void CListContainerElementUI::Event(TEventUI& event)
     // An important twist: The list-item will send the event not to its immediate
     // parent but to the "attached" list. A list may actually embed several components
     // in its path to the item, but key-presses etc. needs to go to the actual list.
-    if( m_pOwner != NULL ) m_pOwner->Event(event); else CControlUI::Event(event);
+    if( m_pOwner != NULL ) m_pOwner->DoEvent(event); else CControlUI::DoEvent(event);
 }
 
 void CListContainerElementUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)

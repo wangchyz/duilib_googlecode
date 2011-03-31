@@ -1,6 +1,4 @@
-
 #include "StdAfx.h"
-#include "UICombo.h"
 
 namespace DuiLib {
 
@@ -142,7 +140,7 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
             TEventUI event;
             event.Type = UIEVENT_KEYDOWN;
             event.chKey = (TCHAR)wParam;
-            m_pOwner->Event(event);
+            m_pOwner->DoEvent(event);
             EnsureVisible(m_pOwner->GetCurSel());
             return 0;
         }
@@ -154,7 +152,7 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         event.wParam = MAKELPARAM(zDelta < 0 ? SB_LINEDOWN : SB_LINEUP, 0);
         event.lParam = lParam;
         event.dwTimestamp = ::GetTickCount();
-        m_pOwner->Event(event);
+        m_pOwner->DoEvent(event);
         EnsureVisible(m_pOwner->GetCurSel());
         return 0;
     }
@@ -233,7 +231,7 @@ UINT CComboUI::GetControlFlags() const
     return UIFLAG_TABSTOP;
 }
 
-void CComboUI::Init()
+void CComboUI::DoInit()
 {
     if( m_iCurSel < 0 ) SelectItem(0);
 }
@@ -371,11 +369,11 @@ void CComboUI::RemoveAll()
     CContainerUI::RemoveAll();
 }
 
-void CComboUI::Event(TEventUI& event)
+void CComboUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CContainerUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CContainerUI::DoEvent(event);
         return;
     }
 
@@ -456,7 +454,7 @@ void CComboUI::Event(TEventUI& event)
         }
         return;
     }
-    CControlUI::Event(event);
+    CControlUI::DoEvent(event);
 }
 
 SIZE CComboUI::EstimateSize(SIZE szAvailable)
@@ -772,6 +770,7 @@ void CComboUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("pushedimage")) == 0 ) SetPushedImage(pstrValue);
     else if( _tcscmp(pstrName, _T("focusedimage")) == 0 ) SetFocusedImage(pstrValue);
     else if( _tcscmp(pstrName, _T("disabledimage")) == 0 ) SetDisabledImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("dropbox")) == 0 ) SetDropBoxAttributeList(pstrValue);
     else if( _tcscmp(pstrName, _T("itemfont")) == 0 ) m_ListInfo.nFont = _ttoi(pstrValue);
     else if( _tcscmp(pstrName, _T("itemalign")) == 0 ) {
         if( _tcsstr(pstrValue, _T("left")) != NULL ) {

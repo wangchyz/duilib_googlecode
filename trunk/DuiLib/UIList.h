@@ -52,7 +52,7 @@ public:
     virtual TListInfoUI* GetListInfo() = 0;
     virtual int GetCurSel() const = 0;
     virtual bool SelectItem(int iIndex) = 0;
-    virtual void Event(TEventUI& event) = 0;
+    virtual void DoEvent(TEventUI& event) = 0;
 };
 
 class IListUI : public IListOwnerUI
@@ -158,7 +158,7 @@ public:
     bool ExpandItem(int iIndex, bool bExpand = true);
 
     void SetPos(RECT rc);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
     IListCallbackUI* GetTextCallback() const;
@@ -202,7 +202,7 @@ public:
 
     void SetScrollPos(SIZE szPos);
     void SetPos(RECT rc);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
 
 protected:
     CListUI* m_pOwner;
@@ -261,7 +261,7 @@ public:
     LPCTSTR GetSepImage() const;
     void SetSepImage(LPCTSTR pStrImage);
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     RECT GetThumbRect() const;
@@ -317,7 +317,7 @@ public:
     void Invalidate(); // 直接CControl::Invalidate会导致滚动条刷新，重写减少刷新区域
     bool Activate();
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
     void DrawItemBk(HDC hDC, const RECT& rcItem);
@@ -341,7 +341,7 @@ public:
     LPCTSTR GetClass() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
     void DoPaint(HDC hDC, const RECT& rcPaint);
 
@@ -368,7 +368,7 @@ public:
     void SetOwner(CControlUI* pOwner);
     CStdString* GetLinkContent(int iIndex);
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
 
     void DrawItemText(HDC hDC, const RECT& rcItem);
@@ -401,7 +401,7 @@ public:
     void SetMouseEnabled(bool bEnable = true);
 
     void SetPos(RECT rc);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     SIZE EstimateSize(SIZE szAvailable);
     void DoPaint(HDC hDC, const RECT& rcPaint);
 
@@ -456,7 +456,7 @@ public:
     void Invalidate(); // 直接CControl::Invalidate会导致滚动条刷新，重写减少刷新区域
     bool Activate();
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     void DoPaint(HDC hDC, const RECT& rcPaint);
 

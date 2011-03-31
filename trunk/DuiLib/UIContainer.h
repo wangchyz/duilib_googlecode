@@ -46,7 +46,7 @@ public:
     bool RemoveAt(int iIndex);
     void RemoveAll();
 
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetVisible(bool bVisible = true);
     void SetInternVisible(bool bVisible = true);
     void SetMouseEnabled(bool bEnable = true);
@@ -136,7 +136,7 @@ public:
     void SetSepImmMode(bool bImmediately);
 	bool IsSepImmMode() const;
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
 
     void SetPos(RECT rc);
     void DoPostPaint(HDC hDC, const RECT& rcPaint);

@@ -18,7 +18,7 @@ public:
     LPCTSTR GetClass() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
-    void Init();
+    void DoInit();
     UINT GetControlFlags() const;
 
     CStdString GetText() const;
@@ -90,7 +90,7 @@ public:
 
     SIZE EstimateSize(SIZE szAvailable);
     void SetPos(RECT rc);
-    void Event(TEventUI& event);
+    void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     
     void DoPaint(HDC hDC, const RECT& rcPaint);

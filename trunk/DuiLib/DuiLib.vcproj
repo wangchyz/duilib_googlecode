@@ -629,7 +629,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\UIComonControls.cpp"
+				RelativePath="UIComonControls.cpp"
 				>
 			</File>
 			<File
@@ -671,6 +671,14 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="UIControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath="UIDelegate.cpp"
+				>
 			</File>
 			<File
 				RelativePath="UIDlgBuilder.cpp"
@@ -873,15 +881,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\UIRender.cpp"
+				RelativePath="UIRender.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\UIRichEdit.cpp"
+				RelativePath="UIRichEdit.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\XUnzip.cpp"
+				RelativePath="XUnzip.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -938,11 +946,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UIComonControls.h"
+				RelativePath="UIComonControls.h"
 				>
 			</File>
 			<File
 				RelativePath="UIContainer.h"
+				>
+			</File>
+			<File
+				RelativePath="UIControl.h"
+				>
+			</File>
+			<File
+				RelativePath="UIDelegate.h"
 				>
 			</File>
 			<File
@@ -966,11 +982,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UIRender.h"
+				RelativePath="UIRender.h"
 				>
 			</File>
 			<File
-				RelativePath=".\UIRichEdit.h"
+				RelativePath="UIRichEdit.h"
 				>
 			</File>
 		</Filter>

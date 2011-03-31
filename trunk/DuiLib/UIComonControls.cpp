@@ -1,6 +1,4 @@
-
 #include "StdAfx.h"
-#include "UIComonControls.h"
 
 namespace DuiLib {
 
@@ -96,7 +94,7 @@ SIZE CLabelUI::EstimateSize(SIZE szAvailable)
     return CControlUI::EstimateSize(szAvailable);
 }
 
-void CLabelUI::Event(TEventUI& event)
+void CLabelUI::DoEvent(TEventUI& event)
 {
     if( event.Type == UIEVENT_SETFOCUS ) 
     {
@@ -116,7 +114,7 @@ void CLabelUI::Event(TEventUI& event)
     {
         return;
     }
-    CControlUI::Event(event);
+    CControlUI::DoEvent(event);
 }
 
 void CLabelUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
@@ -224,11 +222,11 @@ UINT CButtonUI::GetControlFlags() const
     return UIFLAG_TABSTOP | (IsEnabled() ? UIFLAG_SETCURSOR : 0);
 }
 
-void CButtonUI::Event(TEventUI& event)
+void CButtonUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CLabelUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CLabelUI::DoEvent(event);
         return;
     }
 
@@ -286,7 +284,7 @@ void CButtonUI::Event(TEventUI& event)
         ::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)));
         return;
     }
-    CLabelUI::Event(event);
+    CLabelUI::DoEvent(event);
 }
 
 bool CButtonUI::Activate()
@@ -596,11 +594,11 @@ CStdString* CTextUI::GetLinkContent(int iIndex)
     return NULL;
 }
 
-void CTextUI::Event(TEventUI& event)
+void CTextUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CLabelUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CLabelUI::DoEvent(event);
         return;
     }
 
@@ -654,7 +652,7 @@ void CTextUI::Event(TEventUI& event)
         }
     }
 
-    CLabelUI::Event(event);
+    CLabelUI::DoEvent(event);
 }
 
 SIZE CTextUI::EstimateSize(SIZE szAvailable)
@@ -921,11 +919,11 @@ void CSliderUI::SetThumbPushedImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
-void CSliderUI::Event(TEventUI& event)
+void CSliderUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CProgressUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CProgressUI::DoEvent(event);
         return;
     }
 
@@ -1002,7 +1000,7 @@ void CSliderUI::Event(TEventUI& event)
         }
         return;
     }
-    CControlUI::Event(event);
+    CControlUI::DoEvent(event);
 }
 
 
@@ -1201,11 +1199,11 @@ UINT CEditUI::GetControlFlags() const
     return UIFLAG_SETCURSOR | UIFLAG_TABSTOP;
 }
 
-void CEditUI::Event(TEventUI& event)
+void CEditUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pParent != NULL ) m_pParent->Event(event);
-        else CLabelUI::Event(event);
+        if( m_pParent != NULL ) m_pParent->DoEvent(event);
+        else CLabelUI::DoEvent(event);
         return;
     }
 
@@ -1278,7 +1276,7 @@ void CEditUI::Event(TEventUI& event)
         }
         return;
     }
-    CLabelUI::Event(event);
+    CLabelUI::DoEvent(event);
 }
 
 void CEditUI::SetEnabled(bool bEnable)
@@ -2012,11 +2010,11 @@ void CScrollbarUI::SetPos(RECT rc)
     }
 }
 
-void CScrollbarUI::Event(TEventUI& event)
+void CScrollbarUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
-        if( m_pOwner != NULL ) m_pOwner->Event(event);
-        else CControlUI::Event(event);
+        if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
+        else CControlUI::DoEvent(event);
         return;
     }
 
@@ -2223,7 +2221,7 @@ void CScrollbarUI::Event(TEventUI& event)
         return;
     }
 
-    if( m_pOwner != NULL ) m_pOwner->Event(event); else CControlUI::Event(event);
+    if( m_pOwner != NULL ) m_pOwner->DoEvent(event); else CControlUI::DoEvent(event);
 }
 
 void CScrollbarUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
