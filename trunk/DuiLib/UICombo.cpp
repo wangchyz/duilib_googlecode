@@ -437,6 +437,10 @@ void CComboUI::DoEvent(TEventUI& event)
         SelectItem(FindSelectable(m_iCurSel + (bDownward ? 1 : -1), bDownward));
         return;
     }
+    if( event.Type == UIEVENT_CONTEXTMENU )
+    {
+        return;
+    }
     if( event.Type == UIEVENT_MOUSEENTER )
     {
         if( ::PtInRect(&m_rcItem, event.ptMouse ) ) {

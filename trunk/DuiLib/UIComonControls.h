@@ -202,6 +202,8 @@ public:
 
     void SetEnabled(bool bEnable = true);
 
+    int GetChangeStep();
+    void SetChangeStep(int step);
     void SetThumbSize(SIZE szXY);
     RECT GetThumbRect() const;
     LPCTSTR GetThumbImage() const;
@@ -218,6 +220,7 @@ public:
 protected:
     SIZE m_szThumb;
     UINT m_uButtonState;
+    int m_nStep;
 
     CStdString m_sThumbImage;
     CStdString m_sThumbHotImage;

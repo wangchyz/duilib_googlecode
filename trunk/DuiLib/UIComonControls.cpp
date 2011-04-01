@@ -264,6 +264,10 @@ void CButtonUI::DoEvent(TEventUI& event)
         }
         return;
     }
+    if( event.Type == UIEVENT_CONTEXTMENU )
+    {
+        return;
+    }
     if( event.Type == UIEVENT_MOUSEENTER )
     {
         if( IsEnabled() ) {
@@ -626,6 +630,10 @@ void CTextUI::DoEvent(TEventUI& event)
             }
         }
     }
+    if( event.Type == UIEVENT_CONTEXTMENU )
+    {
+        return;
+    }
     // When you move over a link
     if( m_nLinks > 0 && event.Type == UIEVENT_MOUSEMOVE && IsEnabled() ) {
         int nHoverLink = -1;
@@ -836,7 +844,7 @@ void CProgressUI::PaintStatusImage(HDC hDC)
 //
 //
 
-CSliderUI::CSliderUI() : m_uButtonState(0)
+CSliderUI::CSliderUI() : m_uButtonState(0), m_nStep(1)
 {
     m_uTextStyle = DT_SINGLELINE | DT_CENTER;
     m_szThumb.cx = m_szThumb.cy = 10;
@@ -865,6 +873,16 @@ void CSliderUI::SetEnabled(bool bEnable)
     if( !IsEnabled() ) {
         m_uButtonState = 0;
     }
+}
+
+int CSliderUI::GetChangeStep()
+{
+    return m_nStep;
+}
+
+void CSliderUI::SetChangeStep(int step)
+{
+    m_nStep = step;
 }
 
 void CSliderUI::SetThumbSize(SIZE szXY)
@@ -946,6 +964,21 @@ void CSliderUI::DoEvent(TEventUI& event)
         }
         return;
     }
+    if( event.Type == UIEVENT_CONTEXTMENU )
+    {
+        return;
+    }
+    if( event.Type == UIEVENT_SCROLLWHEEL ) 
+    {
+        switch( LOWORD(event.wParam) ) {
+        case SB_LINEUP:
+            SetValue(GetValue() + GetChangeStep());
+            return;
+        case SB_LINEDOWN:
+            SetValue(GetValue() - GetChangeStep());
+            return;
+        }
+    }
     if( event.Type == UIEVENT_MOUSEMOVE )
     {
         if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
@@ -1015,6 +1048,9 @@ void CSliderUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         szXY.cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
         szXY.cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr); 
         SetThumbSize(szXY);
+    }
+    else if( _tcscmp(pstrName, _T("step")) == 0 ) {
+        SetChangeStep(_ttoi(pstrValue));
     }
     else CProgressUI::SetAttribute(pstrName, pstrValue);
 }
@@ -1232,7 +1268,7 @@ void CEditUI::DoEvent(TEventUI& event)
     {
         Invalidate();
     }
-    if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK ) 
+    if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK || event.Type == UIEVENT_RBUTTONDOWN) 
     {
         if( IsEnabled() ) {
             GetManager()->ReleaseCapture();
@@ -1257,6 +1293,10 @@ void CEditUI::DoEvent(TEventUI& event)
         return;
     }
     if( event.Type == UIEVENT_BUTTONUP ) 
+    {
+        return;
+    }
+    if( event.Type == UIEVENT_CONTEXTMENU )
     {
         return;
     }
@@ -2132,6 +2172,10 @@ void CScrollbarUI::DoEvent(TEventUI& event)
                 }
             }
         }
+        return;
+    }
+    if( event.Type == UIEVENT_CONTEXTMENU )
+    {
         return;
     }
     if( event.Type == UIEVENT_TIMER && event.wParam == DEFAULT_TIMERID )
