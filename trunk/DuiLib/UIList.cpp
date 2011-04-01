@@ -1705,7 +1705,7 @@ void CListLabelElementUI::DoEvent(TEventUI& event)
         return;
     }
 
-    if( event.Type == UIEVENT_BUTTONDOWN )
+    if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_RBUTTONDOWN )
     {
         if( IsEnabled() ) {
             m_pManager->SendNotify(this, _T("itemclick"));
@@ -2085,7 +2085,7 @@ void CListExpandElementUI::DoEvent(TEventUI& event)
         else CListTextElementUI::DoEvent(event);
         return;
     }
-    if( event.Type == UIEVENT_BUTTONDOWN )
+    if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_RBUTTONDOWN )
     {
         if( IsEnabled() ) {
             m_pManager->SendNotify(this, _T("itemclick"));
@@ -2462,7 +2462,7 @@ void CListContainerElementUI::DoEvent(TEventUI& event)
             return;
         }
     }
-    if( event.Type == UIEVENT_BUTTONDOWN )
+    if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_RBUTTONDOWN )
     {
         if( IsEnabled() ){
             m_pManager->SendNotify(this, _T("itemclick"));
