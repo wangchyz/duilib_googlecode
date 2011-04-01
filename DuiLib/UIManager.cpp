@@ -738,7 +738,26 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            event.ptMouse = pt;
            event.wKeyState = (WORD)wParam;
            event.dwTimestamp = ::GetTickCount();
-           pControl->Event(event);  
+           pControl->Event(event);
+       }
+       break;
+   case WM_LBUTTONDBLCLK:
+       {
+           ::SetFocus(m_hWndPaint);
+           POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+           m_ptLastMousePos = pt;
+           CControlUI* pControl = FindControl(pt);
+           if( pControl == NULL ) break;
+           if( pControl->GetManager() != this ) break;
+           ::SetCapture(m_hWndPaint);
+           m_bMouseCapture = true;
+           TEventUI event = { 0 };
+           event.Type = UIEVENT_DBLCLICK;
+           event.ptMouse = pt;
+           event.wKeyState = (WORD)wParam;
+           event.dwTimestamp = ::GetTickCount();
+           pControl->Event(event);
+           m_pEventClick = pControl;
        }
        break;
    case WM_LBUTTONUP:
@@ -759,7 +778,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            m_pEventClick = NULL;
        }
        break;
-   case WM_LBUTTONDBLCLK:
+   case WM_RBUTTONDOWN:
        {
            ::SetFocus(m_hWndPaint);
            POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
@@ -767,15 +786,15 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            CControlUI* pControl = FindControl(pt);
            if( pControl == NULL ) break;
            if( pControl->GetManager() != this ) break;
-           ::SetCapture(m_hWndPaint);
-           m_bMouseCapture = true;
+           pControl->SetFocus();
            TEventUI event = { 0 };
-           event.Type = UIEVENT_DBLCLICK;
+           event.Type = UIEVENT_RBUTTONDOWN;
+           event.wParam = wParam;
+           event.lParam = lParam;
            event.ptMouse = pt;
            event.wKeyState = (WORD)wParam;
            event.dwTimestamp = ::GetTickCount();
            pControl->Event(event);
-           m_pEventClick = pControl;
        }
        break;
    case WM_MOUSEWHEEL:
@@ -809,6 +828,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            event.Type = UIEVENT_CONTEXTMENU;
            event.ptMouse = pt;
            event.wKeyState = (WORD)wParam;
+           event.lParam = (LPARAM)pControl;
            event.dwTimestamp = ::GetTickCount();
            pControl->Event(event);
        }
