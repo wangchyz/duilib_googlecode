@@ -461,7 +461,6 @@ public:
     void DoPaint(HDC hDC, const RECT& rcPaint);
 
     void DrawItemText(HDC hDC, const RECT& rcItem);    
-
     void DrawItemBk(HDC hDC, const RECT& rcItem);
 
 protected:

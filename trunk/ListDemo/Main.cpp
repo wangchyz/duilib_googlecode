@@ -1,5 +1,6 @@
 /*
 * Code By Tojen (qq:342269237)
+* 界面设计图片资源80%原创，布局完全原创,学习作品，不好请拍砖
 */
 #include <objbase.h>
 #include <zmouse.h>
@@ -27,15 +28,127 @@ using namespace DuiLib;
 #endif
 
 #define WM_ADDLISTITEM WM_USER + 50
-
+/*
+* 存放第二列数据
+*/
 std::vector<std::string> domain;
+/*
+* 存放第三列数据
+*/
 std::vector<std::string> desc;
+/*
+*  线程函数中传入的结构体变量，使用线程为了使界面线程立即返回，防止卡住，你们懂得。
+*/
 struct Prama
 {
     HWND hWnd;
     CListUI* pList;
     CButtonUI* pSearch;
     CStdString tDomain;
+};
+
+
+class CMenuForm : public CWindowWnd, public INotifyUI
+{
+public:
+    CMenuForm() { };
+    LPCTSTR GetWindowClassName() const { return _T("UIMenuForm"); };
+    UINT GetClassStyle() const { return UI_CLASSSTYLE_DIALOG; };
+    void OnFinalMessage(HWND /*hWnd*/) { delete this; };
+
+    void Init() {
+    }
+
+    void Notify(TNotifyUI& msg)
+    {
+        if( msg.sType == _T("itemselect") ) {
+            Close();
+        }
+    }
+
+    LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
+        styleValue &= ~WS_CAPTION;
+        ::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
+
+        m_pm.Init(m_hWnd);
+        CDialogBuilder builder;
+        CControlUI* pRoot = builder.Create(_T("menu.xml"), (UINT)0, NULL, &m_pm);
+        ASSERT(pRoot && "Failed to parse XML");
+        m_pm.AttachDialog(pRoot);
+        m_pm.AddNotifier(this);
+        m_pm.SetRoundCorner(3, 3);
+        Init();
+        return 0;
+    }
+
+    LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        if( m_hWnd != (HWND) wParam ) Close();
+        return 0;
+    }
+
+    LRESULT OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        if( wParam == VK_ESCAPE ) Close();
+        return 0;
+    }
+
+    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        SIZE szRoundCorner = m_pm.GetRoundCorner();
+        if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
+            RECT rcClient;
+            ::GetClientRect(*this, &rcClient);
+            HRGN hRgn = ::CreateRoundRectRgn(rcClient.left, rcClient.top, rcClient.right + 1, rcClient.bottom + 1, szRoundCorner.cx, szRoundCorner.cy);
+            ::SetWindowRgn(*this, hRgn, TRUE);
+            ::DeleteObject(hRgn);
+        }
+
+        bHandled = FALSE;
+        return 0;
+    }
+
+    LRESULT OnNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        if( ::IsIconic(*this) ) bHandled = FALSE;
+        return (wParam == 0) ? TRUE : FALSE;
+    }
+
+    LRESULT OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        return 0;
+    }
+
+    LRESULT OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        return 0;
+    }
+
+    LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        LRESULT lRes = 0;
+        BOOL bHandled = TRUE;
+        switch( uMsg ) {
+        case WM_CREATE:        lRes = OnCreate(uMsg, wParam, lParam, bHandled); break;
+        case WM_KILLFOCUS:     lRes = OnKillFocus(uMsg, wParam, lParam, bHandled); break;
+        case WM_KEYDOWN:       lRes = OnKeyDown(uMsg, wParam, lParam, bHandled); break;
+        case WM_MOUSEWHEEL:    break;
+        case WM_SIZE:          lRes = OnSize(uMsg, wParam, lParam, bHandled); break;
+        case WM_NCACTIVATE:    lRes = OnNcActivate(uMsg, wParam, lParam, bHandled); break;
+        case WM_NCCALCSIZE:    lRes = OnNcCalcSize(uMsg, wParam, lParam, bHandled); break;
+        case WM_NCPAINT:       lRes = OnNcPaint(uMsg, wParam, lParam, bHandled); break;
+        default:
+            bHandled = FALSE;
+        }
+        if( bHandled ) return lRes;
+        if( m_pm.MessageHandler(uMsg, wParam, lParam, lRes) ) return lRes;
+        return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
+    }
+
+public:
+    CPaintManagerUI m_pm;
 };
 
 class ListMainForm : public CWindowWnd, public INotifyUI, public IListCallbackUI
@@ -78,7 +191,10 @@ public:
         CListUI* pList = prama->pList;
         CButtonUI* pSearch = prama->pSearch;
         CStdString tDomain = prama->tDomain;
-
+        //-------------------------------------
+        /*
+        * 添加数据循环
+        */
         for(int i=0; i<100; i++)
         {
             std::stringstream ss;
@@ -93,7 +209,9 @@ public:
             {
                 ::PostMessage(prama->hWnd, WM_ADDLISTITEM, 0L, (LPARAM)pListElement);
             }
-
+            /*
+            *	Sleep 为了展示添加的动态效果，故放慢了添加速度，同时可以看到添加过程中界面仍然可以响应
+            */
             ::Sleep(100);
         }
         //------------------------------------------
@@ -126,7 +244,9 @@ public:
 
         HANDLE hThread = CreateThread(NULL,0,&ListMainForm::Search, (LPVOID)prama,  0,&dwThreadID);
     }
-
+    /*
+    * 关键的回调函数，IListCallbackUI 中的一个虚函数，渲染时候会调用,在[1]中设置了回调对象
+    */
     LPCTSTR GetItemText(CControlUI* pControl, int iIndex, int iSubItem)
     {
         TCHAR szBuf[MAX_PATH] = {0};
@@ -218,7 +338,17 @@ public:
             sMessage += domain[iIndex].c_str();
 
 #endif
-            ::MessageBox(NULL, sMessage.GetData(), _T("娴嬭瘯(by tojen)"), MB_OK);
+            ::MessageBox(NULL, sMessage.GetData(), _T("提示(by tojen)"), MB_OK);
+        }
+        else if(msg.sType == _T("menu")) 
+        {
+            if( msg.pSender->GetName() != _T("domainlist") ) return;
+            CMenuForm* pMenu = new CMenuForm();
+            if( pMenu == NULL ) { return; }
+            POINT pt = {msg.ptMouse.x, msg.ptMouse.y};
+            ::ClientToScreen(*this, &pt);
+            pMenu->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, UI_WNDSTYLE_EX_DIALOG, pt.x, pt.y, 120, 82, NULL);
+            pMenu->ShowWindow(); 
         }
     }
 
@@ -241,7 +371,7 @@ public:
             rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
 
         m_pm.Init(m_hWnd);
-        m_pm.SetTransparent(100);
+        //m_pm.SetTransparent(100);
         CDialogBuilder builder;
         CControlUI* pRoot = builder.Create(_T("skin.xml"), (UINT)0, NULL, &m_pm);
         ASSERT(pRoot && "Failed to parse XML");
@@ -356,6 +486,7 @@ public:
 
     LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
+        // 有时会在收到WM_NCDESTROY后收到wParam为SC_CLOSE的WM_SYSCOMMAND
         if( wParam == SC_CLOSE ) {
             ::PostQuitMessage(0L);
             bHandled = TRUE;
@@ -430,5 +561,5 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 
     CPaintManagerUI::MessageLoop();
 
-    return 0;
+	return 0;
 }
