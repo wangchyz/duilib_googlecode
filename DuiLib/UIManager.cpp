@@ -787,6 +787,8 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            if( pControl == NULL ) break;
            if( pControl->GetManager() != this ) break;
            pControl->SetFocus();
+           SetCapture();
+           m_bMouseCapture = true;
            TEventUI event = { 0 };
            event.Type = UIEVENT_RBUTTONDOWN;
            event.wParam = wParam;
@@ -795,6 +797,25 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            event.wKeyState = (WORD)wParam;
            event.dwTimestamp = ::GetTickCount();
            pControl->Event(event);
+           m_pEventClick = pControl;
+       }
+       break;
+   case WM_CONTEXTMENU:
+       {
+           POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+           ::ScreenToClient(m_hWndPaint, &pt);
+           m_ptLastMousePos = pt;
+           if( m_pEventClick == NULL ) break;
+           ReleaseCapture();
+           m_bMouseCapture = false;
+           TEventUI event = { 0 };
+           event.Type = UIEVENT_CONTEXTMENU;
+           event.ptMouse = pt;
+           event.wKeyState = (WORD)wParam;
+           event.lParam = (LPARAM)m_pEventClick;
+           event.dwTimestamp = ::GetTickCount();
+           m_pEventClick->Event(event);
+           m_pEventClick = NULL;
        }
        break;
    case WM_MOUSEWHEEL:
@@ -811,26 +832,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
 
            // Let's make sure that the scroll item below the cursor is the same as before...
            ::SendMessage(m_hWndPaint, WM_MOUSEMOVE, 0, (LPARAM) MAKELPARAM(m_ptLastMousePos.x, m_ptLastMousePos.y));
-       }
-       break;
-   case WM_CONTEXTMENU:
-       {
-           ::SetFocus(m_hWndPaint);
-           POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-           ::ScreenToClient(m_hWndPaint, &pt);
-           m_ptLastMousePos = pt;
-           CControlUI* pControl = FindControl(pt);
-           if( pControl == NULL ) break;
-           if( pControl->GetManager() != this ) break;
-           m_pEventClick = pControl;
-           pControl->SetFocus();
-           TEventUI event = { 0 };
-           event.Type = UIEVENT_CONTEXTMENU;
-           event.ptMouse = pt;
-           event.wKeyState = (WORD)wParam;
-           event.lParam = (LPARAM)pControl;
-           event.dwTimestamp = ::GetTickCount();
-           pControl->Event(event);
        }
        break;
    case WM_CHAR:
