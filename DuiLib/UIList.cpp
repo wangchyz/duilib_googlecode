@@ -2299,6 +2299,7 @@ m_pOwner(NULL),
 m_bSelected(false),
 m_uButtonState(0)
 {
+    SetMouseChildEnabled(false);
 }
 
 LPCTSTR CListContainerElementUI::GetClass() const
