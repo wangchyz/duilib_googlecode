@@ -817,9 +817,11 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
                 }
                 else if( sItem == _T("dest") ) {
                     rcItem.left = rc.left + _tcstol(sValue.GetData(), &pstr, 10);  ASSERT(pstr);    
-                    rcItem.top = rc.top + _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
-                    rcItem.right = rc.left + _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
-                    rcItem.bottom = rc.top + _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);  
+                    rcItem.top = rc.top + _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);
+                    rcItem.right = rc.left + _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);
+					if (rcItem.right > rc.right) rcItem.right = rc.right;
+                    rcItem.bottom = rc.top + _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);
+					if (rcItem.bottom > rc.bottom) rcItem.bottom = rc.bottom;
                 }
                 else if( sItem == _T("source") ) {
                     rcBmpPart.left = _tcstol(sValue.GetData(), &pstr, 10);  ASSERT(pstr);    
@@ -870,6 +872,8 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
         rcBmpPart.right = data->nX;
         rcBmpPart.bottom = data->nY;
     }
+	if (rcBmpPart.right > data->nX) rcBmpPart.right = data->nX;
+	if (rcBmpPart.bottom > data->nY) rcBmpPart.bottom = data->nY;
 
     RECT rcTemp;
     if( !::IntersectRect(&rcTemp, &rcItem, &rc) ) return true;
