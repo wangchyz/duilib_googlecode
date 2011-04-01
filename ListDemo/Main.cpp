@@ -47,18 +47,50 @@ struct Prama
     CStdString tDomain;
 };
 
-class ListMainForm;
-class CMenuForm : public CWindowWnd, public INotifyUI
+class CMenuWnd : public CWindowWnd, public INotifyUI
 {
 public:
-    CMenuForm() : m_pOwner(NULL) { };
-    LPCTSTR GetWindowClassName() const { return _T("UIMenuForm"); };
-    UINT GetClassStyle() const { return UI_CLASSSTYLE_DIALOG; };
-    void OnFinalMessage(HWND /*hWnd*/) { delete this; };
+    CMenuWnd() : m_pOwner(NULL) { };
+    void Init(CControlUI* pOwner, CRect rc) {
+        if( pOwner == NULL ) return;
+        MONITORINFO oMonitor = {};
+        oMonitor.cbSize = sizeof(oMonitor);
+        ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
+        CRect rcWork = oMonitor.rcWork;
+        int nWidth = rc.GetWidth();
+        int nHeight = rc.GetHeight();
+        if( rc.bottom > rcWork.bottom ) {
+            if( nHeight >= rcWork.GetHeight() ) {
+                rc.top = 0;
+                rc.bottom = nHeight;
+            }
+            else {
+                rc.bottom = rcWork.bottom;
+                rc.top = rc.bottom - nHeight;
+            }
+        }
+        if( rc.right > rcWork.right ) {
+            if( nWidth >= rcWork.GetWidth() ) {
+                rc.left = 0;
+                rc.right = nWidth;
+            }
+            else {
+                rc.right = rcWork.right;
+                rc.left = rc.right - nWidth;
+            }
+        }
 
-    void SetOwner(CListUI* pList) { m_pOwner = pList; }
-    void Init() {
+        Create(pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW, rc);
+        HWND hWndParent = m_hWnd;
+        while( ::GetParent(hWndParent) != NULL ) hWndParent = ::GetParent(hWndParent);
+        ::ShowWindow(m_hWnd, SW_SHOW);
+        ::SendMessage(hWndParent, WM_NCACTIVATE, TRUE, 0L);
+
+        m_pOwner = pOwner;
     }
+
+    LPCTSTR GetWindowClassName() const { return _T("MenuWnd"); };
+    void OnFinalMessage(HWND /*hWnd*/) { delete this; };
 
     void Notify(TNotifyUI& msg)
     {
@@ -68,23 +100,19 @@ public:
         else if( msg.sType == _T("itemclick") ) {
             if( msg.pSender->GetName() == _T("menu_Delete") ) {
                 if( m_pOwner ) {
-                    int nSel = m_pOwner->GetCurSel();
+                    CListUI* pList = static_cast<CListUI*>(m_pOwner);
+                    int nSel = pList->GetCurSel();
                     if( nSel < 0 ) return;
-                    m_pOwner->RemoveAt(nSel);
+                    pList->RemoveAt(nSel);
                     domain.erase(domain.begin() + nSel);
                     desc.erase(desc.begin() + nSel);
                 }
-
             }
         }
     }
 
     LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
-        styleValue &= ~WS_CAPTION;
-        ::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-
         m_pm.Init(m_hWnd);
         CDialogBuilder builder;
         CControlUI* pRoot = builder.Create(_T("menu.xml"), (UINT)0, NULL, &m_pm);
@@ -92,7 +120,6 @@ public:
         m_pm.AttachDialog(pRoot);
         m_pm.AddNotifier(this);
         m_pm.SetRoundCorner(3, 3);
-        Init();
         return 0;
     }
 
@@ -123,22 +150,6 @@ public:
         return 0;
     }
 
-    LRESULT OnNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-    {
-        if( ::IsIconic(*this) ) bHandled = FALSE;
-        return (wParam == 0) ? TRUE : FALSE;
-    }
-
-    LRESULT OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-    {
-        return 0;
-    }
-
-    LRESULT OnNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-    {
-        return 0;
-    }
-
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         LRESULT lRes = 0;
@@ -149,9 +160,6 @@ public:
         case WM_KEYDOWN:       lRes = OnKeyDown(uMsg, wParam, lParam, bHandled); break;
         case WM_MOUSEWHEEL:    break;
         case WM_SIZE:          lRes = OnSize(uMsg, wParam, lParam, bHandled); break;
-        case WM_NCACTIVATE:    lRes = OnNcActivate(uMsg, wParam, lParam, bHandled); break;
-        case WM_NCCALCSIZE:    lRes = OnNcCalcSize(uMsg, wParam, lParam, bHandled); break;
-        case WM_NCPAINT:       lRes = OnNcPaint(uMsg, wParam, lParam, bHandled); break;
         default:
             bHandled = FALSE;
         }
@@ -162,7 +170,7 @@ public:
 
 public:
     CPaintManagerUI m_pm;
-    CListUI* m_pOwner;
+    CControlUI* m_pOwner;
 };
 
 class ListMainForm : public CWindowWnd, public INotifyUI, public IListCallbackUI
@@ -357,13 +365,11 @@ public:
         else if(msg.sType == _T("menu")) 
         {
             if( msg.pSender->GetName() != _T("domainlist") ) return;
-            CMenuForm* pMenu = new CMenuForm();
+            CMenuWnd* pMenu = new CMenuWnd();
             if( pMenu == NULL ) { return; }
             POINT pt = {msg.ptMouse.x, msg.ptMouse.y};
             ::ClientToScreen(*this, &pt);
-            pMenu->SetOwner(static_cast<CListUI*>(msg.pSender));
-            pMenu->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, UI_WNDSTYLE_EX_DIALOG, pt.x, pt.y, 120, 82, NULL);
-            pMenu->ShowWindow(); 
+            pMenu->Init(msg.pSender, CRect(pt.x, pt.y, pt.x + 120, pt.y + 82));
         }
     }
 
