@@ -47,15 +47,16 @@ struct Prama
     CStdString tDomain;
 };
 
-
+class ListMainForm;
 class CMenuForm : public CWindowWnd, public INotifyUI
 {
 public:
-    CMenuForm() { };
+    CMenuForm() : m_pOwner(NULL) { };
     LPCTSTR GetWindowClassName() const { return _T("UIMenuForm"); };
     UINT GetClassStyle() const { return UI_CLASSSTYLE_DIALOG; };
     void OnFinalMessage(HWND /*hWnd*/) { delete this; };
 
+    void SetOwner(CListUI* pList) { m_pOwner = pList; }
     void Init() {
     }
 
@@ -63,6 +64,18 @@ public:
     {
         if( msg.sType == _T("itemselect") ) {
             Close();
+        }
+        else if( msg.sType == _T("itemclick") ) {
+            if( msg.pSender->GetName() == _T("menu_Delete") ) {
+                if( m_pOwner ) {
+                    int nSel = m_pOwner->GetCurSel();
+                    if( nSel < 0 ) return;
+                    m_pOwner->RemoveAt(nSel);
+                    domain.erase(domain.begin() + nSel);
+                    desc.erase(desc.begin() + nSel);
+                }
+
+            }
         }
     }
 
@@ -149,6 +162,7 @@ public:
 
 public:
     CPaintManagerUI m_pm;
+    CListUI* m_pOwner;
 };
 
 class ListMainForm : public CWindowWnd, public INotifyUI, public IListCallbackUI
@@ -347,6 +361,7 @@ public:
             if( pMenu == NULL ) { return; }
             POINT pt = {msg.ptMouse.x, msg.ptMouse.y};
             ::ClientToScreen(*this, &pt);
+            pMenu->SetOwner(static_cast<CListUI*>(msg.pSender));
             pMenu->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, UI_WNDSTYLE_EX_DIALOG, pt.x, pt.y, 120, 82, NULL);
             pMenu->ShowWindow(); 
         }
