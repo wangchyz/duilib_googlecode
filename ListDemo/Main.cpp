@@ -53,6 +53,8 @@ public:
     CMenuWnd() : m_pOwner(NULL) { };
     void Init(CControlUI* pOwner, CRect rc) {
         if( pOwner == NULL ) return;
+        m_pOwner = pOwner;
+
         MONITORINFO oMonitor = {};
         oMonitor.cbSize = sizeof(oMonitor);
         ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
@@ -85,8 +87,6 @@ public:
         while( ::GetParent(hWndParent) != NULL ) hWndParent = ::GetParent(hWndParent);
         ::ShowWindow(m_hWnd, SW_SHOW);
         ::SendMessage(hWndParent, WM_NCACTIVATE, TRUE, 0L);
-
-        m_pOwner = pOwner;
     }
 
     LPCTSTR GetWindowClassName() const { return _T("MenuWnd"); };
@@ -120,6 +120,13 @@ public:
         m_pm.AttachDialog(pRoot);
         m_pm.AddNotifier(this);
         m_pm.SetRoundCorner(3, 3);
+
+        CListUI* pList = static_cast<CListUI*>(m_pOwner);
+        int nSel = pList->GetCurSel();
+        if( nSel < 0 ) {
+            CControlUI* pControl = m_pm.FindControl(_T("menu_Delete"));
+            if( pControl ) pControl->SetEnabled(false);
+        }
         return 0;
     }
 
