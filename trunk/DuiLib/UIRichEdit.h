@@ -103,6 +103,7 @@ public:
 
 protected:
     CTxtWinHost* m_pTwh;
+    bool m_bVScrollbarFixing;
     bool m_bWantTab;
     bool m_bWantReturn;
     bool m_bWantCtrlReturn;
