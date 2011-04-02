@@ -879,8 +879,7 @@ void CTxtWinHost::SetClientRect(RECT *prc)
     sizelExtent.cx = DXtoHimetricX(rcClient.right - rcClient.left, xPerInch);
     sizelExtent.cy = DYtoHimetricY(rcClient.bottom - rcClient.top, yPerInch);
 
-    pserv->OnTxPropertyBitsChange(TXTBIT_CLIENTRECTCHANGE | TXTBIT_VIEWINSETCHANGE, 
-        TXTBIT_CLIENTRECTCHANGE | TXTBIT_VIEWINSETCHANGE);
+    pserv->OnTxPropertyBitsChange(TXTBIT_VIEWINSETCHANGE, TXTBIT_VIEWINSETCHANGE);
     resized = TRUE;
 }
 
@@ -1034,9 +1033,9 @@ void CTxtWinHost::SetParaFormat(PARAFORMAT2 &p)
 //
 //
 
-CRichEditUI::CRichEditUI() : m_pTwh(NULL), m_bWantTab(true), m_bWantReturn(true), m_bWantCtrlReturn(true),
-    m_bRich(true), m_bReadOnly(false), m_dwTextColor(0), m_iFont(-1), m_iLimitText(cInitTextMax), 
-    m_lTwhStyle(ES_MULTILINE)
+CRichEditUI::CRichEditUI() : m_pTwh(NULL), m_bVScrollbarFixing(false), m_bWantTab(true), m_bWantReturn(true), 
+    m_bWantCtrlReturn(true), m_bRich(true), m_bReadOnly(false), m_dwTextColor(0), m_iFont(-1), 
+    m_iLimitText(cInitTextMax), m_lTwhStyle(ES_MULTILINE)
 {
 }
 
@@ -1707,10 +1706,44 @@ void CRichEditUI::SetPos(RECT rc)
     rc.top += m_rcInset.top;
     rc.right -= m_rcInset.right;
     rc.bottom -= m_rcInset.bottom;
-    if( m_pVerticalScrollbar && m_pVerticalScrollbar->IsVisible() ) rc.right -= m_pVerticalScrollbar->GetFixedWidth();
-    if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) rc.bottom -= m_pHorizontalScrollbar->GetFixedHeight();
+    bool bVScrollbarVisiable = false;
+    if( m_pVerticalScrollbar && m_pVerticalScrollbar->IsVisible() ) {
+        bVScrollbarVisiable = true;
+        rc.right -= m_pVerticalScrollbar->GetFixedWidth();
+    }
+    if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) {
+        rc.bottom -= m_pHorizontalScrollbar->GetFixedHeight();
+    }
 
-    if( m_pTwh ) m_pTwh->SetClientRect(&rc);
+    if( m_pTwh ) {
+        m_pTwh->SetClientRect(&rc);
+        if( bVScrollbarVisiable && (!m_pVerticalScrollbar->IsVisible() || m_bVScrollbarFixing) ) {
+            LONG lWidth = rc.right - rc.left + m_pVerticalScrollbar->GetFixedWidth();
+            LONG lHeight = 0;
+            SIZEL szExtent = { -1, -1 };
+            m_pTwh->GetTextServices()->TxGetNaturalSize(
+                DVASPECT_CONTENT, 
+                GetManager()->GetPaintDC(), 
+                NULL,
+                NULL,
+                TXTNS_FITTOCONTENT,
+                &szExtent,
+                &lWidth,
+                &lHeight);
+            if( lHeight > rc.bottom - rc.top ) {
+                m_pVerticalScrollbar->SetVisible(true);
+                m_pVerticalScrollbar->SetScrollPos(0);
+                m_bVScrollbarFixing = true;
+            }
+            else {
+                if( m_bVScrollbarFixing ) {
+                    m_pVerticalScrollbar->SetVisible(false);
+                    m_bVScrollbarFixing = false;
+                }
+            }
+        }
+    }
+
     if( m_pVerticalScrollbar != NULL && m_pVerticalScrollbar->IsVisible() ) {
         RECT rcScrollbarPos = { rc.right, rc.top, rc.right + m_pVerticalScrollbar->GetFixedWidth(), rc.bottom};
         m_pVerticalScrollbar->SetPos(rcScrollbarPos);
@@ -1759,6 +1792,23 @@ void CRichEditUI::DoPaint(HDC hDC, const RECT& rcPaint)
             NULL, 	   				// Call back function
             NULL,					// Call back parameter
             0);				        // What view of the object
+        if( m_bVScrollbarFixing ) {
+            LONG lWidth = rc.right - rc.left + m_pVerticalScrollbar->GetFixedWidth();
+            LONG lHeight = 0;
+            SIZEL szExtent = { -1, -1 };
+            m_pTwh->GetTextServices()->TxGetNaturalSize(
+                DVASPECT_CONTENT, 
+                GetManager()->GetPaintDC(), 
+                NULL,
+                NULL,
+                TXTNS_FITTOCONTENT,
+                &szExtent,
+                &lWidth,
+                &lHeight);
+            if( lHeight <= rc.bottom - rc.top ) {
+                NeedUpdate();
+            }
+        }
     }
 
     if( m_items.GetSize() > 0 ) {
