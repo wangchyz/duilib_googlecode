@@ -215,6 +215,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
         case 5:
             if( _tcscmp(pstrClass, _T("Combo")) == 0 )                  pControl = new CComboUI;
             else if( _tcscmp(pstrClass, _T("Label")) == 0 )             pControl = new CLabelUI;
+            break;
         case 6:
             if( _tcscmp(pstrClass, _T("Button")) == 0 )                 pControl = new CButtonUI;
             else if( _tcscmp(pstrClass, _T("Option")) == 0 )            pControl = new COptionUI;
@@ -227,6 +228,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
         case 8:
             if( _tcscmp(pstrClass, _T("Progress")) == 0 )               pControl = new CProgressUI;
             else if(  _tcscmp(pstrClass, _T("RichEdit")) == 0 )         pControl = new CRichEditUI;
+            break;
         case 9:
             if( _tcscmp(pstrClass, _T("Container")) == 0 )              pControl = new CContainerUI;
             else if( _tcscmp(pstrClass, _T("TabLayout")) == 0 )         pControl = new CTabLayoutUI;
