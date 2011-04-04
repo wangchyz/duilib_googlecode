@@ -138,7 +138,7 @@ public:
     {
         if( m_hWnd != (HWND) wParam ) {
             if( !bFlag ) Close();
-            else bFlag = false;
+            else { ShowWindow(false, false); bFlag = false; }
         }
         return 0;
     }
