@@ -550,7 +550,6 @@ void CTxtWinHost::TxSetCapture(BOOL fCapture)
 
 void CTxtWinHost::TxSetFocus()
 {
-    ::SetFocus(m_re->GetManager()->GetPaintWindow());
     m_re->SetFocus();
 }
 
