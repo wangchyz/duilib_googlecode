@@ -257,6 +257,9 @@ public:
     void SendNotify(TNotifyUI& Msg);
     void SendNotify(CControlUI* pControl, LPCTSTR pstrMessage, WPARAM wParam = 0, LPARAM lParam = 0);
 
+    bool AddPreMessageFilter(IMessageFilterUI* pFilter);
+    bool RemovePreMessageFilter(IMessageFilterUI* pFilter);
+
     bool AddMessageFilter(IMessageFilterUI* pFilter);
     bool RemoveMessageFilter(IMessageFilterUI* pFilter);
 
@@ -317,6 +320,7 @@ private:
     //
     CStdPtrArray m_aNotifiers;
     CStdPtrArray m_aTimers;
+    CStdPtrArray m_aPreMessageFilters;
     CStdPtrArray m_aMessageFilters;
     CStdPtrArray m_aPostPaintControls;
     CStdPtrArray m_aDelayedCleanup;
