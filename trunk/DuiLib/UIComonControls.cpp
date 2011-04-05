@@ -238,6 +238,13 @@ void CButtonUI::DoEvent(TEventUI& event)
     {
         Invalidate();
     }
+    if( event.Type == UIEVENT_KEYDOWN )
+    {
+        if( event.chKey == VK_SPACE || event.chKey == VK_RETURN ) {
+            Activate();
+            return;
+        }
+    }
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK )
     {
         if( ::PtInRect(&m_rcItem, event.ptMouse) && IsEnabled() ) {
