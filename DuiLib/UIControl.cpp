@@ -481,8 +481,7 @@ void CControlUI::SetVisible(bool bVisible)
     m_bVisible = bVisible;
     if( m_bFocused ) m_bFocused = false;
     if( IsVisible() != v ) {
-        if( !m_bFloat ) NeedParentUpdate();
-        else NeedUpdate();
+        NeedParentUpdate();
     }
 }
 
