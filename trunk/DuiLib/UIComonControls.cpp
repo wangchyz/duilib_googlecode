@@ -459,7 +459,7 @@ void COptionUI::SetGroup(bool bGroup)
 {
     m_bGroup = bGroup;
     if(m_bGroup && m_bSelected) {
-        m_bSelected = false;
+        Selected(true);
         Invalidate();
     }
 }
