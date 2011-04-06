@@ -145,24 +145,22 @@ protected:
 #if defined(EXPORT_UI_SCRIPT)
 	void SaveSkinFile();
 
-	void SaveProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
-	void SaveSingleProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
-	void SaveContainerProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
-
-	void CControlUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CLabelUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CButtonUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void COptionUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CProgressUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CSliderUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CEditUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CScrollbarUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CListUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CComboUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CListHeaderItemUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void CListElementUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-
-	void CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_Properties(CControlUI* pControlUI, TiXmlElement* pParentNode);
+	void Save_SingleProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
+	void Save_ContainerProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
+	void Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CLabelUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CButtonUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_COptionUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CProgressUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CSliderUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CEditUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CScrollbarUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CListUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CListHeaderItemUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CListElementUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
+	void Save_CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
 #endif
 
 private:
