@@ -1648,7 +1648,7 @@ void CRichEditUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_KILLFOCUS )  {
         if( m_pTwh ) {
-            m_pTwh->OnTxInPlaceActivate(NULL);
+            m_pTwh->OnTxInPlaceDeactivate();
             m_pTwh->GetTextServices()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
         }
     }
