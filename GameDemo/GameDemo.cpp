@@ -214,6 +214,49 @@ public:
         pLoginFrame->ShowModal();
     }
 
+    void SendChatMessage() {
+        CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
+        if( pChatEdit == NULL ) return;
+        //pChatEdit->SetFocus();
+        if( !pChatEdit->IsFocused() ) pChatEdit->SetFocus();
+        if( pChatEdit->GetText().IsEmpty() ) return;
+
+        CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
+        if( pRichEdit == NULL ) return;
+        long lSelBegin = 0, lSelEnd = 0;
+        CHARFORMAT2 cf;
+        ZeroMemory(&cf, sizeof(CHARFORMAT2));
+        cf.cbSize = sizeof(cf);
+        cf.dwReserved = 0;
+        cf.dwMask = CFM_COLOR;
+        cf.crTextColor = RGB(220, 0, 0);
+
+        lSelEnd = lSelBegin = pRichEdit->GetTextLength();
+        pRichEdit->SetSel(lSelEnd, lSelEnd);
+        pRichEdit->ReplaceSel(_T("某人"), false);
+        lSelEnd = pRichEdit->GetTextLength();
+        pRichEdit->SetSel(lSelBegin, lSelEnd);
+        pRichEdit->SetSelectionCharFormat(cf);
+
+        lSelBegin = lSelEnd;
+        pRichEdit->SetSel(-1, -1);
+        pRichEdit->ReplaceSel(_T("说:"), false);
+
+        pRichEdit->SetSel(-1, -1);
+        pRichEdit->ReplaceSel(pChatEdit->GetText(), false);
+        pChatEdit->SetText(_T(""));
+
+        pRichEdit->SetSel(-1, -1);
+        pRichEdit->ReplaceSel(_T("\n"), false);
+
+        cf.crTextColor = RGB(0, 0, 0);
+        lSelEnd = pRichEdit->GetTextLength();
+        pRichEdit->SetSel(lSelBegin, lSelEnd);
+        pRichEdit->SetSelectionCharFormat(cf);
+
+        pRichEdit->EndDown();
+    }
+
     void Notify(TNotifyUI& msg)
     {
         if( msg.sType == _T("windowinit") ) OnPrepare();
@@ -271,44 +314,7 @@ public:
                 }
             }
             else if( name == _T("sendbtn") ) {
-                CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
-                if( pChatEdit == NULL || pChatEdit->GetText().IsEmpty() ) return;
-
-                CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
-                if( pRichEdit == NULL ) return;
-                long lSelBegin = 0, lSelEnd = 0;
-                CHARFORMAT2 cf;
-                ZeroMemory(&cf, sizeof(CHARFORMAT2));
-                cf.cbSize = sizeof(cf);
-                cf.dwReserved = 0;
-                cf.dwMask = CFM_COLOR;
-                cf.crTextColor = RGB(220, 0, 0);
-
-                lSelEnd = lSelBegin = pRichEdit->GetTextLength();
-                pRichEdit->SetSel(lSelEnd, lSelEnd);
-                pRichEdit->ReplaceSel(_T("某人"), false);
-                lSelEnd = pRichEdit->GetTextLength();
-                pRichEdit->SetSel(lSelBegin, lSelEnd);
-                pRichEdit->SetSelectionCharFormat(cf);
-
-                lSelBegin = lSelEnd;
-                pRichEdit->SetSel(-1, -1);
-                pRichEdit->ReplaceSel(_T("说:"), false);
-
-                pRichEdit->SetSel(-1, -1);
-                pRichEdit->ReplaceSel(pChatEdit->GetText(), false);
-                pChatEdit->SetText(_T(""));
-                pChatEdit->SetFocus();
-
-                pRichEdit->SetSel(-1, -1);
-                pRichEdit->ReplaceSel(_T("\n"), false);
-
-                cf.crTextColor = RGB(0, 0, 0);
-                lSelEnd = pRichEdit->GetTextLength();
-                pRichEdit->SetSel(lSelBegin, lSelEnd);
-                pRichEdit->SetSelectionCharFormat(cf);
-
-                pRichEdit->EndDown();
+                SendChatMessage();
             }
         }
         else if( msg.sType == _T("selectchanged") ) {
@@ -378,6 +384,11 @@ public:
                 CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
                 if( pChatEdit ) pChatEdit->SetText(msg.pSender->GetText());
                 static_cast<CComboUI*>(msg.pSender)->SelectItem(-1);
+            }
+        }
+        else if( msg.sType == _T("return") ) {
+            if( msg.pSender->GetName() == _T("chatEdit") ) {
+                SendChatMessage();
             }
         }
     }
