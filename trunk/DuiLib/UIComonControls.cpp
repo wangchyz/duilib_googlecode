@@ -1178,6 +1178,9 @@ LRESULT CEditWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     BOOL bHandled = TRUE;
     if( uMsg == WM_KILLFOCUS ) lRes = OnKillFocus(uMsg, wParam, lParam, bHandled);
     else if( uMsg == OCM_COMMAND && GET_WM_COMMAND_CMD(wParam, lParam) == EN_CHANGE ) lRes = OnEditChanged(uMsg, wParam, lParam, bHandled);
+    else if( uMsg == WM_KEYDOWN && TCHAR(wParam) == VK_RETURN ) {
+        m_pOwner->GetManager()->SendNotify(m_pOwner, _T("return"));
+    }
     else if( uMsg == OCM__BASE + WM_CTLCOLOREDIT ) {
         if( m_pOwner->GetNativeEditBkColor() == 0xFFFFFFFF ) return NULL;
         ::SetBkMode((HDC)wParam, TRANSPARENT);
@@ -1208,7 +1211,8 @@ LRESULT CEditWnd::OnEditChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
     ASSERT(pstr);
     if( pstr == NULL ) return 0;
     ::GetWindowText(m_hWnd, pstr, cchLen);
-    m_pOwner->SetText(pstr);
+    m_pOwner->m_sText = pstr;
+    m_pOwner->GetManager()->SendNotify(m_pOwner, _T("textchanged"));
     return 0;
 }
 
@@ -1337,7 +1341,7 @@ void CEditUI::SetEnabled(bool bEnable)
 void CEditUI::SetText(LPCTSTR pstrText)
 {
     m_sText = pstrText;
-    if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("textchanged"));
+    if( m_pWindow != NULL ) Edit_SetText(*m_pWindow, m_sText);
     Invalidate();
 }
 

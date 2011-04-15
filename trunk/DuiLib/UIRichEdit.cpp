@@ -878,7 +878,8 @@ void CTxtWinHost::SetClientRect(RECT *prc)
     sizelExtent.cx = DXtoHimetricX(rcClient.right - rcClient.left, xPerInch);
     sizelExtent.cy = DYtoHimetricY(rcClient.bottom - rcClient.top, yPerInch);
 
-    pserv->OnTxPropertyBitsChange(TXTBIT_VIEWINSETCHANGE, TXTBIT_VIEWINSETCHANGE);
+    pserv->OnTxPropertyBitsChange(TXTBIT_VIEWINSETCHANGE | TXTBIT_CLIENTRECTCHANGE, 
+        TXTBIT_VIEWINSETCHANGE | TXTBIT_CLIENTRECTCHANGE);
     resized = TRUE;
 }
 
@@ -1505,8 +1506,10 @@ HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESU
         }
         if( msg == WM_KEYDOWN || msg == WM_KEYUP || msg == WM_CHAR || msg == WM_IME_CHAR ) {
             if( TCHAR(wparam) == VK_RETURN ) {
-                if( !m_bWantReturn ) return S_OK;
-                if( ::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn ) return S_OK;
+                if( !m_bWantReturn || (::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn) ) {
+                    if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, _T("return"));
+                    return S_OK;
+                }
             }
         }
         return m_pTwh->GetTextServices()->TxSendMessage(msg, wparam, lparam, plresult);
