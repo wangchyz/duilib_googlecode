@@ -878,8 +878,7 @@ void CTxtWinHost::SetClientRect(RECT *prc)
     sizelExtent.cx = DXtoHimetricX(rcClient.right - rcClient.left, xPerInch);
     sizelExtent.cy = DYtoHimetricY(rcClient.bottom - rcClient.top, yPerInch);
 
-    pserv->OnTxPropertyBitsChange(TXTBIT_VIEWINSETCHANGE | TXTBIT_CLIENTRECTCHANGE, 
-        TXTBIT_VIEWINSETCHANGE | TXTBIT_CLIENTRECTCHANGE);
+    pserv->OnTxPropertyBitsChange(TXTBIT_VIEWINSETCHANGE, TXTBIT_VIEWINSETCHANGE);
     resized = TRUE;
 }
 
@@ -1651,7 +1650,7 @@ void CRichEditUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_KILLFOCUS )  {
         if( m_pTwh ) {
-            m_pTwh->OnTxInPlaceDeactivate();
+            m_pTwh->OnTxInPlaceActivate(NULL);
             m_pTwh->GetTextServices()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
         }
     }
