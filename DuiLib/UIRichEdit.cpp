@@ -1500,9 +1500,7 @@ void CRichEditUI::DoInit()
 HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plresult) const
 {
     if( m_pTwh ) {
-        if( !IsMouseEnabled() && msg > WM_MOUSEFIRST && msg < WM_MOUSELAST ) {
-            return S_OK;
-        }
+        if( !IsMouseEnabled() && msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST ) return S_OK;
         if( msg == WM_KEYDOWN || msg == WM_KEYUP || msg == WM_CHAR || msg == WM_IME_CHAR ) {
             if( TCHAR(wparam) == VK_RETURN ) {
                 if( !m_bWantReturn || (::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn) ) {
