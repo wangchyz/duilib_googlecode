@@ -944,6 +944,7 @@ LRESULT CActiveXUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool
     ASSERT(m_pControl->m_bWindowless);
     if( !m_pControl->m_bInPlaceActive ) return 0;
     if( m_pControl->m_pInPlaceObject == NULL ) return 0;
+    if( !IsMouseEnabled() && uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST ) return 0;
     bool bWasHandled = true;
     if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR )
     {
