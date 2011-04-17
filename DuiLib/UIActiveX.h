@@ -34,8 +34,11 @@ public:
     LPCTSTR GetClass() const;
 	LPVOID GetInterface(LPCTSTR pstrName);
 
-    bool CreateControl(const CLSID clsid, bool bDelayedCreate = false);
-    bool CreateControl(LPCTSTR pstrCLSID, bool bDelayedCreate = false);
+    bool IsDelayCreate() const;
+    void SetDelayCreate(bool bDelayCreate = true);
+
+    bool CreateControl(const CLSID clsid);
+    bool CreateControl(LPCTSTR pstrCLSID);
     HRESULT GetControl(const IID iid, LPVOID* ppRet);
 	CLSID GetClisd() const;
 
@@ -50,11 +53,12 @@ public:
 
 protected:
     void ReleaseControl();
-    bool DelayedControlCreation();
+    bool DoCreateControl();
 
 protected:
     CLSID m_clsid;
     bool m_bCreated;
+    bool m_bDelayCreate;
     IOleObject* m_pUnk;
     CActiveXCtrl* m_pControl;
     HWND m_hwndHost;

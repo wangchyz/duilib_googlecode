@@ -844,8 +844,9 @@ LRESULT CActiveXWnd::OnPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 //
 //
 
-CActiveXUI::CActiveXUI() : m_pUnk(NULL), m_pControl(NULL), m_hwndHost(NULL), m_bCreated(false)
+CActiveXUI::CActiveXUI() : m_pUnk(NULL), m_pControl(NULL), m_hwndHost(NULL), m_bCreated(false), m_bDelayCreate(true)
 {
+    m_clsid = IID_NULL;
 }
 
 CActiveXUI::~CActiveXUI()
@@ -895,7 +896,7 @@ void CActiveXUI::SetPos(RECT rc)
 {
     CControlUI::SetPos(rc);
 
-    if( !m_bCreated ) DelayedControlCreation();
+    if( !m_bCreated ) DoCreateControl();
 
     if( m_pUnk == NULL ) return;
     if( m_pControl == NULL ) return;
@@ -933,6 +934,7 @@ void CActiveXUI::DoPaint(HDC hDC, const RECT& rcPaint)
 void CActiveXUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("clsid")) == 0 ) CreateControl(pstrValue);
+    else if( _tcscmp(pstrName, _T("delaycreate")) == 0 ) SetDelayCreate(_tcscmp(pstrValue, _T("true")) == 0);
     else CControlUI::SetAttribute(pstrName, pstrValue);
 }
 
@@ -981,7 +983,21 @@ LRESULT CActiveXUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool
     return lResult;
 }
 
-bool CActiveXUI::CreateControl(LPCTSTR pstrCLSID, bool bDelayedCreate)
+bool CActiveXUI::IsDelayCreate() const
+{
+    return m_bDelayCreate;
+}
+
+void CActiveXUI::SetDelayCreate(bool bDelayCreate)
+{
+    if( m_bDelayCreate == bDelayCreate ) return;
+    if( bDelayCreate == false ) {
+        if( m_bCreated == false && m_clsid != IID_NULL ) DoCreateControl();
+    }
+    m_bDelayCreate = bDelayCreate;
+}
+
+bool CActiveXUI::CreateControl(LPCTSTR pstrCLSID)
 {
     CLSID clsid = { 0 };
     OLECHAR szCLSID[100] = { 0 };
@@ -992,16 +1008,16 @@ bool CActiveXUI::CreateControl(LPCTSTR pstrCLSID, bool bDelayedCreate)
 #endif
     if( pstrCLSID[0] == '{' ) ::CLSIDFromString(szCLSID, &clsid);
     else ::CLSIDFromProgID(szCLSID, &clsid);
-    return CreateControl(clsid, bDelayedCreate);
+    return CreateControl(clsid);
 }
 
-bool CActiveXUI::CreateControl(const CLSID clsid, bool bDelayedCreate)
+bool CActiveXUI::CreateControl(const CLSID clsid)
 {
     ASSERT(clsid!=IID_NULL);
     if( clsid == IID_NULL ) return false;
     m_bCreated = false;
     m_clsid = clsid;
-    if( !bDelayedCreate ) DelayedControlCreation();
+    if( !m_bDelayCreate ) DoCreateControl();
     return true;
 }
 
@@ -1028,7 +1044,7 @@ void CActiveXUI::ReleaseControl()
     m_pManager->RemoveMessageFilter(this);
 }
 
-bool CActiveXUI::DelayedControlCreation()
+bool CActiveXUI::DoCreateControl()
 {
     ReleaseControl();
     // At this point we'll create the ActiveX control
@@ -1065,6 +1081,7 @@ bool CActiveXUI::DelayedControlCreation()
     if( FAILED(Hr) ) Hr = m_pUnk->QueryInterface(IID_IViewObject, (LPVOID*) &m_pControl->m_pViewObject);
     // Activate and done...
     m_pUnk->SetHostNames(OLESTR("UIActiveX"), NULL);
+    if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, _T("showactivex"));
     if( (dwMiscStatus & OLEMISC_INVISIBLEATRUNTIME) == 0 ) {
         Hr = m_pUnk->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pOleClientSite, 0, m_pManager->GetPaintWindow(), &m_rcItem);
         //::RedrawWindow(m_pManager->GetPaintWindow(), &m_rcItem, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE | RDW_INTERNALPAINT | RDW_FRAME);
