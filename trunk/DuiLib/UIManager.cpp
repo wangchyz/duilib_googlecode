@@ -256,6 +256,9 @@ void CPaintManagerUI::SetInitSize(int cx, int cy)
 {
     m_szInitWindowSize.cx = cx;
     m_szInitWindowSize.cy = cy;
+    if( m_pRoot == NULL && m_hWndPaint != NULL ) {
+        ::SetWindowPos(m_hWndPaint, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
+    }
 }
 
 RECT& CPaintManagerUI::GetSizeBox()
@@ -620,7 +623,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
                 }
             }
 
-            m_pRoot->NeedUpdate();
+            if( m_pRoot != NULL ) m_pRoot->NeedUpdate();
         }
         return true;
     case WM_TIMER:
