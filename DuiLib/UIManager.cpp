@@ -1548,6 +1548,11 @@ bool CPaintManagerUI::RemoveFontAt(int index)
     return m_aCustomFonts.Remove(index);
 }
 
+DWORD CPaintManagerUI::GetCustomFontCount() const
+{
+	return m_aCustomFonts.GetSize();
+}
+
 void CPaintManagerUI::RemoveAllFonts()
 {
     TFontInfo* pFontInfo;
@@ -1669,6 +1674,11 @@ bool CPaintManagerUI::RemoveDefaultAttributeList(LPCTSTR pStrControlName)
     return m_DefaultAttrHash.Remove(pStrControlName);
 }
 
+const CStdStringPtrMap& CPaintManagerUI::GetDefaultAttribultes() const
+{
+	return m_DefaultAttrHash;
+}
+
 void CPaintManagerUI::RemoveAllDefaultAttributeList()
 {
     CStdString* pDefaultAttr;
@@ -1692,6 +1702,12 @@ CControlUI* CPaintManagerUI::FindControl(LPCTSTR pstrName)
 {
     ASSERT(m_pRoot);
     return static_cast<CControlUI*>(m_mNameHash.Find(pstrName));
+}
+
+CControlUI* CPaintManagerUI::FindControl(CControlUI* pParent, LPCTSTR pstrName)
+{
+    ASSERT(pParent);
+    return pParent->FindControl(__FindControlFromParentControl, (LPVOID)pstrName, UIFIND_ALL);
 }
 
 CControlUI* CPaintManagerUI::FindControl(POINT pt) const
@@ -1729,6 +1745,14 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameHash(CControlUI* pThi
     // Add this control to the hash list
     pManager->m_mNameHash.Insert(sName, pThis);
     return NULL; // Attempt to add all controls
+}
+
+CControlUI* CALLBACK CPaintManagerUI::__FindControlFromParentControl(CControlUI* pThis, LPVOID pData)
+{
+    LPCTSTR pstrName = static_cast<LPCTSTR>(pData);
+	const CStdString& sName = pThis->GetName();
+	if( sName.IsEmpty() ) return NULL;
+	return (_tcsicmp(sName, pstrName) == 0) ? pThis : NULL;
 }
 
 CControlUI* CALLBACK CPaintManagerUI::__FindControlFromShortcut(CControlUI* pThis, LPVOID pData)
