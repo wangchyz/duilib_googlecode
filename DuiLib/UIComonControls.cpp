@@ -201,7 +201,8 @@ void CLabelUI::PaintText(HDC hDC)
 //
 //
 
-CButtonUI::CButtonUI() : m_uButtonState(0)
+CButtonUI::CButtonUI() : m_uButtonState(0), m_dwHotTextColor(0), m_dwPushedTextColor(0), m_dwFocusedTextColor(0)
+
 {
     m_uTextStyle = DT_SINGLELINE | DT_VCENTER | DT_CENTER;
 }
@@ -445,7 +446,7 @@ void CButtonUI::PaintBorder(HDC hDC)
 	//	CRenderEngine::DrawRect(hDC, m_rcItem, nBorderSize, dwBorderColor);
 	//}
 
-	__super::PaintBorder(hDC);
+	//__super::PaintBorder(hDC);
 }
 void CButtonUI::PaintText(HDC hDC)
 {
