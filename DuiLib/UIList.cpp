@@ -2306,7 +2306,7 @@ m_uButtonState(0)
 
 LPCTSTR CListContainerElementUI::GetClass() const
 {
-    return _T("ListContainerElement");
+    return _T("ListContainerElementUI");
 }
 
 UINT CListContainerElementUI::GetControlFlags() const
