@@ -79,9 +79,8 @@ public:
     SIZE EstimateSize(SIZE szAvailable);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-	virtual void PaintText(HDC hDC);
-    virtual void PaintStatusImage(HDC hDC);
-	virtual void PaintBorder(HDC hDC);
+	void PaintText(HDC hDC);
+    void PaintStatusImage(HDC hDC);
 
 protected:
     UINT m_uButtonState;
