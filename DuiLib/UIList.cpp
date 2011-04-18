@@ -1062,7 +1062,7 @@ SIZE CListHeaderUI::EstimateSize(SIZE szAvailable)
 {
     SIZE cXY = {0, m_cxyFixed.cy};
     if( cXY.cy == 0 && m_pManager != NULL ) {
-        cXY.cy = m_pManager->GetDefaultFontInfo().tmHeight + 6;
+        cXY.cy = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 6;
     }
 
     for( int it = 0; it < m_items.GetSize(); it++ ) {
@@ -1374,7 +1374,7 @@ void CListHeaderItemUI::DoEvent(TEventUI& event)
 
 SIZE CListHeaderItemUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo().tmHeight + 14);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 14);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -1750,7 +1750,7 @@ SIZE CListLabelElementUI::EstimateSize(SIZE szAvailable)
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
     SIZE cXY = m_cxyFixed;
     if( cXY.cy == 0 && m_pManager != NULL ) {
-        cXY.cy = m_pManager->GetDefaultFontInfo().tmHeight + 8;
+        cXY.cy = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8;
         cXY.cy += pInfo->rcTextPadding.top + pInfo->rcTextPadding.bottom;
     }
 
@@ -1932,7 +1932,7 @@ SIZE CListTextElementUI::EstimateSize(SIZE szAvailable)
 
     SIZE cXY = m_cxyFixed;
     if( cXY.cy == 0 && m_pManager != NULL ) {
-        cXY.cy = m_pManager->GetDefaultFontInfo().tmHeight + 8;
+        cXY.cy = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8;
         if( pInfo ) cXY.cy += pInfo->rcTextPadding.top + pInfo->rcTextPadding.bottom;
     }
 
@@ -1957,6 +1957,7 @@ void CListTextElementUI::DrawItemText(HDC hDC, const RECT& rcItem)
     IListCallbackUI* pCallback = m_pOwner->GetTextCallback();
     //ASSERT(pCallback);
     //if( pCallback == NULL ) return;
+
     m_nLinks = 0;
     int nLinks = lengthof(m_rcLinks);
     for( int i = 0; i < pInfo->nColumns; i++ )
@@ -1970,16 +1971,19 @@ void CListTextElementUI::DrawItemText(HDC hDC, const RECT& rcItem)
         LPCTSTR pstrText = NULL;
         if( pCallback ) pstrText = pCallback->GetItemText(this, m_iIndex, i);
         else pstrText = GetText(i);
-
         if( pInfo->bShowHtml )
             CRenderEngine::DrawHtmlText(hDC, m_pManager, rcItem, pstrText, iTextColor, \
-            m_rcLinks, m_sLinks, nLinks, DT_SINGLELINE | pInfo->uTextStyle);
+                &m_rcLinks[m_nLinks], &m_sLinks[m_nLinks], nLinks, DT_SINGLELINE | pInfo->uTextStyle);
         else
             CRenderEngine::DrawText(hDC, m_pManager, rcItem, pstrText, iTextColor, \
             pInfo->nFont, DT_SINGLELINE | pInfo->uTextStyle);
 
-        if( nLinks > 0 ) m_nLinks = nLinks, nLinks = 0; 
-        else nLinks = lengthof(m_rcLinks);
+        m_nLinks += nLinks;
+        nLinks = lengthof(m_rcLinks) - m_nLinks; 
+    }
+    for( int i = m_nLinks; i < lengthof(m_rcLinks); i++ ) {
+        ::ZeroMemory(m_rcLinks + i, sizeof(RECT));
+        ((CStdString*)(m_sLinks + i))->Empty();
     }
 }
 

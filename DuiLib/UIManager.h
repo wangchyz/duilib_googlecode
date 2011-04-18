@@ -88,6 +88,11 @@ typedef enum EVENTTYPE_UI
 typedef struct tagTFontInfo
 {
     HFONT hFont;
+    CStdString sFontName;
+    int iSize;
+    bool bBold;
+    bool bUnderline;
+    bool bItalic;
     TEXTMETRIC tm;
 } TFontInfo;
 
@@ -201,34 +206,31 @@ public:
 
     DWORD GetDefaultDisabledColor();
     void SetDefaultDisabledColor(DWORD dwColor);
-    HFONT GetDefaultFont();
     DWORD GetDefaultFontColor();
-    const TEXTMETRIC& GetDefaultFontInfo();
-    void SetDefaultFont(HFONT hFont, DWORD dwColor = 0xFF000000);
-    HFONT GetDefaultBoldFont();
-    DWORD GetDefaultBoldFontColor();
-    const TEXTMETRIC& GetDefaultBoldFontInfo();
-    void SetDefaultBoldFont(HFONT hFont, DWORD dwColor = 0xFF000000);
-    HFONT GetDefaultLinkFont();
+    void SetDefaultFontColor(DWORD dwColor);
     DWORD GetDefaultLinkFontColor();
-    DWORD GetDefaultLinkFontHoverColor();
-    const TEXTMETRIC& GetDefaultLinkFontInfo();
-    void SetDefaultLinkFont(HFONT hFont, DWORD dwColor = 0xFF0000FF, DWORD dwHoverColor = 0xFFD3215F);
-    bool AddFont(HFONT hFont);
+    void SetDefaultLinkFontColor(DWORD dwColor);
+    DWORD GetDefaultLinkHoverFontColor();
+    void SetDefaultLinkHoverFontColor(DWORD dwColor);
+    DWORD GetDefaultSelectedBkColor();
+    void SetDefaultSelectedBkColor(DWORD dwColor);
+    TFontInfo* GetDefaultFontInfo();
+    void SetDefaultFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     HFONT AddFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
-    bool AddFontAt(int index, HFONT hFont);
-    HFONT AddFontAt(int index, LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline);
+    HFONT AddFontAt(int index, LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     HFONT GetFont(int index);
+    HFONT GetFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     bool FindFont(HFONT hFont);
+    bool FindFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     bool RemoveFont(HFONT hFont);
     bool RemoveFontAt(int index);
-	DWORD GetCustomFontCount() const;
     void RemoveAllFonts();
-    const TEXTMETRIC& GetFontInfo(int index);
+    TFontInfo* GetFontInfo(int index);
+    TFontInfo* GetFontInfo(HFONT hFont);
 
-    TImageInfo* GetImage(LPCTSTR bitmap);
-    TImageInfo* GetImageEx(LPCTSTR bitmap, LPCTSTR type = NULL, DWORD mask = 0);
-    TImageInfo* AddImage(LPCTSTR bitmap, LPCTSTR type = NULL, DWORD mask = 0);
+    const TImageInfo* GetImage(LPCTSTR bitmap);
+    const TImageInfo* GetImageEx(LPCTSTR bitmap, LPCTSTR type = NULL, DWORD mask = 0);
+    const TImageInfo* AddImage(LPCTSTR bitmap, LPCTSTR type = NULL, DWORD mask = 0);
     bool RemoveImage(LPCTSTR bitmap);
     void RemoveAllImages();
 
@@ -332,16 +334,11 @@ private:
     //
     CPaintManagerUI* m_pParentResourcePM;
     DWORD m_dwDefalutDisabledColor;
-    HFONT m_hDefalutFont;
     DWORD m_dwDefalutFontColor;
-    TEXTMETRIC m_hDefalutFontTextMetric;
-    HFONT m_hDefalutBoldFont;
-    DWORD m_dwDefalutBoldFontColor;
-    TEXTMETRIC m_hDefaluttBoldFontTextMetric;
-    HFONT m_hDefalutLinkFont;
     DWORD m_dwDefalutLinkFontColor;
-    DWORD m_dwDefalutLinkFontHoverColor;
-    TEXTMETRIC m_hDefalutLinkFontTextMetric;
+    DWORD m_dwDefalutLinkHoverFontColor;
+    DWORD m_dwDefalutSelectedBkColor;
+    TFontInfo m_DefaultFontInfo;
     CStdPtrArray m_aCustomFonts;
 
     CStdStringPtrMap m_mImageHash;

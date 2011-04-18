@@ -171,30 +171,30 @@ public:
         GameListUI::Node* pGameNode = NULL;
         GameListUI::Node* pServerNode = NULL;
         GameListUI::Node* pRoomNode = NULL;
-        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 3}{x 4}推荐游戏"));
+        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 18 3}{x 4}推荐游戏"));
         for( int i = 0; i < 4; ++i )
         {
-            pGameNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 10}{x 4}四人斗地主"), pCategoryNode);
+            pGameNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 18 10}{x 4}四人斗地主"), pCategoryNode);
             for( int i = 0; i < 3; ++i )
             {
-                pServerNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 10}{x 4}测试服务器"), pGameNode);
+                pServerNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 18 10}{x 4}测试服务器"), pGameNode);
                 for( int i = 0; i < 3; ++i )
                 {
-                    pRoomNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 10}{x 4}测试房间"), pServerNode);
+                    pRoomNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 18 10}{x 4}测试房间"), pServerNode);
                 }
             }
         }
-        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 3}{x 4}最近玩过的游戏"));
+        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 18 3}{x 4}最近玩过的游戏"));
         for( int i = 0; i < 2; ++i )
         {
             pGameList->AddNode(_T("三缺一"), pCategoryNode);
         }
-        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 3}{x 4}棋牌游戏"));
+        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 18 3}{x 4}棋牌游戏"));
         for( int i = 0; i < 8; ++i )
         {
             pGameList->AddNode(_T("双扣"), pCategoryNode);
         }
-        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 3}{x 4}休闲游戏"));
+        pCategoryNode = pGameList->AddNode(_T("{x 4}{i gameicons.png 18 3}{x 4}休闲游戏"));
         for( int i = 0; i < 8; ++i )
         {
             pGameList->AddNode(_T("飞行棋"), pCategoryNode);
@@ -289,19 +289,16 @@ public:
                 if( pControl ) pControl->SetVisible(false);
             }
             else if( name == _T("fontswitch") ) {
-                if( m_pm.GetDefaultFont() == m_pm.GetFont(0) ) {
-                    m_pm.SetDefaultFont(m_pm.GetFont(3));
-                    m_pm.SetDefaultBoldFont(m_pm.GetFont(4));
-                    m_pm.SetDefaultLinkFont(m_pm.GetFont(5));
-                    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
-                    if( pRichEdit ) pRichEdit->SetFont(3);
+                TFontInfo* pFontInfo = m_pm.GetDefaultFontInfo();
+                if( pFontInfo->iSize < 18 ) {
+                    TFontInfo* pFontInfo = m_pm.GetFontInfo(0);
+                    if( pFontInfo )m_pm.SetDefaultFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, 
+                        pFontInfo->bUnderline, pFontInfo->bItalic);
                 }
                 else {
-                    m_pm.SetDefaultFont(m_pm.GetFont(0));
-                    m_pm.SetDefaultBoldFont(m_pm.GetFont(1));
-                    m_pm.SetDefaultLinkFont(m_pm.GetFont(2));
-                    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
-                    if( pRichEdit ) pRichEdit->SetFont(0);
+                    TFontInfo* pFontInfo = m_pm.GetFontInfo(1);
+                    if( pFontInfo )m_pm.SetDefaultFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, 
+                        pFontInfo->bUnderline, pFontInfo->bItalic);
                 }
                 m_pm.GetRoot()->NeedUpdate();
             }

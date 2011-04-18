@@ -463,7 +463,7 @@ void CComboUI::DoEvent(TEventUI& event)
 
 SIZE CComboUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo().tmHeight + 12);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 12);
     return CControlUI::EstimateSize(szAvailable);
 }
 

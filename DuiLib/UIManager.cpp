@@ -77,24 +77,22 @@ m_bAlphaBackground(false),
 m_pParentResourcePM(NULL)
 {
     m_dwDefalutDisabledColor = 0xFFA7A6AA;
+    m_dwDefalutFontColor = 0xFF000000;
+    m_dwDefalutLinkFontColor = 0xFF0000FF;
+    m_dwDefalutLinkHoverFontColor = 0xFFD3215F;
+    m_dwDefalutSelectedBkColor = 0xFFBAE4FF;
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
-    lf.lfHeight = -12;
-    m_hDefalutFont = ::CreateFontIndirect(&lf);
-    m_dwDefalutFontColor = 0xFF000000;
-    ::ZeroMemory(&m_hDefalutFontTextMetric, sizeof(m_hDefalutFontTextMetric));
-    
-    lf.lfUnderline = TRUE;
-    m_hDefalutLinkFont = ::CreateFontIndirect(&lf);
-    m_dwDefalutLinkFontColor = 0xFF0000FF;
-    m_dwDefalutLinkFontHoverColor = 0xFFD3215F;
-    ::ZeroMemory(&m_hDefaluttBoldFontTextMetric, sizeof(m_hDefaluttBoldFontTextMetric));
+    //lf.lfHeight = -12;
+    HFONT hDefaultFont = ::CreateFontIndirect(&lf);
+    m_DefaultFontInfo.hFont = hDefaultFont;
+    m_DefaultFontInfo.sFontName = lf.lfFaceName;
+    m_DefaultFontInfo.iSize = -lf.lfHeight;
+    m_DefaultFontInfo.bBold = false;
+    m_DefaultFontInfo.bUnderline = false;
+    m_DefaultFontInfo.bItalic = false;
+    ::ZeroMemory(&m_DefaultFontInfo.tm, sizeof(m_DefaultFontInfo.tm));
 
-    lf.lfUnderline = FALSE;
-    lf.lfWeight += FW_BOLD;
-    m_hDefalutBoldFont = ::CreateFontIndirect(&lf);
-    m_dwDefalutBoldFontColor = 0xFF000000;
-    ::ZeroMemory(&m_hDefalutLinkFontTextMetric, sizeof(m_hDefalutLinkFontTextMetric));
 
     if( m_hUpdateRectPen == NULL ) {
         m_hUpdateRectPen = ::CreatePen(PS_SOLID, 1, RGB(220, 0, 0));
@@ -130,9 +128,7 @@ CPaintManagerUI::~CPaintManagerUI()
 
     delete m_pRoot;
 
-    ::DeleteObject(m_hDefalutFont);
-    ::DeleteObject(m_hDefalutBoldFont);
-    ::DeleteObject(m_hDefalutLinkFont);
+    ::DeleteObject(m_DefaultFontInfo.hFont);
     RemoveAllFonts();
     RemoveAllImages();
     RemoveAllDefaultAttributeList();
@@ -1263,7 +1259,7 @@ bool CPaintManagerUI::UseParentResource(CPaintManagerUI* pm)
         return true;
     }
     if( pm == this ) return false;
-    
+
     CPaintManagerUI* pParentPM = pm->GetParentResource();
     while( pParentPM ) {
         if( pParentPM == this ) return false;
@@ -1289,94 +1285,15 @@ void CPaintManagerUI::SetDefaultDisabledColor(DWORD dwColor)
     m_dwDefalutDisabledColor = dwColor;
 }
 
-HFONT CPaintManagerUI::GetDefaultFont()
-{
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultFont();
-    return m_hDefalutFont;
-}
-
 DWORD CPaintManagerUI::GetDefaultFontColor()
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultFontColor();
     return m_dwDefalutFontColor;
 }
 
-const TEXTMETRIC& CPaintManagerUI::GetDefaultFontInfo()
+void CPaintManagerUI::SetDefaultFontColor(DWORD dwColor)
 {
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultFontInfo();
-    if( m_hDefalutFontTextMetric.tmHeight == 0 ) {
-        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, m_hDefalutFont);
-        ::GetTextMetrics(m_hDcPaint, &m_hDefalutFontTextMetric);
-        ::SelectObject(m_hDcPaint, hOldFont);
-    }
-
-    return m_hDefalutFontTextMetric;
-}
-
-void CPaintManagerUI::SetDefaultFont(HFONT hFont, DWORD dwColor)
-{
-    if( hFont == NULL ) return;
-
-    if( m_hDcPaint ) {
-        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, hFont);
-        ::GetTextMetrics(m_hDcPaint, &m_hDefalutFontTextMetric);
-        ::SelectObject(m_hDcPaint, hOldFont);
-    }
-    else {
-        ::ZeroMemory(&m_hDefalutFontTextMetric, sizeof(m_hDefalutFontTextMetric));
-    }
-
-    if( m_hDefalutFont && !FindFont(m_hDefalutFont) ) ::DeleteObject(m_hDefalutFont);
-    m_hDefalutFont = hFont;
     m_dwDefalutFontColor = dwColor;
-}
-
-HFONT CPaintManagerUI::GetDefaultBoldFont()
-{
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultBoldFont();
-    return m_hDefalutBoldFont;
-}
-
-DWORD CPaintManagerUI::GetDefaultBoldFontColor()
-{
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultBoldFontColor();
-    return m_dwDefalutBoldFontColor;
-}
-
-const TEXTMETRIC& CPaintManagerUI::GetDefaultBoldFontInfo()
-{
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultBoldFontInfo();
-    if( m_hDefaluttBoldFontTextMetric.tmHeight == 0 ) {
-        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, m_hDefalutBoldFont);
-        ::GetTextMetrics(m_hDcPaint, &m_hDefaluttBoldFontTextMetric);
-        ::SelectObject(m_hDcPaint, hOldFont);
-    }
-
-    return m_hDefaluttBoldFontTextMetric;
-}
-
-void CPaintManagerUI::SetDefaultBoldFont(HFONT hFont, DWORD dwColor)
-{
-    if( hFont == NULL ) return;
-
-    if( m_hDcPaint ) {
-        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, hFont);
-        ::GetTextMetrics(m_hDcPaint, &m_hDefaluttBoldFontTextMetric);
-        ::SelectObject(m_hDcPaint, hOldFont);
-    }
-    else {
-        ::ZeroMemory(&m_hDefaluttBoldFontTextMetric, sizeof(m_hDefaluttBoldFontTextMetric));
-    }
-
-    if( m_hDefalutBoldFont && !FindFont(m_hDefalutBoldFont) ) ::DeleteObject(m_hDefalutBoldFont);
-    m_hDefalutBoldFont = hFont;
-    m_dwDefalutBoldFontColor = dwColor;
-}
-
-HFONT CPaintManagerUI::GetDefaultLinkFont()
-{
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkFont();
-    return m_hDefalutLinkFont;
 }
 
 DWORD CPaintManagerUI::GetDefaultLinkFontColor()
@@ -1385,63 +1302,70 @@ DWORD CPaintManagerUI::GetDefaultLinkFontColor()
     return m_dwDefalutLinkFontColor;
 }
 
-DWORD CPaintManagerUI::GetDefaultLinkFontHoverColor()
+void CPaintManagerUI::SetDefaultLinkFontColor(DWORD dwColor)
 {
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkFontHoverColor();
-    return m_dwDefalutLinkFontHoverColor;
+    m_dwDefalutLinkFontColor = dwColor;
 }
 
-const TEXTMETRIC& CPaintManagerUI::GetDefaultLinkFontInfo()
+DWORD CPaintManagerUI::GetDefaultLinkHoverFontColor()
 {
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkFontInfo();
-    if( m_hDefalutLinkFontTextMetric.tmHeight == 0 ) {
-        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, m_hDefalutLinkFont);
-        ::GetTextMetrics(m_hDcPaint, &m_hDefalutLinkFontTextMetric);
+    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkHoverFontColor();
+    return m_dwDefalutLinkHoverFontColor;
+}
+
+void CPaintManagerUI::SetDefaultLinkHoverFontColor(DWORD dwColor)
+{
+    m_dwDefalutLinkHoverFontColor = dwColor;
+}
+
+DWORD CPaintManagerUI::GetDefaultSelectedBkColor()
+{
+    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultSelectedBkColor();
+    return m_dwDefalutSelectedBkColor;
+}
+
+void CPaintManagerUI::SetDefaultSelectedBkColor(DWORD dwColor)
+{
+    m_dwDefalutSelectedBkColor = dwColor;
+}
+
+TFontInfo* CPaintManagerUI::GetDefaultFontInfo()
+{
+    if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultFontInfo();
+
+    if( m_DefaultFontInfo.tm.tmHeight == 0 ) {
+        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, m_DefaultFontInfo.hFont);
+        ::GetTextMetrics(m_hDcPaint, &m_DefaultFontInfo.tm);
         ::SelectObject(m_hDcPaint, hOldFont);
     }
-
-    return m_hDefalutLinkFontTextMetric;
+    return &m_DefaultFontInfo;
 }
 
-void CPaintManagerUI::SetDefaultLinkFont(HFONT hFont, DWORD dwColor, DWORD dwHoverColor)
+void CPaintManagerUI::SetDefaultFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic)
 {
+    LOGFONT lf = { 0 };
+    ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
+    _tcscpy(lf.lfFaceName, pStrFontName);
+    lf.lfHeight = -nSize;
+    if( bBold ) lf.lfWeight += FW_BOLD;
+    if( bUnderline ) lf.lfUnderline = TRUE;
+    if( bItalic ) lf.lfItalic = TRUE;
+    HFONT hFont = ::CreateFontIndirect(&lf);
     if( hFont == NULL ) return;
 
+    ::DeleteObject(m_DefaultFontInfo.hFont);
+    m_DefaultFontInfo.hFont = hFont;
+    m_DefaultFontInfo.sFontName = pStrFontName;
+    m_DefaultFontInfo.iSize = nSize;
+    m_DefaultFontInfo.bBold = bBold;
+    m_DefaultFontInfo.bUnderline = bUnderline;
+    m_DefaultFontInfo.bItalic = bItalic;
+    ::ZeroMemory(&m_DefaultFontInfo.tm, sizeof(m_DefaultFontInfo.tm));
     if( m_hDcPaint ) {
         HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, hFont);
-        ::GetTextMetrics(m_hDcPaint, &m_hDefalutLinkFontTextMetric);
+        ::GetTextMetrics(m_hDcPaint, &m_DefaultFontInfo.tm);
         ::SelectObject(m_hDcPaint, hOldFont);
     }
-    else {
-        ::ZeroMemory(&m_hDefalutLinkFontTextMetric, sizeof(m_hDefalutLinkFontTextMetric));
-    }
-
-    if( m_hDefalutLinkFont && !FindFont(m_hDefalutLinkFont) ) ::DeleteObject(m_hDefalutLinkFont);
-    m_hDefalutLinkFont = hFont;
-    m_dwDefalutLinkFontColor = dwColor;
-    m_dwDefalutLinkFontHoverColor = dwHoverColor;
-}
-
-bool CPaintManagerUI::AddFont(HFONT hFont)
-{
-    if( hFont == NULL ) return false;
-
-    TFontInfo* pFontInfo = new TFontInfo;
-    if( !pFontInfo ) return false;
-    ::ZeroMemory(pFontInfo, sizeof(TFontInfo));
-    pFontInfo->hFont = hFont;
-    if( m_hDcPaint ) {
-        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, hFont);
-        ::GetTextMetrics(m_hDcPaint, &pFontInfo->tm);
-        ::SelectObject(m_hDcPaint, hOldFont);
-    }
-
-    if( !m_aCustomFonts.Add(pFontInfo) ) {
-        delete pFontInfo;
-        return false;
-    }
-
-    return true;
 }
 
 HFONT CPaintManagerUI::AddFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic)
@@ -1455,37 +1379,31 @@ HFONT CPaintManagerUI::AddFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool
     if( bItalic ) lf.lfItalic = TRUE;
     HFONT hFont = ::CreateFontIndirect(&lf);
     if( hFont == NULL ) return NULL;
-    if( !AddFont(hFont) ) {
+
+    TFontInfo* pFontInfo = new TFontInfo;
+    if( !pFontInfo ) return false;
+    ::ZeroMemory(pFontInfo, sizeof(TFontInfo));
+    pFontInfo->hFont = hFont;
+    pFontInfo->sFontName = pStrFontName;
+    pFontInfo->iSize = nSize;
+    pFontInfo->bBold = bBold;
+    pFontInfo->bUnderline = bUnderline;
+    pFontInfo->bItalic = bItalic;
+    if( m_hDcPaint ) {
+        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, hFont);
+        ::GetTextMetrics(m_hDcPaint, &pFontInfo->tm);
+        ::SelectObject(m_hDcPaint, hOldFont);
+    }
+    if( !m_aCustomFonts.Add(pFontInfo) ) {
         ::DeleteObject(hFont);
+        delete pFontInfo;
         return NULL;
     }
 
     return hFont;
 }
 
-bool CPaintManagerUI::AddFontAt(int index, HFONT hFont)
-{
-    if( hFont == NULL ) return false;
-
-    TFontInfo* pFontInfo = new TFontInfo;
-    if( !pFontInfo ) return false;
-    ::ZeroMemory(pFontInfo, sizeof(TFontInfo));
-    pFontInfo->hFont = hFont;
-    if( m_hDcPaint ) {
-        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, hFont);
-        ::GetTextMetrics(m_hDcPaint, &pFontInfo->tm);
-        ::SelectObject(m_hDcPaint, hOldFont);
-    }
-
-    if( !m_aCustomFonts.InsertAt(index, pFontInfo) ) {
-        delete pFontInfo;
-        return false;
-    }
-
-    return true;
-}
-
-HFONT CPaintManagerUI::AddFontAt(int index, LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline)
+HFONT CPaintManagerUI::AddFontAt(int index, LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic)
 {
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
@@ -1495,8 +1413,24 @@ HFONT CPaintManagerUI::AddFontAt(int index, LPCTSTR pStrFontName, int nSize, boo
     if( bUnderline ) lf.lfUnderline = TRUE;
     HFONT hFont = ::CreateFontIndirect(&lf);
     if( hFont == NULL ) return NULL;
-    if( !AddFontAt(index, hFont) ) {
+
+    TFontInfo* pFontInfo = new TFontInfo;
+    if( !pFontInfo ) return false;
+    ::ZeroMemory(pFontInfo, sizeof(TFontInfo));
+    pFontInfo->hFont = hFont;
+    pFontInfo->sFontName = pStrFontName;
+    pFontInfo->iSize = nSize;
+    pFontInfo->bBold = bBold;
+    pFontInfo->bUnderline = bUnderline;
+    pFontInfo->bItalic = bItalic;
+    if( m_hDcPaint ) {
+        HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, hFont);
+        ::GetTextMetrics(m_hDcPaint, &pFontInfo->tm);
+        ::SelectObject(m_hDcPaint, hOldFont);
+    }
+    if( !m_aCustomFonts.InsertAt(index, pFontInfo) ) {
         ::DeleteObject(hFont);
+        delete pFontInfo;
         return NULL;
     }
 
@@ -1505,22 +1439,45 @@ HFONT CPaintManagerUI::AddFontAt(int index, LPCTSTR pStrFontName, int nSize, boo
 
 HFONT CPaintManagerUI::GetFont(int index)
 {
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetFont(index);
-    if( index < 0 || index >= m_aCustomFonts.GetSize() ) return GetDefaultFont();
+    if( index < 0 || index >= m_aCustomFonts.GetSize() ) return GetDefaultFontInfo()->hFont;
     TFontInfo* pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[index]);
     return pFontInfo->hFont;
 }
 
+HFONT CPaintManagerUI::GetFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic)
+{
+    TFontInfo* pFontInfo = NULL;
+    for( int it = 0; it < m_aCustomFonts.GetSize(); it++ ) {
+        pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[it]);
+        if( pFontInfo->sFontName == pStrFontName && pFontInfo->iSize == nSize && 
+            pFontInfo->bBold == bBold && pFontInfo->bUnderline == bUnderline && pFontInfo->bItalic == bItalic) 
+            return pFontInfo->hFont;
+    }
+    if( m_pParentResourcePM ) return m_pParentResourcePM->GetFont(pStrFontName, nSize, bBold, bUnderline, bItalic);
+    return NULL;
+}
+
 bool CPaintManagerUI::FindFont(HFONT hFont)
 {
-    if( m_pParentResourcePM ) return m_pParentResourcePM->FindFont(hFont);
-
     TFontInfo* pFontInfo = NULL;
     for( int it = 0; it < m_aCustomFonts.GetSize(); it++ ) {
         pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[it]);
         if( pFontInfo->hFont == hFont ) return true;
     }
+    if( m_pParentResourcePM ) return m_pParentResourcePM->FindFont(hFont);
+    return false;
+}
 
+bool CPaintManagerUI::FindFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic)
+{
+    TFontInfo* pFontInfo = NULL;
+    for( int it = 0; it < m_aCustomFonts.GetSize(); it++ ) {
+        pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[it]);
+        if( pFontInfo->sFontName == pStrFontName && pFontInfo->iSize == nSize && 
+            pFontInfo->bBold == bBold && pFontInfo->bUnderline == bUnderline && pFontInfo->bItalic == bItalic) 
+            return true;
+    }
+    if( m_pParentResourcePM ) return m_pParentResourcePM->FindFont(pStrFontName, nSize, bBold, bUnderline, bItalic);
     return false;
 }
 
@@ -1548,11 +1505,6 @@ bool CPaintManagerUI::RemoveFontAt(int index)
     return m_aCustomFonts.Remove(index);
 }
 
-DWORD CPaintManagerUI::GetCustomFontCount() const
-{
-	return m_aCustomFonts.GetSize();
-}
-
 void CPaintManagerUI::RemoveAllFonts()
 {
     TFontInfo* pFontInfo;
@@ -1564,9 +1516,8 @@ void CPaintManagerUI::RemoveAllFonts()
     m_aCustomFonts.Empty();
 }
 
-const TEXTMETRIC& CPaintManagerUI::GetFontInfo(int index)
+TFontInfo* CPaintManagerUI::GetFontInfo(int index)
 {
-    if( m_pParentResourcePM ) return m_pParentResourcePM->GetFontInfo(index);
     if( index < 0 || index >= m_aCustomFonts.GetSize() ) return GetDefaultFontInfo();
     TFontInfo* pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[index]);
     if( pFontInfo->tm.tmHeight == 0 ) {
@@ -1574,17 +1525,36 @@ const TEXTMETRIC& CPaintManagerUI::GetFontInfo(int index)
         ::GetTextMetrics(m_hDcPaint, &pFontInfo->tm);
         ::SelectObject(m_hDcPaint, hOldFont);
     }
-    return pFontInfo->tm;
+    return pFontInfo;
 }
 
-TImageInfo* CPaintManagerUI::GetImage(LPCTSTR bitmap)
+TFontInfo* CPaintManagerUI::GetFontInfo(HFONT hFont)
+{
+    TFontInfo* pFontInfo = NULL;
+    for( int it = 0; it < m_aCustomFonts.GetSize(); it++ ) {
+        pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[it]);
+        if( pFontInfo->hFont == hFont ) {
+            if( pFontInfo->tm.tmHeight == 0 ) {
+                HFONT hOldFont = (HFONT) ::SelectObject(m_hDcPaint, pFontInfo->hFont);
+                ::GetTextMetrics(m_hDcPaint, &pFontInfo->tm);
+                ::SelectObject(m_hDcPaint, hOldFont);
+            }
+            return pFontInfo;
+        }
+    }
+
+    if( m_pParentResourcePM ) return m_pParentResourcePM->GetFontInfo(hFont);
+    return GetDefaultFontInfo();
+}
+
+const TImageInfo* CPaintManagerUI::GetImage(LPCTSTR bitmap)
 {
     TImageInfo* data = static_cast<TImageInfo*>(m_mImageHash.Find(bitmap));
     if( !data && m_pParentResourcePM ) return m_pParentResourcePM->GetImage(bitmap);
     else return data;
 }
 
-TImageInfo* CPaintManagerUI::GetImageEx(LPCTSTR bitmap, LPCTSTR type, DWORD mask)
+const TImageInfo* CPaintManagerUI::GetImageEx(LPCTSTR bitmap, LPCTSTR type, DWORD mask)
 {
     TImageInfo* data = static_cast<TImageInfo*>(m_mImageHash.Find(bitmap));
     if( !data ) {
@@ -1596,7 +1566,7 @@ TImageInfo* CPaintManagerUI::GetImageEx(LPCTSTR bitmap, LPCTSTR type, DWORD mask
     return data;
 }
 
-TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, LPCTSTR type, DWORD mask)
+const TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, LPCTSTR type, DWORD mask)
 {
     TImageInfo* data = NULL;
     if( type != NULL ) {
@@ -1621,7 +1591,7 @@ TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, LPCTSTR type, DWORD mask)
 
 bool CPaintManagerUI::RemoveImage(LPCTSTR bitmap)
 {
-    TImageInfo* data = GetImage(bitmap);
+    const TImageInfo* data = GetImage(bitmap);
     if( !data ) return false;
 
     ::DeleteObject(data->hBitmap);

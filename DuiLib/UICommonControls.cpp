@@ -90,7 +90,7 @@ void CLabelUI::SetShowHtml(bool bShowHtml)
 
 SIZE CLabelUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo().tmHeight + 4);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 4);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -401,7 +401,7 @@ void CButtonUI::SetDisabledImage(LPCTSTR pStrImage)
 
 SIZE CButtonUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo().tmHeight + 8);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -610,7 +610,7 @@ void COptionUI::SetForeImage(LPCTSTR pStrImage)
 
 SIZE COptionUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo().tmHeight + 8);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -1210,7 +1210,7 @@ void CEditWnd::Init(CEditUI* pOwner)
     rcPos.top += rcInset.top;
     rcPos.right -= rcInset.right;
     rcPos.bottom -= rcInset.bottom;
-    LONG lEditHeight = pOwner->GetManager()->GetDefaultFontInfo().tmHeight;
+    LONG lEditHeight = pOwner->GetManager()->GetDefaultFontInfo()->tm.tmHeight;
     if( lEditHeight < rcPos.GetHeight() ) {
         rcPos.top += (rcPos.GetHeight() - lEditHeight) / 2;
         rcPos.bottom = rcPos.top + lEditHeight;
@@ -1218,7 +1218,7 @@ void CEditWnd::Init(CEditUI* pOwner)
     UINT uStyle = WS_CHILD | ES_AUTOHSCROLL;
     if( pOwner->IsPasswordMode() ) uStyle |= ES_PASSWORD;
     Create(pOwner->GetManager()->GetPaintWindow(), NULL, uStyle, 0, rcPos);
-    SetWindowFont(m_hWnd, pOwner->GetManager()->GetDefaultFont(), TRUE);
+    SetWindowFont(m_hWnd, pOwner->GetManager()->GetDefaultFontInfo()->hFont, TRUE);
     Edit_LimitText(m_hWnd, pOwner->GetMaxChar());
     if( pOwner->IsPasswordMode() ) Edit_SetPasswordChar(m_hWnd, pOwner->GetPasswordChar());
     Edit_SetText(m_hWnd, pOwner->GetText());
@@ -1539,7 +1539,7 @@ void CEditUI::SetInternVisible(bool bVisible)
 
 SIZE CEditUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo().tmHeight + 6);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 6);
     return CControlUI::EstimateSize(szAvailable);
 }
 
