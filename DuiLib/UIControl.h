@@ -58,8 +58,6 @@ public:
     virtual int GetHeight() const;
     virtual int GetX() const;
     virtual int GetY() const;
-	virtual SIZE GetXYPos() const;
-	virtual void SetXYPos(SIZE szXY);
     virtual RECT GetPadding() const;
     virtual void SetPadding(RECT rcPadding); // 设置外边距，由上层窗口绘制
     virtual SIZE GetFixedXY() const;         // 实际大小位置使用GetPos获取，这里得到的是预设的参考值
