@@ -135,6 +135,14 @@ typedef struct tagExtendedAttributes
 #include "ResourceView.h"
 #include "HookAPI.h"
 
+using DuiLib::CContainerUI;
+using DuiLib::CPaintManagerUI;
+using DuiLib::CWindowWnd;
+using DuiLib::TNotifyUI;
+using DuiLib::IMessageFilterUI;
+using DuiLib::CStdPtrArray;
+using DuiLib::CStdValArray;
+using DuiLib::CStdStringPtrMap;
 using DuiLib::CStdString;
 using DuiLib::TListInfoUI;
 using DuiLib::CRenderEngine;
@@ -157,11 +165,20 @@ using DuiLib::CDialogLayoutUI;
 using DuiLib::CTabLayoutUI;
 using DuiLib::CTileLayoutUI;
 using DuiLib::CListHeaderUI;
+using DuiLib::CListElementUI;
 using DuiLib::CListHeaderItemUI;
 using DuiLib::CListTextElementUI;
 using DuiLib::CListLabelElementUI;
 using DuiLib::CListExpandElementUI;
 using DuiLib::CListContainerElementUI;
+using DuiLib::CScrollbarUI;
+using DuiLib::IContainerUI;
+using DuiLib::STRINGorID;
+using DuiLib::TRelativePosUI;
+using DuiLib::TImageInfo;
+using DuiLib::TFontInfo;
+using DuiLib::TEventUI;
+using DuiLib::EVENTTYPE_UI;
 
 extern CMainFrame* g_pMainFrame;
 extern CToolBoxWnd* g_pToolBoxWnd;
