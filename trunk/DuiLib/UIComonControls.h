@@ -70,13 +70,25 @@ public:
     LPCTSTR GetDisabledImage();
     void SetDisabledImage(LPCTSTR pStrImage);
 
+    void SetHotTextColor(DWORD dwColor);
+	DWORD GetHotTextColor() const;
+    void SetPushedTextColor(DWORD dwColor);
+	DWORD GetPushedTextColor() const;
+    void SetFocusedTextColor(DWORD dwColor);
+	DWORD GetFocusedTextColor() const;
     SIZE EstimateSize(SIZE szAvailable);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-    void PaintStatusImage(HDC hDC);
+	virtual void PaintText(HDC hDC);
+    virtual void PaintStatusImage(HDC hDC);
+	virtual void PaintBorder(HDC hDC);
 
 protected:
     UINT m_uButtonState;
+
+	DWORD m_dwHotTextColor;
+	DWORD m_dwPushedTextColor;
+	DWORD m_dwFocusedTextColor;
 
     CStdString m_sNormalImage;
     CStdString m_sHotImage;

@@ -222,6 +222,7 @@ public:
     bool FindFont(HFONT hFont);
     bool RemoveFont(HFONT hFont);
     bool RemoveFontAt(int index);
+	DWORD GetCustomFontCount() const;
     void RemoveAllFonts();
     const TEXTMETRIC& GetFontInfo(int index);
 
@@ -234,6 +235,7 @@ public:
     void AddDefaultAttributeList(LPCTSTR pStrControlName, LPCTSTR pStrControlAttrList);
     LPCTSTR GetDefaultAttributeList(LPCTSTR pStrControlName) const;
     bool RemoveDefaultAttributeList(LPCTSTR pStrControlName);
+	const CStdStringPtrMap& GetDefaultAttribultes() const;
     void RemoveAllDefaultAttributeList();
 
     bool AttachDialog(CControlUI* pControl);
@@ -271,6 +273,7 @@ public:
     CControlUI* GetRoot() const;
     CControlUI* FindControl(POINT pt) const;
     CControlUI* FindControl(LPCTSTR pstrName);
+	CControlUI* FindControl(CControlUI* pParent, LPCTSTR pstrName);
 
     static void MessageLoop();
     static bool TranslateMessage(const LPMSG pMsg);
@@ -285,6 +288,7 @@ private:
     static CControlUI* CALLBACK __FindControlFromTab(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromShortcut(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromUpdate(CControlUI* pThis, LPVOID pData);
+	static CControlUI* CALLBACK __FindControlFromParentControl(CControlUI* pThis, LPVOID pData);
 
 private:
     HWND m_hWndPaint;

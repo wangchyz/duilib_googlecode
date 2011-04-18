@@ -313,6 +313,36 @@ void CButtonUI::SetEnabled(bool bEnable)
     }
 }
 
+void CButtonUI::SetHotTextColor(DWORD dwColor)
+{
+	m_dwHotTextColor = dwColor;
+}
+
+DWORD CButtonUI::GetHotTextColor() const
+{
+	return m_dwHotTextColor;
+}
+
+void CButtonUI::SetPushedTextColor(DWORD dwColor)
+{
+	m_dwPushedTextColor = dwColor;
+}
+
+DWORD CButtonUI::GetPushedTextColor() const
+{
+	return m_dwPushedTextColor;
+}
+
+void CButtonUI::SetFocusedTextColor(DWORD dwColor)
+{
+	m_dwFocusedTextColor = dwColor;
+}
+
+DWORD CButtonUI::GetFocusedTextColor() const
+{
+	return m_dwFocusedTextColor;
+}
+
 LPCTSTR CButtonUI::GetNormalImage()
 {
     return m_sNormalImage;
@@ -381,9 +411,77 @@ void CButtonUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("pushedimage")) == 0 ) SetPushedImage(pstrValue);
     else if( _tcscmp(pstrName, _T("focusedimage")) == 0 ) SetFocusedImage(pstrValue);
     else if( _tcscmp(pstrName, _T("disabledimage")) == 0 ) SetDisabledImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("hottextcolor")) == 0 ) {
+        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+        LPTSTR pstr = NULL;
+        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+        SetHotTextColor(clrColor);
+    }
+    else if( _tcscmp(pstrName, _T("pushedtextcolor")) == 0 ) {
+        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+        LPTSTR pstr = NULL;
+        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+        SetPushedTextColor(clrColor);
+    }
+    else if( _tcscmp(pstrName, _T("focusedtextcolor")) == 0 ) {
+        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+        LPTSTR pstr = NULL;
+        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+        SetFocusedTextColor(clrColor);
+    }
     else CLabelUI::SetAttribute(pstrName, pstrValue);
 }
 
+void CButtonUI::PaintBorder(HDC hDC)
+{
+	//if (m_dwBorderColor != 0 && m_nBorderSize > 0)
+	//{
+	//	DWORD dwBorderColor = m_dwBorderColor;
+	//	int nBorderSize = m_nBorderSize;
+	//	if (((m_uButtonState & UISTATE_HOT) != 0) || ((m_uButtonState & UISTATE_FOCUSED) != 0)) {
+	//		dwBorderColor = 0xFF85E4FF;
+	//		nBorderSize += 1;
+	//	}
+	//	CRenderEngine::DrawRect(hDC, m_rcItem, nBorderSize, dwBorderColor);
+	//}
+
+	__super::PaintBorder(hDC);
+}
+void CButtonUI::PaintText(HDC hDC)
+{
+
+	if( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;
+	else m_uButtonState &= ~ UISTATE_FOCUSED;
+	if( !IsEnabled() ) m_uButtonState |= UISTATE_DISABLED;
+	else m_uButtonState &= ~ UISTATE_DISABLED;
+
+    if( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
+    if( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
+
+    if( m_sText.IsEmpty() ) return;
+    int nLinks = 0;
+    RECT rc = m_rcItem;
+    rc.left += m_rcTextPadding.left;
+    rc.right -= m_rcTextPadding.right;
+    rc.top += m_rcTextPadding.top;
+    rc.bottom -= m_rcTextPadding.bottom;
+
+	DWORD clrColor = IsEnabled()?m_dwTextColor:m_dwDisabledTextColor;
+
+	if( ((m_uButtonState & UISTATE_PUSHED) != 0) && (GetPushedTextColor() != 0) )
+		clrColor = GetPushedTextColor();
+	else if( ((m_uButtonState & UISTATE_HOT) != 0) && (GetHotTextColor() != 0) )
+		clrColor = GetHotTextColor();
+	else if( ((m_uButtonState & UISTATE_FOCUSED) != 0) && (GetFocusedTextColor() != 0) )
+		clrColor = GetFocusedTextColor();
+
+    if( m_bShowHtml )
+		CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, clrColor, \
+        NULL, NULL, nLinks, m_uTextStyle);
+    else
+        CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, clrColor, \
+        m_iFont, m_uTextStyle);
+}
 void CButtonUI::PaintStatusImage(HDC hDC)
 {
     if( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;

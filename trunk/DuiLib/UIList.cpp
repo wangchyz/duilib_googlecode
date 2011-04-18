@@ -45,6 +45,7 @@ UINT CListUI::GetControlFlags() const
 
 LPVOID CListUI::GetInterface(LPCTSTR pstrName)
 {
+	if( _tcscmp(pstrName, _T("CList")) == 0 ) return static_cast<CListUI*>(this);
     if( _tcscmp(pstrName, _T("List")) == 0 ) return static_cast<IListUI*>(this);
     if( _tcscmp(pstrName, _T("ListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
     return CVerticalLayoutUI::GetInterface(pstrName);
@@ -1464,6 +1465,7 @@ UINT CListElementUI::GetControlFlags() const
 LPVOID CListElementUI::GetInterface(LPCTSTR pstrName)
 {
     if( _tcscmp(pstrName, _T("ListItem")) == 0 ) return static_cast<IListItemUI*>(this);
+	if( _tcscmp(pstrName, _T("ListElement")) == 0 ) return static_cast<CListElementUI*>(this);
     return CControlUI::GetInterface(pstrName);
 }
 
@@ -2315,6 +2317,7 @@ UINT CListContainerElementUI::GetControlFlags() const
 LPVOID CListContainerElementUI::GetInterface(LPCTSTR pstrName)
 {
     if( _tcscmp(pstrName, _T("ListItem")) == 0 ) return static_cast<IListItemUI*>(this);
+	if( _tcscmp(pstrName, _T("ListContainerElement")) == 0 ) return static_cast<CListContainerElementUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
 

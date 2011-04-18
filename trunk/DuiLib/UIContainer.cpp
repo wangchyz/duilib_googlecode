@@ -766,7 +766,7 @@ void CContainerUI::ProcessScrollbar(RECT rc, int cxRequired, int cyRequired)
 
         if( m_pVerticalScrollbar->GetScrollRange() != cyScroll ) {
             int iScrollPos = m_pVerticalScrollbar->GetScrollPos();
-            m_pVerticalScrollbar->SetScrollRange(abs(cyScroll));
+			m_pVerticalScrollbar->SetScrollRange(::abs(cyScroll));
             if( m_pVerticalScrollbar->GetScrollRange() == 0 ) {
                 m_pVerticalScrollbar->SetVisible(false);
                 m_pVerticalScrollbar->SetScrollPos(0);

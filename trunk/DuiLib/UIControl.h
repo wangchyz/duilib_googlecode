@@ -43,6 +43,8 @@ public:
     void SetBkImage(LPCTSTR pStrImage);
     DWORD GetBorderColor() const;
     void SetBorderColor(DWORD dwBorderColor);
+	DWORD GetFocusBorderColor() const;
+	void SetFocusBorderColor(DWORD dwBorderColor);
     int GetBorderSize() const;
     void SetBorderSize(int nSize);
     SIZE GetBorderRound() const;
@@ -56,6 +58,8 @@ public:
     virtual int GetHeight() const;
     virtual int GetX() const;
     virtual int GetY() const;
+	virtual SIZE GetXYPos() const;
+	virtual void SetXYPos(SIZE szXY);
     virtual RECT GetPadding() const;
     virtual void SetPadding(RECT rcPadding); // 设置外边距，由上层窗口绘制
     virtual SIZE GetFixedXY() const;         // 实际大小位置使用GetPos获取，这里得到的是预设的参考值
@@ -172,6 +176,7 @@ protected:
     DWORD m_dwBackColor3;
     CStdString m_sBkImage;
     DWORD m_dwBorderColor;
+	DWORD m_dwFocusBorderColor;
     int m_nBorderSize;
     SIZE m_cxyBorderRound;
     RECT m_rcPaint;

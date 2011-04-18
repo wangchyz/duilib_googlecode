@@ -102,9 +102,14 @@ static BOOL WINAPI AlphaBitBlt(HDC hDC, int nDestX, int nDestY, int dwWidth, int
         return FALSE;
 
     //Creates Source DIB
-    LPBITMAPINFO lpbiSrc;
+    LPBITMAPINFO lpbiSrc = NULL;
     // Fill in the BITMAPINFOHEADER
     lpbiSrc = (LPBITMAPINFO) new BYTE[sizeof(BITMAPINFOHEADER)];
+	if (lpbiSrc == NULL)
+	{
+		::DeleteDC(hTempDC);
+		return FALSE;
+	}
     lpbiSrc->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     lpbiSrc->bmiHeader.biWidth = dwWidth;
     lpbiSrc->bmiHeader.biHeight = dwHeight;
@@ -124,6 +129,7 @@ static BOOL WINAPI AlphaBitBlt(HDC hDC, int nDestX, int nDestY, int dwWidth, int
 
     if ((NULL == hSrcDib) || (NULL == pSrcBits)) 
     {
+		delete [] lpbiSrc;
         ::DeleteDC(hTempDC);
         return FALSE;
     }
@@ -133,9 +139,17 @@ static BOOL WINAPI AlphaBitBlt(HDC hDC, int nDestX, int nDestY, int dwWidth, int
     ::SelectObject (hTempDC, hOldTempBmp);
 
     //Creates Destination DIB
-    LPBITMAPINFO lpbiDest;
+    LPBITMAPINFO lpbiDest = NULL;
     // Fill in the BITMAPINFOHEADER
     lpbiDest = (LPBITMAPINFO) new BYTE[sizeof(BITMAPINFOHEADER)];
+	if (lpbiDest == NULL)
+	{
+        delete [] lpbiSrc;
+        ::DeleteObject(hSrcDib);
+        ::DeleteDC(hTempDC);
+        return FALSE;
+	}
+
     lpbiDest->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     lpbiDest->bmiHeader.biWidth = dwWidth;
     lpbiDest->bmiHeader.biHeight = dwHeight;
