@@ -20,7 +20,7 @@
 #include "UIDelegate.h"
 #include "UIControl.h"
 #include "UIContainer.h"
-#include "UIComonControls.h"
+#include "UICommonControls.h"
 #include "UIList.h"
 #include "UICombo.h"
 #include "UIActiveX.h"

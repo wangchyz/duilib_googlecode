@@ -20,6 +20,7 @@ m_dwBackColor(0),
 m_dwBackColor2(0),
 m_dwBackColor3(0),
 m_dwBorderColor(0),
+m_dwFocusBorderColor(0),
 m_nBorderSize(1)
 {
     m_cXY.cx = m_cXY.cy = 0;

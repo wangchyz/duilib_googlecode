@@ -58,6 +58,14 @@ public:
         return 0;
     }
 
+    LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+    {
+        ::PostQuitMessage(0L);
+
+        bHandled = FALSE;
+        return 0;
+    }
+
     LRESULT OnNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         if( ::IsIconic(*this) ) bHandled = FALSE;
@@ -114,6 +122,7 @@ public:
         BOOL bHandled = TRUE;
         switch( uMsg ) {
         case WM_CREATE:        lRes = OnCreate(uMsg, wParam, lParam, bHandled); break;
+        case WM_DESTROY:       lRes = OnDestroy(uMsg, wParam, lParam, bHandled); break;
         case WM_NCACTIVATE:    lRes = OnNcActivate(uMsg, wParam, lParam, bHandled); break;
         case WM_NCCALCSIZE:    lRes = OnNcCalcSize(uMsg, wParam, lParam, bHandled); break;
         case WM_NCPAINT:       lRes = OnNcPaint(uMsg, wParam, lParam, bHandled); break;

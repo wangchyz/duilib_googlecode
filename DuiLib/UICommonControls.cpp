@@ -433,21 +433,6 @@ void CButtonUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else CLabelUI::SetAttribute(pstrName, pstrValue);
 }
 
-void CButtonUI::PaintBorder(HDC hDC)
-{
-	//if (m_dwBorderColor != 0 && m_nBorderSize > 0)
-	//{
-	//	DWORD dwBorderColor = m_dwBorderColor;
-	//	int nBorderSize = m_nBorderSize;
-	//	if (((m_uButtonState & UISTATE_HOT) != 0) || ((m_uButtonState & UISTATE_FOCUSED) != 0)) {
-	//		dwBorderColor = 0xFF85E4FF;
-	//		nBorderSize += 1;
-	//	}
-	//	CRenderEngine::DrawRect(hDC, m_rcItem, nBorderSize, dwBorderColor);
-	//}
-
-	//__super::PaintBorder(hDC);
-}
 void CButtonUI::PaintText(HDC hDC)
 {
 
@@ -483,6 +468,7 @@ void CButtonUI::PaintText(HDC hDC)
         CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, clrColor, \
         m_iFont, m_uTextStyle);
 }
+
 void CButtonUI::PaintStatusImage(HDC hDC)
 {
     if( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;
@@ -519,14 +505,6 @@ void CButtonUI::PaintStatusImage(HDC hDC)
         if( !DrawImage(hDC, (LPCTSTR)m_sNormalImage) ) m_sNormalImage.Empty();
         else return;
     }
-
-    //DWORD dwBorderColor = 0xFF4EA0D1;
-    //int nBorderSize = 1;
-    //if( (m_uButtonState & UISTATE_HOT) != 0 ) {
-    //    dwBorderColor = 0xFF85E4FF;
-    //    nBorderSize = 2;
-    //}
-    //CRenderEngine::DrawRect(hDC, m_rcItem, nBorderSize, dwBorderColor);
 }
 
 
