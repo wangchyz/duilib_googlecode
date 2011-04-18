@@ -930,17 +930,39 @@ void CRenderEngine::DrawColor(HDC hDC, const RECT& rc, DWORD color)
 
 void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD dwSecond, bool bVertical, int nSteps)
 {
+    typedef BOOL (WINAPI *LPALPHABLEND)(HDC, int, int, int, int,HDC, int, int, int, int, BLENDFUNCTION);
+    static LPALPHABLEND lpAlphaBlend = (LPALPHABLEND) ::GetProcAddress(::GetModuleHandle(_T("msimg32.dll")), "AlphaBlend");
+    if( lpAlphaBlend == NULL ) lpAlphaBlend = AlphaBitBlt;
     typedef BOOL (WINAPI *PGradientFill)(HDC, PTRIVERTEX, ULONG, PVOID, ULONG, ULONG);
     static PGradientFill lpGradientFill = (PGradientFill) ::GetProcAddress(::GetModuleHandle(_T("msimg32.dll")), "GradientFill");
+
+    BYTE bAlpha = (BYTE)(((dwFirst >> 24) + (dwSecond >> 24)) >> 1);
+    if( bAlpha == 0 ) return;
+    int cx = rc.right - rc.left;
+    int cy = rc.bottom - rc.top;
+    RECT rcPaint = rc;
+    HDC hPaintDC = hDC;
+    HBITMAP hPaintBitmap = NULL;
+    HBITMAP hOldPaintBitmap = NULL;
+    if( bAlpha < 255 ) {
+        rcPaint.left = rcPaint.top = 0;
+        rcPaint.right = cx;
+        rcPaint.bottom = cy;
+        hPaintDC = ::CreateCompatibleDC(hDC);
+        hPaintBitmap = ::CreateCompatibleBitmap(hDC, cx, cy);
+        ASSERT(hPaintDC);
+        ASSERT(hPaintBitmap);
+        hOldPaintBitmap = (HBITMAP) ::SelectObject(hPaintDC, hPaintBitmap);
+    }
     if( lpGradientFill != NULL ) 
     {
         TRIVERTEX triv[2] = 
         {
-            { rc.left, rc.top, GetBValue(dwFirst) << 8, GetGValue(dwFirst) << 8, GetRValue(dwFirst) << 8, 0xFF00 },
-            { rc.right, rc.bottom, GetBValue(dwSecond) << 8, GetGValue(dwSecond) << 8, GetRValue(dwSecond) << 8, 0xFF00 }
+            { rcPaint.left, rcPaint.top, GetBValue(dwFirst) << 8, GetGValue(dwFirst) << 8, GetRValue(dwFirst) << 8, 0xFF00 },
+            { rcPaint.right, rcPaint.bottom, GetBValue(dwSecond) << 8, GetGValue(dwSecond) << 8, GetRValue(dwSecond) << 8, 0xFF00 }
         };
         GRADIENT_RECT grc = { 0, 1 };
-        lpGradientFill(hDC, triv, 2, &grc, 1, bVertical ? GRADIENT_FILL_RECT_V : GRADIENT_FILL_RECT_H);
+        lpGradientFill(hPaintDC, triv, 2, &grc, 1, bVertical ? GRADIENT_FILL_RECT_V : GRADIENT_FILL_RECT_H);
     }
     else 
     {
@@ -959,7 +981,7 @@ void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD d
             BYTE bB = (BYTE) ((GetRValue(dwSecond) * (nLines - i) + GetRValue(dwFirst) * i) >> nShift);
             // ... then paint with the resulting color
             HBRUSH hBrush = ::CreateSolidBrush(RGB(bR,bG,bB));
-            RECT r2 = rc;
+            RECT r2 = rcPaint;
             if( bVertical ) {
                 r2.bottom = rc.bottom - ((i * (rc.bottom - rc.top)) >> nShift);
                 r2.top = rc.bottom - (((i + 1) * (rc.bottom - rc.top)) >> nShift);
@@ -968,10 +990,17 @@ void CRenderEngine::DrawGradient(HDC hDC, const RECT& rc, DWORD dwFirst, DWORD d
             else {
                 r2.left = rc.right - (((i + 1) * (rc.right - rc.left)) >> nShift);
                 r2.right = rc.right - ((i * (rc.right - rc.left)) >> nShift);
-                if( (r2.right - r2.left) > 0 ) ::FillRect(hDC, &r2, hBrush);
+                if( (r2.right - r2.left) > 0 ) ::FillRect(hPaintDC, &r2, hBrush);
             }
             ::DeleteObject(hBrush);
         }
+    }
+    if( bAlpha < 255 ) {
+        BLENDFUNCTION bf = { AC_SRC_OVER, 0, bAlpha, AC_SRC_ALPHA };
+        lpAlphaBlend(hDC, rc.left, rc.top, cx, cy, hPaintDC, 0, 0, cx, cy, bf);
+        ::SelectObject(hPaintDC, hOldPaintBitmap);
+        ::DeleteObject(hPaintBitmap);
+        ::DeleteDC(hPaintDC);
     }
 }
 
@@ -1022,15 +1051,20 @@ void CRenderEngine::DrawText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTS
 void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTSTR pstrText, DWORD dwTextColor, RECT* prcLinks, CStdString* sLinks, int& nLinkRects, UINT uStyle)
 {
     // 考虑到在xml编辑器中使用<>符号不方便，可以使用{}符号代替
+    // 支持标签嵌套（如<l><b>text</b></l>），但是交叉嵌套是应该避免的（如<l><b>text</l></b>）
     // The string formatter supports a kind of "mini-html" that consists of various short tags:
     //
-    //   Link:             <a x>text</a>      where x(optional) = link content, normal like app:notepad or http:www.xxx.com
     //   Bold:             <b>text</b>
     //   Color:            <c #xxxxxx>text</c>  where x = RGB in hex
-    //   Change font:      <f x>text</f>        where x = font id
-    //   Image:            <i x y>              where x = image name and y(optional) = imagelist id
+    //   Font:             <f x>text</f>        where x = font id
+    //   Italic:           <i>text</i>
+    //   Image:            <i x y z>            where x = image name and y = imagelist num and z(optional) = imagelist id
+    //   Link:             <a x>text</a>        where x(optional) = link content, normal like app:notepad or http:www.xxx.com
     //   NewLine           <n>                  
-    //   Paragraph:        <p>
+    //   Paragraph:        <p x>text</p>        where x = extra pixels indent in p
+    //   Raw Text:         <r>text</r>
+    //   Selected:         <s>text</s>
+    //   Underline:        <u>text</u>
     //   X Indent:         <x i>                where i = hor indent in pixels
     //   Y Indent:         <y i>                where i = ver indent in pixels 
 
@@ -1040,15 +1074,22 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
 
     bool bDraw = (uStyle & DT_CALCRECT) == 0;
 
+    CStdPtrArray aFontArray(10);
+    CStdPtrArray aColorArray(10);
+    CStdPtrArray aPIndentArray(10);
+
     RECT rcClip = { 0 };
     ::GetClipBox(hDC, &rcClip);
     HRGN hOldRgn = ::CreateRectRgnIndirect(&rcClip);
     HRGN hRgn = ::CreateRectRgnIndirect(&rc);
     if( bDraw ) ::ExtSelectClipRgn(hDC, hRgn, RGN_AND);
 
-    HFONT hOldFont = (HFONT) ::SelectObject(hDC, pManager->GetDefaultFont());
+    TEXTMETRIC* pTm = &pManager->GetDefaultFontInfo()->tm;
+    HFONT hOldFont = (HFONT) ::SelectObject(hDC, pManager->GetDefaultFontInfo()->hFont);
     ::SetBkMode(hDC, TRANSPARENT);
     ::SetTextColor(hDC, RGB(GetBValue(dwTextColor), GetGValue(dwTextColor), GetRValue(dwTextColor)));
+    DWORD dwBkColor = pManager->GetDefaultSelectedBkColor();
+    ::SetBkColor(hDC, RGB(GetBValue(dwBkColor), GetGValue(dwBkColor), GetRValue(dwBkColor)));
 
     // If the drawstyle include a alignment, we'll need to first determine the text-size so
     // we can draw it at the correct position...
@@ -1073,63 +1114,84 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
         rc.left = rc.right - (rcText.right - rcText.left);
     }
 
-    // Determine if we're hovering over a link, because we would like to
-    // indicate it by coloring the link text.
-    // BUG: This assumes that the prcLink has already been filled once with
-    //      link coordinates! That is usually not the case at first repaint. We'll clear
-    //      the remanining entries at exit.
     bool bHoverLink = false;
+    CStdString sHoverLink;
     POINT ptMouse = pManager->GetMousePos();
     for( int i = 0; !bHoverLink && i < nLinkRects; i++ ) {
-        CStdString *pStr = (CStdString*)(sLinks + i);
-        pStr->Empty();
-        if( ::PtInRect(prcLinks + i, ptMouse) ) bHoverLink = true;
+        if( ::PtInRect(prcLinks + i, ptMouse) ) {
+            sHoverLink = *(CStdString*)(sLinks + i);
+            bHoverLink = true;
+        }
     }
 
-    TEXTMETRIC tm = pManager->GetDefaultFontInfo();
     POINT pt = { rc.left, rc.top };
     int iLinkIndex = 0;
-    int cyLine = tm.tmHeight + tm.tmExternalLeading;
+    int cyLine = pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1);
     int cyMinHeight = 0;
     int cxMaxWidth = 0;
     POINT ptLinkStart = { 0 };
+    bool bLineEnd = false;
+    bool bInRaw = false;
     bool bInLink = false;
+    bool bInSelected = false;
+    int iLineLinkIndex = 0;
 
-    while( *pstrText != _T('\0') ) 
-    {
-        if( pt.x >= rc.right || *pstrText == _T('\n') ) 
-        {
-            // A new link was detected/requested. We'll adjust the line height
-            // for the next line and expand the link hitbox (if any)
-            if( bInLink && iLinkIndex < nLinkRects ) ::SetRect(&prcLinks[iLinkIndex++], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + tm.tmHeight);
-            if( bInLink && iLinkIndex < nLinkRects ) {
-                CStdString *pStr1 = (CStdString*)(sLinks + iLinkIndex - 1);
-                CStdString *pStr2 = (CStdString*)(sLinks + iLinkIndex);
-                *pStr2 = *pStr1;
-            }
-            if( (uStyle & DT_SINGLELINE) != 0 ) break;
+    // 排版习惯是图文底部对齐，所以每行绘制都要分两步，先计算高度，再绘制
+    CStdPtrArray aLineFontArray;
+    CStdPtrArray aLineColorArray;
+    CStdPtrArray aLinePIndentArray;
+    LPCTSTR pstrLineBegin = pstrText;
+    bool bLineInRaw = false;
+    bool bLineInLink = false;
+    bool bLineInSelected = false;
+    int cyLineHeight = 0;
+    bool bLineDraw = false; // 行的第二阶段：绘制
+    while( *pstrText != _T('\0') ) {
+        if( pt.x >= rc.right || *pstrText == _T('\n') || bLineEnd ) {
             if( *pstrText == _T('\n') ) pstrText++;
+            if( bLineEnd ) bLineEnd = false;
+            if( !bLineDraw ) {
+                if( bInLink && iLinkIndex < nLinkRects ) {
+                    ::SetRect(&prcLinks[iLinkIndex++], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + cyLine);
+                    CStdString *pStr1 = (CStdString*)(sLinks + iLinkIndex - 1);
+                    CStdString *pStr2 = (CStdString*)(sLinks + iLinkIndex);
+                    *pStr2 = *pStr1;
+                }
+                for( int i = iLineLinkIndex; i < iLinkIndex; i++ ) {
+                    prcLinks[i].bottom = pt.y + cyLine;
+                }
+                if( bDraw ) {
+                    bInLink = bLineInLink;
+                    iLinkIndex = iLineLinkIndex;
+                }
+            }
+            else {
+                if( bInLink && iLinkIndex < nLinkRects ) iLinkIndex++;
+                bLineInLink = bInLink;
+                iLineLinkIndex = iLinkIndex;
+            }
+            if( (uStyle & DT_SINGLELINE) != 0 && (!bDraw || bLineDraw) ) break;
+            if( bDraw ) bLineDraw = !bLineDraw; // !
             pt.x = rc.left;
-            pt.y += cyLine/* - tm.tmDescent*/;
+            if( !bLineDraw ) pt.y += cyLine;
             if( pt.y > rc.bottom && bDraw ) break;
             ptLinkStart = pt;
-            cyLine = tm.tmHeight + tm.tmExternalLeading;
+            cyLine = pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1);
             if( pt.x >= rc.right ) break;
-            while( *pstrText == _T(' ') ) pstrText++;
         }
-        else if( ( *pstrText == _T('<') || *pstrText == _T('{') )
+        else if( !bInRaw && ( *pstrText == _T('<') || *pstrText == _T('{') )
             && ( pstrText[1] >= _T('a') && pstrText[1] <= _T('z') )
-            && ( pstrText[2] == _T(' ') || pstrText[2] == _T('>') || pstrText[2] == _T('}') ) )
-        {
-            pstrText++;
-            switch( *pstrText )
-            {
+            && ( pstrText[2] == _T(' ') || pstrText[2] == _T('>') || pstrText[2] == _T('}') ) ) {
+                pstrText++;
+                LPCTSTR pstrNextStart = NULL;
+                switch( *pstrText ) {
             case _T('a'):  // Link
                 {
                     pstrText++;
-                    if( *pstrText == _T(' ') ) pstrText++;
-                    if( iLinkIndex < nLinkRects ) {
+                    while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                    if( iLinkIndex < nLinkRects && !bLineDraw ) {
                         CStdString *pStr = (CStdString*)(sLinks + iLinkIndex);
+                        pStr->Empty();
                         while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) {
                             LPCTSTR pstrTemp = ::CharNext(pstrText);
                             while( pstrText < pstrTemp) {
@@ -1137,204 +1199,345 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                             }
                         }
                     }
-                    DWORD clrColor = bHoverLink ?  pManager->GetDefaultLinkFontHoverColor() : pManager->GetDefaultLinkFontColor();
+
+                    DWORD clrColor = pManager->GetDefaultLinkFontColor();
+                    if( bHoverLink && iLinkIndex < nLinkRects ) {
+                        CStdString *pStr = (CStdString*)(sLinks + iLinkIndex);
+                        if( sHoverLink == *pStr ) clrColor = pManager->GetDefaultLinkHoverFontColor();
+                    }
+                    //else if( prcLinks == NULL ) {
+                    //    if( ::PtInRect(&rc, ptMouse) )
+                    //        clrColor = pManager->GetDefaultLinkHoverFontColor();
+                    //}
+                    aColorArray.Add((LPVOID)clrColor);
                     ::SetTextColor(hDC,  RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
-                    ::SelectObject(hDC, pManager->GetDefaultLinkFont());
-                    tm = pManager->GetDefaultLinkFontInfo();
-                    cyLine = MAX(cyLine, tm.tmHeight + tm.tmExternalLeading);
+                    TFontInfo* pFontInfo = pManager->GetDefaultFontInfo();
+                    if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                    if( pFontInfo->bUnderline == false ) {
+                        HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
+                        if( hFont == NULL ) hFont = pManager->AddFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
+                        pFontInfo = pManager->GetFontInfo(hFont);
+                        aFontArray.Add(pFontInfo);
+                        pTm = &pFontInfo->tm;
+                        ::SelectObject(hDC, pFontInfo->hFont);
+                        cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
+                    }
                     ptLinkStart = pt;
                     bInLink = true;
                 }
                 break;
-            case _T('f'):  // Font
+            case _T('b'):  // Bold
                 {
                     pstrText++;
-                    int iFont = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-                    ::SelectObject(hDC, pManager->GetFont(iFont));
-                    tm = pManager->GetFontInfo(iFont);
-                    cyLine = MAX(cyLine, tm.tmHeight + tm.tmExternalLeading);
-                }
-                break;
-            case _T('b'):  // Bold text
-                {
-                    pstrText++;
-                    ::SelectObject(hDC, pManager->GetDefaultBoldFont());
-                    tm = pManager->GetDefaultBoldFontInfo();
-                    cyLine = MAX(cyLine, tm.tmHeight + tm.tmExternalLeading);
-                }
-                break;
-            case _T('x'):  // Indent
-                {
-                    pstrText++;
-                    int iWidth = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-                    pt.x += iWidth;
-                    cxMaxWidth = MAX(cxMaxWidth, pt.x);
-                }
-                break;
-            case _T('n'):  // Newline
-                {
-                    pstrText++;
-                    if( (uStyle & DT_SINGLELINE) != 0 ) break;
-                    if( bInLink && iLinkIndex < nLinkRects) ::SetRect(&prcLinks[iLinkIndex++], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + tm.tmHeight);
-                    if( bInLink && iLinkIndex < nLinkRects ) {
-                        CStdString *pStr1 = (CStdString*)(sLinks + iLinkIndex - 1);
-                        CStdString *pStr2 = (CStdString*)(sLinks + iLinkIndex);
-                        *pStr2 = *pStr1;
-                    }
-                    pt.x = rc.left;
-                    pt.y += cyLine/* - tm.tmDescent*/;
-                    if( pt.y > rc.bottom && bDraw ) break;
-                    ptLinkStart = pt;
-                    cyLine = tm.tmHeight + tm.tmExternalLeading;
-                    if( pt.x >= rc.right ) break;
-                }
-                break;
-            case _T('p'):  // Paragraph
-                {
-                    pstrText++;
-                    pt.x = rc.right;
-                    cyLine = MAX(cyLine, tm.tmHeight + tm.tmExternalLeading) + 5;
-                    ::SelectObject(hDC, pManager->GetDefaultFont());
-                    DWORD clrColor = pManager->GetDefaultFontColor();
-                    ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
-                    tm = pManager->GetDefaultFontInfo();
-                }
-                break;
-            case _T('y'):
-                {
-                    pstrText++;
-                    cyLine = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-                }
-                break;
-            case _T('i'):  // Image
-                {
-                    pstrText++;
-                    int iWidth = 0;
-                    int iHeight = 0;
-                    if( *pstrText == _T(' ') ) pstrText++;
-                    TImageInfo* pImageInfo = NULL;
-                    CStdString sName;
-                    int imageListIndex = -1;
-                    while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') && *pstrText != _T(' ') ) {
-                        LPCTSTR pstrTemp = ::CharNext(pstrText);
-                        while( pstrText < pstrTemp) {
-                            sName += *pstrText++;
-                        }
-                    }
-
-                    if( *pstrText == _T(' ') ) pstrText++;
-                    if( isdigit(*pstrText) ) {
-                        imageListIndex = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-                    }
-
-                    if( !sName.IsEmpty() ) pImageInfo = pManager->GetImageEx((LPCTSTR)sName);
-                    if( pImageInfo ) {
-                        iWidth = pImageInfo->nX;
-                        iHeight = pImageInfo->nY;
-                        if( imageListIndex != -1 ) {
-                            if( imageListIndex >= pImageInfo->nX / pImageInfo->nY ) imageListIndex = 0;
-                            iWidth = iHeight;
-                        }
-
-                        if( pt.x + iWidth >= rc.right && iWidth <= rc.right - rc.left && (uStyle & DT_SINGLELINE) == 0 ) {
-                            if( bInLink && iLinkIndex < nLinkRects) ::SetRect(&prcLinks[iLinkIndex++], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + tm.tmHeight);
-                            if( bInLink && iLinkIndex < nLinkRects ) {
-                                CStdString *pStr1 = (CStdString*)(sLinks + iLinkIndex - 1);
-                                CStdString *pStr2 = (CStdString*)(sLinks + iLinkIndex);
-                                *pStr2 = *pStr1;
-                            }
-                            pt.x = rc.left;
-                            pt.y += cyLine/* - tm.tmDescent*/;
-                            if( pt.y > rc.bottom && bDraw ) break;
-                            ptLinkStart = pt;
-                        }
-
-                        if( bDraw ) {
-                            CRect rcImage(pt.x, pt.y, pt.x + iWidth, pt.y + iHeight);
-                            CRect rcBmpPart(0, 0, iWidth, iHeight);
-                            if( imageListIndex != -1 ) {
-                                rcBmpPart.left = iWidth * imageListIndex;
-                                rcBmpPart.right = iWidth * (imageListIndex + 1);
-                            }
-                            CRect rcCorner(0, 0, 0, 0);
-                            DrawImage(hDC, pImageInfo->hBitmap, rcImage, rcImage, rcBmpPart, rcCorner, \
-                                pImageInfo->alphaChannel, 255);
-                        }
-
-                        cyLine = MAX(iHeight, cyLine);
-                        pt.x += iWidth;
-                        cyMinHeight = pt.y + iHeight;
-                        cxMaxWidth = MAX(cxMaxWidth, pt.x);
+                    TFontInfo* pFontInfo = pManager->GetDefaultFontInfo();
+                    if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                    if( pFontInfo->bBold == false ) {
+                        HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, true, pFontInfo->bUnderline, pFontInfo->bItalic);
+                        if( hFont == NULL ) hFont = pManager->AddFont(pFontInfo->sFontName, pFontInfo->iSize, true, pFontInfo->bUnderline, pFontInfo->bItalic);
+                        pFontInfo = pManager->GetFontInfo(hFont);
+                        aFontArray.Add(pFontInfo);
+                        pTm = &pFontInfo->tm;
+                        ::SelectObject(hDC, pFontInfo->hFont);
+                        cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
                     }
                 }
                 break;
             case _T('c'):  // Color
                 {
                     pstrText++;
-                    if( *pstrText == _T(' ') ) pstrText++;
+                    while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
                     if( *pstrText == _T('#')) pstrText++;
-
                     DWORD clrColor = _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 16);
+                    aColorArray.Add((LPVOID)clrColor);
                     ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
+                }
+                break;
+            case _T('f'):  // Font
+                {
+                    pstrText++;
+                    while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                    LPCTSTR pstrTemp = pstrText;
+                    int iFont = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+                    //if( isdigit(*pstrText) ) { // debug版本会引起异常
+                    if( pstrTemp != pstrText ) {
+                        TFontInfo* pFontInfo = pManager->GetFontInfo(iFont);
+                        aFontArray.Add(pFontInfo);
+                        pTm = &pFontInfo->tm;
+                        ::SelectObject(hDC, pFontInfo->hFont);
+                    }
+                    else {
+                        CStdString sFontName;
+                        int iFontSize = 10;
+                        CStdString sFontAttr;
+                        bool bBold = false;
+                        bool bUnderline = false;
+                        bool bItalic = false;
+                        while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') && *pstrText != _T(' ') ) {
+                            pstrTemp = ::CharNext(pstrText);
+                            while( pstrText < pstrTemp) {
+                                sFontName += *pstrText++;
+                            }
+                        }
+                        while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                        if( isdigit(*pstrText) ) {
+                            iFontSize = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+                        }
+                        while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                        while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) {
+                            pstrTemp = ::CharNext(pstrText);
+                            while( pstrText < pstrTemp) {
+                                sFontAttr += *pstrText++;
+                            }
+                        }
+                        sFontAttr.MakeLower();
+                        if( sFontAttr.Find(_T("bold")) >= 0 ) bBold = true;
+                        if( sFontAttr.Find(_T("underline")) >= 0 ) bUnderline = true;
+                        if( sFontAttr.Find(_T("italic")) >= 0 ) bItalic = true;
+                        HFONT hFont = pManager->GetFont(sFontName, iFontSize, bBold, bUnderline, bItalic);
+                        if( hFont == NULL ) hFont = pManager->AddFont(sFontName, iFontSize, bBold, bUnderline, bItalic);
+                        TFontInfo* pFontInfo = pManager->GetFontInfo(hFont);
+                        aFontArray.Add(pFontInfo);
+                        pTm = &pFontInfo->tm;
+                        ::SelectObject(hDC, pFontInfo->hFont);
+                    }
+                    cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
+                }
+                break;
+            case _T('i'):  // Italic or Image
+                {
+                    pstrNextStart = pstrText - 1;
+                    pstrText++;
+                    int iWidth = 0;
+                    int iHeight = 0;
+                    while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                    const TImageInfo* pImageInfo = NULL;
+                    CStdString sName;
+                    while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') && *pstrText != _T(' ') ) {
+                        LPCTSTR pstrTemp = ::CharNext(pstrText);
+                        while( pstrText < pstrTemp) {
+                            sName += *pstrText++;
+                        }
+                    }
+                    if( sName.IsEmpty() ) { // Italic
+                        pstrNextStart = NULL;
+                        TFontInfo* pFontInfo = pManager->GetDefaultFontInfo();
+                        if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                        if( pFontInfo->bItalic == false ) {
+                            HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, pFontInfo->bUnderline, true);
+                            if( hFont == NULL ) hFont = pManager->AddFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, pFontInfo->bUnderline, true);
+                            pFontInfo = pManager->GetFontInfo(hFont);
+                            aFontArray.Add(pFontInfo);
+                            pTm = &pFontInfo->tm;
+                            ::SelectObject(hDC, pFontInfo->hFont);
+                            cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
+                        }
+                    }
+                    else {
+                        while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                        int iImageListNum = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+                        if( iImageListNum <= 0 ) iImageListNum = 1;
+                        while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                        int iImageListIndex = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+                        if( iImageListIndex < 0 || iImageListIndex >= iImageListNum ) iImageListIndex = 0;
+
+                        pImageInfo = pManager->GetImageEx((LPCTSTR)sName);
+                        if( pImageInfo ) {
+                            iWidth = pImageInfo->nX;
+                            iHeight = pImageInfo->nY;
+                            if( iImageListNum > 1 ) iWidth /= iImageListNum;
+
+                            if( pt.x + iWidth > rc.right && pt.x > rc.left && (uStyle & DT_SINGLELINE) == 0 ) {
+                                bLineEnd = true;
+                            }
+                            else {
+                                pstrNextStart = NULL;
+                                if( bDraw && bLineDraw ) {
+                                    CRect rcImage(pt.x, pt.y + cyLineHeight - iHeight, pt.x + iWidth, pt.y + cyLineHeight);
+                                    if( iHeight < cyLineHeight ) { 
+                                        rcImage.bottom -= (cyLineHeight - iHeight) / 2;
+                                        rcImage.top = rcImage.bottom -  iHeight;
+                                    }
+                                    CRect rcBmpPart(0, 0, iWidth, iHeight);
+                                    rcBmpPart.left = iWidth * iImageListIndex;
+                                    rcBmpPart.right = iWidth * (iImageListIndex + 1);
+                                    CRect rcCorner(0, 0, 0, 0);
+                                    DrawImage(hDC, pImageInfo->hBitmap, rcImage, rcImage, rcBmpPart, rcCorner, \
+                                        pImageInfo->alphaChannel, 255);
+                                }
+
+                                cyLine = MAX(iHeight, cyLine);
+                                pt.x += iWidth;
+                                cyMinHeight = pt.y + iHeight;
+                                cxMaxWidth = MAX(cxMaxWidth, pt.x);
+                            }
+                        }
+                        else pstrNextStart = NULL;
+                    }
+                }
+                break;
+            case _T('n'):  // Newline
+                {
+                    pstrText++;
+                    if( (uStyle & DT_SINGLELINE) != 0 ) break;
+                    bLineEnd = true;
+                }
+                break;
+            case _T('p'):  // Paragraph
+                {
+                    pstrText++;
+                    if( pt.x > rc.left ) bLineEnd = true;
+                    while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                    int cyLineExtra = (int)_tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+                    aPIndentArray.Add((LPVOID)cyLineExtra);
+                    cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + cyLineExtra);
+                }
+                break;
+            case _T('r'):  // Raw Text
+                {
+                    pstrText++;
+                    bInRaw = true;
+                }
+                break;
+            case _T('s'):  // Selected text background color
+                {
+                    pstrText++;
+                    bInSelected = !bInSelected;
+                    if( bDraw && bLineDraw ) {
+                        if( bInSelected ) ::SetBkMode(hDC, OPAQUE);
+                        else ::SetBkMode(hDC, TRANSPARENT);
+                    }
+                }
+                break;
+            case _T('u'):  // Underline text
+                {
+                    pstrText++;
+                    TFontInfo* pFontInfo = pManager->GetDefaultFontInfo();
+                    if( aFontArray.GetSize() > 0 ) pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                    if( pFontInfo->bUnderline == false ) {
+                        HFONT hFont = pManager->GetFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
+                        if( hFont == NULL ) hFont = pManager->AddFont(pFontInfo->sFontName, pFontInfo->iSize, pFontInfo->bBold, true, pFontInfo->bItalic);
+                        pFontInfo = pManager->GetFontInfo(hFont);
+                        aFontArray.Add(pFontInfo);
+                        pTm = &pFontInfo->tm;
+                        ::SelectObject(hDC, pFontInfo->hFont);
+                        cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
+                    }
+                }
+                break;
+            case _T('x'):  // X Indent
+                {
+                    pstrText++;
+                    while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                    int iWidth = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+                    pt.x += iWidth;
+                    cxMaxWidth = MAX(cxMaxWidth, pt.x);
+                }
+                break;
+            case _T('y'):  // Y Indent
+                {
+                    pstrText++;
+                    while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+                    cyLine = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+                }
+                break;
+                }
+                if( pstrNextStart != NULL ) pstrText = pstrNextStart;
+                else {
+                    while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) pstrText = ::CharNext(pstrText);
+                    pstrText = ::CharNext(pstrText);
+                }
+        }
+        else if( !bInRaw && ( *pstrText == _T('<') || *pstrText == _T('{') ) && pstrText[1] == _T('/') )
+        {
+            pstrText++;
+            pstrText++;
+            switch( *pstrText )
+            {
+            case _T('c'):
+                {
+                    pstrText++;
+                    aColorArray.Remove(aColorArray.GetSize() - 1);
+                    DWORD clrColor = dwTextColor;
+                    if( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
+                    ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
+                }
+                break;
+            case _T('p'):
+                pstrText++;
+                if( pt.x > rc.left ) bLineEnd = true;
+                aPIndentArray.Remove(aPIndentArray.GetSize() - 1);
+                cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
+                break;
+            case _T('s'):
+                {
+                    pstrText++;
+                    bInSelected = !bInSelected;
+                    if( bDraw && bLineDraw ) {
+                        if( bInSelected ) ::SetBkMode(hDC, OPAQUE);
+                        else ::SetBkMode(hDC, TRANSPARENT);
+                    }
+                }
+                break;
+            case _T('a'):
+                {
+                    if( iLinkIndex < nLinkRects ) {
+                        if( !bLineDraw ) ::SetRect(&prcLinks[iLinkIndex], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + pTm->tmHeight + pTm->tmExternalLeading);
+                        iLinkIndex++;
+                    }
+                    aColorArray.Remove(aColorArray.GetSize() - 1);
+                    DWORD clrColor = dwTextColor;
+                    if( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
+                    ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
+                    bInLink = false;
+                }
+            case _T('b'):
+            case _T('f'):
+            case _T('i'):
+            case _T('u'):
+                {
+                    pstrText++;
+                    aFontArray.Remove(aFontArray.GetSize() - 1);
+                    TFontInfo* pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                    if( pFontInfo == NULL ) pFontInfo = pManager->GetDefaultFontInfo();
+                    if( pTm->tmItalic && pFontInfo->bItalic == false ) {
+                        ABC abc;
+                        ::GetCharABCWidths(hDC, _T(' '), _T(' '), &abc);
+                        pt.x += abc.abcC / 2; // 简单修正一下斜体混排的问题, 正确做法应该是http://support.microsoft.com/kb/244798/en-us
+                    }
+                    pTm = &pFontInfo->tm;
+                    ::SelectObject(hDC, pFontInfo->hFont);
+                    cyLine = MAX(cyLine, pTm->tmHeight + pTm->tmExternalLeading + (int)aPIndentArray.GetAt(aPIndentArray.GetSize() - 1));
                 }
                 break;
             }
             while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) pstrText = ::CharNext(pstrText);
             pstrText = ::CharNext(pstrText);
         }
-        else if( ( *pstrText == _T('<') || *pstrText == _T('{') ) && pstrText[1] == _T('/') )
-        {
-            pstrText++;
-            pstrText++;
-            switch( *pstrText )
-            {
-            case _T('a'):
-                pstrText++;
-                if( iLinkIndex < nLinkRects ) ::SetRect(&prcLinks[iLinkIndex++], ptLinkStart.x, ptLinkStart.y, MIN(pt.x, rc.right), pt.y + tm.tmHeight + tm.tmExternalLeading);
-                ::SetTextColor(hDC, RGB(GetBValue(dwTextColor), GetGValue(dwTextColor), GetRValue(dwTextColor)));
-                ::SelectObject(hDC, pManager->GetDefaultFont());
-                tm = pManager->GetDefaultFontInfo();
-                bInLink = false;
-                break;
-            case _T('f'):
-            case _T('b'):
-                pstrText++;
-                ::SelectObject(hDC, pManager->GetDefaultFont());
-                tm = pManager->GetDefaultFontInfo();
-                break;
-            case _T('c'):
-                pstrText++;
-                ::SetTextColor(hDC, RGB(GetBValue(dwTextColor), GetGValue(dwTextColor), GetRValue(dwTextColor)));
-                break;
-            }
-            while( *pstrText != _T('\0') && *pstrText != _T('>') && *pstrText != _T('}') ) pstrText = ::CharNext(pstrText);
-            pstrText = ::CharNext(pstrText);
-        }
-        else if( *pstrText == _T('<') && pstrText[2] == _T('>') && (pstrText[1] == _T('{')  || pstrText[1] == _T('}')) )
+        else if( !bInRaw &&  *pstrText == _T('<') && pstrText[2] == _T('>') && (pstrText[1] == _T('{')  || pstrText[1] == _T('}')) )
         {
             SIZE szSpace = { 0 };
             ::GetTextExtentPoint32(hDC, &pstrText[1], 1, &szSpace);
-            if( bDraw ) ::TextOut(hDC, pt.x, pt.y, &pstrText[1], 1);
+            if( bDraw && bLineDraw ) ::TextOut(hDC, pt.x, pt.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, &pstrText[1], 1);
             pt.x += szSpace.cx;
             cxMaxWidth = MAX(cxMaxWidth, pt.x);
             pstrText++;pstrText++;pstrText++;
         }
-        else if( *pstrText == _T('{') && pstrText[2] == _T('}') && (pstrText[1] == _T('<')  || pstrText[1] == _T('>')) )
+        else if( !bInRaw &&  *pstrText == _T('{') && pstrText[2] == _T('}') && (pstrText[1] == _T('<')  || pstrText[1] == _T('>')) )
         {
             SIZE szSpace = { 0 };
             ::GetTextExtentPoint32(hDC, &pstrText[1], 1, &szSpace);
-            if( bDraw ) ::TextOut(hDC, pt.x, pt.y, &pstrText[1], 1);
+            if( bDraw && bLineDraw ) ::TextOut(hDC, pt.x,  pt.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, &pstrText[1], 1);
             pt.x += szSpace.cx;
             cxMaxWidth = MAX(cxMaxWidth, pt.x);
             pstrText++;pstrText++;pstrText++;
         }
-        else if( *pstrText == _T(' ') )
+        else if( !bInRaw &&  *pstrText == _T(' ') )
         {
             SIZE szSpace = { 0 };
             ::GetTextExtentPoint32(hDC, _T(" "), 1, &szSpace);
             // Still need to paint the space because the font might have
             // underline formatting.
-            if( bDraw ) ::TextOut(hDC, pt.x, pt.y, _T(" "), 1);
+            if( bDraw && bLineDraw ) ::TextOut(hDC, pt.x,  pt.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, _T(" "), 1);
             pt.x += szSpace.cx;
             cxMaxWidth = MAX(cxMaxWidth, pt.x);
             pstrText++;
@@ -1347,51 +1550,54 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             int cchLastGoodWord = 0;
             int cchLastGoodSize = 0;
             LPCTSTR p = pstrText;
+            LPCTSTR pstrNext;
             SIZE szText = { 0 };
-            if( *p == _T('<') || *p == _T('{') ) p++, cchChars++, cchSize++;
-            while( *p != _T('\0') && *p != _T('<') && *p != _T('{') && *p != _T('\n') ) {
+            if( !bInRaw && *p == _T('<') || *p == _T('{') ) p++, cchChars++, cchSize++;
+            while( *p != _T('\0') && *p != _T('\n') ) {
                 // This part makes sure that we're word-wrapping if needed or providing support
                 // for DT_END_ELLIPSIS. Unfortunately the GetTextExtentPoint32() call is pretty
                 // slow when repeated so often.
                 // TODO: Rewrite and use GetTextExtentExPoint() instead!
-
-                LPCTSTR pstrTemp = ::CharNext(p);
+                if( bInRaw ) {
+                    if( ( *p == _T('<') || *p == _T('{') ) && p[1] == _T('/') 
+                        && p[2] == _T('r') && ( p[3] == _T('>') || p[3] == _T('}') ) ) {
+                            p += 4;
+                            bInRaw = false;
+                            break;
+                    }
+                }
+                else {
+                    if( *p == _T('<') || *p == _T('{') ) break;
+                }
+                pstrNext = ::CharNext(p);
                 cchChars++;
-                cchSize += (int)(pstrTemp - p);
-
-                szText.cx = cchChars * tm.tmMaxCharWidth;
+                cchSize += (int)(pstrNext - p);
+                szText.cx = cchChars * pTm->tmMaxCharWidth;
                 if( pt.x + szText.cx >= rc.right ) {
                     ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
                 }
-
                 if( pt.x + szText.cx > rc.right ) {
                     if( pt.x + szText.cx > rc.right && pt.x != rc.left) {
                         cchChars--;
-                        cchSize -= (int)(pstrTemp - p);
+                        cchSize -= (int)(pstrNext - p);
                     }
-
                     if( (uStyle & DT_WORDBREAK) != 0 && cchLastGoodWord > 0 ) {
                         cchChars = cchLastGoodWord;
                         cchSize = cchLastGoodSize;                 
                     }
-                    
                     if( (uStyle & DT_END_ELLIPSIS) != 0 && cchChars > 2 ) {
                         cchChars = cchLastGoodWord;
                         cchSize = cchLastGoodSize;
                     }
-
-                    pt.x = rc.right;
+                    bLineEnd = true;
                     cxMaxWidth = MAX(cxMaxWidth, pt.x);
                     break;
                 }
-
-                if (!( ( p[0] >= _T('a') && p[0] <= _T('z') ) || ( p[0] >= _T('A') && p[0] <= _T('Z') ) ))
-                {
+                if (!( ( p[0] >= _T('a') && p[0] <= _T('z') ) || ( p[0] >= _T('A') && p[0] <= _T('Z') ) )) {
                     cchLastGoodWord = cchChars;
                     cchLastGoodSize = cchSize;
                 }
-                if( *p == _T(' ') ) 
-                {
+                if( *p == _T(' ') ) {
                     cchLastGoodWord = cchChars;
                     cchLastGoodSize = cchSize;
                 }
@@ -1399,8 +1605,8 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             }
             if( cchChars > 0 ) {				
                 ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
-                if( bDraw ) {
-                    ::TextOut(hDC, ptPos.x, ptPos.y, pstrText, cchSize);
+                if( bDraw && bLineDraw ) {
+                    ::TextOut(hDC, ptPos.x, ptPos.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, pstrText, cchSize);
                     if( pt.x >= rc.right && (uStyle & DT_END_ELLIPSIS) != 0 ) ::TextOut(hDC, rc.right - 10, ptPos.y, _T("..."), 3);
                 }
                 pt.x += szText.cx;
@@ -1408,11 +1614,47 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 pstrText += cchSize;
             }
         }
+
+        if( pt.x >= rc.right || *pstrText == _T('\n') || *pstrText == _T('\0') ) bLineEnd = true;
+        if( bDraw && bLineEnd ) {
+            if( !bLineDraw ) {
+                aFontArray.Resize(aLineFontArray.GetSize());
+                ::CopyMemory(aFontArray.GetData(), aLineFontArray.GetData(), aLineFontArray.GetSize() * sizeof(LPVOID));
+                aColorArray.Resize(aLineColorArray.GetSize());
+                ::CopyMemory(aColorArray.GetData(), aLineColorArray.GetData(), aLineColorArray.GetSize() * sizeof(LPVOID));
+                aPIndentArray.Resize(aLinePIndentArray.GetSize());
+                ::CopyMemory(aPIndentArray.GetData(), aLinePIndentArray.GetData(), aLinePIndentArray.GetSize() * sizeof(LPVOID));
+
+                cyLineHeight = cyLine;
+                pstrText = pstrLineBegin;
+                bInRaw = bLineInRaw;
+                bInSelected = bLineInSelected;
+
+                DWORD clrColor = dwTextColor;
+                if( aColorArray.GetSize() > 0 ) clrColor = (int)aColorArray.GetAt(aColorArray.GetSize() - 1);
+                ::SetTextColor(hDC, RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
+                TFontInfo* pFontInfo = (TFontInfo*)aFontArray.GetAt(aFontArray.GetSize() - 1);
+                if( pFontInfo == NULL ) pFontInfo = pManager->GetDefaultFontInfo();
+                pTm = &pFontInfo->tm;
+                ::SelectObject(hDC, pFontInfo->hFont);
+                if( bInSelected ) ::SetBkMode(hDC, OPAQUE);
+            }
+            else {
+                aLineFontArray.Resize(aFontArray.GetSize());
+                ::CopyMemory(aLineFontArray.GetData(), aFontArray.GetData(), aFontArray.GetSize() * sizeof(LPVOID));
+                aLineColorArray.Resize(aColorArray.GetSize());
+                ::CopyMemory(aLineColorArray.GetData(), aColorArray.GetData(), aColorArray.GetSize() * sizeof(LPVOID));
+                aLinePIndentArray.Resize(aPIndentArray.GetSize());
+                ::CopyMemory(aLinePIndentArray.GetData(), aPIndentArray.GetData(), aPIndentArray.GetSize() * sizeof(LPVOID));
+                pstrLineBegin = pstrText;
+                bLineInSelected = bInSelected;
+                bLineInRaw = bInRaw;
+            }
+        }
+
         ASSERT(iLinkIndex<=nLinkRects);
     }
 
-    // Clear remaining link rects and return number of used rects
-    for( int i = iLinkIndex; i < nLinkRects; i++ ) ::ZeroMemory(prcLinks + i, sizeof(RECT));
     nLinkRects = iLinkIndex;
 
     // Return size of text when requested

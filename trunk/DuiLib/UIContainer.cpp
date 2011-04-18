@@ -340,7 +340,7 @@ void CContainerUI::SetScrollPos(SIZE szPos)
 void CContainerUI::LineUp()
 {
     int cyLine = 8;
-    if( m_pManager ) cyLine = m_pManager->GetDefaultFontInfo().tmHeight + 8;
+    if( m_pManager ) cyLine = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8;
 
     SIZE sz = GetScrollPos();
     sz.cy -= cyLine;
@@ -350,7 +350,7 @@ void CContainerUI::LineUp()
 void CContainerUI::LineDown()
 {
     int cyLine = 8;
-    if( m_pManager ) cyLine = m_pManager->GetDefaultFontInfo().tmHeight + 8;
+    if( m_pManager ) cyLine = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8;
 
     SIZE sz = GetScrollPos();
     sz.cy += cyLine;

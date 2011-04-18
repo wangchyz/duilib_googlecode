@@ -70,8 +70,6 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
                     bool defaultfont = false;
                     bool defaultboldfont = false;
                     bool defaultlinkfont = false;
-					DWORD dwDefLinkColor = 0xFF0000FF;
-					DWORD dwDefLinkHoverColor = 0xFFD3215F;
                     for( int i = 0; i < nAttributes; i++ ) {
                         pstrName = node.GetAttributeName(i);
                         pstrValue = node.GetAttributeValue(i);
@@ -93,30 +91,10 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
                         else if( _tcscmp(pstrName, _T("default")) == 0 ) {
                             defaultfont = (_tcscmp(pstrValue, _T("true")) == 0);
                         }
-                        else if( _tcscmp(pstrName, _T("defaultbold")) == 0 ) {
-                            defaultboldfont = (_tcscmp(pstrValue, _T("true")) == 0);
-                        }
-                        else if( _tcscmp(pstrName, _T("defaultlink")) == 0 ) {
-                            defaultlinkfont = (_tcscmp(pstrValue, _T("true")) == 0);
-						}
-						else if( _tcscmp(pstrName, _T("defaultlinkcolor")) == 0 ) {
-							if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
-							LPTSTR pstr = NULL;
-							dwDefLinkColor = _tcstoul(pstrValue, &pstr, 16);
-						}
-						else if( _tcscmp(pstrName, _T("defaultlinkhovercolor")) == 0 ) {
-							if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
-							LPTSTR pstr = NULL;
-							dwDefLinkHoverColor = _tcstoul(pstrValue, &pstr, 16);
-						}
                     }
                     if( pFontName ) {
-                        HFONT hFont = pManager->AddFont(pFontName, size, bold, underline, italic);
-                        if( hFont != NULL ) {
-                            if( defaultfont ) pManager->SetDefaultFont(hFont);
-                            if( defaultboldfont ) pManager->SetDefaultBoldFont(hFont);
-                            if( defaultlinkfont ) pManager->SetDefaultLinkFont(hFont,dwDefLinkColor,dwDefLinkHoverColor);
-                        }
+                        pManager->AddFont(pFontName, size, bold, underline, italic);
+                        if( defaultfont ) pManager->SetDefaultFont(pFontName, size, bold, underline, italic);
                     }
                 }
                 else if( _tcscmp(pstrClass, _T("Default")) == 0 ) {
