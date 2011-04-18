@@ -16,7 +16,8 @@ public:
     HRGN hRgn;
     HRGN hOldRgn;
 
-    static void GenerateClip(HDC hDC, RECT rcItem, CRenderClip& clip);
+    static void GenerateClip(HDC hDC, RECT rc, CRenderClip& clip);
+    static void GenerateRoundClip(HDC hDC, RECT rc, RECT rcItem, int width, int height, CRenderClip& clip);
     static void UseOldClipBegin(HDC hDC, CRenderClip& clip);
     static void UseOldClipEnd(HDC hDC, CRenderClip& clip);
 };
