@@ -297,19 +297,6 @@ int CControlUI::GetY() const
     return m_rcItem.top;
 }
 
-SIZE CControlUI::GetXYPos() const
-{
-	return m_cXY;
-}
-
-void CControlUI::SetXYPos(SIZE szXY)
-{
-	m_cXY.cx = szXY.cx;
-	m_cXY.cy = szXY.cy;
-	if( !m_bFloat ) NeedParentUpdate();
-	else NeedUpdate();
-}
-
 RECT CControlUI::GetPadding() const
 {
     return m_rcPadding;
