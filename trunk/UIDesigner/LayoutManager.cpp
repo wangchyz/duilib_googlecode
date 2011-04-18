@@ -1,5 +1,7 @@
 #include "StdAfx.h"
 #include "LayoutManager.h"
+#include "UIUtil.h"
+#include <vector>
 
 //////////////////////////////////////////////////////////////////////////
 //CFormUI
@@ -1045,19 +1047,18 @@ void CLayoutManager::MicoMoveRight(CArray<CControlUI*,CControlUI*>& arrSelected,
 
 #if defined(EXPORT_UI_SCRIPT)
 
-
-void CDesignerCanvas::Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if (pControlUI->GetName() && _tcslen(pControlUI->GetName()) > 0)
-		pNode->SetAttribute("name", StringConvertor::TcharToUtf8(pControlUI->GetName()));
+		pNode->SetAttribute("name", StringConvertor::WideToUtf8(pControlUI->GetName()));
 
 	if (pControlUI->GetText() && _tcslen(pControlUI->GetText()) > 0)
-		pNode->SetAttribute("text", StringConvertor::TcharToUtf8(pControlUI->GetText()));
+		pNode->SetAttribute("text", StringConvertor::WideToUtf8(pControlUI->GetText()));
 
 	if (pControlUI->GetToolTip() && _tcslen(pControlUI->GetToolTip()) > 0)
-		pNode->SetAttribute("tooltip", StringConvertor::TcharToUtf8(pControlUI->GetToolTip()));
+		pNode->SetAttribute("tooltip", StringConvertor::WideToUtf8(pControlUI->GetToolTip()));
 
 	if (!pControlUI->IsVisible() && !((static_cast<IContainerUI*>(pControlUI->GetInterface(_T("IContainer"))) != NULL) && (static_cast<CContainerUI*>(pControlUI->GetInterface(_T("Container"))) != NULL)))
 	{
@@ -1082,14 +1083,14 @@ void CDesignerCanvas::Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlEl
 	if (pControlUI->GetShortcut() != _T('\0'))
 	{
 		_stprintf(szBuf, _T("%c"),pControlUI->GetShortcut());
-		pNode->SetAttribute("shortcut", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("shortcut", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetBorderSize() != 1)
 	{
 		// Ä¬ÈÏÎª1
 		_stprintf(szBuf, _T("%d"),pControlUI->GetBorderSize());
-		pNode->SetAttribute("bordersize", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("bordersize", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->IsFloat())
@@ -1097,7 +1098,7 @@ void CDesignerCanvas::Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlEl
 		pNode->SetAttribute("float", "true");
 
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), pControlUI->GetFixedXY().cx, pControlUI->GetFixedXY().cy, pControlUI->GetFixedXY().cx + pControlUI->GetFixedWidth(), pControlUI->GetFixedXY().cy + pControlUI->GetFixedHeight());
-		pNode->SetAttribute("pos", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("pos", StringConvertor::WideToUtf8(szBuf));
 	}
 	else
 	{
@@ -1107,19 +1108,19 @@ void CDesignerCanvas::Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlEl
 			|| (pControlUI->GetFixedHeight() != 0))
 		{
 			_stprintf(szBuf, _T("%d,%d,%d,%d"), pControlUI->GetFixedXY().cx, pControlUI->GetFixedXY().cy, pControlUI->GetFixedXY().cx + pControlUI->GetFixedWidth(), pControlUI->GetFixedXY().cy + pControlUI->GetFixedHeight());
-			pNode->SetAttribute("pos", StringConvertor::TcharToUtf8(szBuf));
+			pNode->SetAttribute("pos", StringConvertor::WideToUtf8(szBuf));
 		}
 
 		if (pControlUI->GetFixedWidth() > 0)
 		{
 			_stprintf(szBuf, _T("%d"), pControlUI->GetFixedWidth());
-			pNode->SetAttribute("width", StringConvertor::TcharToUtf8(szBuf));
+			pNode->SetAttribute("width", StringConvertor::WideToUtf8(szBuf));
 		}
 
 		if (pControlUI->GetFixedHeight() > 0)
 		{
 			_stprintf(szBuf, _T("%d"), pControlUI->GetFixedHeight());
-			pNode->SetAttribute("height", StringConvertor::TcharToUtf8(szBuf));
+			pNode->SetAttribute("height", StringConvertor::WideToUtf8(szBuf));
 		}
 	}
 
@@ -1127,19 +1128,19 @@ void CDesignerCanvas::Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlEl
 	if ((rcPadding.left != 0) || (rcPadding.right != 0) || (rcPadding.bottom != 0) || (rcPadding.top != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcPadding.left, rcPadding.top, rcPadding.right, rcPadding.bottom);
-		pNode->SetAttribute("padding", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("padding", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetBkImage() && _tcslen(pControlUI->GetBkImage()) > 0)
 	{
-		pNode->SetAttribute("bkimage", StringConvertor::TcharToUtf8(pControlUI->GetBkImage()));
+		pNode->SetAttribute("bkimage", StringConvertor::WideToUtf8(pControlUI->GetBkImage()));
 	}
 
 	if (pControlUI->GetBkColor() != 0)
 	{
 		DWORD dwColor = pControlUI->GetBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("bkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("bkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetBkColor2() != 0)
@@ -1147,59 +1148,56 @@ void CDesignerCanvas::Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlEl
 		DWORD dwColor = pControlUI->GetBkColor2();
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 
-		pNode->SetAttribute("bkcolor2", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("bkcolor2", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetBorderColor() != 0)
 	{
 		DWORD dwColor = pControlUI->GetBorderColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("bordercolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("bordercolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetFocusBorderColor() != 0)
 	{
 		DWORD dwColor = pControlUI->GetFocusBorderColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("focusbordercolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("focusbordercolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetMaxHeight() != 9999)
 	{
 		_stprintf(szBuf, _T("%d"), pControlUI->GetMaxHeight());
-		pNode->SetAttribute("maxheight", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("maxheight", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetMaxWidth() != 9999)
 	{
 		_stprintf(szBuf, _T("%d"), pControlUI->GetMaxWidth());
-		pNode->SetAttribute("maxwidth", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("maxwidth", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetMinWidth() != 0)
 	{
 		_stprintf(szBuf, _T("%d"), pControlUI->GetMinWidth());
-		pNode->SetAttribute("minwidth", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("minwidth", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pControlUI->GetMinHeight() != 0)
 	{
 		_stprintf(szBuf, _T("%d"), pControlUI->GetMinHeight());
-		pNode->SetAttribute("minheight", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("minheight", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	TRelativePosUI relativePos = pControlUI->GetRelativePos();
 	if (relativePos.bRelative)
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), relativePos.nMoveXPercent, relativePos.nMoveYPercent, relativePos.nZoomXPercent, relativePos.nZoomYPercent);
-		pNode->SetAttribute("relativepos", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("relativepos", StringConvertor::WideToUtf8(szBuf));
 	}
-
-	if (pControlUI->GetStretchMode() && _tcslen(pControlUI->GetStretchMode()) > 0)
-		pNode->SetAttribute("stretch", StringConvertor::TcharToUtf8(pControlUI->GetStretchMode()));
 }
 
-void CDesignerCanvas::Save_CLabelUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CLabelUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CControlUI_Properties(pControlUI, pNode);
 
@@ -1211,27 +1209,27 @@ void CDesignerCanvas::Save_CLabelUI_Properties(CControlUI* pControlUI, TiXmlElem
 	if ((rcTextPadding.left != 0) || (rcTextPadding.right != 0) || (rcTextPadding.bottom != 0) || (rcTextPadding.top != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcTextPadding.left, rcTextPadding.top, rcTextPadding.right, rcTextPadding.bottom);
-		pNode->SetAttribute("textpadding", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("textpadding", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pLabelUI->GetTextColor() != 0)
 	{
 		DWORD dwColor = pLabelUI->GetTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("textcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("textcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pLabelUI->GetDisabledTextColor() != 0)
 	{
 		DWORD dwColor = pLabelUI->GetDisabledTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("disabledtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("disabledtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pLabelUI->IsShowHtml())
 		pNode->SetAttribute("showhtml", "true");
 
-	tString tstrAlgin;
+	std::wstring tstrAlgin;
 	UINT uTextStyle = pLabelUI->GetTextStyle();
 
 	if (uTextStyle & DT_LEFT)
@@ -1253,65 +1251,59 @@ void CDesignerCanvas::Save_CLabelUI_Properties(CControlUI* pControlUI, TiXmlElem
 		tstrAlgin += _T("wrap");
 
 	if (!tstrAlgin.empty())
-		pNode->SetAttribute("align", StringConvertor::TcharToUtf8(tstrAlgin.c_str()));
+		pNode->SetAttribute("align", StringConvertor::WideToUtf8(tstrAlgin.c_str()));
 }
 
-void CDesignerCanvas::Save_CButtonUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CButtonUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CLabelUI_Properties(pControlUI, pNode);
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	CButtonUI* pButtonUI = static_cast<CButtonUI*>(pControlUI->GetInterface(_T("Button")));
 	if (pButtonUI->GetNormalImage() && _tcslen(pButtonUI->GetNormalImage()) > 0)
-		pNode->SetAttribute("normalimage", StringConvertor::TcharToUtf8(pButtonUI->GetNormalImage()));
+		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(pButtonUI->GetNormalImage()));
 
 	if (pButtonUI->GetHotImage() && _tcslen(pButtonUI->GetHotImage()) > 0)
-		pNode->SetAttribute("hotimage", StringConvertor::TcharToUtf8(pButtonUI->GetHotImage()));
+		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(pButtonUI->GetHotImage()));
 
 	if (pButtonUI->GetPushedImage() && _tcslen(pButtonUI->GetPushedImage()) > 0)
-		pNode->SetAttribute("pushedimage", StringConvertor::TcharToUtf8(pButtonUI->GetPushedImage()));
+		pNode->SetAttribute("pushedimage", StringConvertor::WideToUtf8(pButtonUI->GetPushedImage()));
 
 	if (pButtonUI->GetFocusedImage() && _tcslen(pButtonUI->GetFocusedImage()) > 0)
-		pNode->SetAttribute("focusedimage", StringConvertor::TcharToUtf8(pButtonUI->GetFocusedImage()));
+		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(pButtonUI->GetFocusedImage()));
 
 	if (pButtonUI->GetDisabledImage() && _tcslen(pButtonUI->GetDisabledImage()) > 0)
-		pNode->SetAttribute("disabledimage", StringConvertor::TcharToUtf8(pButtonUI->GetDisabledImage()));
-
-	if (pButtonUI->GetForeImage() && _tcslen(pButtonUI->GetForeImage()) > 0)
-		pNode->SetAttribute("foreimage", StringConvertor::TcharToUtf8(pButtonUI->GetForeImage()));
+		pNode->SetAttribute("disabledimage", StringConvertor::WideToUtf8(pButtonUI->GetDisabledImage()));
 
 	if (pButtonUI->GetFocusedTextColor() != 0)
 	{
 		DWORD dwColor = pButtonUI->GetFocusedTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("focusedtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("focusedtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pButtonUI->GetPushedTextColor() != 0)
 	{
 		DWORD dwColor = pButtonUI->GetPushedTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("pushedtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("pushedtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pButtonUI->GetHotTextColor() != 0)
 	{
 		DWORD dwColor = pButtonUI->GetHotTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("hottextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("hottextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 }
 
 
-void CDesignerCanvas::Save_COptionUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_COptionUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CButtonUI_Properties(pControlUI, pNode);
 	COptionUI* pOptionUI = static_cast<COptionUI*>(pControlUI->GetInterface(_T("Option")));
 
 	TCHAR szBuf[MAX_PATH] = {0};
-
-	if (!pOptionUI->IsImageFitallArea())
-		pNode->SetAttribute("fitallArea", "false");
 
 	if (pOptionUI->IsGroup())
 		pNode->SetAttribute("group", pOptionUI->IsGroup()?"true":"false");
@@ -1319,18 +1311,14 @@ void CDesignerCanvas::Save_COptionUI_Properties(CControlUI* pControlUI, TiXmlEle
 	if (pOptionUI->IsSelected())
 		pNode->SetAttribute("selected", pOptionUI->IsSelected()?"true":"false");
 
-	if (pOptionUI->GetSelectedTextColor() != 0)
-	{
-		DWORD dwColor = pOptionUI->GetSelectedTextColor();					
-		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("selectedtextcolor", StringConvertor::TcharToUtf8(szBuf));
-	}
+	if (pOptionUI->GetForeImage() && _tcslen(pOptionUI->GetForeImage()) > 0)
+		pNode->SetAttribute("foreimage", StringConvertor::WideToUtf8(pOptionUI->GetForeImage()));
 
 	if (pOptionUI->GetSelectedImage() && _tcslen(pOptionUI->GetSelectedImage()) > 0)
-		pNode->SetAttribute("selectedimage", StringConvertor::TcharToUtf8(pOptionUI->GetSelectedImage()));
+		pNode->SetAttribute("selectedimage", StringConvertor::WideToUtf8(pOptionUI->GetSelectedImage()));
 }
 
-void CDesignerCanvas::Save_CProgressUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CProgressUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CLabelUI_Properties(pControlUI, pNode);
 	CProgressUI* pProgressUI = static_cast<CProgressUI*>(pControlUI->GetInterface(_T("Progress")));
@@ -1338,23 +1326,23 @@ void CDesignerCanvas::Save_CProgressUI_Properties(CControlUI* pControlUI, TiXmlE
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if (pProgressUI->GetFgImage() && _tcslen(pProgressUI->GetFgImage()) > 0)
-		pNode->SetAttribute("fgimage", StringConvertor::TcharToUtf8(pProgressUI->GetFgImage()));
+		pNode->SetAttribute("fgimage", StringConvertor::WideToUtf8(pProgressUI->GetFgImage()));
 
 	_stprintf(szBuf, _T("%d"), pProgressUI->GetMinValue());
-	pNode->SetAttribute("min", StringConvertor::TcharToUtf8(szBuf));
+	pNode->SetAttribute("min", StringConvertor::WideToUtf8(szBuf));
 
 
 	_stprintf(szBuf, _T("%d"), pProgressUI->GetMaxValue());
-	pNode->SetAttribute("max", StringConvertor::TcharToUtf8(szBuf));
+	pNode->SetAttribute("max", StringConvertor::WideToUtf8(szBuf));
 
 	_stprintf(szBuf, _T("%d"), pProgressUI->GetValue());
-	pNode->SetAttribute("value", StringConvertor::TcharToUtf8(szBuf));
+	pNode->SetAttribute("value", StringConvertor::WideToUtf8(szBuf));
 
 	if (pProgressUI->IsHorizontal())
 		pNode->SetAttribute("hor", pProgressUI->IsHorizontal()?"true":"false");
 }
 
-void CDesignerCanvas::Save_CSliderUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CSliderUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CProgressUI_Properties(pControlUI, pNode);
 
@@ -1362,19 +1350,19 @@ void CDesignerCanvas::Save_CSliderUI_Properties(CControlUI* pControlUI, TiXmlEle
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if (pSliderUI->GetThumbImage() && _tcslen(pSliderUI->GetThumbImage()) > 0)
-		pNode->SetAttribute("thumbimage", StringConvertor::TcharToUtf8(pSliderUI->GetThumbImage()));
+		pNode->SetAttribute("thumbimage", StringConvertor::WideToUtf8(pSliderUI->GetThumbImage()));
 
 	if (pSliderUI->GetThumbHotImage() && _tcslen(pSliderUI->GetThumbHotImage()) > 0)
-		pNode->SetAttribute("thumbhotimage", StringConvertor::TcharToUtf8(pSliderUI->GetThumbHotImage()));
+		pNode->SetAttribute("thumbhotimage", StringConvertor::WideToUtf8(pSliderUI->GetThumbHotImage()));
 
 	if (pSliderUI->GetThumbPushedImage() && _tcslen(pSliderUI->GetThumbPushedImage()) > 0)
-		pNode->SetAttribute("thumbpushedimage", StringConvertor::TcharToUtf8(pSliderUI->GetThumbPushedImage()));
+		pNode->SetAttribute("thumbpushedimage", StringConvertor::WideToUtf8(pSliderUI->GetThumbPushedImage()));
 
 	_stprintf(szBuf, _T("%d,%d"), pSliderUI->GetThumbRect().right - pSliderUI->GetThumbRect().left, pSliderUI->GetThumbRect().bottom - pSliderUI->GetThumbRect().top);
-	pNode->SetAttribute("thumbsize", StringConvertor::TcharToUtf8(szBuf));
+	pNode->SetAttribute("thumbsize", StringConvertor::WideToUtf8(szBuf));
 }
 
-void CDesignerCanvas::Save_CEditUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CEditUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CLabelUI_Properties(pControlUI, pNode);
 	CEditUI* pEditUI = static_cast<CEditUI*>(pControlUI->GetInterface(_T("Edit")));
@@ -1386,94 +1374,88 @@ void CDesignerCanvas::Save_CEditUI_Properties(CControlUI* pControlUI, TiXmlEleme
 
 	if (pEditUI->IsReadOnly())
 		pNode->SetAttribute("readonly", pEditUI->IsReadOnly()?"true":"false");
-
-	if (pEditUI->IsDigitalNumber())
-		pNode->SetAttribute("digitalnumber", pEditUI->IsDigitalNumber()?"true":"false");
-
-	if (pEditUI->IsMultiLine())
-		pNode->SetAttribute("multiline", pEditUI->IsMultiLine()?"true":"false");
 }
 
-void CDesignerCanvas::Save_CScrollbarUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CScrollbarUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CControlUI_Properties(pControlUI, pNode);
 	CScrollbarUI* pScrollbarUI = static_cast<CScrollbarUI*>(pControlUI->GetInterface(_T("Scrollbar")));
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if (pScrollbarUI->GetBkNormalImage() && _tcslen(pScrollbarUI->GetBkNormalImage()) > 0)
-		pNode->SetAttribute("bknormalimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetBkNormalImage()));
+		pNode->SetAttribute("bknormalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkNormalImage()));
 
 	if (pScrollbarUI->GetBkHotImage() && _tcslen(pScrollbarUI->GetBkHotImage()) > 0)
-		pNode->SetAttribute("bkhotimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetBkHotImage()));
+		pNode->SetAttribute("bkhotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkHotImage()));
 
 	if (pScrollbarUI->GetBkPushedImage() && _tcslen(pScrollbarUI->GetBkPushedImage()) > 0)
-		pNode->SetAttribute("bkpushedimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetBkPushedImage()));
+		pNode->SetAttribute("bkpushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkPushedImage()));
 
 	if (pScrollbarUI->GetBkDisabledImage() && _tcslen(pScrollbarUI->GetBkDisabledImage()) > 0)
-		pNode->SetAttribute("bkdisabledimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetBkDisabledImage()));
+		pNode->SetAttribute("bkdisabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkDisabledImage()));
 
 	if (pScrollbarUI->GetRailNormalImage() && _tcslen(pScrollbarUI->GetRailNormalImage()) > 0)
-		pNode->SetAttribute("railnormalimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetRailNormalImage()));
+		pNode->SetAttribute("railnormalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailNormalImage()));
 
 	if (pScrollbarUI->GetRailHotImage() && _tcslen(pScrollbarUI->GetRailHotImage()) > 0)
-		pNode->SetAttribute("railhotimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetRailHotImage()));
+		pNode->SetAttribute("railhotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailHotImage()));
 
 	if (pScrollbarUI->GetRailPushedImage() && _tcslen(pScrollbarUI->GetRailPushedImage()) > 0)
-		pNode->SetAttribute("railpushedimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetRailPushedImage()));
+		pNode->SetAttribute("railpushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailPushedImage()));
 
 	if (pScrollbarUI->GetRailDisabledImage() && _tcslen(pScrollbarUI->GetRailDisabledImage()) > 0)
-		pNode->SetAttribute("raildisabledimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetRailDisabledImage()));
+		pNode->SetAttribute("raildisabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailDisabledImage()));
 
 	if (pScrollbarUI->GetThumbNormalImage() && _tcslen(pScrollbarUI->GetThumbNormalImage()) > 0)
-		pNode->SetAttribute("thumbnormalimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetThumbNormalImage()));
+		pNode->SetAttribute("thumbnormalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbNormalImage()));
 
 	if (pScrollbarUI->GetThumbHotImage() && _tcslen(pScrollbarUI->GetThumbHotImage()) > 0)
-		pNode->SetAttribute("thumbhotimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetThumbHotImage()));
+		pNode->SetAttribute("thumbhotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbHotImage()));
 
 	if (pScrollbarUI->GetThumbPushedImage() && _tcslen(pScrollbarUI->GetThumbPushedImage()) > 0)
-		pNode->SetAttribute("thumbpushedimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetThumbPushedImage()));
+		pNode->SetAttribute("thumbpushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbPushedImage()));
 
 	if (pScrollbarUI->GetThumbDisabledImage() && _tcslen(pScrollbarUI->GetThumbDisabledImage()) > 0)
-		pNode->SetAttribute("thumbdisabledimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetThumbDisabledImage()));
+		pNode->SetAttribute("thumbdisabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbDisabledImage()));
 
 	if (pScrollbarUI->GetButton2NormalImage() && _tcslen(pScrollbarUI->GetButton2NormalImage()) > 0)
-		pNode->SetAttribute("button2normalimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton2NormalImage()));
+		pNode->SetAttribute("button2normalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2NormalImage()));
 
 	if (pScrollbarUI->GetButton2HotImage() && _tcslen(pScrollbarUI->GetButton2HotImage()) > 0)
-		pNode->SetAttribute("button2hotimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton2HotImage()));
+		pNode->SetAttribute("button2hotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2HotImage()));
 
 	if (pScrollbarUI->GetButton2PushedImage() && _tcslen(pScrollbarUI->GetButton2PushedImage()) > 0)
-		pNode->SetAttribute("button2pushedimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton2PushedImage()));
+		pNode->SetAttribute("button2pushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2PushedImage()));
 
 	if (pScrollbarUI->GetButton2DisabledImage() && _tcslen(pScrollbarUI->GetButton2DisabledImage()) > 0)
-		pNode->SetAttribute("button2disabledimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton2DisabledImage()));
+		pNode->SetAttribute("button2disabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2DisabledImage()));
 
 	if (pScrollbarUI->GetButton1NormalImage() && _tcslen(pScrollbarUI->GetButton1NormalImage()) > 0)
-		pNode->SetAttribute("button1normalimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton1NormalImage()));
+		pNode->SetAttribute("button1normalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1NormalImage()));
 
 	if (pScrollbarUI->GetButton1HotImage() && _tcslen(pScrollbarUI->GetButton1HotImage()) > 0)
-		pNode->SetAttribute("button1hotimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton1HotImage()));
+		pNode->SetAttribute("button1hotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1HotImage()));
 
 	if (pScrollbarUI->GetButton1PushedImage() && _tcslen(pScrollbarUI->GetButton1PushedImage()) > 0)
-		pNode->SetAttribute("button1pushedimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton1PushedImage()));
+		pNode->SetAttribute("button1pushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1PushedImage()));
 
 	if (pScrollbarUI->GetButton1DisabledImage() && _tcslen(pScrollbarUI->GetButton1DisabledImage()) > 0)
-		pNode->SetAttribute("button1disabledimage", StringConvertor::TcharToUtf8(pScrollbarUI->GetButton1DisabledImage()));
+		pNode->SetAttribute("button1disabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1DisabledImage()));
 
 	_stprintf(szBuf, _T("%d"), pScrollbarUI->GetLineSize());
-	pNode->SetAttribute("linesize", StringConvertor::TcharToUtf8(szBuf));
+	pNode->SetAttribute("linesize", StringConvertor::WideToUtf8(szBuf));
 
 	_stprintf(szBuf, _T("%d"), pScrollbarUI->GetScrollRange());
-	pNode->SetAttribute("range", StringConvertor::TcharToUtf8(szBuf));
+	pNode->SetAttribute("range", StringConvertor::WideToUtf8(szBuf));
 
 	_stprintf(szBuf, _T("%d"), pScrollbarUI->GetScrollPos());
-	pNode->SetAttribute("value", StringConvertor::TcharToUtf8(szBuf));
+	pNode->SetAttribute("value", StringConvertor::WideToUtf8(szBuf));
 
 	if (pScrollbarUI->IsHorizontal())
 		pNode->SetAttribute("hor",pScrollbarUI->IsHorizontal()?"true":"false");
 }
 
-void CDesignerCanvas::Save_CListUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CListUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CControlUI_Properties(pControlUI, pNode);
 	CListUI* pListUI = static_cast<CListUI*>(pControlUI->GetInterface(_T("CList")));
@@ -1484,69 +1466,69 @@ void CDesignerCanvas::Save_CListUI_Properties(CControlUI* pControlUI, TiXmlEleme
 		pNode->SetAttribute("header", "hidden");
 
 	if (pListUI->GetHeader() && pListUI->GetHeader()->GetBkImage() && _tcslen(pListUI->GetHeader()->GetBkImage()) > 0)
-		pNode->SetAttribute("headerbkimage", StringConvertor::TcharToUtf8(pListUI->GetHeader()->GetBkImage()));	
+		pNode->SetAttribute("headerbkimage", StringConvertor::WideToUtf8(pListUI->GetHeader()->GetBkImage()));	
 
 	RECT rcTextPadding = pListUI->GetItemTextPadding();
 	if ((rcTextPadding.left != 0) || (rcTextPadding.right != 0) || (rcTextPadding.bottom != 0) || (rcTextPadding.top != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcTextPadding.left, rcTextPadding.top, rcTextPadding.right, rcTextPadding.bottom);
-		pNode->SetAttribute("itemtextpadding", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemtextpadding", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetItemTextColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetItemBkColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itembkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itembkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetSelectedItemTextColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetSelectedItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemselectedtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetSelectedItemBkColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetSelectedItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedbkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemselectedbkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetHotItemTextColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetHotItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhottextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemhottextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetHotItemBkColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetHotItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhotbkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemhotbkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetDisabledItemTextColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetDisabledItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemdisabledtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetDisabledItemBkColor() != 0)
 	{
 		DWORD dwColor = pListUI->GetDisabledItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledbkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemdisabledbkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetItemLineColor() != 0)
@@ -1554,20 +1536,20 @@ void CDesignerCanvas::Save_CListUI_Properties(CControlUI* pControlUI, TiXmlEleme
 		DWORD dwColor = pListUI->GetItemLineColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 
-		pNode->SetAttribute("itemlinecolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemlinecolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetItemImage() && _tcslen(pListUI->GetItemImage()) > 0)
-		pNode->SetAttribute("itemimage", StringConvertor::TcharToUtf8(pListUI->GetItemImage()));
+		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(pListUI->GetItemImage()));
 
 	if (pListUI->GetSelectedItemImage() && _tcslen(pListUI->GetSelectedItemImage()) > 0)
-		pNode->SetAttribute("itemselectedimage", StringConvertor::TcharToUtf8(pListUI->GetSelectedItemImage()));
+		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(pListUI->GetSelectedItemImage()));
 
 	if (pListUI->GetHotItemImage() && _tcslen(pListUI->GetHotItemImage()) > 0)
-		pNode->SetAttribute("itemhotimage", StringConvertor::TcharToUtf8(pListUI->GetHotItemImage()));
+		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(pListUI->GetHotItemImage()));
 
 	if (pListUI->GetDisabledItemImage() && _tcslen(pListUI->GetDisabledItemImage()) > 0)
-		pNode->SetAttribute("itemdisabledimage", StringConvertor::TcharToUtf8(pListUI->GetDisabledItemImage()));
+		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(pListUI->GetDisabledItemImage()));
 
 	if (pListUI->IsItemShowHtml())
 		pNode->SetAttribute("itemshowhtml",pListUI->IsItemShowHtml()?"true":"false");
@@ -1577,7 +1559,7 @@ void CDesignerCanvas::Save_CListUI_Properties(CControlUI* pControlUI, TiXmlEleme
 	if ((rcInset.left != 0) || (rcInset.right != 0) || (rcInset.bottom != 0) || (rcInset.top != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcInset.left, rcInset.top, rcInset.right, rcInset.bottom);
-		pNode->SetAttribute("inset", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("inset", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListUI->GetVerticalScrollbar())
@@ -1597,7 +1579,7 @@ void CDesignerCanvas::Save_CListUI_Properties(CControlUI* pControlUI, TiXmlEleme
 	}
 }
 
-void CDesignerCanvas::Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CControlUI_Properties(pControlUI, pNode);
 	CComboUI* pComboUI = static_cast<CComboUI*>(pControlUI->GetInterface(_T("Combo")));
@@ -1607,38 +1589,21 @@ void CDesignerCanvas::Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElem
 	if ((pComboUI->GetDropBoxSize().cx != 0) || (pComboUI->GetDropBoxSize().cy != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d"), pComboUI->GetDropBoxSize().cx, pComboUI->GetDropBoxSize().cy);
-		pNode->SetAttribute("dropboxsize", StringConvertor::TcharToUtf8(szBuf));
-	}
-
-	UINT dropType = pComboUI->GetDropType();
-	switch (dropType)
-	{
-	case CComboUI::COMBODROP_SIMPLE:
-		_stprintf(szBuf, _T("dropsimple"));
-		pNode->SetAttribute("droptype", StringConvertor::TcharToUtf8(szBuf));
-		break;
-	case CComboUI::COMBODROP_DOWN:
-		_stprintf(szBuf, _T("dropdown"));
-		pNode->SetAttribute("droptype", StringConvertor::TcharToUtf8(szBuf));
-		break;
-	case CComboUI::COMBODROP_LIST:
-		_stprintf(szBuf, _T("droplist"));
-		pNode->SetAttribute("droptype", StringConvertor::TcharToUtf8(szBuf));
-		break;
+		pNode->SetAttribute("dropboxsize", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	RECT rcItemPadding = pComboUI->GetItemTextPadding();
 	if ((rcItemPadding.left != 0) || (rcItemPadding.right != 0) || (rcItemPadding.bottom != 0) || (rcItemPadding.top != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcItemPadding.left, rcItemPadding.top, rcItemPadding.right, rcItemPadding.bottom);
-		pNode->SetAttribute("itemtextpadding", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemtextpadding", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetItemTextColor() != 0)
 	{
 		DWORD dwColor = pComboUI->GetItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemtextcolor", StringConvertor::WideToUtf8(szBuf));
 
 	}
 
@@ -1646,42 +1611,42 @@ void CDesignerCanvas::Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElem
 	{
 		DWORD dwColor = pComboUI->GetItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itembkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itembkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetSelectedItemTextColor() != 0)
 	{
 		DWORD dwColor = pComboUI->GetSelectedItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemselectedtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetSelectedItemBkColor() != 0)
 	{
 		DWORD dwColor = pComboUI->GetSelectedItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedbkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemselectedbkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetHotItemTextColor() != 0)
 	{
 		DWORD dwColor = pComboUI->GetHotItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhottextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemhottextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetHotItemBkColor() != 0)
 	{
 		DWORD dwColor = pComboUI->GetHotItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhotbkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemhotbkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetDisabledItemTextColor() != 0)
 	{
 		DWORD dwColor = pComboUI->GetDisabledItemTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledtextcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemdisabledtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetDisabledItemBkColor() != 0)
@@ -1689,30 +1654,27 @@ void CDesignerCanvas::Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElem
 
 		DWORD dwColor = pComboUI->GetDisabledItemBkColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledbkcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemdisabledbkcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetItemLineColor() != 0)
 	{
 		DWORD dwColor = pComboUI->GetItemLineColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemlinecolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("itemlinecolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pComboUI->GetItemImage() && _tcslen(pComboUI->GetItemImage()) > 0)
-		pNode->SetAttribute("itemimage", StringConvertor::TcharToUtf8(pComboUI->GetItemImage()));
+		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(pComboUI->GetItemImage()));
 
 	if (pComboUI->GetSelectedItemImage() && _tcslen(pComboUI->GetSelectedItemImage()) > 0)
-		pNode->SetAttribute("itemselectedimage", StringConvertor::TcharToUtf8(pComboUI->GetSelectedItemImage()));
+		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(pComboUI->GetSelectedItemImage()));
 
 	if (pComboUI->GetHotItemImage() && _tcslen(pComboUI->GetHotItemImage()) > 0)
-		pNode->SetAttribute("itemhotimage", StringConvertor::TcharToUtf8(pComboUI->GetHotItemImage()));
+		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(pComboUI->GetHotItemImage()));
 
 	if (pComboUI->GetDisabledItemImage() && _tcslen(pComboUI->GetDisabledItemImage()) > 0)
-		pNode->SetAttribute("itemdisabledimage", StringConvertor::TcharToUtf8(pComboUI->GetDisabledItemImage()));
-
-	if (pComboUI->GetDropBtnImage() && _tcslen(pComboUI->GetDropBtnImage()) > 0)
-		pNode->SetAttribute("dropbtnimage", StringConvertor::TcharToUtf8(pComboUI->GetDropBtnImage()));
+		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(pComboUI->GetDisabledItemImage()));
 
 	if (pComboUI->IsItemShowHtml())
 		pNode->SetAttribute("itemshowhtml",pComboUI->IsItemShowHtml()?"true":"false");
@@ -1722,11 +1684,11 @@ void CDesignerCanvas::Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElem
 	if ((rcInset.left != 0) || (rcInset.right != 0) || (rcInset.bottom != 0) || (rcInset.top != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcInset.left, rcInset.top, rcInset.right, rcInset.bottom);
-		pNode->SetAttribute("inset", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("inset", StringConvertor::WideToUtf8(szBuf));
 	}
 }
 
-void CDesignerCanvas::Save_CListHeaderItemUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CListHeaderItemUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CControlUI_Properties(pControlUI, pNode);
 
@@ -1738,19 +1700,19 @@ void CDesignerCanvas::Save_CListHeaderItemUI_Properties(CControlUI* pControlUI, 
 	{
 		DWORD dwColor = pListHeaderItemUI->GetTextColor();					
 		_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("textcolor", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("textcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (pListHeaderItemUI->GetSepWidth() != 0)
 	{
 		_stprintf(szBuf, _T("%d"), pListHeaderItemUI->GetSepWidth());
-		pNode->SetAttribute("sepwidth", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("sepwidth", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	if (!pListHeaderItemUI->IsDragable())
 		pNode->SetAttribute("dragable", "false");
 
-	tString tstrAlgin;
+	std::wstring tstrAlgin;
 	UINT uTextStyle = pListHeaderItemUI->GetTextStyle();
 
 	if (uTextStyle & DT_LEFT)
@@ -1772,30 +1734,30 @@ void CDesignerCanvas::Save_CListHeaderItemUI_Properties(CControlUI* pControlUI, 
 		tstrAlgin += _T("wrap");
 
 	if (!tstrAlgin.empty())
-		pNode->SetAttribute("align", StringConvertor::TcharToUtf8(tstrAlgin.c_str()));
+		pNode->SetAttribute("align", StringConvertor::WideToUtf8(tstrAlgin.c_str()));
 
 	if (pListHeaderItemUI->GetNormalImage() && _tcslen(pListHeaderItemUI->GetNormalImage()) > 0)
-		pNode->SetAttribute("normalimage", StringConvertor::TcharToUtf8(pListHeaderItemUI->GetNormalImage()));
+		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetNormalImage()));
 
 	if (pListHeaderItemUI->GetHotImage() && _tcslen(pListHeaderItemUI->GetHotImage()) > 0)
-		pNode->SetAttribute("hotimage", StringConvertor::TcharToUtf8(pListHeaderItemUI->GetHotImage()));
+		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetHotImage()));
 
 	if (pListHeaderItemUI->GetPushedImage() && _tcslen(pListHeaderItemUI->GetPushedImage()) > 0)
-		pNode->SetAttribute("pushedimage", StringConvertor::TcharToUtf8(pListHeaderItemUI->GetPushedImage()));
+		pNode->SetAttribute("pushedimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetPushedImage()));
 
 	if (pListHeaderItemUI->GetFocusedImage() && _tcslen(pListHeaderItemUI->GetFocusedImage()) > 0)
-		pNode->SetAttribute("focusedimage", StringConvertor::TcharToUtf8(pListHeaderItemUI->GetFocusedImage()));
+		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetFocusedImage()));
 
 	if (pListHeaderItemUI->GetSepImage() && _tcslen(pListHeaderItemUI->GetSepImage()) > 0)
-		pNode->SetAttribute("sepimage", StringConvertor::TcharToUtf8(pListHeaderItemUI->GetSepImage()));
+		pNode->SetAttribute("sepimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetSepImage()));
 }
 
-void CDesignerCanvas::Save_CListElementUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CListElementUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CControlUI_Properties(pControlUI, pNode);
 }
 
-void CDesignerCanvas::Save_CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
+void CLayoutManager::Save_CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode)
 {
 	Save_CControlUI_Properties(pControlUI, pNode);
 	CContainerUI* pContainerUI = static_cast<CContainerUI*>(pControlUI->GetInterface(_T("Container")));
@@ -1806,16 +1768,18 @@ void CDesignerCanvas::Save_CContainerUI_Properties(CControlUI* pControlUI, TiXml
 	if ((rcInset.left != 0) || (rcInset.right != 0) || (rcInset.bottom != 0) || (rcInset.top != 0))
 	{
 		_stprintf(szBuf, _T("%d,%d,%d,%d"), rcInset.left, rcInset.top, rcInset.right, rcInset.bottom);
-		pNode->SetAttribute("inset", StringConvertor::TcharToUtf8(szBuf));
+		pNode->SetAttribute("inset", StringConvertor::WideToUtf8(szBuf));
 	}
 }
 
-void CDesignerCanvas::Save_ContainerProperties(CControlUI* pControlUI, TiXmlElement* pParentNode)
+void CLayoutManager::Save_ContainerProperties(CControlUI* pControlUI, TiXmlElement* pParentNode)
 {
 	TiXmlElement* pNode = NULL;
 	if ((static_cast<IContainerUI*>(pControlUI->GetInterface(_T("IContainer"))) != NULL) && (static_cast<CContainerUI*>(pControlUI->GetInterface(_T("Container"))) != NULL))
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 
 		if (_tcsicmp(pControlUI->GetClass(), _T("ListUI")) == 0)
@@ -1841,90 +1805,118 @@ void CDesignerCanvas::Save_ContainerProperties(CControlUI* pControlUI, TiXmlElem
 	}
 }
 
-void CDesignerCanvas::Save_SingleProperties(CControlUI* pControlUI, TiXmlElement* pParentNode)
+void CLayoutManager::Save_SingleProperties(CControlUI* pControlUI, TiXmlElement* pParentNode)
 {
 	TiXmlElement* pNode = NULL;
 	if (_tcsicmp(pControlUI->GetClass(), _T("ControlUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CControlUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("LabelUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CLabelUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("TextUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CLabelUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ButtonUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CButtonUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("OptionUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_COptionUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ProgressUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CProgressUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("SliderUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CSliderUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("EditUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CEditUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ScrollbarUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CScrollbarUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ListHeaderItemUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CListHeaderItemUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ListElementUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CListElementUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ListLabelElementUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CListElementUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ListTextElementUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CListElementUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
 	else if (_tcsicmp(pControlUI->GetClass(), _T("ListExpandElementUI")) == 0)
 	{
-		pNode = new TiXmlElement(StringConvertor::TcharToUtf8(pControlUI->GetTypeName()));		
+		CString class_name = pControlUI->GetClass();
+		class_name = class_name.Mid(0, class_name.GetLength() - 2);
+		pNode = new TiXmlElement(StringConvertor::WideToUtf8(class_name.GetBuffer()));		
 		Save_CListElementUI_Properties(pControlUI, pNode);
 		TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	}
@@ -1936,7 +1928,7 @@ void CDesignerCanvas::Save_SingleProperties(CControlUI* pControlUI, TiXmlElement
 	}
 }
 
-void CDesignerCanvas::Save_Properties(CControlUI* pControlUI, TiXmlElement* pParentNode)
+void CLayoutManager::Save_Properties(CControlUI* pControlUI, TiXmlElement* pParentNode)
 {
 	if ((pControlUI != NULL) && (pParentNode != NULL))
 	{
@@ -1950,6 +1942,7 @@ void CDesignerCanvas::Save_Properties(CControlUI* pControlUI, TiXmlElement* pPar
 		}
 	}
 }
+
 
 void CLayoutManager::SaveSkinFile()
 {
@@ -1976,54 +1969,54 @@ void CLayoutManager::SaveSkinFile()
 		{
 			//<Window sizebox="4,4,6,6" caption="0,0,0,30" mininfo="800,570" roundcorner="20,20,20,20">
 			CContainerUI* pContainerUI = static_cast<CContainerUI*>(pRoot->GetInterface(_T("Container")));
-			RECT rcSize = m_pm.GetSizeBox();
+			RECT rcSize = m_Manager.GetSizeBox();
 			if ((rcSize.left != 0) || (rcSize.right != 0) || (rcSize.bottom != 0) || (rcSize.top != 0))
 			{
 				_stprintf(szBuf, _T("%d,%d,%d,%d"), rcSize.left, rcSize.top, rcSize.right, rcSize.bottom);
-				pRootElm->SetAttribute("sizebox", StringConvertor::TcharToUtf8(szBuf));
+				pRootElm->SetAttribute("sizebox", StringConvertor::WideToUtf8(szBuf));
 			}
 			else
 				pRootElm->SetAttribute("sizebox", "4,4,6,6");
 
-			RECT rcCaption = m_pm.GetCaptionRect();
+			RECT rcCaption = m_Manager.GetCaptionRect();
 			if ((rcCaption.left != 0) || (rcCaption.right != 0) || (rcCaption.bottom != 0) || (rcCaption.top != 0))
 			{
 				_stprintf(szBuf, _T("%d,%d,%d,%d"), rcCaption.left, rcCaption.top, rcCaption.right, rcCaption.bottom);
-				pRootElm->SetAttribute("caption", StringConvertor::TcharToUtf8(szBuf));
+				pRootElm->SetAttribute("caption", StringConvertor::WideToUtf8(szBuf));
 			}
 			else
 				pRootElm->SetAttribute("caption", "0,0,0,30");
 
-			SIZE szRoundCorner = m_pm.GetRoundCorner();
+			SIZE szRoundCorner = m_Manager.GetRoundCorner();
 			if ((szRoundCorner.cx != 0) || (szRoundCorner.cy != 0))
 			{
 				_stprintf(szBuf, _T("%d,%d"), szRoundCorner.cx, szRoundCorner.cy);
-				pRootElm->SetAttribute("roundcorner", StringConvertor::TcharToUtf8(szBuf));
+				pRootElm->SetAttribute("roundcorner", StringConvertor::WideToUtf8(szBuf));
 			}
 
-			if ((m_formInfo.szCanvasSize.cx != 0) && (m_formInfo.szCanvasSize.cy != 0))
-			{
-				_stprintf(szBuf, _T("%d,%d"), m_formInfo.szCanvasSize.cx, m_formInfo.szCanvasSize.cy);
-				pRootElm->SetAttribute("size", StringConvertor::TcharToUtf8(szBuf));
+			//if ((m_formInfo.szCanvasSize.cx != 0) && (m_formInfo.szCanvasSize.cy != 0))
+			//{
+			//	_stprintf(szBuf, _T("%d,%d"), m_formInfo.szCanvasSize.cx, m_formInfo.szCanvasSize.cy);
+			//	pRootElm->SetAttribute("size", StringConvertor::WideToUtf8(szBuf));
 
-				_stprintf(szBuf, _T("%d,%d"), m_formInfo.szCanvasSize.cx, m_formInfo.szCanvasSize.cy);
-				pRootElm->SetAttribute("mininfo", StringConvertor::TcharToUtf8(szBuf));
-			}
-			else
-			{
-				pRootElm->SetAttribute("mininfo", "0,0,0,30");
-			}
-			pRootElm->SetAttribute("opacity", m_formInfo.bOpacity?"true":"false");
-			_stprintf(szBuf, _T("%d"), m_formInfo.dwTransparency);
-			pRootElm->SetAttribute("transparency", StringConvertor::TcharToUtf8(szBuf));
+			//	_stprintf(szBuf, _T("%d,%d"), m_formInfo.szCanvasSize.cx, m_formInfo.szCanvasSize.cy);
+			//	pRootElm->SetAttribute("mininfo", StringConvertor::WideToUtf8(szBuf));
+			//}
+			//else
+			//{
+			//	pRootElm->SetAttribute("mininfo", "0,0,0,30");
+			//}
+			//pRootElm->SetAttribute("opacity", m_formInfo.bOpacity?"true":"false");
+			//_stprintf(szBuf, _T("%d"), m_formInfo.dwTransparency);
+			//pRootElm->SetAttribute("transparency", StringConvertor::WideToUtf8(szBuf));
 		}
 		TiXmlNode* pNode = xmlDoc.InsertEndChild(*pRootElm);
 
-		if (m_pm.GetCustomFontCount() > 0)
+		if (m_Manager.GetCustomFontCount() > 0)
 		{
-			HFONT hDefaultLinkFont = m_pm.GetDefaultLinkFont();
-			HFONT hDefaultFont = m_pm.GetDefaultFont();
-			HFONT hDefaultBoldFont = m_pm.GetDefaultBoldFont();
+			HFONT hDefaultLinkFont = m_Manager.GetDefaultLinkFont();
+			HFONT hDefaultFont = m_Manager.GetDefaultFont();
+			HFONT hDefaultBoldFont = m_Manager.GetDefaultBoldFont();
 			LOGFONT lfDefault = {0};
 			LOGFONT lfDefaultLink = {0};
 			LOGFONT lfDefaultBold = {0};
@@ -2033,14 +2026,14 @@ void CLayoutManager::SaveSkinFile()
 
 			std::vector<LOGFONT> cachedFonts;
 
-			for (DWORD index = 0; index < m_pm.GetCustomFontCount(); ++index)
+			for (DWORD index = 0; index < m_Manager.GetCustomFontCount(); ++index)
 			{
-				HFONT hFont = m_pm.GetFont(index);
+				HFONT hFont = m_Manager.GetFont(index);
 				LOGFONT lf = {0};
 				GetObject(hFont, sizeof(LOGFONT), &lf);
 
 				bool bSaved = false;
-				for (vector<LOGFONT>::const_iterator citer = cachedFonts.begin(); citer != cachedFonts.end(); ++citer)
+				for (std::vector<LOGFONT>::const_iterator citer = cachedFonts.begin(); citer != cachedFonts.end(); ++citer)
 				{
 					if ((citer->lfWeight == lf.lfWeight) && (citer->lfItalic == lf.lfItalic) && (citer->lfHeight == lf.lfHeight)
 						&& (_tcsicmp(lf.lfFaceName, citer->lfFaceName) == 0))
@@ -2055,10 +2048,10 @@ void CLayoutManager::SaveSkinFile()
 				cachedFonts.push_back(lf);
 
 				TiXmlElement* pFontElem = new TiXmlElement("Font");
-				pFontElem->SetAttribute("name", StringConvertor::TcharToUtf8(lf.lfFaceName));
+				pFontElem->SetAttribute("name", StringConvertor::WideToUtf8(lf.lfFaceName));
 
 				_stprintf(szBuf, _T("%d"), -lf.lfHeight);
-				pFontElem->SetAttribute("size", StringConvertor::TcharToUtf8(szBuf));
+				pFontElem->SetAttribute("size", StringConvertor::WideToUtf8(szBuf));
 
 				pFontElem->SetAttribute("bold", (lf.lfWeight >= FW_BOLD)?"true":"false");
 				pFontElem->SetAttribute("italic", lf.lfItalic?"true":"false");
@@ -2077,20 +2070,20 @@ void CLayoutManager::SaveSkinFile()
 					&& (_tcsicmp(lf.lfFaceName, lfDefaultLink.lfFaceName) == 0))
 				{
 					pFontElem->SetAttribute("defaultlink", "true");
-					DWORD dwColor = m_pm.GetDefaultLinkFontColor();
+					DWORD dwColor = m_Manager.GetDefaultLinkFontColor();
 					TCHAR szBuf[MAX_PATH] = {0};
 
 					if (dwColor != 0)
 					{
 						_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-						pFontElem->SetAttribute("defaultlinkcolor", StringConvertor::TcharToUtf8(szBuf));
+						pFontElem->SetAttribute("defaultlinkcolor", StringConvertor::WideToUtf8(szBuf));
 					}
 
-					dwColor = m_pm.GetDefaultLinkFontHoverColor();
+					dwColor = m_Manager.GetDefaultLinkFontHoverColor();
 					if (dwColor != 0)
 					{
 						_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-						pFontElem->SetAttribute("defaultlinkhovercolor", StringConvertor::TcharToUtf8(szBuf));
+						pFontElem->SetAttribute("defaultlinkhovercolor", StringConvertor::WideToUtf8(szBuf));
 					}
 				}
 
@@ -2101,19 +2094,19 @@ void CLayoutManager::SaveSkinFile()
 			}
 		}
 
-		const CStdStringPtrMap& defaultAttrHash = m_pm.GetDefaultAttribultes();
+		const CStdStringPtrMap& defaultAttrHash = m_Manager.GetDefaultAttribultes();
 		if (defaultAttrHash.GetSize() > 0)
 		{
 			for (int index = 0; index < defaultAttrHash.GetSize(); ++index)
 			{
 				LPCTSTR lpstrKey = defaultAttrHash.GetAt(index);
-				LPCTSTR lpstrAttribute = m_pm.GetDefaultAttributeList(lpstrKey);
+				LPCTSTR lpstrAttribute = m_Manager.GetDefaultAttributeList(lpstrKey);
 
 				TiXmlElement* pAttributeElem = new TiXmlElement("Default");
-				pAttributeElem->SetAttribute("name", StringConvertor::TcharToUtf8(lpstrKey));
+				pAttributeElem->SetAttribute("name", StringConvertor::WideToUtf8(lpstrKey));
 
-				tString tstrAttribute(lpstrAttribute);
-				pAttributeElem->SetAttribute("value", StringConvertor::TcharToUtf8(tstrAttribute.c_str()));
+				std::wstring tstrAttribute(lpstrAttribute);
+				pAttributeElem->SetAttribute("value", StringConvertor::WideToUtf8(tstrAttribute.c_str()));
 
 				pNode->ToElement()->InsertEndChild(*pAttributeElem);
 

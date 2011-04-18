@@ -5,7 +5,7 @@ using DuiLib::CPaintManagerUI;
 using DuiLib::CWindowWnd;
 using DuiLib::TNotifyUI;
 
-//#define EXPORT_UI_SCRIPT
+#define EXPORT_UI_SCRIPT
 
 #if defined(EXPORT_UI_SCRIPT)
 #include "tinyxml.h"
