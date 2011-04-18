@@ -1771,7 +1771,12 @@ void CRichEditUI::DoPaint(HDC hDC, const RECT& rcPaint)
 
     CRenderClip clip;
     CRenderClip::GenerateClip(hDC, rcTemp, clip);
-    CControlUI::DoPaint(hDC, rcPaint);
+    if( m_cxyBorderRound.cx > 0 || m_cxyBorderRound.cy > 0 ) {
+        CRenderClip roundClip;
+        CRenderClip::GenerateRoundClip(hDC, rcTemp, m_rcItem, m_cxyBorderRound.cx, m_cxyBorderRound.cy, roundClip);
+        CControlUI::DoPaint(hDC, rcPaint);
+    }
+    else CControlUI::DoPaint(hDC, rcPaint);
 
     if( m_pTwh ) {
         RECT rc;
