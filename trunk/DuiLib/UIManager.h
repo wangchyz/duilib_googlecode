@@ -216,6 +216,7 @@ public:
     void SetDefaultSelectedBkColor(DWORD dwColor);
     TFontInfo* GetDefaultFontInfo();
     void SetDefaultFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
+    DWORD GetCustomFontCount() const;
     HFONT AddFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     HFONT AddFontAt(int index, LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     HFONT GetFont(int index);
