@@ -57,6 +57,8 @@ public:
     virtual void SetChildPadding(int iPadding);
     virtual bool IsAutoDestroy() const;
     virtual void SetAutoDestroy(bool bAuto);
+    virtual bool IsDelayedDestroy() const;
+    virtual void SetDelayedDestroy(bool bDelayed);
     virtual bool IsMouseChildEnabled() const;
     virtual void SetMouseChildEnabled(bool bEnable = true);
 
@@ -98,6 +100,7 @@ protected:
     RECT m_rcInset;
     int m_iChildPadding;
     bool m_bAutoDestroy;
+    bool m_bDelayedDestroy;
     bool m_bMouseChildEnabled;
     bool m_bScrollProcess; // ∑¿÷πSetPos—≠ª∑µ˜”√
 

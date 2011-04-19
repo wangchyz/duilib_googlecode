@@ -9,6 +9,7 @@ namespace DuiLib {
 CContainerUI::CContainerUI() : 
 m_iChildPadding(0),
 m_bAutoDestroy(true),
+m_bDelayedDestroy(false),
 m_bMouseChildEnabled(true),
 m_pVerticalScrollbar(NULL),
 m_pHorizontalScrollbar(NULL),
@@ -98,8 +99,10 @@ bool CContainerUI::Remove(CControlUI* pControl)
     for( int it = 0; it < m_items.GetSize(); it++ ) {
         if( static_cast<CControlUI*>(m_items[it]) == pControl ) {
             NeedUpdate();
-
-            if (m_bAutoDestroy) delete pControl;
+            if( m_bAutoDestroy ) {
+                if( m_bDelayedDestroy && m_pManager ) m_pManager->AddDelayedCleanup(pControl);             
+                else delete pControl;
+            }
             return m_items.Remove(it);
         }
     }
@@ -118,7 +121,10 @@ bool CContainerUI::RemoveAt(int iIndex)
 
 void CContainerUI::RemoveAll()
 {
-    for( int it = 0; m_bAutoDestroy && it < m_items.GetSize(); it++ ) delete static_cast<CControlUI*>(m_items[it]);
+    for( int it = 0; m_bAutoDestroy && it < m_items.GetSize(); it++ ) {
+        if( m_bDelayedDestroy && m_pManager ) m_pManager->AddDelayedCleanup(static_cast<CControlUI*>(m_items[it]));             
+        else delete static_cast<CControlUI*>(m_items[it]);
+    }
     m_items.Empty();
     NeedUpdate();
 }
@@ -131,6 +137,16 @@ bool CContainerUI::IsAutoDestroy() const
 void CContainerUI::SetAutoDestroy(bool bAuto)
 {
     m_bAutoDestroy = bAuto;
+}
+
+bool CContainerUI::IsDelayedDestroy() const
+{
+    return m_bDelayedDestroy;
+}
+
+void CContainerUI::SetDelayedDestroy(bool bDelayed)
+{
+    m_bDelayedDestroy = bDelayed;
 }
 
 RECT CContainerUI::GetInset() const
