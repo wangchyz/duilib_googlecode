@@ -84,6 +84,7 @@ void CRenderClip::GenerateRoundClip(HDC hDC, RECT rc, RECT rcItem, int width, in
     ::ExtSelectClipRgn(hDC, clip.hRgn, RGN_AND);
     clip.hDC = hDC;
     clip.rcItem = rc;
+    ::DeleteObject(hRgnItem);
 }
 
 void CRenderClip::UseOldClipBegin(HDC hDC, CRenderClip& clip)
