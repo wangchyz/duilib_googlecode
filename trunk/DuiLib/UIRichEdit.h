@@ -27,6 +27,8 @@ public:
     void SetRich(bool bRich = true);
     bool IsReadOnly();
     void SetReadOnly(bool bReadOnly = true);
+    bool GetWordWrap();
+    void SetWordWrap(bool bWordWrap = true);
     int GetFont();
     void SetFont(int index);
     void SetFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
@@ -43,10 +45,26 @@ public:
     void SetModify(bool bModified = true) const;
     void GetSel(CHARRANGE &cr) const;
     void GetSel(long& nStartChar, long& nEndChar) const;
-    void SetSel(CHARRANGE &cr);
-    void SetSel(long nStartChar, long nEndChar);
+    int SetSel(CHARRANGE &cr);
+    int SetSel(long nStartChar, long nEndChar);
     void ReplaceSel(LPCTSTR lpszNewText, bool bCanUndo);
+    void ReplaceSelW(LPCWSTR lpszNewText, bool bCanUndo = false);
     CStdString GetSelText() const;
+    int SetSelAll();
+    int SetSelNone();
+    WORD GetSelectionType() const;
+    bool GetZoom(int& nNum, int& nDen) const;
+    bool SetZoom(int nNum, int nDen);
+    bool SetZoomOff();
+    bool GetAutoURLDetect() const;
+    bool SetAutoURLDetect(bool bAutoDetect = true);
+    DWORD GetEventMask() const;
+    DWORD SetEventMask(DWORD dwEventMask);
+    CStdString GetTextRange(long nStartChar, long nEndChar) const;
+    void HideSelection(bool bHide = true, bool bChangeStyle = false);
+    void ScrollCaret();
+    int InsertText(long nInsertAfterChar, LPCTSTR lpstrText, bool bCanUndo = false);
+    int AppendText(LPCTSTR lpstrText, bool bCanUndo = false);
     DWORD GetDefaultCharFormat(CHARFORMAT2 &cf) const;
     bool SetDefaultCharFormat(CHARFORMAT2 &cf);
     DWORD GetSelectionCharFormat(CHARFORMAT2 &cf) const;
@@ -61,11 +79,14 @@ public:
     void Cut();
     void Paste();
     int GetLineCount() const;
+    CStdString GetLine(int nIndex, int nMaxLength) const;
+    int LineIndex(int nLine = -1) const;
+    int LineLength(int nLine = -1) const;
+    bool LineScroll(int nLines, int nChars = 0);
 	CPoint GetCharPos(long lChar) const;
     long LineFromChar(long nIndex) const;
     CPoint PosFromChar(UINT nChar) const;
     int CharFromPos(CPoint pt) const;
-    bool SetAutoURLDetect(bool bEnable = true);
     void EmptyUndoBuffer();
     UINT SetUndoLimit(UINT nLimit);
     long StreamIn(int nFormat, EDITSTREAM &es);
@@ -75,8 +96,9 @@ public:
     // 注意：TxSendMessage和SendMessage是有区别的，TxSendMessage没有multibyte和unicode自动转换的功能，
     // 而richedit2.0内部是以unicode实现的，在multibyte程序中，必须自己处理unicode到multibyte的转换
     virtual HRESULT TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plresult) const; 
-    IDropTarget* GetDropTarget();
-    virtual bool OnViewChanged();
+    IDropTarget* GetTxDropTarget();
+    virtual bool OnTxViewChanged();
+    virtual void OnTxNotify(DWORD iNotify, void *pv);
 
     void SetScrollPos(SIZE szPos);
     void LineUp();
@@ -109,6 +131,7 @@ protected:
     bool m_bWantCtrlReturn;
     bool m_bRich;
     bool m_bReadOnly;
+    bool m_bWordWrap;
     DWORD m_dwTextColor;
     int m_iFont;
     int m_iLimitText;

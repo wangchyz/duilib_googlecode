@@ -500,7 +500,7 @@ void CTxtWinHost::TxInvalidateRect(LPCRECT prc, BOOL fMode)
 
 void CTxtWinHost::TxViewChange(BOOL fUpdate) 
 {
-    if( m_re->OnViewChanged() )
+    if( m_re->OnTxViewChanged() )
         ::UpdateWindow(m_re->GetManager()->GetPaintWindow());
 }
 
@@ -710,17 +710,16 @@ HRESULT CTxtWinHost::TxGetPropertyBits(DWORD dwMask, DWORD *pdwBits)
 
 HRESULT CTxtWinHost::TxNotify(DWORD iNotify, void *pv)
 {
-    if( iNotify == EN_REQUESTRESIZE )
-    {
+    if( iNotify == EN_REQUESTRESIZE ) {
         RECT rc;
         REQRESIZE *preqsz = (REQRESIZE *)pv;
-
         GetControlRect(&rc);
         rc.bottom = rc.top + preqsz->rc.bottom;
         rc.right  = rc.left + preqsz->rc.right;
         SetClientRect(&rc);
         return S_OK;
     }
+    m_re->OnTxNotify(iNotify, pv);
     return S_OK;
 }
 
@@ -1033,7 +1032,7 @@ void CTxtWinHost::SetParaFormat(PARAFORMAT2 &p)
 //
 
 CRichEditUI::CRichEditUI() : m_pTwh(NULL), m_bVScrollbarFixing(false), m_bWantTab(true), m_bWantReturn(true), 
-    m_bWantCtrlReturn(true), m_bRich(true), m_bReadOnly(false), m_dwTextColor(0), m_iFont(-1), 
+    m_bWantCtrlReturn(true), m_bRich(true), m_bReadOnly(false), m_bWordWrap(false), m_dwTextColor(0), m_iFont(-1), 
     m_iLimitText(cInitTextMax), m_lTwhStyle(ES_MULTILINE)
 {
 }
@@ -1114,6 +1113,17 @@ void CRichEditUI::SetReadOnly(bool bReadOnly)
 {
     m_bReadOnly = bReadOnly;
     if( m_pTwh ) m_pTwh->SetReadOnly(bReadOnly);
+}
+
+bool CRichEditUI::GetWordWrap()
+{
+    return m_bWordWrap;
+}
+
+void CRichEditUI::SetWordWrap(bool bWordWrap)
+{
+    m_bWordWrap = bWordWrap;
+    if( m_pTwh ) m_pTwh->SetWordWrap(bWordWrap);
 }
 
 int CRichEditUI::GetFont()
@@ -1255,17 +1265,21 @@ void CRichEditUI::GetSel(long& nStartChar, long& nEndChar) const
     nEndChar = cr.cpMax;
 }
 
-void CRichEditUI::SetSel(CHARRANGE &cr)
+int CRichEditUI::SetSel(CHARRANGE &cr)
 { 
-    TxSendMessage(EM_EXSETSEL, 0, (LPARAM)&cr, 0); 
+    LRESULT lResult;
+    TxSendMessage(EM_EXSETSEL, 0, (LPARAM)&cr, &lResult); 
+    return (int)lResult;
 }
 
-void CRichEditUI::SetSel(long nStartChar, long nEndChar)
+int CRichEditUI::SetSel(long nStartChar, long nEndChar)
 {
     CHARRANGE cr;
     cr.cpMin = nStartChar;
     cr.cpMax = nEndChar;
-    TxSendMessage(EM_EXSETSEL, 0, (LPARAM)&cr, 0); 
+    LRESULT lResult;
+    TxSendMessage(EM_EXSETSEL, 0, (LPARAM)&cr, &lResult); 
+    return (int)lResult;
 }
 
 void CRichEditUI::ReplaceSel(LPCTSTR lpszNewText, bool bCanUndo)
@@ -1282,6 +1296,11 @@ void CRichEditUI::ReplaceSel(LPCTSTR lpszNewText, bool bCanUndo)
 #endif
 }
 
+void CRichEditUI::ReplaceSelW(LPCWSTR lpszNewText, bool bCanUndo)
+{
+    TxSendMessage(EM_REPLACESEL, (WPARAM) bCanUndo, (LPARAM)lpszNewText, 0); 
+}
+
 CStdString CRichEditUI::GetSelText() const
 {
     if( !m_pTwh ) return CStdString();
@@ -1296,6 +1315,114 @@ CStdString CRichEditUI::GetSelText() const
     sText = (LPCWSTR)lpText;
     delete lpText;
     return sText;
+}
+
+int CRichEditUI::SetSelAll()
+{
+    return SetSel(0, -1);
+}
+
+int CRichEditUI::SetSelNone()
+{
+    return SetSel(-1, 0);
+}
+
+bool CRichEditUI::GetZoom(int& nNum, int& nDen) const
+{
+    LRESULT lResult;
+    TxSendMessage(EM_GETZOOM, (WPARAM)&nNum, (LPARAM)&nDen, &lResult);
+    return (BOOL)lResult == TRUE;
+}
+
+bool CRichEditUI::SetZoom(int nNum, int nDen)
+{
+    if (nNum < 0 || nNum > 64) return false;
+    if (nDen < 0 || nDen > 64) return false;
+    LRESULT lResult;
+    TxSendMessage(EM_SETZOOM, nNum, nDen, &lResult);
+    return (BOOL)lResult == TRUE;
+}
+
+bool CRichEditUI::SetZoomOff()
+{
+    LRESULT lResult;
+    TxSendMessage(EM_SETZOOM, 0, 0, &lResult);
+    return (BOOL)lResult == TRUE;
+}
+
+WORD CRichEditUI::GetSelectionType() const
+{
+    LRESULT lResult;
+    TxSendMessage(EM_SELECTIONTYPE, 0, 0, &lResult);
+    return (WORD)lResult;
+}
+
+bool CRichEditUI::GetAutoURLDetect() const
+{
+    LRESULT lResult;
+    TxSendMessage(EM_GETAUTOURLDETECT, 0, 0, &lResult);
+    return (BOOL)lResult == TRUE;
+}
+
+bool CRichEditUI::SetAutoURLDetect(bool bAutoDetect)
+{
+    LRESULT lResult;
+    TxSendMessage(EM_AUTOURLDETECT, bAutoDetect, 0, &lResult);
+    return (BOOL)lResult == FALSE;
+}
+
+DWORD CRichEditUI::GetEventMask() const
+{
+    LRESULT lResult;
+    TxSendMessage(EM_GETEVENTMASK, 0, 0, &lResult);
+    return (DWORD)lResult;
+}
+
+DWORD CRichEditUI::SetEventMask(DWORD dwEventMask)
+{
+    LRESULT lResult;
+    TxSendMessage(EM_SETEVENTMASK, 0, dwEventMask, &lResult);
+    return (DWORD)lResult;
+}
+
+CStdString CRichEditUI::GetTextRange(long nStartChar, long nEndChar) const
+{
+    TEXTRANGEW tr = { 0 };
+    tr.chrg.cpMin = nStartChar;
+    tr.chrg.cpMax = nEndChar;
+    LPWSTR lpText = NULL;
+    lpText = new WCHAR[nEndChar - nStartChar + 1];
+    ::ZeroMemory(lpText, (nEndChar - nStartChar + 1) * sizeof(WCHAR));
+    tr.lpstrText = lpText;
+    TxSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)&tr, 0);
+    CStdString sText;
+    sText = (LPCWSTR)lpText;
+    delete lpText;
+    return sText;
+}
+
+void CRichEditUI::HideSelection(bool bHide, bool bChangeStyle)
+{
+    TxSendMessage(EM_HIDESELECTION, bHide, bChangeStyle, 0);
+}
+
+void CRichEditUI::ScrollCaret()
+{
+    TxSendMessage(EM_SCROLLCARET, 0, 0, 0);
+}
+
+int CRichEditUI::InsertText(long nInsertAfterChar, LPCTSTR lpstrText, bool bCanUndo)
+{
+    int nRet = SetSel(nInsertAfterChar, nInsertAfterChar);
+    ReplaceSel(lpstrText, bCanUndo);
+    return nRet;
+}
+
+int CRichEditUI::AppendText(LPCTSTR lpstrText, bool bCanUndo)
+{
+    int nRet = SetSel(-1, -1);
+    ReplaceSel(lpstrText, bCanUndo);
+    return nRet;
 }
 
 DWORD CRichEditUI::GetDefaultCharFormat(CHARFORMAT2 &cf) const
@@ -1413,6 +1540,40 @@ int CRichEditUI::GetLineCount() const
     return (int)lResult; 
 }
 
+CStdString CRichEditUI::GetLine(int nIndex, int nMaxLength) const
+{
+    LPWSTR lpText = NULL;
+    lpText = new WCHAR[nMaxLength + 1];
+    ::ZeroMemory(lpText, (nMaxLength + 1) * sizeof(WCHAR));
+    *(LPWORD)lpText = (WORD)nMaxLength;
+    TxSendMessage(EM_GETLINE, nIndex, (LPARAM)lpText, 0);
+    CStdString sText;
+    sText = (LPCWSTR)lpText;
+    delete lpText;
+    return sText;
+}
+
+int CRichEditUI::LineIndex(int nLine) const
+{
+    LRESULT lResult;
+    TxSendMessage(EM_LINEINDEX, nLine, 0, &lResult);
+    return (int)lResult;
+}
+
+int CRichEditUI::LineLength(int nLine) const
+{
+    LRESULT lResult;
+    TxSendMessage(EM_LINELENGTH, nLine, 0, &lResult);
+    return (int)lResult;
+}
+
+bool CRichEditUI::LineScroll(int nLines, int nChars)
+{
+    LRESULT lResult;
+    TxSendMessage(EM_LINESCROLL, nChars, nLines, &lResult);
+    return (BOOL)lResult == TRUE;
+}
+
 CPoint CRichEditUI::GetCharPos(long lChar) const
 { 
     CPoint pt; 
@@ -1442,14 +1603,6 @@ int CRichEditUI::CharFromPos(CPoint pt) const
     LRESULT lResult;
     TxSendMessage(EM_CHARFROMPOS, 0, (LPARAM)&ptl, &lResult);
     return (int)lResult; 
-}
-
-bool CRichEditUI::SetAutoURLDetect(bool bEnable /* = true */)
-{ 
-    if( !m_pTwh ) return false;
-    LRESULT lResult;
-    TxSendMessage(EM_AUTOURLDETECT, (WPARAM) bEnable, 0, &lResult);
-    return (BOOL)lResult == TRUE; 
 }
 
 void CRichEditUI::EmptyUndoBuffer()
@@ -1514,16 +1667,20 @@ HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESU
     return S_FALSE;
 }
 
-IDropTarget* CRichEditUI::GetDropTarget()
+IDropTarget* CRichEditUI::GetTxDropTarget()
 {
     IDropTarget *pdt = NULL;
     if( m_pTwh->GetTextServices()->TxGetDropTarget(&pdt) == NOERROR ) return pdt;
     return NULL;
 }
 
-bool CRichEditUI::OnViewChanged()
+bool CRichEditUI::OnTxViewChanged()
 {
     return true;
+}
+
+void CRichEditUI::OnTxNotify(DWORD iNotify, void *pv)
+{
 }
 
 // 多行非rich格式的richedit有一个滚动条bug，在最后一行是空行时，LineDown和SetScrollPos无法滚动到最后

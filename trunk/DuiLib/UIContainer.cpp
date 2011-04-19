@@ -891,12 +891,9 @@ void CVerticalLayoutUI::SetPos(RECT rc)
             cyFixedRemaining -= sz.cy;
         }
 
-        //if(sz.cx == 0) {
-        //     sz.cx = MAX(0, rc.right - rc.left - rcPadding.left - rcPadding.right);
-        //}
-
-        sz.cx = MAX(0, szAvailable.cx - rcPadding.left - rcPadding.right);
-
+        sz.cx = pControl->GetFixedWidth();
+        if( sz.cx == 0 ) sz.cx = szAvailable.cx - rcPadding.left - rcPadding.right;
+        if( sz.cx < 0 ) sz.cx = 0;
         if( sz.cx < pControl->GetMinWidth() ) sz.cx = pControl->GetMinWidth();
         if( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
 
@@ -1167,12 +1164,9 @@ void CHorizontalLayoutUI::SetPos(RECT rc)
             cxFixedRemaining -= sz.cx;
         }
 
-        //if(sz.cy == 0) {
-        //    sz.cy = MAX(0, rc.bottom - rc.top - rcPadding.top - rcPadding.bottom);
-        //}
-
-        sz.cy = MAX(0, rc.bottom - rc.top - rcPadding.top - rcPadding.bottom);
-
+        sz.cy = pControl->GetFixedHeight();
+        if( sz.cy == 0 ) sz.cy = rc.bottom - rc.top - rcPadding.top - rcPadding.bottom;
+        if( sz.cy < 0 ) sz.cy = 0;
         if( sz.cy < pControl->GetMinHeight() ) sz.cy = pControl->GetMinHeight();
         if( sz.cy > pControl->GetMaxHeight() ) sz.cy = pControl->GetMaxHeight();
 
