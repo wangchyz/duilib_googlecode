@@ -110,7 +110,7 @@ void CImagePreview::SetImageProperty(LPCTSTR pstrImage,CRect& rcDest,CRect& rcSo
 	else
 		m_strProperty.Empty();
 
-	TImageInfo* pImage=m_pManager->GetImageEx(pstrImage,NULL,clrMask);
+	const TImageInfo* pImage=m_pManager->GetImageEx(pstrImage,NULL,clrMask);
 	if(pImage)
 	{
 		CRect rcClient;
