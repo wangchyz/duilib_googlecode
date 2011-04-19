@@ -16,6 +16,16 @@ public:
     void Notify(TNotifyUI& msg)
     {
         if( msg.sType == _T("windowinit") ) OnPrepare();
+        else if( msg.sType == _T("click") ) {
+            if( msg.pSender->GetName() == _T("insertimagebtn") ) {
+                CRichEditUI* pRich = static_cast<CRichEditUI*>(m_pm.FindControl(_T("testrichedit")));
+                if( pRich ) {
+                    pRich->SetDelayedDestroy(true);
+                    pRich->RemoveAll();
+                    pRich->SetDelayedDestroy(false);
+                }
+            }
+        }
     }
 
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)

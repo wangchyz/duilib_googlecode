@@ -953,8 +953,7 @@ bool CPaintManagerUI::AttachDialog(CControlUI* pControl)
     // pull the internal memory of the calling code. We'll delay the cleanup.
     if( m_pRoot != NULL ) {
         m_aPostPaintControls.Empty();
-        m_aDelayedCleanup.Add(m_pRoot);
-        ::PostMessage(m_hWndPaint, WM_APP + 1, 0, 0L);
+        AddDelayedCleanup(m_pRoot);
     }
     // Set the dialog root element
     m_pRoot = pControl;
@@ -1230,6 +1229,12 @@ bool CPaintManagerUI::SetPostPaintIndex(CControlUI* pControl, int iIndex)
 {
     RemovePostPaint(pControl);
     return m_aPostPaintControls.InsertAt(iIndex, pControl);
+}
+
+void CPaintManagerUI::AddDelayedCleanup(CControlUI* pControl)
+{
+    m_aDelayedCleanup.Add(pControl);
+    ::PostMessage(m_hWndPaint, WM_APP + 1, 0, 0L);
 }
 
 void CPaintManagerUI::SendNotify(CControlUI* pControl, LPCTSTR pstrMessage, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)

@@ -273,6 +273,8 @@ public:
     bool RemovePostPaint(CControlUI* pControl);
     bool SetPostPaintIndex(CControlUI* pControl, int iIndex);
 
+    void AddDelayedCleanup(CControlUI* pControl);
+
     CControlUI* GetRoot() const;
     CControlUI* FindControl(POINT pt) const;
     CControlUI* FindControl(LPCTSTR pstrName);
