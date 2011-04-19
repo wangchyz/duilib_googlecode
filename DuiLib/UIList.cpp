@@ -315,7 +315,7 @@ void CListUI::DoEvent(TEventUI& event)
         }
         break;
     }
-    CControlUI::DoEvent(event);
+    CVerticalLayoutUI::DoEvent(event);
 }
 
 CListHeaderUI* CListUI::GetHeader() const
