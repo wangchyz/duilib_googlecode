@@ -2014,15 +2014,10 @@ void CLayoutManager::SaveSkinFile()
 
 		if (m_Manager.GetCustomFontCount() > 0)
 		{
-			HFONT hDefaultLinkFont = m_Manager.GetDefaultLinkFont();
-			HFONT hDefaultFont = m_Manager.GetDefaultFont();
-			HFONT hDefaultBoldFont = m_Manager.GetDefaultBoldFont();
+			TFontInfo* default_info = m_Manager.GetDefaultFontInfo();
+			HFONT hDefaultFont = default_info->hFont;
 			LOGFONT lfDefault = {0};
-			LOGFONT lfDefaultLink = {0};
-			LOGFONT lfDefaultBold = {0};
 			GetObject(hDefaultFont, sizeof(LOGFONT), &lfDefault);
-			GetObject(hDefaultLinkFont, sizeof(LOGFONT), &lfDefaultLink);
-			GetObject(hDefaultBoldFont, sizeof(LOGFONT), &lfDefaultBold);
 
 			std::vector<LOGFONT> cachedFonts;
 
@@ -2059,33 +2054,6 @@ void CLayoutManager::SaveSkinFile()
 				if ((lfDefault.lfWeight == lf.lfWeight) && (lfDefault.lfItalic == lf.lfItalic) && (lfDefault.lfHeight == lf.lfHeight)
 					&& (_tcsicmp(lf.lfFaceName, lfDefault.lfFaceName) == 0))
 					pFontElem->SetAttribute("default", "true");
-
-				if ((lfDefaultBold.lfWeight == lf.lfWeight) && (lfDefaultBold.lfItalic == lf.lfItalic) && (lfDefaultBold.lfHeight == lf.lfHeight)
-					&& (_tcsicmp(lf.lfFaceName, lfDefaultBold.lfFaceName) == 0))
-				{
-					pFontElem->SetAttribute("defaultbold", "true");
-				}
-
-				if ((lfDefaultLink.lfWeight == lf.lfWeight) && (lfDefaultLink.lfItalic == lf.lfItalic) && (lfDefaultLink.lfHeight == lf.lfHeight)
-					&& (_tcsicmp(lf.lfFaceName, lfDefaultLink.lfFaceName) == 0))
-				{
-					pFontElem->SetAttribute("defaultlink", "true");
-					DWORD dwColor = m_Manager.GetDefaultLinkFontColor();
-					TCHAR szBuf[MAX_PATH] = {0};
-
-					if (dwColor != 0)
-					{
-						_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-						pFontElem->SetAttribute("defaultlinkcolor", StringConvertor::WideToUtf8(szBuf));
-					}
-
-					dwColor = m_Manager.GetDefaultLinkFontHoverColor();
-					if (dwColor != 0)
-					{
-						_stprintf(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-						pFontElem->SetAttribute("defaultlinkhovercolor", StringConvertor::WideToUtf8(szBuf));
-					}
-				}
 
 				pNode->ToElement()->InsertEndChild(*pFontElem);
 
