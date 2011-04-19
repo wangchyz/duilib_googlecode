@@ -1368,6 +1368,11 @@ void CPaintManagerUI::SetDefaultFont(LPCTSTR pStrFontName, int nSize, bool bBold
     }
 }
 
+DWORD CPaintManagerUI::GetCustomFontCount() const
+{
+    return m_aCustomFonts.GetSize();
+}
+
 HFONT CPaintManagerUI::AddFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic)
 {
     LOGFONT lf = { 0 };

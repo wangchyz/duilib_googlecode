@@ -68,8 +68,6 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
                     bool underline = false;
                     bool italic = false;
                     bool defaultfont = false;
-                    bool defaultboldfont = false;
-                    bool defaultlinkfont = false;
                     for( int i = 0; i < nAttributes; i++ ) {
                         pstrName = node.GetAttributeName(i);
                         pstrValue = node.GetAttributeValue(i);
@@ -166,6 +164,36 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
                     } 
                     else if( _tcscmp(pstrName, _T("bktrans")) == 0 ) {
                         pManager->SetBackgroundTransparent(_tcscmp(pstrValue, _T("true")) == 0);
+                    } 
+                    else if( _tcscmp(pstrName, _T("disabledfontcolor")) == 0 ) {
+                        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+                        LPTSTR pstr = NULL;
+                        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+                        pManager->SetDefaultDisabledColor(clrColor);
+                    } 
+                    else if( _tcscmp(pstrName, _T("defaultfontcolor")) == 0 ) {
+                        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+                        LPTSTR pstr = NULL;
+                        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+                        pManager->SetDefaultFontColor(clrColor);
+                    }
+                    else if( _tcscmp(pstrName, _T("linkfontcolor")) == 0 ) {
+                        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+                        LPTSTR pstr = NULL;
+                        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+                        pManager->SetDefaultLinkFontColor(clrColor);
+                    } 
+                    else if( _tcscmp(pstrName, _T("linkhoverfontcolor")) == 0 ) {
+                        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+                        LPTSTR pstr = NULL;
+                        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+                        pManager->SetDefaultLinkHoverFontColor(clrColor);
+                    } 
+                    else if( _tcscmp(pstrName, _T("selectedcolor")) == 0 ) {
+                        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+                        LPTSTR pstr = NULL;
+                        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+                        pManager->SetDefaultSelectedBkColor(clrColor);
                     } 
                 }
             }
