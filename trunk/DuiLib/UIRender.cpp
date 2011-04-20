@@ -44,6 +44,8 @@ extern "C"
 {
     extern unsigned char *stbi_load_from_memory(unsigned char const *buffer, int len, int *x, int *y, \
         int *comp, int req_comp);
+	extern void     stbi_image_free(void *retval_from_stbi_load);
+
 };
 
 namespace DuiLib {
@@ -328,7 +330,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
         }
     }
 
-    free(pImage);
+    stbi_image_free(pImage);
 
     TImageInfo* data = new TImageInfo;
     data->hBitmap = hBitmap;
