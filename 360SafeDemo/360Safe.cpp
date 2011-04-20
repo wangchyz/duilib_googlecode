@@ -148,9 +148,11 @@ public:
 	{
         SIZE szRoundCorner = m_pm.GetRoundCorner();
         if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
-            RECT rcClient;
-            ::GetClientRect(*this, &rcClient);
-            HRGN hRgn = ::CreateRoundRectRgn(rcClient.left, rcClient.top, rcClient.right + 1, rcClient.bottom + 1, szRoundCorner.cx, szRoundCorner.cy);
+            CRect rcWnd;
+            ::GetWindowRect(*this, &rcWnd);
+            rcWnd.Offset(-rcWnd.left, -rcWnd.top);
+            rcWnd.right++; rcWnd.bottom++;
+            HRGN hRgn = ::CreateRoundRectRgn(rcWnd.left, rcWnd.top, rcWnd.right, rcWnd.bottom, szRoundCorner.cx, szRoundCorner.cy);
             ::SetWindowRgn(*this, hRgn, TRUE);
             ::DeleteObject(hRgn);
         }
