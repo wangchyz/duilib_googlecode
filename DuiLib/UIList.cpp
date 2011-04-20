@@ -1061,9 +1061,13 @@ LPVOID CListHeaderUI::GetInterface(LPCTSTR pstrName)
 SIZE CListHeaderUI::EstimateSize(SIZE szAvailable)
 {
     SIZE cXY = {0, m_cxyFixed.cy};
-    if( cXY.cy == 0 && m_pManager != NULL ) {
-        cXY.cy = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 6;
-    }
+	if( cXY.cy == 0 && m_pManager != NULL ) {
+		for( int it = 0; it < m_items.GetSize(); it++ ) {
+			cXY.cy = MAX(cXY.cy,static_cast<CControlUI*>(m_items[it])->EstimateSize(szAvailable).cy);
+		}
+		int nMin = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 6;
+		cXY.cy = MAX(cXY.cy,nMin);
+	}
 
     for( int it = 0; it < m_items.GetSize(); it++ ) {
         cXY.cx +=  static_cast<CControlUI*>(m_items[it])->EstimateSize(szAvailable).cx;
