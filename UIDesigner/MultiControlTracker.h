@@ -161,9 +161,9 @@ public:
 	BOOL SetFocus(CControlUI* pControl);
 	CTrackerElement* FindTracker(CControlUI* pControl) const;
 	CControlUI* GetFocused() const;
-	void GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected) const;
-	BOOL IsEmpty() { return (m_arrTracker.GetSize() == 0); }
-	int  GetSize() { return m_arrTracker.GetSize(); }
+	BOOL GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected) const;
+	BOOL IsEmpty() const { return m_arrTracker.IsEmpty(); }
+	int  GetSize() const { return m_arrTracker.GetSize(); }
 
 	SIZE GetFormSize() const { return m_szForm; }
 	void SetFormSize(SIZE size) { m_szForm=size; }

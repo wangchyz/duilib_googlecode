@@ -200,7 +200,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogProjectNew.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogUIFileNew.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FileView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GlobalVariable.cpp"
 				>
 			</File>
 			<File
@@ -268,6 +280,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UICommandHistory.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UIDesigner.cpp"
 				>
 			</File>
@@ -302,7 +318,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogProjectNew.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogUIFileNew.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FileView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GlobalVariable.h"
 				>
 			</File>
 			<File
@@ -359,6 +387,10 @@
 			</File>
 			<File
 				RelativePath=".\ToolBoxWnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UICommandHistory.h"
 				>
 			</File>
 			<File
@@ -449,6 +481,10 @@
 			</File>
 			<File
 				RelativePath=".\res\movehandle.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\project_explorer_hc.bmp"
 				>
 			</File>
 			<File

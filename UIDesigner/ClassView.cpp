@@ -250,9 +250,8 @@ BOOL CClassView::RemoveUITreeItem(HTREEITEM hItem)
 		HTREEITEM hChild=m_wndClassView.GetChildItem(hItem);
 		while(hChild!=NULL)
 		{
-			HTREEITEM hNext=m_wndClassView.GetNextItem(hChild,TVGN_NEXT);
 			RemoveUITreeItem(hChild);
-			hChild=hNext;
+			hChild=m_wndClassView.GetNextItem(hChild,TVGN_NEXT);
 		}
 	}
 

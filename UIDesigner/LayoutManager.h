@@ -110,9 +110,11 @@ public:
 
 	void Draw(CDC* pDC);
 	void DrawAuxBorder(CDC* pDC,CControlUI* pControl);
+	void DrawGrid(CDC* pDC,CRect& rect);
 
 	static CControlUI* NewControl(int nClass,CRect& rect,CPaintManagerUI* pManager,CControlUI* pParent);
 	BOOL RemoveControl(CControlUI* pControl);
+	CPaintManagerUI* GetManager();
 	CFormUI* GetForm() const;
 	CControlUI* FindControl(CPoint point) const;
 

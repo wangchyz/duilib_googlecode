@@ -80,6 +80,11 @@
 #define TRACKER_HANDLE_SIZE 7
 #define MICO_MOVE_SPACE 1
 
+#define DIR_STYLES _T("Styles\\")
+#define DIR_TEMPLATES _T("Templates\\")
+
+#define UI_COMMAND_HISTORY 10
+
 //UI type
 enum UIType
 {
@@ -131,9 +136,11 @@ typedef struct tagExtendedAttributes
 #include "MainFrm.h"
 #include "ToolBoxWnd.h"
 #include "PropertiesWnd.h"
+#include "FileView.h"
 #include "ClassView.h"
 #include "ResourceView.h"
 #include "HookAPI.h"
+#include "GlobalVariable.h"
 
 using DuiLib::CContainerUI;
 using DuiLib::CPaintManagerUI;
@@ -183,6 +190,7 @@ using DuiLib::EVENTTYPE_UI;
 extern CMainFrame* g_pMainFrame;
 extern CToolBoxWnd* g_pToolBoxWnd;
 extern CPropertiesWnd* g_pPropertiesWnd;
+extern CFileView* g_pFileView;
 extern CClassView* g_pClassView;
 extern CResourceViewBar* g_pResourceView;
 extern CHookAPI g_HookAPI;

@@ -399,18 +399,16 @@ void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 	{
 		CString strSkinDir(pstrLoad);
 		int nFind=strSkinDir.ReverseFind(_T('\\'));
-		strSkinDir=strSkinDir.Left(nFind);
-		nFind=strSkinDir.ReverseFind(_T('\\'));
-		strSkinDir=strSkinDir.Left(nFind);
-		strSkinDir+=_T("\\");
+		if(nFind != -1)
+			strSkinDir=strSkinDir.Left(nFind + 1);
 		
 		g_HookAPI.SetSkinDir(strSkinDir);
 		g_HookAPI.EnableCreateFile(true);
 
 		CDialogBuilder builder;
 		CControlUI* pRoot=builder.Create(pstrLoad,(UINT)0,NULL,&m_Manager);
-		ASSERT(pRoot && "Failed to parse XML");
-		pForm->Add(pRoot);
+		if(pRoot)
+			pForm->Add(pRoot);
 
 		SIZE size=m_Manager.GetInitSize();
 		pForm->SetInitSize(size.cx,size.cy);
@@ -428,13 +426,13 @@ void CLayoutManager::Draw(CDC* pDC)
 
 	CContainerUI* pContainer=static_cast<CContainerUI*>(pForm->GetInterface(_T("Container")));
 	ASSERT(pContainer);
-	if(m_bShowAuxBorder)
-		DrawAuxBorder(pDC,pContainer->GetItemAt(0));
+	DrawAuxBorder(pDC,pContainer->GetItemAt(0));
+	DrawGrid(pDC, rcPaint);
 }
 
 void CLayoutManager::DrawAuxBorder(CDC* pDC,CControlUI* pControl)
 {
-	if(pControl==NULL||!pControl->IsVisible())
+	if(!m_bShowAuxBorder||pControl==NULL||!pControl->IsVisible())
 		return;
 
 	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
@@ -459,6 +457,18 @@ void CLayoutManager::DrawAuxBorder(CDC* pDC,CControlUI* pControl)
 	for(int i=0;i<pContainer->GetCount();i++)
 	{
 		DrawAuxBorder(pDC,pContainer->GetItemAt(i));
+	}
+}
+
+void CLayoutManager::DrawGrid(CDC* pDC, CRect& rect)
+{
+	if(!m_bShowGrid)
+		return;
+
+	for(int i=rect.left; i<rect.right; i+=10)
+	{
+		for(int j=rect.top; j<rect.bottom; j+=10)
+			pDC->SetPixel(i, j, RGB(0,0,0));
 	}
 }
 
@@ -560,6 +570,11 @@ CControlUI* CLayoutManager::NewControl(int nClass,CRect& rect,CPaintManagerUI* p
 	pControl->SetManager(pManager,pParent);
 	pControl->SetTag((UINT_PTR)pExtended);
 
+	//default attributes
+	LPCTSTR pDefaultAttributes = pManager->GetDefaultAttributeList(pControl->GetClass());
+	if(pDefaultAttributes)
+		pControl->ApplyAttributeList(pDefaultAttributes);
+
 	//pos
 	CRect rcParent=pParent?pParent->GetPos():CRect(0,0,0,0);
 	pControl->SetFixedXY(CSize(rect.left-rcParent.left,rect.top-rcParent.top));
@@ -595,6 +610,11 @@ BOOL CLayoutManager::RemoveControl(CControlUI* pControl)
 	pParent->Remove(pControl);
 
 	return TRUE;
+}
+
+CPaintManagerUI* CLayoutManager::GetManager()
+{
+	return &m_Manager;
 }
 
 CFormUI* CLayoutManager::GetForm() const

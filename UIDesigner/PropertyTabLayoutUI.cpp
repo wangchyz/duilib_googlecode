@@ -132,7 +132,7 @@ BOOL CPropertyTabLayoutUI::OnInitDialog()
 			CSingleCheckListBox::m_nLastChecked=i;
 	}
 
-	m_menuUI.LoadMenu(IDR_MENU_UI);
+	m_menuUI.LoadMenu(IDR_UI);
 	m_btnAdd.m_hMenu=m_menuUI.GetSubMenu(0)->GetSafeHmenu();
 	m_btnAdd.SizeToContent();
 	m_btnAdd.m_bOSMenu=FALSE;

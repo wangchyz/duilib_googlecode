@@ -8,6 +8,8 @@
 #include "UIDesignerView.h"
 
 #include "PropertyTabLayoutUI.h"
+#include "tinyxml.h"
+#include <io.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -59,6 +61,10 @@ BEGIN_MESSAGE_MAP(CUIDesignerView, CScrollView)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CUIDesignerView::OnUpdateNeedSel)
 	ON_COMMAND(ID_EDIT_PASTE, &CUIDesignerView::OnEditPaste)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, &CUIDesignerView::OnUpdateNeedClip)
+	ON_COMMAND(ID_EDIT_UNDO, &CUIDesignerView::OnEditUndo)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_UNDO, &CUIDesignerView::OnUpdateEditUndo)
+	ON_COMMAND(ID_EDIT_REDO, &CUIDesignerView::OnEditRedo)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_REDO, &CUIDesignerView::OnUpdateEditRedo)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_SETCURSOR()
 	ON_WM_SIZE()
@@ -198,7 +204,7 @@ void CUIDesignerView::OnInitialUpdate()
 
 	g_pClassView->InsertUITreeItem(pForm,pDoc->GetTitle());
 	if(pForm->GetCount()>0)
-		InitUI(pForm->GetItemAt(0));
+		InitUITree(pForm->GetItemAt(0));
 	g_pClassView->SelectUITreeItem(pForm);
 	m_bInit=true;
 
@@ -493,7 +499,7 @@ void CUIDesignerView::OnActivated()
 	g_pPropertiesWnd->ShowProperty(m_MultiTracker.GetFocused());
 }
 
-void CUIDesignerView::InitUI(CControlUI* pControl)
+void CUIDesignerView::InitUITree(CControlUI* pControl)
 {
 	if(pControl==NULL)
 		return;
@@ -510,7 +516,7 @@ void CUIDesignerView::InitUI(CControlUI* pControl)
 		return;
 	for (int i=0;i<pContainer->GetCount();i++)
 	{
-		InitUI(pContainer->GetItemAt(i));
+		InitUITree(pContainer->GetItemAt(i));
 	}
 }
 
@@ -604,13 +610,15 @@ void CUIDesignerView::OnAlignSameSize()
 void CUIDesignerView::OnShowGrid()
 {
 	m_LayoutManager.ShowGrid(!m_LayoutManager.IsShowGrid());
+
+	m_LayoutManager.GetForm()->NeedUpdate();
 }
 
 void CUIDesignerView::OnShowAuxBorder()
 {
 	m_LayoutManager.ShowAuxBorder(!m_LayoutManager.IsShowAuxBorder());
 
-	this->Invalidate(FALSE);
+	m_LayoutManager.GetForm()->NeedUpdate();
 }
 
 void CUIDesignerView::OnUpdateFormEditTest(CCmdUI* pCmdUI)
@@ -704,12 +712,98 @@ void CUIDesignerView::OnEditCut()
 
 void CUIDesignerView::OnEditCopy()
 {
+	ASSERT(m_cfUI != NULL);
 
+	CArray<CControlUI*,CControlUI*> arrSelected;
+
+	m_MultiTracker.GetSelected(arrSelected);
+	TiXmlDocument xmlDoc;
+	char xml[] = {("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Option text=\"游戏大厅\" width=\"64\" group=\"true\" />")};
+// 	TiXmlElement* pRootElm = new TiXmlElement("Window");
+// 	pRootElm->SetAttribute("name","哈哈");
+// 	TiXmlNode* pNode = xmlDoc.InsertEndChild(*pRootElm);
+	xmlDoc.Parse(xml);
+	TiXmlPrinter printer;
+	xmlDoc.Accept(&printer);
+// 	delete pRootElm;
+	CSharedFile file(GMEM_MOVEABLE, printer.Size()+1);
+	file.Write(printer.CStr(), printer.Size());
+	COleDataSource* pDataSource = NULL;
+	TRY
+	{
+		pDataSource = new COleDataSource;
+		pDataSource->CacheGlobalData(m_cfUI, file.Detach());
+		pDataSource->SetClipboard();
+	}
+	CATCH_ALL(e)
+	{
+		delete pDataSource;
+		THROW_LAST();
+	}
+	END_CATCH_ALL
 }
 
 void CUIDesignerView::OnEditPaste()
 {
+	COleDataObject dataObject;
+	dataObject.AttachClipboard();
 
+	if(dataObject.IsDataAvailable(m_cfUI))
+	{
+		CFile* pFile = dataObject.GetFileData(m_cfUI);
+		if (pFile == NULL)
+			return;
+
+		int len = (int)pFile->GetLength();
+		char* pstrXML  = new char[len];
+		pFile->Read(pstrXML, len);
+
+#ifdef _UNICODE //可以使用UIUtil的函数
+		DWORD dwSize = strlen(pstrXML);
+		DWORD nWide = ::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pstrXML, dwSize, NULL, 0);
+
+		LPTSTR pwstrXML = new TCHAR[nWide + 1];
+		::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pstrXML, dwSize, pwstrXML, nWide);
+		pwstrXML[nWide] = _T('\0');
+
+		PasteControls(pwstrXML);
+		delete[] pwstrXML;
+#else
+		PasteControls(pstrXML);
+#endif
+
+		delete[] pstrXML;
+		delete pFile;
+	}
+}
+
+void CUIDesignerView::PasteControls(LPCTSTR xml)
+{
+	CDialogBuilder builder;
+	CControlUI* pRoot=builder.Create(xml, (UINT)0, NULL, m_LayoutManager.GetManager());
+	if(pRoot)
+	{
+		CControlUI* pParent = m_MultiTracker.GetFocused();
+		if(pParent->GetInterface(_T("Container")) == NULL)
+			pParent = pParent->GetParent();
+		if(pParent == NULL)
+			pParent = m_LayoutManager.GetForm();
+		CContainerUI* pContainer=static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
+		pContainer->Add(pRoot);
+		InitUITree(pRoot);
+		pContainer->SetPos(pContainer->GetPos());
+		pContainer->NeedUpdate();
+	}
+}
+
+void CUIDesignerView::OnEditUndo()
+{
+	m_UICommandHistory.Undo();
+}
+
+void CUIDesignerView::OnEditRedo()
+{
+	m_UICommandHistory.Redo();
 }
 
 void CUIDesignerView::OnUpdateNeedSel(CCmdUI* pCmdUI)
@@ -719,43 +813,69 @@ void CUIDesignerView::OnUpdateNeedSel(CCmdUI* pCmdUI)
 
 void CUIDesignerView::OnUpdateNeedClip(CCmdUI* pCmdUI)
 {
-	BOOL bOn=FALSE;
-	if(CountClipboardFormats()!=0&&IsClipboardFormatAvailable(11))
-		bOn=TRUE;
+	BOOL bOn = FALSE;
+	if(CountClipboardFormats()!=0 && IsClipboardFormatAvailable(m_cfUI))
+		bOn = TRUE;
 
 	pCmdUI->Enable(bOn);
+}
+
+void CUIDesignerView::OnUpdateEditUndo(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_UICommandHistory.CanUndo());
+}
+
+void CUIDesignerView::OnUpdateEditRedo(CCmdUI* pCmdUI)
+{
+	pCmdUI->Enable(m_UICommandHistory.CanRedo());
 }
 
 void CUIDesignerView::OnMicoMoveUp()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_LayoutManager.MicoMoveUp(arrSelected,MICO_MOVE_SPACE);
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.MicoMoveUp(arrSelected,MICO_MOVE_SPACE);
+		m_UICommandHistory.End();
+	}
 }
 
 void CUIDesignerView::OnMicoMoveDown()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_LayoutManager.MicoMoveDown(arrSelected,MICO_MOVE_SPACE);
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.MicoMoveDown(arrSelected,MICO_MOVE_SPACE);
+		m_UICommandHistory.End();
+	}
 }
 
 void CUIDesignerView::OnMicoMoveLeft()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_LayoutManager.MicoMoveLeft(arrSelected,MICO_MOVE_SPACE);
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.MicoMoveLeft(arrSelected,MICO_MOVE_SPACE);
+		m_UICommandHistory.End();
+	}
 }
 
 void CUIDesignerView::OnMicoMoveRight()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_LayoutManager.MicoMoveRight(arrSelected,MICO_MOVE_SPACE);
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.MicoMoveRight(arrSelected,MICO_MOVE_SPACE);
+		m_UICommandHistory.End();
+	}
 }
 
 void CUIDesignerView::OnShowPropertyDialog()
