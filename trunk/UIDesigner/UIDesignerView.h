@@ -5,6 +5,7 @@
 #include "UIDesignerDoc.h"
 #include "MultiControlTracker.h"
 #include "LayoutManager.h"
+#include "UICommandHistory.h"
 
 //////////////////////////////////////////////////////////////////////////
 //CUIDesignerView
@@ -47,11 +48,6 @@ public:
 
 	BOOL OnRemoveControl();
 
-	void OnMicoMoveUp();
-	void OnMicoMoveDown();
-	void OnMicoMoveLeft();
-	void OnMicoMoveRight();
-
 	void OnShowPropertyDialog();
 
 protected:
@@ -59,14 +55,21 @@ protected:
 	CTrackerElement* CreateTracker(CControlUI* pControl);
 	int GetControlType(CControlUI* pControl);
 
-	void InitUI(CControlUI* pControl);
+	void InitUITree(CControlUI* pControl);
 	void ReleaseExtendedAttributes(CControlUI* pControl);
-
 	void ShowPropertyDialog(CControlUI* pControl);
+
+	void OnMicoMoveUp();
+	void OnMicoMoveDown();
+	void OnMicoMoveLeft();
+	void OnMicoMoveRight();
+
+	void PasteControls(LPCTSTR xml);
 
 private:
 	CLayoutManager m_LayoutManager;
 	CMultiControlTracker m_MultiTracker;
+	CUICommandHistory m_UICommandHistory;
 
 	CPoint m_ptDPtoLP;//Device coordinates to Logical coordinates
 	bool m_bInit;
@@ -122,8 +125,12 @@ public:
 	afx_msg void OnEditCut();
 	afx_msg void OnEditCopy();
 	afx_msg void OnEditPaste();
+	afx_msg void OnEditUndo();
+	afx_msg void OnEditRedo();
 	afx_msg void OnUpdateNeedSel(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateNeedClip(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateEditUndo(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateEditRedo(CCmdUI* pCmdUI);
 public:
 	afx_msg void OnDestroy();
 };

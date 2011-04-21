@@ -4,11 +4,12 @@
 
 #include "stdafx.h"
 
-CMainFrame* g_pMainFrame=NULL;
-CToolBoxWnd* g_pToolBoxWnd=NULL;
-CPropertiesWnd* g_pPropertiesWnd=NULL;
-CClassView* g_pClassView=NULL;
-CResourceViewBar* g_pResourceView=NULL;
+CMainFrame* g_pMainFrame = NULL;
+CToolBoxWnd* g_pToolBoxWnd = NULL;
+CPropertiesWnd* g_pPropertiesWnd = NULL;
+CFileView* g_pFileView = NULL;
+CClassView* g_pClassView = NULL;
+CResourceViewBar* g_pResourceView = NULL;
 CHookAPI g_pHookAPI;
 
 int g_GetUIClass(CControlUI* pControl)

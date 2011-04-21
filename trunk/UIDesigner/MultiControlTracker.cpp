@@ -1205,14 +1205,19 @@ CControlUI* CMultiControlTracker::GetFocused() const
 	return m_pFocused->m_pControl;
 }
 
-void CMultiControlTracker::GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected) const
+BOOL CMultiControlTracker::GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected) const
 {
+	if(IsEmpty())
+		return FALSE;
+
 	for(int i=0;i<m_arrTracker.GetSize();i++)
 	{
 		CTrackerElement* pArrTracker = m_arrTracker.GetAt(i);
 
 		arrSelected.Add(pArrTracker->m_pControl);
 	}
+
+	return TRUE;
 }
 
 BOOL CMultiControlTracker::SetFocus(CControlUI* pControl)

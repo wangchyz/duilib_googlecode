@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(中华人民共和国) resources
+// Chinese (P.R.C.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -74,7 +74,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\UIDesigner.ico"
-IDR_UIDesignerTYPE      ICON                    "res\\UIDesignerDoc.ico"
+IDR_UIDESIGNER          ICON                    "res\\UIDesignerDoc.ico"
 IDI_FILE_VIEW           ICON                    "res\\file_view.ico"
 IDI_FILE_VIEW_HC        ICON                    "res\\file_view_hc.ico"
 IDI_CLASS_VIEW          ICON                    "res\\class_view.ico"
@@ -98,8 +98,8 @@ IDB_FILE_VIEW           BITMAP                  "res\\fileview.bmp"
 IDB_FILE_VIEW_24        BITMAP                  "res\\fileview_hc.bmp"
 IDB_CLASS_VIEW          BITMAP                  "res\\classview.bmp"
 IDB_CLASS_VIEW_24       BITMAP                  "res\\classview_hc.bmp"
-IDR_EXPLORER            BITMAP                  "res\\explorer.bmp"
-IDB_EXPLORER_24         BITMAP                  "res\\explorer_hc.bmp"
+IDR_PROJECT_EXPLORER    BITMAP                  "res\\explorer.bmp"
+IDB_PROJECT_EXPLORER_24 BITMAP                  "res\\project_explorer_hc.bmp"
 IDR_MENU_IMAGES         BITMAP                  "res\\menuimages.bmp"
 IDB_MENU_IMAGES_24      BITMAP                  "res\\menuimages_hc.bmp"
 IDR_PROPERTIES          BITMAP                  "res\\properties.bmp"
@@ -152,9 +152,12 @@ BEGIN
     BUTTON      ID_NEW_FOLDER
 END
 
-IDR_EXPLORER TOOLBAR  16, 16
+IDR_PROJECT_EXPLORER TOOLBAR  16, 16
 BEGIN
-    BUTTON      ID_PROPERTIES
+    BUTTON      IDR_PROJECT_NEW
+    BUTTON      IDR_FILE_NEW
+    SEPARATOR
+    BUTTON      IDR_FILE_DELETE
 END
 
 IDR_MENU_IMAGES TOOLBAR  16, 16
@@ -209,24 +212,39 @@ IDR_MAINFRAME MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "新建(&N)\tCtrl+N",              ID_FILE_NEW
-        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
+        POPUP "新建"
+        BEGIN
+            MENUITEM "项目(&P)...\tCtrl+Shift+N",     ID_PROJECT_NEW
+            MENUITEM "文件(&N)...\tCtrl+N",           ID_FILE_NEW
+        END
+        POPUP "打开"
+        BEGIN
+            MENUITEM "项目(&P)...\tCtrl+Shift+O",     ID_PROJECT_OPEN
+            MENUITEM "文件(&O)...\tCtrl+O",           ID_FILE_OPEN
+            MENUITEM "模板(&T)...\tCtrl+T",           ID_TEMPLATE_OPEN
+        END
+        MENUITEM SEPARATOR
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
+        MENUITEM "全部关闭(&K)",                    ID_FILE_CLOSE_ALL
+        MENUITEM "关闭项目(&P)",                    ID_PROJECT_CLOSE
         MENUITEM SEPARATOR
-        MENUITEM "打印设置(&R)...",                 ID_FILE_PRINT_SETUP
+        MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
+        MENUITEM "另存为(&A)...",                  ID_FILE_SAVE_AS
+        MENUITEM "保存全部(&L)...\tCtrl+Shift+S",   ID_FILE_SAVE_ALL
+        MENUITEM "保存模板(&T)...",                 ID_TEMPLATE_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1
         MENUITEM SEPARATOR
         MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
     POPUP "视图(&V)"
     BEGIN
-        POPUP "工具栏和停靠窗口(&T)"
+        POPUP "工具栏(&T)"
         BEGIN
             MENUITEM "<占位符>",                       ID_VIEW_TOOLBAR
         END
         MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
-        POPUP "应用程序外观(&A)"
+        POPUP "外观样式(&A)"
         BEGIN
             MENUITEM "Windows 2000(&2)",            ID_VIEW_APPLOOK_WIN_2000
             MENUITEM "Office XP(&X)",               ID_VIEW_APPLOOK_OFF_XP
@@ -248,21 +266,32 @@ BEGIN
     END
 END
 
-IDR_UIDesignerTYPE MENU 
+IDR_UIDESIGNER MENU 
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "新建(&N)\tCtrl+N",              ID_FILE_NEW
-        MENUITEM "打开(&O)...\tCtrl+O",           ID_FILE_OPEN
+        POPUP "新建"
+        BEGIN
+            MENUITEM "项目(&P)...\tCtrl+Shift+N",     ID_PROJECT_NEW
+            MENUITEM "文件(&N)...\tCtrl+N",           ID_FILE_NEW
+        END
+        POPUP "打开"
+        BEGIN
+            MENUITEM "项目(&P)...\tCtrl+Shift+O",     ID_PROJECT_OPEN
+            MENUITEM "文件(&O)...\tCtrl+O",           ID_FILE_OPEN
+            MENUITEM "模板(&T)...\tCtrl+T",           ID_TEMPLATE_OPEN
+        END
+        MENUITEM SEPARATOR
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
+        MENUITEM "全部关闭(&K)",                    ID_FILE_CLOSE_ALL
+        MENUITEM "关闭项目(&P)",                    ID_PROJECT_CLOSE
+        MENUITEM SEPARATOR
         MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
         MENUITEM "另存为(&A)...",                  ID_FILE_SAVE_AS
+        MENUITEM "保存全部(&L)...\tCtrl+Shift+S",   ID_FILE_SAVE_ALL
+        MENUITEM "保存模板(&T)...",                 ID_TEMPLATE_SAVE
         MENUITEM SEPARATOR
-        MENUITEM "打印(&P)...\tCtrl+P",           ID_FILE_PRINT
-        MENUITEM "打印预览(&V)",                    ID_FILE_PRINT_PREVIEW
-        MENUITEM "打印设置(&R)...",                 ID_FILE_PRINT_SETUP
-        MENUITEM SEPARATOR
-        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1
         MENUITEM SEPARATOR
         MENUITEM "退出(&X)",                      ID_APP_EXIT
     END
@@ -322,15 +351,20 @@ BEGIN
     POPUP "文件管理器"
     BEGIN
         MENUITEM "打开(&O)",                      ID_OPEN
-        MENUITEM "打开方式(&W)....",                ID_OPEN_WITH
+        POPUP "新建"
+        BEGIN
+            MENUITEM "文件(&F)",                      IDR_FILE_NEW
+            MENUITEM "文件夹(&D)",                     ID_DIRECTORY_NEW
+            MENUITEM "项目(&P)...",                   IDR_PROJECT_NEW
+        END
+        MENUITEM "创建副本(&L)",                    ID_CREATE_COPY
+        MENUITEM "删除(&D)",                      IDR_FILE_DELETE
+        MENUITEM "重命名(&R)",                     ID_FILE_RENAME
         MENUITEM SEPARATOR
-        MENUITEM "编译(&C)",                      ID_DUMMY_COMPILE
+        MENUITEM "展开(&E)",                      ID_TREE_EXPAND
+        MENUITEM "折叠(&C)",                      ID_TREE_COLLAPSE
         MENUITEM SEPARATOR
-        MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
-        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "删除(&R)",                      ID_EDIT_CLEAR
-        MENUITEM SEPARATOR
-        MENUITEM "属性(&P)...",                   ID_PROPERTIES
+        MENUITEM "关闭项目(&T)",                    ID_PROJECT_CLOSE
     END
 END
 
@@ -364,7 +398,7 @@ BEGIN
     END
 END
 
-IDR_MENU_UI MENU 
+IDR_UI MENU 
 BEGIN
     POPUP "UI"
     BEGIN
@@ -410,7 +444,9 @@ BEGIN
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
-    "P",            ID_PROJECT_NEW,         VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_PROJECT_NEW,         VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "O",            ID_PROJECT_OPEN,        VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE_ALL,       VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 
@@ -467,6 +503,34 @@ BEGIN
     PUSHBUTTON      "取消",IDCANCEL,263,179,50,14
     LISTBOX         IDC_LIST_TABLAYOUTUI_TAB,42,25,105,68,LBS_SORT | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "添加Tab",IDC_BUTTON_TABLAYOUTUI_ADD,198,42,50,14
+END
+
+IDD_PROJECT_NEW DIALOGEX 0, 0, 299, 105
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "新建项目"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定(&O)",IDOK,177,84,50,14
+    PUSHBUTTON      "取消(&C)",IDCANCEL,242,84,50,14
+    LTEXT           "项目名称:",IDC_STATIC,11,17,36,8
+    LTEXT           "项目路径:",IDC_STATIC,11,46,36,8
+    PUSHBUTTON      "浏览",IDC_BUTTON_BROWSE,242,43,50,14
+    EDITTEXT        IDC_EDIT_PROJECT_NAME,51,14,176,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_PROJECT_PATH,51,43,176,14,ES_AUTOHSCROLL
+END
+
+IDD_UIFILE_NEW DIALOGEX 0, 0, 396, 212
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "新建UI文件"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,273,191,50,14
+    PUSHBUTTON      "取消",IDCANCEL,339,191,50,14
+    LTEXT           "名称:",IDC_STATIC,11,11,20,8
+    EDITTEXT        IDC_EDIT_FILE_NAME,35,8,70,14,ES_AUTOHSCROLL
+    LISTBOX         IDC_LIST_STYLE,7,41,98,139,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Static",IDC_STATIC_PREVIEW,121,7,268,172
+    LTEXT           "样式:",IDC_STATIC,11,29,20,8
 END
 
 
@@ -540,6 +604,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 193
     END
+
+    IDD_PROJECT_NEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 292
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
+    END
+
+    IDD_UIFILE_NEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 389
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 205
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -558,7 +638,7 @@ END
 STRINGTABLE 
 BEGIN
     IDR_MAINFRAME           "UIDesigner"
-    IDR_UIDesignerTYPE      "\nUIDesigner\nUIDesigner\nUIDesigner Files (*.xml)\n.xml\nUIDesigner.Document\nUIDesigner.Document"
+    IDR_UIDESIGNER          "\nUIDesigner\nUIDesigner\nUIDesigner Files (*.xml)\n.xml\nUIDesigner.Document\nUIDesigner.Document"
     IDS_WINDOWS_MANAGER     "窗口(&W)..."
 END
 
@@ -580,13 +660,11 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_FILE_NEW             "创建新文档\n新建"
-    ID_FILE_OPEN            "打开现有文档\n打开"
+    ID_FILE_NEW             "创建新文档\n文件"
+    ID_FILE_OPEN            "打开现有文档\n文件"
     ID_FILE_CLOSE           "关闭活动文档\n关闭"
     ID_FILE_SAVE            "保存活动文档\n保存"
     ID_FILE_SAVE_AS         "用新名称保存活动文档\n另存为"
-    ID_FILE_PAGE_SETUP      "更改打印选项\n页面设置"
-    ID_FILE_PRINT_SETUP     "更改打印机选项和打印选项\n打印设置"
     ID_FILE_PRINT           "打印活动文档\n打印"
     ID_FILE_PRINT_DIRECT    "使用当前选项打印活动文档\n快速打印"
     ID_FILE_PRINT_PREVIEW   "显示整页\n打印预览"
@@ -715,7 +793,7 @@ BEGIN
     ID_FORMEDIT_ALIGN_SAME_SIZE "\n使大小相同"
     ID_FORMEDIT_SHOW_GRID   "\n显示网格"
     ID_FORMEDIT_SHOW_AUXBORDER "\n显示辅助边框"
-    ID_PROJECT_NEW          "创建新项目\n新建工程"
+    ID_PROJECT_NEW          "创建新项目\n项目"
     ID_FILE_SAVE_ALL        "保存全部活动文档\n保存全部"
 END
 
@@ -724,7 +802,20 @@ BEGIN
     AFX_IDS_PREVIEW_CLOSE   "关闭打印预览模式\n取消预览"
 END
 
-#endif    // 中文(中华人民共和国) resources
+STRINGTABLE 
+BEGIN
+    ID_PROJECT_OPEN         "打开项目\n项目"
+    ID_TEMPLATE_OPEN        "打开模板\n模板"
+    ID_PROJECT_CLOSE        "关闭项目\n项目"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_TEMPLATE_SAVE        "保存模板\n模板"
+    ID_FILE_CLOSE_ALL       "关闭全部活动文档\n关闭全部"
+END
+
+#endif    // Chinese (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

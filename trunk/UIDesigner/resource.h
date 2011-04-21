@@ -15,15 +15,15 @@
 #define ID_VIEW_CUSTOMIZE               126
 #define IDR_MAINFRAME                   128
 #define IDR_MAINFRAME_HC                129
-#define IDR_UIDesignerTYPE              130
+#define IDR_UIDESIGNER                  130
 #define ID_WINDOW_MANAGER               131
 #define IDS_WINDOWS_MANAGER             132
 #define ID_VIEW_FILEVIEW                133
 #define ID_VIEW_CLASSVIEW               134
-#define ID_PROPERTIES                   135
+#define IDR_PROJECT_NEW                 135
 #define ID_OPEN                         136
-#define ID_OPEN_WITH                    137
-#define ID_DUMMY_COMPILE                138
+#define ID_DIRECTORY_NEW                137
+#define ID_CREATE_COPY                  138
 #define ID_CLASS_ADD_MEMBER_FUNCTION    139
 #define ID_CLASS_ADD_MEMBER_VARIABLE    140
 #define ID_CLASS_DEFINITION             141
@@ -49,8 +49,8 @@
 #define IDI_CLASS_VIEW_HC               164
 #define IDI_PROPERTIES_WND              167
 #define IDI_PROPERTIES_WND_HC           168
-#define IDR_EXPLORER                    169
-#define IDB_EXPLORER_24                 170
+#define IDR_PROJECT_EXPLORER            169
+#define IDB_PROJECT_EXPLORER_24         170
 #define IDR_SORT                        171
 #define IDB_SORT_24                     172
 #define IDR_POPUP_SORT                  173
@@ -92,9 +92,11 @@
 #define IDR_FORMEDIT                    319
 #define ID_FORMEDIT_TEST                320
 #define ID_FORMEDIT_ALIGN_LEFT          321
-#define IDR_MENU_UI                     321
+#define IDR_UI                          321
 #define ID_FORMEDIT_ALIGN_RIGHT         322
+#define IDD_PROJECT_NEW                 322
 #define ID_FORMEDIT_ALIGN_TOP           323
+#define IDD_UIFILE_NEW                  323
 #define ID_FORMEDIT_ALIGN_BOTTOM        324
 #define ID_FORMEDIT_ALIGN_CENTER_VERTICALLY 325
 #define ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY 326
@@ -107,6 +109,11 @@
 #define ID_FORMEDIT_SHOW_AUXBORDER      333
 #define ID_PROJECT_NEW                  334
 #define ID_FILE_SAVE_ALL                335
+#define IDR_FILE_NEW                    336
+#define IDR_FILE_DELETE                 337
+#define ID_FILE_RENAME                  338
+#define ID_TREE_EXPAND                  339
+#define ID_TREE_COLLAPSE                340
 #define IDC_BUTTON_IMAGE_IMPORT         1000
 #define IDC_BUTTON_IMAGE_CLEAR          1001
 #define IDC_LIST_IMAGE_RESOURCE         1002
@@ -122,6 +129,14 @@
 #define IDC_RADIO_IMAGE_HOLE_TRUE       1012
 #define IDC_LIST_TABLAYOUTUI_TAB        1012
 #define IDC_BUTTON_TABLAYOUTUI_ADD      1013
+#define IDC_BUTTON_BRO                  1014
+#define IDC_BUTTON_BROWSE               1014
+#define IDC_EDIT_PROJECT_NAME           1015
+#define IDC_EDIT_PROJECT_PATH           1016
+#define IDC_EDIT_FILE_NAME              1017
+#define IDC_LIST_STYLE                  1020
+#define IDC_STATIC_                     1021
+#define IDC_STATIC_PREVIEW              1021
 #define ID_UI_CONTROL_BUTTON            32793
 #define ID_UI_CONTROL_CONTROL           32794
 #define ID_UI_CONTROL_LABEL             32795
@@ -138,14 +153,20 @@
 #define ID_UI_LAYOUT_DIALOG             32810
 #define ID_UI_LAYOUT_TILE               32812
 #define ID_UI_LAYOUT_TAB                32814
+#define ID_PROJECT_OPEN                 32822
+#define ID_TEMPLATE_OPEN                32826
+#define ID_PROJECT_CLOSE                32828
+#define ID_TAMPLATE_SAVE                32836
+#define ID_TEMPLATE_SAVE                32837
+#define ID_FILE_CLOSE_ALL               32840
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        322
-#define _APS_NEXT_COMMAND_VALUE         32815
-#define _APS_NEXT_CONTROL_VALUE         1014
+#define _APS_NEXT_RESOURCE_VALUE        324
+#define _APS_NEXT_COMMAND_VALUE         32842
+#define _APS_NEXT_CONTROL_VALUE         1022
 #define _APS_NEXT_SYMED_VALUE           316
 #endif
 #endif

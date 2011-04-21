@@ -1,10 +1,8 @@
-
 // MainFrm.cpp : CMainFrame 类的实现
 //
 
 #include "stdafx.h"
 #include "UIDesigner.h"
-
 #include "MainFrm.h"
 
 #ifdef _DEBUG
@@ -29,6 +27,13 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_REGISTERED_MESSAGE(AFX_WM_ON_GET_TAB_TOOLTIP, OnGetTabToolTip)
 	ON_REGISTERED_MESSAGE(AFX_WM_CHANGE_ACTIVE_TAB, OnChangeActiveTab)
 	ON_COMMAND(ID_PROJECT_NEW, &CMainFrame::OnProjectNew)
+	ON_COMMAND(ID_PROJECT_OPEN, &CMainFrame::OnProjectOpen)
+	ON_COMMAND(ID_PROJECT_CLOSE, &CMainFrame::OnProjectClose)
+	ON_COMMAND(ID_TEMPLATE_OPEN, &CMainFrame::OnTemplateOpen)
+	ON_COMMAND(ID_FILE_CLOSE_ALL, &CMainFrame::OnFileCloseAll)
+	ON_COMMAND(ID_FILE_SAVE_ALL, &CMainFrame::OnFileSaveAll)
+	ON_UPDATE_COMMAND_UI(ID_PROJECT_CLOSE, &CMainFrame::OnUpdateProjectExist)
+	ON_UPDATE_COMMAND_UI(ID_FILE_CLOSE_ALL, &CMainFrame::OnUpdateFileCloseAll)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -80,6 +85,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_wndMenuBar.SetPaneStyle(m_wndMenuBar.GetPaneStyle() | CBRS_SIZE_DYNAMIC | CBRS_TOOLTIPS | CBRS_FLYBY);
 
+	//取消首先显示最近使用的命令
+	CMFCMenuBar::SetRecentlyUsedMenus(FALSE);
 	// 防止菜单栏在激活时获得焦点
 	CMFCPopupMenu::SetForceMenuFocus(FALSE);
 
@@ -90,7 +97,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // 未能创建
 	}
 
-	// Create FormEdit toolbar:
+	// Create FormEdit toolbar
 	if (!m_wndToolbarFormEdit.Create(this, WS_CHILD|WS_VISIBLE|CBRS_TOP|CBRS_TOOLTIPS|CBRS_FLYBY|CBRS_HIDE_INPLACE|CBRS_SIZE_DYNAMIC| CBRS_GRIPPER | CBRS_BORDER_3D, ID_VIEW_FORMEDIT_TOOLBAR) || !m_wndToolbarFormEdit.LoadToolBar(IDR_FORMEDIT))
 	{
 		TRACE0("未能创建窗口编辑工具栏\n");
@@ -514,5 +521,46 @@ LRESULT CMainFrame::OnChangeActiveTab(WPARAM wp,LPARAM lp)
 
 void CMainFrame::OnProjectNew()
 {
+	g_pFileView->OnProjectNew();
+}
 
+void CMainFrame::OnProjectOpen()
+{
+	// TODO: Add your command handler code here
+	CGlobalVariable::m_bIsProjectExist = true;
+}
+
+void CMainFrame::OnProjectClose()
+{
+	// TODO: Add your command handler code here
+	CGlobalVariable::m_bIsProjectExist = false;
+}
+
+void CMainFrame::OnTemplateOpen()
+{
+	// TODO: Add your command handler code here
+}
+
+void CMainFrame::OnFileCloseAll()
+{
+	// TODO: 在此添加命令处理程序代码
+	AfxGetApp()->CloseAllDocuments(TRUE);
+}
+
+void CMainFrame::OnFileSaveAll()
+{
+	// TODO: 在此添加命令处理程序代码
+	AfxGetApp()->SaveAllModified();
+}
+
+void CMainFrame::OnUpdateProjectExist(CCmdUI *pCmdUI)
+{
+	// TODO: 在此添加命令更新用户界面处理程序代码
+	pCmdUI->Enable(CGlobalVariable::m_bIsProjectExist);
+}
+
+void CMainFrame::OnUpdateFileCloseAll(CCmdUI *pCmdUI)
+{
+	// TODO: 在此添加命令更新用户界面处理程序代码
+	pCmdUI->Enable(MDIGetActive() ? TRUE:FALSE);
 }

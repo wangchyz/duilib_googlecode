@@ -1,7 +1,32 @@
-
 #pragma once
-
 #include "ViewTree.h"
+
+//////////////////////////////////////////////////////////////////////////
+//CFileViewTree
+class CFileViewTree : public CTreeCtrl
+{
+	// 构造
+public:
+	CFileViewTree();
+	virtual ~CFileViewTree();
+
+	// 重写
+protected:
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+
+protected:
+	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult);
+};
+
+//////////////////////////////////////////////////////////////////////////
+//CFileView
+
+#define INFO_DIRECTORY 1
+#define INFO_FILE      2
+#define INFO_PROJECT   3
 
 class CFileViewToolBar : public CMFCToolBar
 {
@@ -15,6 +40,8 @@ class CFileViewToolBar : public CMFCToolBar
 
 class CFileView : public CDockablePane
 {
+	friend class CFileViewTree;
+
 // 构造
 public:
 	CFileView();
@@ -25,28 +52,40 @@ public:
 // 属性
 protected:
 
-	CViewTree m_wndFileView;
+	CFileViewTree m_wndFileView;
 	CImageList m_FileViewImages;
 	CFileViewToolBar m_wndToolBar;
-
-protected:
-	void FillFileView();
 
 // 实现
 public:
 	virtual ~CFileView();
 
+public:
+	afx_msg void OnProjectNew();
+
+protected:
+	CString GetFileRelativePath(HTREEITEM hItem);
+	BOOL DeleteUIFile(HTREEITEM hItem);
+	BOOL DeleteDirectory(HTREEITEM hItem);
+	void OpenUIFile(HTREEITEM hItem);
+	CDocument* FindUIFile(CString& strPath);
+	BOOL CloseUIFile(CString& strPath);
+	BOOL RenameFile(CString strNewName, HTREEITEM hItem);
+
+	void ExpandFileViewTree(HTREEITEM hItem, UINT nCode);
+
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
-	afx_msg void OnProperties();
+	afx_msg void OnFileNew();
+	afx_msg void OnFileDelete();
 	afx_msg void OnFileOpen();
-	afx_msg void OnFileOpenWith();
-	afx_msg void OnDummyCompile();
-	afx_msg void OnEditCut();
-	afx_msg void OnEditCopy();
-	afx_msg void OnEditClear();
+	afx_msg void OnDirectoryNew();
+	afx_msg void OnCreateCopy();
+	afx_msg void OnFileRename();
+	afx_msg void OnTreeCollapse();
+	afx_msg void OnTreeExpand();
 	afx_msg void OnPaint();
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 

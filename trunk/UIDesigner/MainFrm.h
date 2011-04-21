@@ -61,12 +61,20 @@ protected:
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
 	afx_msg LRESULT OnGetTabToolTip(WPARAM wp, LPARAM lp);
 	afx_msg LRESULT OnChangeActiveTab(WPARAM wp,LPARAM lp);
-	afx_msg void OnProjectNew();
 	DECLARE_MESSAGE_MAP()
 
 	BOOL CreateDockingWindows();
 	void SetDockingWindowIcons(BOOL bHiColorIcons);
 	virtual void OnUpdateFrameTitle(BOOL bAddToTitle);
+public:
+	afx_msg void OnProjectNew();
+	afx_msg void OnProjectOpen();
+	afx_msg void OnProjectClose();
+	afx_msg void OnTemplateOpen();
+	afx_msg void OnFileCloseAll();
+	afx_msg void OnFileSaveAll();
+	afx_msg void OnUpdateProjectExist(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateFileCloseAll(CCmdUI *pCmdUI);
 };
 
 

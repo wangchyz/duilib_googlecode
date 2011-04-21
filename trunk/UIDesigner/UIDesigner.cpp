@@ -22,8 +22,6 @@ BEGIN_MESSAGE_MAP(CUIDesignerApp, CWinAppEx)
 	// 基于文件的标准文档命令
 	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
-	// 标准打印设置命令
-	ON_COMMAND(ID_FILE_PRINT_SETUP, &CWinAppEx::OnFilePrintSetup)
 END_MESSAGE_MAP()
 
 
@@ -91,7 +89,7 @@ BOOL CUIDesignerApp::InitInstance()
 	// 将用作文档、框架窗口和视图之间的连接
 
 	CMultiDocTemplate* pUIDocTemplate = NULL;
-	pUIDocTemplate = new CMultiDocTemplate(IDR_UIDesignerTYPE,
+	pUIDocTemplate = new CMultiDocTemplate(IDR_UIDESIGNER,
 		RUNTIME_CLASS(CUIDesignerDoc),
 		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
 		RUNTIME_CLASS(CUIDesignerView));
