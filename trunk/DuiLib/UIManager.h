@@ -204,15 +204,15 @@ public:
     bool UseParentResource(CPaintManagerUI* pm);
     CPaintManagerUI* GetParentResource() const;
 
-    DWORD GetDefaultDisabledColor();
+    DWORD GetDefaultDisabledColor() const;
     void SetDefaultDisabledColor(DWORD dwColor);
-    DWORD GetDefaultFontColor();
+    DWORD GetDefaultFontColor() const;
     void SetDefaultFontColor(DWORD dwColor);
-    DWORD GetDefaultLinkFontColor();
+    DWORD GetDefaultLinkFontColor() const;
     void SetDefaultLinkFontColor(DWORD dwColor);
-    DWORD GetDefaultLinkHoverFontColor();
+    DWORD GetDefaultLinkHoverFontColor() const;
     void SetDefaultLinkHoverFontColor(DWORD dwColor);
-    DWORD GetDefaultSelectedBkColor();
+    DWORD GetDefaultSelectedBkColor() const;
     void SetDefaultSelectedBkColor(DWORD dwColor);
     TFontInfo* GetDefaultFontInfo();
     void SetDefaultFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
@@ -283,6 +283,7 @@ public:
 
     CControlUI* GetRoot() const;
     CControlUI* FindControl(POINT pt) const;
+	CControlUI* FindControl(CControlUI* pParent, POINT pt) const;
     CControlUI* FindControl(LPCTSTR pstrName);
 	CControlUI* FindControl(CControlUI* pParent, LPCTSTR pstrName);
 
@@ -299,7 +300,7 @@ private:
     static CControlUI* CALLBACK __FindControlFromTab(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromShortcut(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromUpdate(CControlUI* pThis, LPVOID pData);
-	static CControlUI* CALLBACK __FindControlFromParentControl(CControlUI* pThis, LPVOID pData);
+	static CControlUI* CALLBACK __FindControlFromNameByParent(CControlUI* pThis, LPVOID pData);
 
 private:
     HWND m_hWndPaint;

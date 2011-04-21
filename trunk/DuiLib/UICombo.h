@@ -43,15 +43,15 @@ public:
 
     RECT GetTextPadding() const;
     void SetTextPadding(RECT rc);
-    LPCTSTR GetNormalImage();
+    LPCTSTR GetNormalImage() const;
     void SetNormalImage(LPCTSTR pStrImage);
-    LPCTSTR GetHotImage();
+    LPCTSTR GetHotImage() const;
     void SetHotImage(LPCTSTR pStrImage);
-    LPCTSTR GetPushedImage();
+    LPCTSTR GetPushedImage() const;
     void SetPushedImage(LPCTSTR pStrImage);
-    LPCTSTR GetFocusedImage();
+    LPCTSTR GetFocusedImage() const;
     void SetFocusedImage(LPCTSTR pStrImage);
-    LPCTSTR GetDisabledImage();
+    LPCTSTR GetDisabledImage() const;
     void SetDisabledImage(LPCTSTR pStrImage);
 
     TListInfoUI* GetListInfo();

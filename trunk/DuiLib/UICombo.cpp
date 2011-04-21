@@ -222,6 +222,7 @@ LPCTSTR CComboUI::GetClass() const
 
 LPVOID CComboUI::GetInterface(LPCTSTR pstrName)
 {
+	if( _tcscmp(pstrName, _T("Combo")) == 0 ) return static_cast<CComboUI*>(this);
     if( _tcscmp(pstrName, _T("ListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
@@ -523,7 +524,7 @@ void CComboUI::SetTextPadding(RECT rc)
     Invalidate();
 }
 
-LPCTSTR CComboUI::GetNormalImage()
+LPCTSTR CComboUI::GetNormalImage() const
 {
     return m_sNormalImage;
 }
@@ -534,7 +535,7 @@ void CComboUI::SetNormalImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
-LPCTSTR CComboUI::GetHotImage()
+LPCTSTR CComboUI::GetHotImage() const
 {
     return m_sHotImage;
 }
@@ -545,7 +546,7 @@ void CComboUI::SetHotImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
-LPCTSTR CComboUI::GetPushedImage()
+LPCTSTR CComboUI::GetPushedImage() const
 {
     return m_sPushedImage;
 }
@@ -556,7 +557,7 @@ void CComboUI::SetPushedImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
-LPCTSTR CComboUI::GetFocusedImage()
+LPCTSTR CComboUI::GetFocusedImage() const
 {
     return m_sFocusedImage;
 }
@@ -567,7 +568,7 @@ void CComboUI::SetFocusedImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
-LPCTSTR CComboUI::GetDisabledImage()
+LPCTSTR CComboUI::GetDisabledImage() const
 {
     return m_sDisabledImage;
 }
