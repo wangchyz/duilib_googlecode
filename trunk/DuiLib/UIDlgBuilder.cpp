@@ -4,7 +4,6 @@ namespace DuiLib {
 
 CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuilderCallback* pCallback, CPaintManagerUI* pManager)
 {
-    m_pCallback = pCallback;
     if( HIWORD(xml.m_lpstr) != NULL ) {
         if( *(xml.m_lpstr) == _T('<') ) {
             if( !m_xml.Load(xml.m_lpstr) ) return NULL;
@@ -14,7 +13,6 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
         }
     }
     else {
-
         HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), xml.m_lpstr, type.m_lpstr);
         if( hResource == NULL ) return NULL;
         HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceDll(), hResource);
@@ -28,7 +26,15 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, STRINGorID type, IDialogBuild
         ::FreeResource(hResource);
     }
 
+    return Create(pCallback, pManager);
+}
+
+CControlUI* CDialogBuilder::Create(IDialogBuilderCallback* pCallback, CPaintManagerUI* pManager)
+{
+    m_pCallback = pCallback;
     CMarkupNode root = m_xml.GetRoot();
+    if( !root.IsValid() ) return NULL;
+
     if( pManager ) {
         LPCTSTR pstrClass = root.GetName();
         if( _tcscmp(pstrClass, _T("Window")) == 0 ) {

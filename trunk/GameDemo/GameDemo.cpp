@@ -304,12 +304,12 @@ public:
                 }
                 m_pm.GetRoot()->NeedUpdate();
             }
-            else if( name == _T("leaveBtn") ) {
+            else if( name == _T("leaveBtn")  || name == _T("roomclosebtn") ) {
                 COptionUI* pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("hallswitch")));
-                if( pControl && pControl->IsSelected() == false ) {
+                if( pControl ) {
                     pControl->Activate();
-                    pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("roomswitch")));
-                    if( pControl ) pControl->SetVisible(false);
+                    CHorizontalLayoutUI* pH = static_cast<CHorizontalLayoutUI*>(m_pm.FindControl(_T("roomswitchpanel")));
+                    if( pH ) pH->SetVisible(false);
                 }
             }
             else if( name == _T("sendbtn") ) {
@@ -370,13 +370,14 @@ public:
                     if( node->data()._level == 3 ) {
                         COptionUI* pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("roomswitch")));
                         if( pControl ) {
-                            pControl->SetVisible(true);
+                            CHorizontalLayoutUI* pH = static_cast<CHorizontalLayoutUI*>(m_pm.FindControl(_T("roomswitchpanel")));
+                            if( pH ) pH->SetVisible(true);
+                            pControl->SetText(node->parent()->parent()->data()._text);
                             pControl->Activate();
                         }
                     }
                 }
             }
-
         }
         else if( msg.sType == _T("itemselect") ) {
             if( msg.pSender->GetName() == _T("chatCombo") ) {

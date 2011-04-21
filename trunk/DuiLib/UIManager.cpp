@@ -132,6 +132,8 @@ CPaintManagerUI::~CPaintManagerUI()
     RemoveAllFonts();
     RemoveAllImages();
     RemoveAllDefaultAttributeList();
+    RemoveAllOptionGroups();
+    RemoveAllTimers();
 
     // Reset other parts...
     if( m_hwndTooltip != NULL ) ::DestroyWindow(m_hwndTooltip);
@@ -985,6 +987,67 @@ void CPaintManagerUI::ReapObjects(CControlUI* pControl)
     if( !sName.IsEmpty() ) m_mNameHash.Remove(sName);
 }
 
+bool CPaintManagerUI::AddOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl)
+{
+    LPVOID lp = m_mOptionGroup.Find(pStrGroupName);
+    if( lp ) {
+        CStdPtrArray* aOptionGroup = static_cast<CStdPtrArray*>(lp);
+        for( int i = 0; i < aOptionGroup->GetSize(); i++ ) {
+            if( static_cast<CControlUI*>(aOptionGroup->GetAt(i)) == pControl ) {
+                return false;
+            }
+        }
+        aOptionGroup->Add(pControl);
+    }
+    else {
+        CStdPtrArray* aOptionGroup = new CStdPtrArray(6);
+        aOptionGroup->Add(pControl);
+        m_mOptionGroup.Insert(pStrGroupName, aOptionGroup);
+    }
+    return true;
+}
+
+CStdPtrArray* CPaintManagerUI::GetOptionGroup(LPCTSTR pStrGroupName)
+{
+    LPVOID lp = m_mOptionGroup.Find(pStrGroupName);
+    if( lp ) return static_cast<CStdPtrArray*>(lp);
+    return NULL;
+}
+
+void CPaintManagerUI::RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl)
+{
+    LPVOID lp = m_mOptionGroup.Find(pStrGroupName);
+    if( lp ) {
+        CStdPtrArray* aOptionGroup = static_cast<CStdPtrArray*>(lp);
+        if( aOptionGroup == NULL ) return;
+        int i = 0;
+        for( i = 0; i < aOptionGroup->GetSize(); i++ ) {
+            if( static_cast<CControlUI*>(aOptionGroup->GetAt(i)) == pControl ) {
+                aOptionGroup->Remove(i);
+                break;
+            }
+        }
+        if( aOptionGroup->IsEmpty() ) m_mOptionGroup.Remove(pStrGroupName);
+        else {
+            pControl = static_cast<CControlUI*>(aOptionGroup->GetAt(i));
+            if( pControl ) pControl->Activate();
+            else static_cast<CControlUI*>(aOptionGroup->GetAt(0))->Activate();
+        }
+    }
+}
+
+void CPaintManagerUI::RemoveAllOptionGroups()
+{
+    CStdPtrArray* aOptionGroup;
+    for( int i = 0; i< m_mOptionGroup.GetSize(); i++ ) {
+        if(LPCTSTR key = m_mOptionGroup.GetAt(i)) {
+            aOptionGroup = static_cast<CStdPtrArray*>(m_mOptionGroup.Find(key));
+            delete aOptionGroup;
+        }
+    }
+    m_mOptionGroup.Resize();
+}
+
 void CPaintManagerUI::MessageLoop()
 {
     MSG msg = { 0 };
@@ -1099,13 +1162,29 @@ bool CPaintManagerUI::KillTimer(CControlUI* pControl, UINT nTimerID)
             && pTimer->nLocalID == nTimerID )
         {
             if( pTimer->bKilled == false ) {
-                ::KillTimer(pTimer->hWnd, pTimer->uWinTimer);
+                if( ::IsWindow(m_hWndPaint) ) ::KillTimer(pTimer->hWnd, pTimer->uWinTimer);
                 pTimer->bKilled = true;
                 return true;
             }
         }
     }
     return false;
+}
+
+void CPaintManagerUI::RemoveAllTimers()
+{
+    for( int i = 0; i < m_aTimers.GetSize(); i++ ) {
+        TIMERINFO* pTimer = static_cast<TIMERINFO*>(m_aTimers[i]);
+        if( pTimer->hWnd == m_hWndPaint )
+        {
+            if( pTimer->bKilled == false ) {
+                if( ::IsWindow(m_hWndPaint) ) ::KillTimer(m_hWndPaint, pTimer->uWinTimer);
+            }
+            delete pTimer;
+        }
+    }
+
+    m_aTimers.Empty();
 }
 
 void CPaintManagerUI::SetCapture()
