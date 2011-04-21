@@ -1059,7 +1059,7 @@ void CPropertiesWnd::ShowOptionProperty(CControlUI* pControl)
 	//selected
 	pPropOption->GetSubItem(tagSelected-tagOption)->SetValue((_variant_t)pOption->IsSelected());
 	//group
-	pPropOption->GetSubItem(tagGroup-tagOption)->SetValue((_variant_t)pOption->IsGroup());
+	pPropOption->GetSubItem(tagGroup-tagOption)->SetValue((_variant_t)pOption->GetGroup());
 
 	pPropOption->Show(TRUE,FALSE);
 }
