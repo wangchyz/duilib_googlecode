@@ -512,8 +512,13 @@ void CButtonUI::PaintStatusImage(HDC hDC)
 //
 //
 
-COptionUI::COptionUI() : m_bGroup(false), m_bSelected(false)
+COptionUI::COptionUI() : m_bSelected(false)
 {
+}
+
+COptionUI::~COptionUI()
+{
+    if( !m_sGroupName.IsEmpty() && m_pManager ) m_pManager->RemoveOptionGroup(m_sGroupName, this);
 }
 
 LPCTSTR COptionUI::GetClass() const
@@ -527,18 +532,39 @@ LPVOID COptionUI::GetInterface(LPCTSTR pstrName)
     return CButtonUI::GetInterface(pstrName);
 }
 
-bool COptionUI::IsGroup() const
+void COptionUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit)
 {
-    return m_bGroup;
+    CControlUI::SetManager(pManager, pParent, bInit);
+    if( !m_sGroupName.IsEmpty() ) {
+        if (m_pManager) m_pManager->AddOptionGroup(m_sGroupName, this);
+    }
 }
 
-void COptionUI::SetGroup(bool bGroup)
+LPCTSTR COptionUI::GetGroup() const
 {
-    m_bGroup = bGroup;
-    if(m_bGroup && m_bSelected) {
-        Selected(true);
-        Invalidate();
+    return m_sGroupName;
+}
+
+void COptionUI::SetGroup(LPCTSTR pStrGroupName)
+{
+    if( pStrGroupName == NULL ) {
+        if( m_sGroupName.IsEmpty() ) return;
+        m_sGroupName.Empty();
     }
+    else {
+        if( m_sGroupName == pStrGroupName ) return;
+        if (!m_sGroupName.IsEmpty() && m_pManager) m_pManager->RemoveOptionGroup(m_sGroupName, this);
+        m_sGroupName = pStrGroupName;
+    }
+
+    if( !m_sGroupName.IsEmpty() ) {
+        if (m_pManager) m_pManager->AddOptionGroup(m_sGroupName, this);
+    }
+    else {
+        if (m_pManager) m_pManager->RemoveOptionGroup(m_sGroupName, this);
+    }
+
+    Selected(m_bSelected);
 }
 
 bool COptionUI::IsSelected() const
@@ -552,26 +578,23 @@ void COptionUI::Selected(bool bSelected)
     m_bSelected = bSelected;
     if( m_bSelected ) m_uButtonState |= UISTATE_SELECTED;
     else m_uButtonState &= ~UISTATE_SELECTED;
- 
-    if(m_bGroup) {
-        if(m_bSelected)  {
-            if( GetParent() ) {
-                IContainerUI* pParent = (IContainerUI*)(GetParent()->GetInterface(_T("IContainer")));
-                if(pParent) {
-                    for( int it = 0; it < pParent->GetCount(); it++ ) {
-                        COptionUI* pControl = static_cast<COptionUI*>(pParent->GetItemAt(it)->GetInterface(_T("Option")));
-                        if( pControl && pControl != this && pControl->IsGroup() && pControl->IsVisible() && pControl->IsEnabled() ) {
-                            pControl->Selected(false);
-                        }
+
+    if( m_pManager != NULL ) {
+        if( !m_sGroupName.IsEmpty() ) {
+            if( m_bSelected ) {
+                CStdPtrArray* aOptionGroup = m_pManager->GetOptionGroup(m_sGroupName);
+                for( int i = 0; i < aOptionGroup->GetSize(); i++ ) {
+                    COptionUI* pControl = static_cast<COptionUI*>(aOptionGroup->GetAt(i));
+                    if( pControl != this ) {
+                        pControl->Selected(false);
                     }
                 }
+                m_pManager->SendNotify(this, _T("selectchanged"));
             }
-
-            if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("selectchanged"));
         }
-    }
-    else {
-        if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("selectchanged"));
+        else {
+            m_pManager->SendNotify(this, _T("selectchanged"));
+        }
     }
 
     Invalidate();
@@ -580,7 +603,7 @@ void COptionUI::Selected(bool bSelected)
 bool COptionUI::Activate()
 {
     if( !CControlUI::Activate() ) return false;
-    if( m_bGroup ) Selected(true);
+    if( !m_sGroupName.IsEmpty() ) Selected(true);
     else Selected(!m_bSelected);
 
     return true;
@@ -616,7 +639,7 @@ SIZE COptionUI::EstimateSize(SIZE szAvailable)
 
 void COptionUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
-    if( _tcscmp(pstrName, _T("group")) == 0 ) SetGroup(_tcscmp(pstrValue, _T("true")) == 0);
+    if( _tcscmp(pstrName, _T("group")) == 0 ) SetGroup(pstrValue);
     else if( _tcscmp(pstrName, _T("selected")) == 0 ) Selected(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("selectedimage")) == 0 ) SetSelectedImage(pstrValue);
 	else if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);

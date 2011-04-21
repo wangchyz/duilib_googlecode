@@ -16,6 +16,7 @@ class UILIB_API CDialogBuilder
 {
 public:
     CControlUI* Create(STRINGorID xml, STRINGorID type = (UINT) 0, IDialogBuilderCallback* pCallback = NULL, CPaintManagerUI* pManager = NULL);
+    CControlUI* Create(IDialogBuilderCallback* pCallback = NULL, CPaintManagerUI* pManager = NULL);
 
     void GetLastErrorMessage(LPTSTR pstrMessage, SIZE_T cchMax) const;
     void GetLastErrorLocation(LPTSTR pstrSource, SIZE_T cchMax) const;

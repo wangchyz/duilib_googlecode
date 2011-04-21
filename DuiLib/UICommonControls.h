@@ -104,9 +104,12 @@ class UILIB_API COptionUI : public CButtonUI
 {
 public:
     COptionUI();
+    ~COptionUI();
 
     LPCTSTR GetClass() const;
     LPVOID GetInterface(LPCTSTR pstrName);
+
+    void SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit = true);
 
     bool Activate();
 
@@ -115,8 +118,8 @@ public:
 	LPCTSTR GetForeImage();
 	void SetForeImage(LPCTSTR pStrImage);
 
-    bool IsGroup() const;
-    void SetGroup(bool bGroup);
+    LPCTSTR GetGroup() const;
+    void SetGroup(LPCTSTR pStrGroupName = NULL);
     bool IsSelected() const;
     void Selected(bool bSelected);
 
@@ -127,8 +130,7 @@ public:
 
 protected:
     bool m_bSelected;
-    bool m_bGroup;
-
+    CStdString m_sGroupName;
     CStdString m_sSelectedImage;
 	CStdString m_sForeImage;
 };

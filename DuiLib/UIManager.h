@@ -245,6 +245,11 @@ public:
     bool InitControls(CControlUI* pControl, CControlUI* pParent = NULL);
     void ReapObjects(CControlUI* pControl);
 
+    bool AddOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl);
+    CStdPtrArray* GetOptionGroup(LPCTSTR pStrGroupName);
+    void RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl);
+    void RemoveAllOptionGroups();
+
     CControlUI* GetFocus() const;
     void SetFocus(CControlUI* pControl);
 
@@ -252,6 +257,7 @@ public:
 
     bool SetTimer(CControlUI* pControl, UINT nTimerID, UINT uElapse);
     bool KillTimer(CControlUI* pControl, UINT nTimerID);
+    void RemoveAllTimers();
 
     void SetCapture();
     void ReleaseCapture();
@@ -334,6 +340,7 @@ private:
     CStdPtrArray m_aPostPaintControls;
     CStdPtrArray m_aDelayedCleanup;
     CStdStringPtrMap m_mNameHash;
+    CStdStringPtrMap m_mOptionGroup;
     //
     CPaintManagerUI* m_pParentResourcePM;
     DWORD m_dwDefalutDisabledColor;
