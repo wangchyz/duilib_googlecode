@@ -1325,8 +1325,8 @@ void CLayoutManager::Save_COptionUI_Properties(CControlUI* pControlUI, TiXmlElem
 
 	TCHAR szBuf[MAX_PATH] = {0};
 
-	if (pOptionUI->IsGroup())
-		pNode->SetAttribute("group", pOptionUI->IsGroup()?"true":"false");
+	if (pOptionUI->GetGroup() && _tcslen(pOptionUI->GetGroup()))
+		pNode->SetAttribute("group",StringConvertor::WideToUtf8(pOptionUI->GetGroup()));
 
 	if (pOptionUI->IsSelected())
 		pNode->SetAttribute("selected", pOptionUI->IsSelected()?"true":"false");
