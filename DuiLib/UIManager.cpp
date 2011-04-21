@@ -1358,7 +1358,7 @@ CPaintManagerUI* CPaintManagerUI::GetParentResource() const
     return m_pParentResourcePM;
 }
 
-DWORD CPaintManagerUI::GetDefaultDisabledColor()
+DWORD CPaintManagerUI::GetDefaultDisabledColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultDisabledColor();
     return m_dwDefalutDisabledColor;
@@ -1369,7 +1369,7 @@ void CPaintManagerUI::SetDefaultDisabledColor(DWORD dwColor)
     m_dwDefalutDisabledColor = dwColor;
 }
 
-DWORD CPaintManagerUI::GetDefaultFontColor()
+DWORD CPaintManagerUI::GetDefaultFontColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultFontColor();
     return m_dwDefalutFontColor;
@@ -1380,7 +1380,7 @@ void CPaintManagerUI::SetDefaultFontColor(DWORD dwColor)
     m_dwDefalutFontColor = dwColor;
 }
 
-DWORD CPaintManagerUI::GetDefaultLinkFontColor()
+DWORD CPaintManagerUI::GetDefaultLinkFontColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkFontColor();
     return m_dwDefalutLinkFontColor;
@@ -1391,7 +1391,7 @@ void CPaintManagerUI::SetDefaultLinkFontColor(DWORD dwColor)
     m_dwDefalutLinkFontColor = dwColor;
 }
 
-DWORD CPaintManagerUI::GetDefaultLinkHoverFontColor()
+DWORD CPaintManagerUI::GetDefaultLinkHoverFontColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkHoverFontColor();
     return m_dwDefalutLinkHoverFontColor;
@@ -1402,7 +1402,7 @@ void CPaintManagerUI::SetDefaultLinkHoverFontColor(DWORD dwColor)
     m_dwDefalutLinkHoverFontColor = dwColor;
 }
 
-DWORD CPaintManagerUI::GetDefaultSelectedBkColor()
+DWORD CPaintManagerUI::GetDefaultSelectedBkColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultSelectedBkColor();
     return m_dwDefalutSelectedBkColor;
@@ -1765,14 +1765,19 @@ CControlUI* CPaintManagerUI::FindControl(LPCTSTR pstrName)
 
 CControlUI* CPaintManagerUI::FindControl(CControlUI* pParent, LPCTSTR pstrName)
 {
-    ASSERT(pParent);
-    return pParent->FindControl(__FindControlFromParentControl, (LPVOID)pstrName, UIFIND_ALL);
+	ASSERT(pParent);
+	return pParent->FindControl(__FindControlFromNameByParent, (LPVOID)pstrName, UIFIND_ALL);
 }
 
 CControlUI* CPaintManagerUI::FindControl(POINT pt) const
 {
     ASSERT(m_pRoot);
     return m_pRoot->FindControl(__FindControlFromPoint, &pt, UIFIND_VISIBLE | UIFIND_HITTEST | UIFIND_TOP_FIRST);
+}
+CControlUI* CPaintManagerUI::FindControl(CControlUI* pParent, POINT pt) const
+{
+	ASSERT(pParent);
+	return pParent->FindControl(__FindControlFromPoint, &pt, UIFIND_VISIBLE | UIFIND_HITTEST | UIFIND_TOP_FIRST);
 }
 
 CControlUI* CALLBACK CPaintManagerUI::__FindControlFromCount(CControlUI* /*pThis*/, LPVOID pData)
@@ -1806,7 +1811,7 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameHash(CControlUI* pThi
     return NULL; // Attempt to add all controls
 }
 
-CControlUI* CALLBACK CPaintManagerUI::__FindControlFromParentControl(CControlUI* pThis, LPVOID pData)
+CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameByParent(CControlUI* pThis, LPVOID pData)
 {
     LPCTSTR pstrName = static_cast<LPCTSTR>(pData);
 	const CStdString& sName = pThis->GetName();
