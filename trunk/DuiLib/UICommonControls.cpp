@@ -809,6 +809,8 @@ void CTextUI::PaintText(HDC hDC)
 
 CProgressUI::CProgressUI() : m_bHorizontal(true), m_nMin(0), m_nMax(100), m_nValue(0)
 {
+	m_dwBorderColor = 0xFF4EA0D1;
+	m_nBorderSize = 1;
     m_uTextStyle = DT_SINGLELINE | DT_CENTER;
     SetFixedHeight(12);
 }
@@ -917,10 +919,6 @@ void CProgressUI::PaintStatusImage(HDC hDC)
         if( !DrawImage(hDC, (LPCTSTR)m_sFgImage, (LPCTSTR)m_sFgImageModify) ) m_sFgImage.Empty();
         else return;
     }
-
-    DWORD dwBorderColor = 0xFF4EA0D1;
-    int nBorderSize = 1;
-    CRenderEngine::DrawRect(hDC, m_rcItem, nBorderSize, dwBorderColor);
 }
 
 
