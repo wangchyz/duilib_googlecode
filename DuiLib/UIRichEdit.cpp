@@ -335,20 +335,6 @@ BOOL CTxtWinHost::Init(CRichEditUI *re, const CREATESTRUCT *pcs)
 #endif
     }
 
-    rcClient.left = pcs->x;
-    rcClient.top = pcs->y;
-    rcClient.right = pcs->x + pcs->cx;
-    rcClient.bottom = pcs->y + pcs->cy;
-
-    LONG xPerInch = ::GetDeviceCaps(re->GetManager()->GetPaintDC(), LOGPIXELSX); 
-    LONG yPerInch =	::GetDeviceCaps(re->GetManager()->GetPaintDC(), LOGPIXELSY); 
-    sizelExtent.cx = DXtoHimetricX(pcs->cx, xPerInch);
-    sizelExtent.cy = DYtoHimetricY(pcs->cy, yPerInch);
-
-    // notify Text Services that we are in place active
-    if(FAILED(pserv->OnTxInPlaceActivate(&rcClient)))
-        goto err;
-
     return TRUE;
 
 err:
@@ -1653,7 +1639,6 @@ void CRichEditUI::DoInit()
 HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plresult) const
 {
     if( m_pTwh ) {
-        if( !IsMouseEnabled() && msg >= WM_MOUSEFIRST && msg <= WM_MOUSELAST ) return S_OK;
         if( msg == WM_KEYDOWN || msg == WM_KEYUP || msg == WM_CHAR || msg == WM_IME_CHAR ) {
             if( TCHAR(wparam) == VK_RETURN ) {
                 if( !m_bWantReturn || (::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn) ) {
@@ -2087,6 +2072,9 @@ void CRichEditUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
 {
     if( !IsVisible() || !IsEnabled() ) return 0;
+    if( !IsMouseEnabled() && uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST ) return 0;
+    if( uMsg == WM_MOUSEWHEEL ) return 0;
+
     bool bWasHandled = true;
     if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR )
     {
