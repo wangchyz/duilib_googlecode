@@ -1016,24 +1016,27 @@ CStdPtrArray* CPaintManagerUI::GetOptionGroup(LPCTSTR pStrGroupName)
 
 void CPaintManagerUI::RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl)
 {
-    LPVOID lp = m_mOptionGroup.Find(pStrGroupName);
-    if( lp ) {
-        CStdPtrArray* aOptionGroup = static_cast<CStdPtrArray*>(lp);
-        if( aOptionGroup == NULL ) return;
-        int i = 0;
-        for( i = 0; i < aOptionGroup->GetSize(); i++ ) {
-            if( static_cast<CControlUI*>(aOptionGroup->GetAt(i)) == pControl ) {
-                aOptionGroup->Remove(i);
-                break;
-            }
-        }
-        if( aOptionGroup->IsEmpty() ) m_mOptionGroup.Remove(pStrGroupName);
-        else {
-            pControl = static_cast<CControlUI*>(aOptionGroup->GetAt(i));
-            if( pControl ) pControl->Activate();
-            else static_cast<CControlUI*>(aOptionGroup->GetAt(0))->Activate();
-        }
-    }
+	LPVOID lp = m_mOptionGroup.Find(pStrGroupName);
+	if( lp ) {
+		CStdPtrArray* aOptionGroup = static_cast<CStdPtrArray*>(lp);
+		if( aOptionGroup == NULL ) return;
+		int i = 0;
+		for( i = 0; i < aOptionGroup->GetSize(); i++ ) {
+			if( static_cast<CControlUI*>(aOptionGroup->GetAt(i)) == pControl ) {
+				aOptionGroup->Remove(i);
+				break;
+			}
+		}
+		if( aOptionGroup->IsEmpty() ) {
+			delete aOptionGroup;
+			m_mOptionGroup.Remove(pStrGroupName);
+		}
+		else {
+			pControl = static_cast<CControlUI*>(aOptionGroup->GetAt(i));
+			if( pControl ) pControl->Activate();
+			else static_cast<CControlUI*>(aOptionGroup->GetAt(0))->Activate();
+		}
+	}
 }
 
 void CPaintManagerUI::RemoveAllOptionGroups()
