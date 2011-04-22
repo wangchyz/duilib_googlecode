@@ -116,16 +116,6 @@ CPaintManagerUI::~CPaintManagerUI()
     // Delete the control-tree structures
     for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) delete static_cast<CControlUI*>(m_aDelayedCleanup[i]);
     m_mNameHash.Resize(0);
-
-    for( int i = 0; i< m_aTimers.GetSize(); i++ ) {
-        TIMERINFO* pTimer = static_cast<TIMERINFO*>(m_aTimers[i]);
-        if( pTimer->bKilled == false ) {
-            KillTimer(pTimer->pSender, pTimer->nLocalID);
-        }
-
-        delete static_cast<TIMERINFO*>(m_aTimers[i]);
-    }
-
     delete m_pRoot;
 
     ::DeleteObject(m_DefaultFontInfo.hFont);
