@@ -907,7 +907,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             return true;
         }
         break;
-    case  WM_CTLCOLOREDIT:
+    case WM_CTLCOLOREDIT:
         {
             if( lParam == 0 ) break;
             HWND hWndChild = (HWND) lParam;

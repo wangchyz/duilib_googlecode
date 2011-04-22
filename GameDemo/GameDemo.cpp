@@ -62,11 +62,6 @@ public:
         m_pm.AttachDialog(pRoot);
         m_pm.AddNotifier(this);
 
-        SIZE szInitWindowSize = m_pm.GetInitSize();
-        if( szInitWindowSize.cx != 0 ) {
-            ::SetWindowPos(*this, NULL, 0, 0, szInitWindowSize.cx, szInitWindowSize.cy, SWP_NOZORDER | SWP_NOMOVE);
-        }
-
         Init();
         return 0;
     }
@@ -240,7 +235,7 @@ public:
         if( pLoginFrame == NULL ) { Close(); return; }
         pLoginFrame->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, UI_WNDSTYLE_EX_DIALOG, 0, 0, 0, 0, NULL);
         pLoginFrame->CenterWindow();
-        pLoginFrame->ShowModal();
+        ShowModal(*pLoginFrame);
     }
 
     void SendChatMessage() {
@@ -313,8 +308,8 @@ public:
 
                 COptionUI* pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("hallswitch")));
                 pControl->Activate();
-                pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("roomswitch")));
-                if( pControl ) pControl->SetVisible(false);
+                CHorizontalLayoutUI* pH = static_cast<CHorizontalLayoutUI*>(m_pm.FindControl(_T("roomswitchpanel")));
+                if( pH ) pH->SetVisible(false);
             }
             else if( name == _T("fontswitch") ) {
                 TFontInfo* pFontInfo = m_pm.GetDefaultFontInfo();

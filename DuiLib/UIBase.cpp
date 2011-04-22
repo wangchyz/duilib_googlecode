@@ -889,6 +889,76 @@ LPCTSTR CStdStringPtrMap::operator[] (int nIndex) const
 //
 //
 
+class CMessageBox : public CWindowWnd, public INotifyUI
+{
+public:
+    CMessageBox() : m_iRetCode(IDCANCEL) {}
+    LPCTSTR GetWindowClassName() const { return _T("UIMESSAGEBOX"); }
+    UINT GetClassStyle() const { return UI_CLASSSTYLE_DIALOG; };
+    void OnFinalMessage(HWND hWnd) { }
+    void SetContentText(LPCTSTR lpText) { m_sContent = lpText; }
+    int GetRetCode() { return m_iRetCode; }
+    LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+        if( uMsg == WM_CREATE ) {     
+            m_pm.Init(m_hWnd);
+            CDialogBuilder builder;
+            CControlUI* pRoot = builder.Create(GetDialogResource(), (UINT)0, NULL, &m_pm);
+            m_pm.AttachDialog(pRoot);
+            m_pm.AddNotifier(this);
+
+            CControlUI *pText = m_pm.FindControl(_T("content"));
+            if( pText ) pText->SetText(m_sContent);
+            CenterWindow();
+            return 0;
+        }
+        else if( uMsg == WM_KEYDOWN ) {
+            if( wParam == VK_RETURN ) {
+                m_iRetCode = IDOK;
+                Close();
+                return 0;
+            }
+            else if( wParam == VK_ESCAPE ) {
+                m_iRetCode = IDCANCEL;
+                Close();
+                return 0;
+            }
+        }
+        LRESULT lRes = 0;
+        if( m_pm.MessageHandler(uMsg, wParam, lParam, lRes) ) return lRes;
+        return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
+    }
+    void Notify(TNotifyUI& msg) {
+        if( msg.sType == _T("click") ) {
+            if( msg.pSender->GetName() == _T("ok")) {
+                m_iRetCode = IDOK;
+                Close();
+            }
+        }
+    }
+    LPCTSTR GetDialogResource() const {
+        return _T("<Window size=\"360,120\">")
+               _T("    <VerticalLayout bkcolor=\"#FFFFFFFF\" inset=\"12, 8, 12, 8\" >" )
+               _T("        <Text name=\"content\" maxheight=\"48\" />")
+               _T("        <Control />")
+               _T("        <HorizontalLayout height=\"22\">")
+               _T("            <Control />")
+               _T("            <Button name=\"ok\" text=\"È·¶¨\" bordercolor=\"#FF000000\" width=\"60\"/>")
+               _T("            <Control />")
+               _T("        </HorizontalLayout>")
+               _T("    </VerticalLayout>")
+               _T("</Window>");
+    }
+
+public:
+    CPaintManagerUI m_pm;
+    CStdString m_sContent;
+    int m_iRetCode;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+//
+
 CWindowWnd::CWindowWnd() : m_hWnd(NULL), m_OldWndProc(::DefWindowProc), m_bSubclassed(false)
 {
 }
@@ -955,17 +1025,30 @@ void CWindowWnd::ShowWindow(bool bShow /*= true*/, bool bTakeFocus /*= false*/)
     ::ShowWindow(m_hWnd, bShow ? (bTakeFocus ? SW_SHOWNORMAL : SW_SHOWNOACTIVATE) : SW_HIDE);
 }
 
-bool CWindowWnd::ShowModal()
+bool CWindowWnd::ShowModal(HWND hWnd)
 {
-    ASSERT(::IsWindow(m_hWnd));
-    HWND hWndParent = GetWindowOwner(m_hWnd);
-    ::ShowWindow(m_hWnd, SW_SHOWNORMAL);
-    ::EnableWindow(hWndParent, FALSE);
+    if( hWnd == NULL ) return false;
+    ASSERT(::IsWindow(hWnd));
+    HWND hWndParent = GetWindowOwner(hWnd);
+    ASSERT(hWndParent == m_hWnd);
+    ::ShowWindow(hWnd, SW_SHOWNORMAL);
+    ::EnableWindow(m_hWnd, FALSE);
+    bool bNeedClose = false;
     MSG msg = { 0 };
-    while( ::IsWindow(m_hWnd) && ::GetMessage(&msg, NULL, 0, 0) ) {
-        if( msg.message == WM_CLOSE && msg.hwnd == m_hWnd ) {
-            ::EnableWindow(hWndParent, TRUE);
-            ::SetFocus(hWndParent);
+    while( ::IsWindow(hWnd) && ::GetMessage(&msg, NULL, 0, 0) ) {
+        if( msg.message == WM_CLOSE ) {
+            if( msg.hwnd == hWnd ) {
+                ::EnableWindow(m_hWnd, TRUE);
+                ::SetFocus(m_hWnd);
+            }
+            else if( msg.hwnd == m_hWnd ) {
+                hWndParent = GetWindowOwner(m_hWnd);
+                if( hWndParent ) ::EnableWindow(hWndParent, FALSE);
+                ::EnableWindow(m_hWnd, TRUE);
+                ShowWindow(false, false);
+                bNeedClose = true;
+                continue;
+            }
         }
         if( !CPaintManagerUI::TranslateMessage(&msg) ) {
             ::TranslateMessage(&msg);
@@ -973,10 +1056,21 @@ bool CWindowWnd::ShowModal()
         }
         if( msg.message == WM_QUIT ) break;
     }
-    ::EnableWindow(hWndParent, TRUE);
-    ::SetFocus(hWndParent);
+    if( !bNeedClose ) ::EnableWindow(m_hWnd, TRUE);
+    else if( hWndParent ) ::EnableWindow(hWndParent, TRUE);
+    ::SetFocus(m_hWnd);
     if( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
+    else if( bNeedClose ) PostMessage(WM_CLOSE);
     return true;
+}
+
+int CWindowWnd::MessageBox(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
+{
+    CMessageBox mb;
+    mb.SetContentText(lpText);
+    mb.Create(m_hWnd, lpCaption, UI_WNDSTYLE_DIALOG, 0, 0, 0, 0, 0, NULL);
+    ShowModal(mb);
+    return mb.GetRetCode();
 }
 
 void CWindowWnd::Close()

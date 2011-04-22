@@ -50,7 +50,7 @@ struct Prama
 class CMenuWnd : public CWindowWnd, public INotifyUI
 {
 public:
-    CMenuWnd() : m_pOwner(NULL), bFlag(false) { };
+    CMenuWnd() : m_pOwner(NULL) { };
     void Init(CControlUI* pOwner, CRect rc) {
         if( pOwner == NULL ) return;
         m_pOwner = pOwner;
@@ -94,7 +94,6 @@ public:
 
     void Notify(TNotifyUI& msg)
     {
-        bFlag = true;
         if( msg.sType == _T("itemselect") ) {
             Close();
         }
@@ -107,12 +106,10 @@ public:
                     pList->RemoveAt(nSel);
                     domain.erase(domain.begin() + nSel);
                     desc.erase(desc.begin() + nSel);
-                    ::MessageBox(m_pm.GetPaintWindow(), _T("≤‚ ‘"), _T("≤‚ ‘"), MB_OK);
+                    MessageBox( _T("≤‚ ‘"), _T("≤‚ ‘"), MB_OK);
                 }
             }
         }
-        if( !bFlag ) Close();
-        bFlag = false;
     }
 
     LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -136,10 +133,7 @@ public:
 
     LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
-        if( m_hWnd != (HWND) wParam ) {
-            if( !bFlag ) Close();
-            else { ShowWindow(false, false); bFlag = false; }
-        }
+        if( m_hWnd != (HWND) wParam ) PostMessage(WM_CLOSE);
         return 0;
     }
 

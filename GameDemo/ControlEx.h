@@ -156,12 +156,12 @@ public:
             if( m_dwDelayNum > 0 ) lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
             switch( LOWORD(event.wParam) ) {
                 case SB_LINEUP:
-                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY = lDeltaY + 10;
-                    else m_dwDelayDeltaY = lDeltaY + 16;
+                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY = lDeltaY + 8;
+                    else m_dwDelayDeltaY = lDeltaY + 12;
                     break;
                 case SB_LINEDOWN:
-                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY = lDeltaY - 10;
-                    else m_dwDelayDeltaY = lDeltaY - 16;
+                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY = lDeltaY - 8;
+                    else m_dwDelayDeltaY = lDeltaY - 12;
                     break;
             }
             if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
@@ -414,12 +414,12 @@ public:
             if( m_dwDelayNum > 0 ) lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
             switch( LOWORD(event.wParam) ) {
                 case SB_LINEUP:
-                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY = lDeltaY + 10;
-                    else m_dwDelayDeltaY = lDeltaY + 16;
+                    if( m_dwDelayDeltaY >= 0 ) m_dwDelayDeltaY = lDeltaY + 8;
+                    else m_dwDelayDeltaY = lDeltaY + 12;
                     break;
                 case SB_LINEDOWN:
-                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY = lDeltaY - 10;
-                    else m_dwDelayDeltaY = lDeltaY - 16;
+                    if( m_dwDelayDeltaY <= 0 ) m_dwDelayDeltaY = lDeltaY - 8;
+                    else m_dwDelayDeltaY = lDeltaY - 12;
                     break;
             }
             if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
