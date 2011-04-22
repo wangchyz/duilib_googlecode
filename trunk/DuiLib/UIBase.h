@@ -282,7 +282,8 @@ public:
     HWND Subclass(HWND hWnd);
     void Unsubclass();
     void ShowWindow(bool bShow = true, bool bTakeFocus = true);
-    bool ShowModal();
+    bool ShowModal(HWND hWnd);
+    int MessageBox(LPCTSTR lpText, LPCTSTR lpCaption, UINT uType); // 目前仅支持MB_OK
     void Close();
     void CenterWindow();
     void SetIcon(UINT nRes);
