@@ -1088,7 +1088,12 @@ CControlUI* CPaintManagerUI::GetFocus() const
 void CPaintManagerUI::SetFocus(CControlUI* pControl)
 {
     // Paint manager window has focus?
-    if( ::GetFocus() != m_hWndPaint ) ::SetFocus(m_hWndPaint);
+    HWND hFocusWnd = ::GetFocus();
+    if( hFocusWnd != m_hWndPaint ) {
+        HWND hwndParent = ::GetParent(hFocusWnd);
+        UINT uStyle = GetWindowStyle(hFocusWnd);
+        if( !(hwndParent == m_hWndPaint && ((uStyle & WS_CHILD) != 0)) ) ::SetFocus(m_hWndPaint);
+    }
     // Already has focus?
     if( pControl == m_pFocus ) return;
     // Remove focus from old control

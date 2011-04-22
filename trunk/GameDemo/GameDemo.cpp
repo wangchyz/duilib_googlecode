@@ -10,13 +10,17 @@ CMiniDumper g_miniDumper( true );
 
 #include "ControlEx.h"
 
-class CLoginFrameWnd : public CWindowWnd, public INotifyUI
+class CLoginFrameWnd : public CWindowWnd, public INotifyUI, public IMessageFilterUI
 {
 public:
     CLoginFrameWnd() { };
     LPCTSTR GetWindowClassName() const { return _T("UILoginFrame"); };
     UINT GetClassStyle() const { return UI_CLASSSTYLE_DIALOG; };
-    void OnFinalMessage(HWND /*hWnd*/) { delete this; };
+    void OnFinalMessage(HWND /*hWnd*/) 
+    { 
+        m_pm.RemovePreMessageFilter(this);
+        delete this; 
+    };
 
     void Init() {
         CComboUI* pAccountCombo = static_cast<CComboUI*>(m_pm.FindControl(_T("accountcombo")));
@@ -50,6 +54,7 @@ public:
             rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
 
         m_pm.Init(m_hWnd);
+        m_pm.AddPreMessageFilter(this);
         CDialogBuilder builder;
         CDialogBuilderCallbackEx cb;
         CControlUI* pRoot = builder.Create(_T("login.xml"), (UINT)0, &cb, &m_pm);
@@ -137,6 +142,28 @@ public:
         return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
     }
 
+    LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
+    {
+        if( uMsg == WM_KEYDOWN ) {
+            if( wParam == VK_RETURN ) {
+                CEditUI* pEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("accountedit")));
+                if( pEdit->GetText().IsEmpty() ) pEdit->SetFocus();
+                else {
+                    pEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("pwdedit")));
+                    if( pEdit->GetText().IsEmpty() ) pEdit->SetFocus();
+                    else Close();
+                }
+                return true;
+            }
+            else if( wParam == VK_ESCAPE ) {
+                PostQuitMessage(0);
+                return true;
+            }
+
+        }
+        return false;
+    }
+
 public:
     CPaintManagerUI m_pm;
 };
@@ -219,8 +246,7 @@ public:
     void SendChatMessage() {
         CEditUI* pChatEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("chatEdit")));
         if( pChatEdit == NULL ) return;
-        //pChatEdit->SetFocus();
-        if( !pChatEdit->IsFocused() ) pChatEdit->SetFocus();
+        pChatEdit->SetFocus();
         if( pChatEdit->GetText().IsEmpty() ) return;
 
         CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
@@ -326,6 +352,8 @@ public:
                 CTabLayoutUI* pControl = static_cast<CTabLayoutUI*>(m_pm.FindControl(_T("switch")));
                 if( pControl && pControl->GetCurSel() != 1 ) {
                     pControl->SelectItem(1);
+                    DeskListUI* pDeskList = static_cast<DeskListUI*>(m_pm.FindControl(_T("destlist")));
+                    pDeskList->SetFocus();
                     CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_pm.FindControl(_T("chatmsglist")));
                     if( pRichEdit ) {
                         pRichEdit->SetText(_T("欢迎进入XXX游戏，祝游戏愉快！\n\n"));

@@ -5,10 +5,7 @@
 #include <math.h>
 
 inline double CalculateDelay(double state) {
-    if(state < 0.5) {
-        return pow(state * 2, 2) / 2.0;
-    }
-    return 1.0 - (pow((state - 1.0) * 2, 2) / 2.0);
+    return pow(state, 2);
 }
 
 // category(0)->game(1)->server(2)->room(3)
@@ -169,7 +166,7 @@ public:
             }
             if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
             else if( m_dwDelayDeltaY < -100 ) m_dwDelayDeltaY = -100;
-            m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 4;
+            m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 5;
             m_dwDelayLeft = m_dwDelayNum;
             m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
             return;
@@ -403,7 +400,7 @@ public:
                     m_dwDelayDeltaY = (event.ptMouse.y - m_ptLastMouse.y);
                     if( m_dwDelayDeltaY > 120 ) m_dwDelayDeltaY = 120;
                     else if( m_dwDelayDeltaY < -120 ) m_dwDelayDeltaY = -120;
-                    m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 4;
+                    m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 5;
                     m_dwDelayLeft = m_dwDelayNum;
                 }
                 else 
@@ -427,7 +424,7 @@ public:
             }
             if( m_dwDelayDeltaY > 100 ) m_dwDelayDeltaY = 100;
             else if( m_dwDelayDeltaY < -100 ) m_dwDelayDeltaY = -100;
-            m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 4;
+            m_dwDelayNum = (DWORD)sqrt((double)abs(m_dwDelayDeltaY)) * 5;
             m_dwDelayLeft = m_dwDelayNum;
             m_pManager->SetTimer(this, SCROLL_TIMERID, 50U);
             return;
