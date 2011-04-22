@@ -749,16 +749,19 @@ CStdStringPtrMap::CStdStringPtrMap(int nSize)
 
 CStdStringPtrMap::~CStdStringPtrMap()
 {
-    int len = m_nBuckets;
-    while( len-- ) {
-        TITEM* pItem = m_aT[len];
-        while( pItem ) {
-            TITEM* pKill = pItem;
-            pItem = pItem->pNext;
-            delete pKill;
-        }
-    }
-    delete [] m_aT;
+	if( m_aT ) {
+		int len = m_nBuckets;
+		while( len-- ) {
+			TITEM* pItem = m_aT[len];
+			while( pItem ) {
+				TITEM* pKill = pItem;
+				pItem = pItem->pNext;
+				delete pKill;
+			}
+		}
+		delete [] m_aT;
+		m_aT = NULL;
+	}
 }
 
 void CStdStringPtrMap::Resize(int nSize)
