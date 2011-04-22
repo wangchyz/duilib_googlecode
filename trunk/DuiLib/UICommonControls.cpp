@@ -1657,7 +1657,7 @@ void CEditUI::PaintText(HDC hDC)
 //
 //
 
-CScrollbarUI::CScrollbarUI() : m_bHorizontal(false), m_nRange(100), m_nScrollPos(0), m_nLineSize(8), 
+CScrollBarUI::CScrollBarUI() : m_bHorizontal(false), m_nRange(100), m_nScrollPos(0), m_nLineSize(8), 
 m_pOwner(NULL), m_nLastScrollPos(0), m_nLastScrollOffset(0), m_nScrollRepeatDelay(0), m_uButton1State(0), \
 m_uButton2State(0), m_uThumbState(0), m_bShowButton1(true), m_bShowButton2(true)
 {
@@ -1668,28 +1668,28 @@ m_uButton2State(0), m_uThumbState(0), m_bShowButton1(true), m_bShowButton2(true)
     ::ZeroMemory(&m_rcButton2, sizeof(m_rcButton2));
 }
 
-LPCTSTR CScrollbarUI::GetClass() const
+LPCTSTR CScrollBarUI::GetClass() const
 {
-    return _T("ScrollbarUI");
+    return _T("ScrollBarUI");
 }
 
-LPVOID CScrollbarUI::GetInterface(LPCTSTR pstrName)
+LPVOID CScrollBarUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("Scrollbar")) == 0 ) return static_cast<CScrollbarUI*>(this);
+    if( _tcscmp(pstrName, _T("ScrollBar")) == 0 ) return static_cast<CScrollBarUI*>(this);
     return CControlUI::GetInterface(pstrName);
 }
 
-CContainerUI* CScrollbarUI::GetOwner() const
+CContainerUI* CScrollBarUI::GetOwner() const
 {
     return m_pOwner;
 }
 
-void CScrollbarUI::SetOwner(CContainerUI* pOwner)
+void CScrollBarUI::SetOwner(CContainerUI* pOwner)
 {
     m_pOwner = pOwner;
 }
 
-void CScrollbarUI::SetEnabled(bool bEnable)
+void CScrollBarUI::SetEnabled(bool bEnable)
 {
     CControlUI::SetEnabled(bEnable);
     if( !IsEnabled() ) {
@@ -1699,18 +1699,18 @@ void CScrollbarUI::SetEnabled(bool bEnable)
     }
 }
 
-void CScrollbarUI::SetFocus()
+void CScrollBarUI::SetFocus()
 {
     if( m_pOwner != NULL ) m_pOwner->SetFocus();
     else CControlUI::SetFocus();
 }
 
-bool CScrollbarUI::IsHorizontal()
+bool CScrollBarUI::IsHorizontal()
 {
     return m_bHorizontal;
 }
 
-void CScrollbarUI::SetHorizontal(bool bHorizontal)
+void CScrollBarUI::SetHorizontal(bool bHorizontal)
 {
     if( m_bHorizontal == bHorizontal ) return;
 
@@ -1731,12 +1731,12 @@ void CScrollbarUI::SetHorizontal(bool bHorizontal)
     if( m_pOwner != NULL ) m_pOwner->NeedUpdate(); else NeedParentUpdate();
 }
 
-int CScrollbarUI::GetScrollRange() const
+int CScrollBarUI::GetScrollRange() const
 {
     return m_nRange;
 }
 
-void CScrollbarUI::SetScrollRange(int nRange)
+void CScrollBarUI::SetScrollRange(int nRange)
 {
     if( m_nRange == nRange ) return;
     
@@ -1746,12 +1746,12 @@ void CScrollbarUI::SetScrollRange(int nRange)
     SetPos(m_rcItem);
 }
 
-int CScrollbarUI::GetScrollPos() const
+int CScrollBarUI::GetScrollPos() const
 {
     return m_nScrollPos;
 }
 
-void CScrollbarUI::SetScrollPos(int nPos)
+void CScrollBarUI::SetScrollPos(int nPos)
 {
     if( m_nScrollPos == nPos ) return;
 
@@ -1761,259 +1761,259 @@ void CScrollbarUI::SetScrollPos(int nPos)
     SetPos(m_rcItem);
 }
 
-int CScrollbarUI::GetLineSize() const
+int CScrollBarUI::GetLineSize() const
 {
     return m_nLineSize;
 }
 
-void CScrollbarUI::SetLineSize(int nSize)
+void CScrollBarUI::SetLineSize(int nSize)
 {
     m_nLineSize = nSize;
 }
 
-bool CScrollbarUI::GetShowButton1()
+bool CScrollBarUI::GetShowButton1()
 {
     return m_bShowButton1;
 }
 
-void CScrollbarUI::SetShowButton1(bool bShow)
+void CScrollBarUI::SetShowButton1(bool bShow)
 {
     m_bShowButton1 = bShow;
     SetPos(m_rcItem);
 }
 
-LPCTSTR CScrollbarUI::GetButton1NormalImage()
+LPCTSTR CScrollBarUI::GetButton1NormalImage()
 {
     return m_sButton1NormalImage;
 }
 
-void CScrollbarUI::SetButton1NormalImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton1NormalImage(LPCTSTR pStrImage)
 {
     m_sButton1NormalImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetButton1HotImage()
+LPCTSTR CScrollBarUI::GetButton1HotImage()
 {
     return m_sButton1HotImage;
 }
 
-void CScrollbarUI::SetButton1HotImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton1HotImage(LPCTSTR pStrImage)
 {
     m_sButton1HotImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetButton1PushedImage()
+LPCTSTR CScrollBarUI::GetButton1PushedImage()
 {
     return m_sButton1PushedImage;
 }
 
-void CScrollbarUI::SetButton1PushedImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton1PushedImage(LPCTSTR pStrImage)
 {
     m_sButton1PushedImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetButton1DisabledImage()
+LPCTSTR CScrollBarUI::GetButton1DisabledImage()
 {
     return m_sButton1DisabledImage;
 }
 
-void CScrollbarUI::SetButton1DisabledImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton1DisabledImage(LPCTSTR pStrImage)
 {
     m_sButton1DisabledImage = pStrImage;
     Invalidate();
 }
 
-bool CScrollbarUI::GetShowButton2()
+bool CScrollBarUI::GetShowButton2()
 {
     return m_bShowButton2;
 }
 
-void CScrollbarUI::SetShowButton2(bool bShow)
+void CScrollBarUI::SetShowButton2(bool bShow)
 {
     m_bShowButton2 = bShow;
     SetPos(m_rcItem);
 }
 
-LPCTSTR CScrollbarUI::GetButton2NormalImage()
+LPCTSTR CScrollBarUI::GetButton2NormalImage()
 {
     return m_sButton2NormalImage;
 }
 
-void CScrollbarUI::SetButton2NormalImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton2NormalImage(LPCTSTR pStrImage)
 {
     m_sButton2NormalImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetButton2HotImage()
+LPCTSTR CScrollBarUI::GetButton2HotImage()
 {
     return m_sButton2HotImage;
 }
 
-void CScrollbarUI::SetButton2HotImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton2HotImage(LPCTSTR pStrImage)
 {
     m_sButton2HotImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetButton2PushedImage()
+LPCTSTR CScrollBarUI::GetButton2PushedImage()
 {
     return m_sButton2PushedImage;
 }
 
-void CScrollbarUI::SetButton2PushedImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton2PushedImage(LPCTSTR pStrImage)
 {
     m_sButton2PushedImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetButton2DisabledImage()
+LPCTSTR CScrollBarUI::GetButton2DisabledImage()
 {
     return m_sButton2DisabledImage;
 }
 
-void CScrollbarUI::SetButton2DisabledImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetButton2DisabledImage(LPCTSTR pStrImage)
 {
     m_sButton2DisabledImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetThumbNormalImage()
+LPCTSTR CScrollBarUI::GetThumbNormalImage()
 {
     return m_sThumbNormalImage;
 }
 
-void CScrollbarUI::SetThumbNormalImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetThumbNormalImage(LPCTSTR pStrImage)
 {
     m_sThumbNormalImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetThumbHotImage()
+LPCTSTR CScrollBarUI::GetThumbHotImage()
 {
     return m_sThumbHotImage;
 }
 
-void CScrollbarUI::SetThumbHotImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetThumbHotImage(LPCTSTR pStrImage)
 {
     m_sThumbHotImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetThumbPushedImage()
+LPCTSTR CScrollBarUI::GetThumbPushedImage()
 {
     return m_sThumbPushedImage;
 }
 
-void CScrollbarUI::SetThumbPushedImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetThumbPushedImage(LPCTSTR pStrImage)
 {
     m_sThumbPushedImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetThumbDisabledImage()
+LPCTSTR CScrollBarUI::GetThumbDisabledImage()
 {
     return m_sThumbDisabledImage;
 }
 
-void CScrollbarUI::SetThumbDisabledImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetThumbDisabledImage(LPCTSTR pStrImage)
 {
     m_sThumbDisabledImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetRailNormalImage()
+LPCTSTR CScrollBarUI::GetRailNormalImage()
 {
     return m_sRailNormalImage;
 }
 
-void CScrollbarUI::SetRailNormalImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetRailNormalImage(LPCTSTR pStrImage)
 {
     m_sRailNormalImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetRailHotImage()
+LPCTSTR CScrollBarUI::GetRailHotImage()
 {
     return m_sRailHotImage;
 }
 
-void CScrollbarUI::SetRailHotImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetRailHotImage(LPCTSTR pStrImage)
 {
     m_sRailHotImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetRailPushedImage()
+LPCTSTR CScrollBarUI::GetRailPushedImage()
 {
     return m_sRailPushedImage;
 }
 
-void CScrollbarUI::SetRailPushedImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetRailPushedImage(LPCTSTR pStrImage)
 {
     m_sRailPushedImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetRailDisabledImage()
+LPCTSTR CScrollBarUI::GetRailDisabledImage()
 {
     return m_sRailDisabledImage;
 }
 
-void CScrollbarUI::SetRailDisabledImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetRailDisabledImage(LPCTSTR pStrImage)
 {
     m_sRailDisabledImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetBkNormalImage()
+LPCTSTR CScrollBarUI::GetBkNormalImage()
 {
     return m_sBkNormalImage;
 }
 
-void CScrollbarUI::SetBkNormalImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetBkNormalImage(LPCTSTR pStrImage)
 {
     m_sBkNormalImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetBkHotImage()
+LPCTSTR CScrollBarUI::GetBkHotImage()
 {
     return m_sBkHotImage;
 }
 
-void CScrollbarUI::SetBkHotImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetBkHotImage(LPCTSTR pStrImage)
 {
     m_sBkHotImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetBkPushedImage()
+LPCTSTR CScrollBarUI::GetBkPushedImage()
 {
     return m_sBkPushedImage;
 }
 
-void CScrollbarUI::SetBkPushedImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetBkPushedImage(LPCTSTR pStrImage)
 {
     m_sBkPushedImage = pStrImage;
     Invalidate();
 }
 
-LPCTSTR CScrollbarUI::GetBkDisabledImage()
+LPCTSTR CScrollBarUI::GetBkDisabledImage()
 {
     return m_sBkDisabledImage;
 }
 
-void CScrollbarUI::SetBkDisabledImage(LPCTSTR pStrImage)
+void CScrollBarUI::SetBkDisabledImage(LPCTSTR pStrImage)
 {
     m_sBkDisabledImage = pStrImage;
     Invalidate();
 }
 
-void CScrollbarUI::SetPos(RECT rc)
+void CScrollBarUI::SetPos(RECT rc)
 {
     CControlUI::SetPos(rc);
     rc = m_rcItem;
@@ -2166,7 +2166,7 @@ void CScrollbarUI::SetPos(RECT rc)
     }
 }
 
-void CScrollbarUI::DoEvent(TEventUI& event)
+void CScrollBarUI::DoEvent(TEventUI& event)
 {
     if( !IsMouseEnabled() && event.Type > UIEVENT__MOUSEBEGIN && event.Type < UIEVENT__MOUSEEND ) {
         if( m_pOwner != NULL ) m_pOwner->DoEvent(event);
@@ -2384,7 +2384,7 @@ void CScrollbarUI::DoEvent(TEventUI& event)
     if( m_pOwner != NULL ) m_pOwner->DoEvent(event); else CControlUI::DoEvent(event);
 }
 
-void CScrollbarUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
+void CScrollBarUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("button1normalimage")) == 0 ) SetButton1NormalImage(pstrValue);
     else if( _tcscmp(pstrName, _T("button1hotimage")) == 0 ) SetButton1HotImage(pstrValue);
@@ -2415,7 +2415,7 @@ void CScrollbarUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else CControlUI::SetAttribute(pstrName, pstrValue);
 }
 
-void CScrollbarUI::DoPaint(HDC hDC, const RECT& rcPaint)
+void CScrollBarUI::DoPaint(HDC hDC, const RECT& rcPaint)
 {
     if( !::IntersectRect(&m_rcPaint, &rcPaint, &m_rcItem) ) return;
     PaintBk(hDC);
@@ -2425,7 +2425,7 @@ void CScrollbarUI::DoPaint(HDC hDC, const RECT& rcPaint)
     PaintRail(hDC);
 }
 
-void CScrollbarUI::PaintBk(HDC hDC)
+void CScrollBarUI::PaintBk(HDC hDC)
 {
     if( !IsEnabled() ) m_uThumbState |= UISTATE_DISABLED;
     else m_uThumbState &= ~ UISTATE_DISABLED;
@@ -2455,7 +2455,7 @@ void CScrollbarUI::PaintBk(HDC hDC)
     }
 }
 
-void CScrollbarUI::PaintButton1(HDC hDC)
+void CScrollBarUI::PaintButton1(HDC hDC)
 {
     if( !IsEnabled() ) m_uButton1State |= UISTATE_DISABLED;
     else m_uButton1State &= ~ UISTATE_DISABLED;
@@ -2493,7 +2493,7 @@ void CScrollbarUI::PaintButton1(HDC hDC)
     CRenderEngine::DrawRect(hDC, m_rcButton1, nBorderSize, dwBorderColor);
 }
 
-void CScrollbarUI::PaintButton2(HDC hDC)
+void CScrollBarUI::PaintButton2(HDC hDC)
 {
     if( !IsEnabled() ) m_uButton2State |= UISTATE_DISABLED;
     else m_uButton2State &= ~ UISTATE_DISABLED;
@@ -2531,7 +2531,7 @@ void CScrollbarUI::PaintButton2(HDC hDC)
     CRenderEngine::DrawRect(hDC, m_rcButton2, nBorderSize, dwBorderColor);
 }
 
-void CScrollbarUI::PaintThumb(HDC hDC)
+void CScrollBarUI::PaintThumb(HDC hDC)
 {
     if( m_rcThumb.left == 0 && m_rcThumb.top == 0 && m_rcThumb.right == 0 && m_rcThumb.bottom == 0 ) return;
     if( !IsEnabled() ) m_uThumbState |= UISTATE_DISABLED;
@@ -2570,7 +2570,7 @@ void CScrollbarUI::PaintThumb(HDC hDC)
     CRenderEngine::DrawRect(hDC, m_rcThumb, nBorderSize, dwBorderColor);
 }
 
-void CScrollbarUI::PaintRail(HDC hDC)
+void CScrollBarUI::PaintRail(HDC hDC)
 {
     if( m_rcThumb.left == 0 && m_rcThumb.top == 0 && m_rcThumb.right == 0 && m_rcThumb.bottom == 0 ) return;
     if( !IsEnabled() ) m_uThumbState |= UISTATE_DISABLED;

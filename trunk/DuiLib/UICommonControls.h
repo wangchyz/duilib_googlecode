@@ -306,10 +306,10 @@ protected:
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
-class UILIB_API CScrollbarUI : public CControlUI
+class UILIB_API CScrollBarUI : public CControlUI
 {
 public:
-    CScrollbarUI();
+    CScrollBarUI();
 
     LPCTSTR GetClass() const;
     LPVOID GetInterface(LPCTSTR pstrName);

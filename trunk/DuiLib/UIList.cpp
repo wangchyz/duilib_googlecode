@@ -616,8 +616,8 @@ void CListUI::EnsureVisible(int iIndex)
     rcList.right -= rcListInset.right;
     rcList.bottom -= rcListInset.bottom;
 
-    CScrollbarUI* pHorizontalScrollbar = m_pList->GetHorizontalScrollbar();
-    if( pHorizontalScrollbar && pHorizontalScrollbar->IsVisible() ) rcList.bottom -= pHorizontalScrollbar->GetFixedHeight();
+    CScrollBarUI* pHorizontalScrollBar = m_pList->GetHorizontalScrollBar();
+    if( pHorizontalScrollBar && pHorizontalScrollBar->IsVisible() ) rcList.bottom -= pHorizontalScrollBar->GetFixedHeight();
 
     int iPos = m_pList->GetScrollPos().cy;
     if( rcItem.top >= rcList.top && rcItem.bottom < rcList.bottom ) return;
@@ -816,14 +816,14 @@ void CListUI::EnableScrollBar(bool bEnableVertical, bool bEnableHorizontal)
     m_pList->EnableScrollBar(bEnableVertical, bEnableHorizontal);
 }
 
-CScrollbarUI* CListUI::GetVerticalScrollbar() const
+CScrollBarUI* CListUI::GetVerticalScrollBar() const
 {
-    return m_pList->GetVerticalScrollbar();
+    return m_pList->GetVerticalScrollBar();
 }
 
-CScrollbarUI* CListUI::GetHorizontalScrollbar() const
+CScrollBarUI* CListUI::GetHorizontalScrollBar() const
 {
-    return m_pList->GetHorizontalScrollbar();
+    return m_pList->GetHorizontalScrollBar();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -841,16 +841,16 @@ void CListBodyUI::SetScrollPos(SIZE szPos)
 {
     int cx = 0;
     int cy = 0;
-    if( m_pVerticalScrollbar && m_pVerticalScrollbar->IsVisible() ) {
-        int iLastScrollPos = m_pVerticalScrollbar->GetScrollPos();
-        m_pVerticalScrollbar->SetScrollPos(szPos.cy);
-        cy = m_pVerticalScrollbar->GetScrollPos() - iLastScrollPos;
+    if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
+        int iLastScrollPos = m_pVerticalScrollBar->GetScrollPos();
+        m_pVerticalScrollBar->SetScrollPos(szPos.cy);
+        cy = m_pVerticalScrollBar->GetScrollPos() - iLastScrollPos;
     }
 
-    if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) {
-        int iLastScrollPos = m_pHorizontalScrollbar->GetScrollPos();
-        m_pHorizontalScrollbar->SetScrollPos(szPos.cx);
-        cx = m_pHorizontalScrollbar->GetScrollPos() - iLastScrollPos;
+    if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
+        int iLastScrollPos = m_pHorizontalScrollBar->GetScrollPos();
+        m_pHorizontalScrollBar->SetScrollPos(szPos.cx);
+        cx = m_pHorizontalScrollBar->GetScrollPos() - iLastScrollPos;
     }
 
     if( cx == 0 && cy == 0 ) return;
@@ -903,13 +903,13 @@ void CListBodyUI::SetPos(RECT rc)
     rc.top += m_rcInset.top;
     rc.right -= m_rcInset.right;
     rc.bottom -= m_rcInset.bottom;
-    if( m_pVerticalScrollbar && m_pVerticalScrollbar->IsVisible() ) rc.right -= m_pVerticalScrollbar->GetFixedWidth();
-    if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) rc.bottom -= m_pHorizontalScrollbar->GetFixedHeight();
+    if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) rc.right -= m_pVerticalScrollBar->GetFixedWidth();
+    if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
 
     // Determine the minimum size
     SIZE szAvailable = { rc.right - rc.left, rc.bottom - rc.top };
-    if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) 
-        szAvailable.cx += m_pHorizontalScrollbar->GetScrollRange();
+    if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
+        szAvailable.cx += m_pHorizontalScrollBar->GetScrollRange();
 
     int cxNeeded = 0;
     int nAdjustables = 0;
@@ -952,12 +952,12 @@ void CListBodyUI::SetPos(RECT rc)
     // Position the elements
     SIZE szRemaining = szAvailable;
     int iPosY = rc.top;
-    if( m_pVerticalScrollbar && m_pVerticalScrollbar->IsVisible() ) {
-        iPosY -= m_pVerticalScrollbar->GetScrollPos();
+    if( m_pVerticalScrollBar && m_pVerticalScrollBar->IsVisible() ) {
+        iPosY -= m_pVerticalScrollBar->GetScrollPos();
     }
     int iPosX = rc.left;
-    if( m_pHorizontalScrollbar && m_pHorizontalScrollbar->IsVisible() ) {
-        iPosX -= m_pHorizontalScrollbar->GetScrollPos();
+    if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) {
+        iPosX -= m_pHorizontalScrollBar->GetScrollPos();
     }
     int iAdjustable = 0;
     int cyFixedRemaining = cyFixed;
@@ -1002,30 +1002,30 @@ void CListBodyUI::SetPos(RECT rc)
     }
     cyNeeded += (nEstimateNum - 1) * m_iChildPadding;
 
-    if( m_pHorizontalScrollbar != NULL ) {
+    if( m_pHorizontalScrollBar != NULL ) {
         if( cxNeeded > rc.right - rc.left ) {
-            if( m_pHorizontalScrollbar->IsVisible() ) {
-                m_pHorizontalScrollbar->SetScrollRange(cxNeeded - (rc.right - rc.left));
+            if( m_pHorizontalScrollBar->IsVisible() ) {
+                m_pHorizontalScrollBar->SetScrollRange(cxNeeded - (rc.right - rc.left));
             }
             else {
-                m_pHorizontalScrollbar->SetVisible(true);
-                m_pHorizontalScrollbar->SetScrollRange(cxNeeded - (rc.right - rc.left));
-                m_pHorizontalScrollbar->SetScrollPos(0);
-                rc.bottom -= m_pHorizontalScrollbar->GetFixedHeight();
+                m_pHorizontalScrollBar->SetVisible(true);
+                m_pHorizontalScrollBar->SetScrollRange(cxNeeded - (rc.right - rc.left));
+                m_pHorizontalScrollBar->SetScrollPos(0);
+                rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
             }
         }
         else {
-            if( m_pHorizontalScrollbar->IsVisible() ) {
-                m_pHorizontalScrollbar->SetVisible(false);
-                m_pHorizontalScrollbar->SetScrollRange(0);
-                m_pHorizontalScrollbar->SetScrollPos(0);
-                rc.bottom += m_pHorizontalScrollbar->GetFixedHeight();
+            if( m_pHorizontalScrollBar->IsVisible() ) {
+                m_pHorizontalScrollBar->SetVisible(false);
+                m_pHorizontalScrollBar->SetScrollRange(0);
+                m_pHorizontalScrollBar->SetScrollPos(0);
+                rc.bottom += m_pHorizontalScrollBar->GetFixedHeight();
             }
         }
     }
 
     // Process the scrollbar
-    ProcessScrollbar(rc, cxNeeded, cyNeeded);
+    ProcessScrollBar(rc, cxNeeded, cyNeeded);
 }
 
 void CListBodyUI::DoEvent(TEventUI& event)
@@ -1524,10 +1524,10 @@ void CListElementUI::Invalidate()
             rc.top += rcInset.top;
             rc.right -= rcInset.right;
             rc.bottom -= rcInset.bottom;
-            CScrollbarUI* pVerticalScrollbar = pParentContainer->GetVerticalScrollbar();
-            if( pVerticalScrollbar && pVerticalScrollbar->IsVisible() ) rc.right -= pVerticalScrollbar->GetFixedWidth();
-            CScrollbarUI* pHorizontalScrollbar = pParentContainer->GetHorizontalScrollbar();
-            if( pHorizontalScrollbar && pHorizontalScrollbar->IsVisible() ) rc.bottom -= pHorizontalScrollbar->GetFixedHeight();
+            CScrollBarUI* pVerticalScrollBar = pParentContainer->GetVerticalScrollBar();
+            if( pVerticalScrollBar && pVerticalScrollBar->IsVisible() ) rc.right -= pVerticalScrollBar->GetFixedWidth();
+            CScrollBarUI* pHorizontalScrollBar = pParentContainer->GetHorizontalScrollBar();
+            if( pHorizontalScrollBar && pHorizontalScrollBar->IsVisible() ) rc.bottom -= pHorizontalScrollBar->GetFixedHeight();
 
             RECT invalidateRc = m_rcItem;
             if( !::IntersectRect(&invalidateRc, &m_rcItem, &rc) ) 
@@ -2380,10 +2380,10 @@ void CListContainerElementUI::Invalidate()
             rc.top += rcInset.top;
             rc.right -= rcInset.right;
             rc.bottom -= rcInset.bottom;
-            CScrollbarUI* pVerticalScrollbar = pParentContainer->GetVerticalScrollbar();
-            if( pVerticalScrollbar && pVerticalScrollbar->IsVisible() ) rc.right -= pVerticalScrollbar->GetFixedWidth();
-            CScrollbarUI* pHorizontalScrollbar = pParentContainer->GetHorizontalScrollbar();
-            if( pHorizontalScrollbar && pHorizontalScrollbar->IsVisible() ) rc.bottom -= pHorizontalScrollbar->GetFixedHeight();
+            CScrollBarUI* pVerticalScrollBar = pParentContainer->GetVerticalScrollBar();
+            if( pVerticalScrollBar && pVerticalScrollBar->IsVisible() ) rc.right -= pVerticalScrollBar->GetFixedWidth();
+            CScrollBarUI* pHorizontalScrollBar = pParentContainer->GetHorizontalScrollBar();
+            if( pHorizontalScrollBar && pHorizontalScrollBar->IsVisible() ) rc.bottom -= pHorizontalScrollBar->GetFixedHeight();
 
             RECT invalidateRc = m_rcItem;
             if( !::IntersectRect(&invalidateRc, &m_rcItem, &rc) ) 
