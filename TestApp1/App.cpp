@@ -20,9 +20,7 @@ public:
             if( msg.pSender->GetName() == _T("insertimagebtn") ) {
                 CRichEditUI* pRich = static_cast<CRichEditUI*>(m_pm.FindControl(_T("testrichedit")));
                 if( pRich ) {
-                    pRich->SetDelayedDestroy(true);
                     pRich->RemoveAll();
-                    pRich->SetDelayedDestroy(false);
                 }
             }
         }

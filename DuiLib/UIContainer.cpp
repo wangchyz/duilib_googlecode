@@ -9,7 +9,7 @@ namespace DuiLib {
 CContainerUI::CContainerUI() : 
 m_iChildPadding(0),
 m_bAutoDestroy(true),
-m_bDelayedDestroy(false),
+m_bDelayedDestroy(true),
 m_bMouseChildEnabled(true),
 m_pVerticalScrollbar(NULL),
 m_pHorizontalScrollbar(NULL),
