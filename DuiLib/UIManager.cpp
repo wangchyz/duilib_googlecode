@@ -1038,14 +1038,13 @@ void CPaintManagerUI::RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pCont
 
 void CPaintManagerUI::RemoveAllOptionGroups()
 {
-    CStdPtrArray* aOptionGroup;
-    for( int i = 0; i< m_mOptionGroup.GetSize(); i++ ) {
-        if(LPCTSTR key = m_mOptionGroup.GetAt(i)) {
-            aOptionGroup = static_cast<CStdPtrArray*>(m_mOptionGroup.Find(key));
-            delete aOptionGroup;
-        }
-    }
-    m_mOptionGroup.Resize();
+	CStdPtrArray* aOptionGroup;
+	for( int i = 0; i< m_mOptionGroup.GetSize(); i++ ) {
+		if(LPCTSTR key = m_mOptionGroup.GetAt(i)) {
+			aOptionGroup = static_cast<CStdPtrArray*>(m_mOptionGroup.Find(key));
+			delete aOptionGroup;
+		}
+	}
 }
 
 void CPaintManagerUI::MessageLoop()
@@ -1699,8 +1698,6 @@ void CPaintManagerUI::RemoveAllImages()
             delete data;
         }
     }
-
-    m_mImageHash.Resize();
 }
 
 void CPaintManagerUI::AddDefaultAttributeList(LPCTSTR pStrControlName, LPCTSTR pStrControlAttrList)
@@ -1740,15 +1737,13 @@ const CStdStringPtrMap& CPaintManagerUI::GetDefaultAttribultes() const
 
 void CPaintManagerUI::RemoveAllDefaultAttributeList()
 {
-    CStdString* pDefaultAttr;
-    for( int i = 0; i< m_DefaultAttrHash.GetSize(); i++ ) {
-        if(LPCTSTR key = m_DefaultAttrHash.GetAt(i)) {
-            pDefaultAttr = static_cast<CStdString*>(m_DefaultAttrHash.Find(key));
-            delete pDefaultAttr;
-        }
-    }
-
-    m_DefaultAttrHash.Resize();
+	CStdString* pDefaultAttr;
+	for( int i = 0; i< m_DefaultAttrHash.GetSize(); i++ ) {
+		if(LPCTSTR key = m_DefaultAttrHash.GetAt(i)) {
+			pDefaultAttr = static_cast<CStdString*>(m_DefaultAttrHash.Find(key));
+			delete pDefaultAttr;
+		}
+	}
 }
 
 CControlUI* CPaintManagerUI::GetRoot() const
