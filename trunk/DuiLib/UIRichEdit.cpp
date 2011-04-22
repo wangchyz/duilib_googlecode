@@ -1632,6 +1632,7 @@ void CRichEditUI::DoInit()
     CreateHost(this, &cs, &m_pTwh);
     if( m_pTwh ) {
         m_pTwh->SetTransparent(TRUE);
+        if( m_bReadOnly ) m_pTwh->OnTxInPlaceActivate(NULL);
         m_pManager->AddMessageFilter(this);
     }
 }
