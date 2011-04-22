@@ -125,7 +125,7 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         ::GetCursorPos(&pt);
         ::ScreenToClient(m_pm.GetPaintWindow(), &pt);
         CControlUI* pControl = m_pm.FindControl(pt);
-        if( pControl && _tcscmp(pControl->GetClass(), _T("ScrollbarUI")) != 0 ) PostMessage(WM_KILLFOCUS);
+        if( pControl && _tcscmp(pControl->GetClass(), _T("ScrollBarUI")) != 0 ) PostMessage(WM_KILLFOCUS);
     }
     else if( uMsg == WM_KEYDOWN ) {
         switch( wParam ) {
@@ -171,8 +171,8 @@ void CComboWnd::EnsureVisible(int iIndex)
     m_pLayout->FindSelectable(m_pOwner->GetCurSel(), false);
     RECT rcItem = m_pLayout->GetItemAt(iIndex)->GetPos();
     RECT rcList = m_pLayout->GetPos();
-    CScrollbarUI* pHorizontalScrollbar = m_pLayout->GetHorizontalScrollbar();
-    if( pHorizontalScrollbar && pHorizontalScrollbar->IsVisible() ) rcList.bottom -= pHorizontalScrollbar->GetFixedHeight();
+    CScrollBarUI* pHorizontalScrollBar = m_pLayout->GetHorizontalScrollBar();
+    if( pHorizontalScrollBar && pHorizontalScrollBar->IsVisible() ) rcList.bottom -= pHorizontalScrollBar->GetFixedHeight();
     int iPos = m_pLayout->GetScrollPos().cy;
     if( rcItem.top >= rcList.top && rcItem.bottom < rcList.bottom ) return;
     int dx = 0;

@@ -180,8 +180,8 @@ public:
     void HomeLeft();
     void EndRight();
     void EnableScrollBar(bool bEnableVertical = true, bool bEnableHorizontal = false);
-    virtual CScrollbarUI* GetVerticalScrollbar() const;
-    virtual CScrollbarUI* GetHorizontalScrollbar() const;
+    virtual CScrollBarUI* GetVerticalScrollBar() const;
+    virtual CScrollBarUI* GetHorizontalScrollBar() const;
 
 protected:
     int m_iCurSel;

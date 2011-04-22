@@ -24,7 +24,7 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
-class CScrollbarUI;
+class CScrollBarUI;
 
 class UILIB_API CContainerUI : public CControlUI, public IContainerUI
 {
@@ -88,12 +88,12 @@ public:
     virtual void HomeLeft();
     virtual void EndRight();
     virtual void EnableScrollBar(bool bEnableVertical = true, bool bEnableHorizontal = false);
-    virtual CScrollbarUI* GetVerticalScrollbar() const;
-    virtual CScrollbarUI* GetHorizontalScrollbar() const;
+    virtual CScrollBarUI* GetVerticalScrollBar() const;
+    virtual CScrollBarUI* GetHorizontalScrollBar() const;
 
 protected:
     virtual void SetFloatPos(int iIndex);
-    virtual void ProcessScrollbar(RECT rc, int cxRequired, int cyRequired);
+    virtual void ProcessScrollBar(RECT rc, int cxRequired, int cyRequired);
 
 protected:
     CStdPtrArray m_items;
@@ -104,8 +104,8 @@ protected:
     bool m_bMouseChildEnabled;
     bool m_bScrollProcess; // ∑¿÷πSetPos—≠ª∑µ˜”√
 
-    CScrollbarUI* m_pVerticalScrollbar;
-    CScrollbarUI* m_pHorizontalScrollbar;
+    CScrollBarUI* m_pVerticalScrollBar;
+    CScrollBarUI* m_pHorizontalScrollBar;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +244,8 @@ public:
     bool SelectItem(int iIndex);
 
     void SetPos(RECT rc);
+
+    void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
 protected:
     int m_iCurSel;

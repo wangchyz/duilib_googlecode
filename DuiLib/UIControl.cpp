@@ -586,6 +586,7 @@ bool CControlUI::IsUpdateNeeded() const
 
 void CControlUI::NeedUpdate()
 {
+    if( !IsVisible() ) return;
     m_bUpdateNeeded = true;
     Invalidate();
 
