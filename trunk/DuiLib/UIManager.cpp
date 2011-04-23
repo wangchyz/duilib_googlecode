@@ -1084,7 +1084,12 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
         else {
             HWND hwndParent = ::GetParent(hFocusWnd);
             UINT uStyle = GetWindowStyle(hFocusWnd);
-            if( !(hwndParent == m_hWndPaint && ((uStyle & WS_CHILD) != 0)) ) ::SetFocus(m_hWndPaint);
+            if( hwndParent == m_hWndPaint && ((uStyle & WS_CHILD) != 0) ) {
+                if( pControl != m_pFocus ) ::SetFocus(m_hWndPaint);
+            }
+            else {
+                ::SetFocus(m_hWndPaint);
+            }
         }
     }
     // Already has focus?

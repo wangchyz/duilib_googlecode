@@ -1807,7 +1807,6 @@ void CRichEditUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK ) 
     {
-        GetManager()->ReleaseCapture();
         return;
     }
     if( event.Type == UIEVENT_MOUSEMOVE ) 
