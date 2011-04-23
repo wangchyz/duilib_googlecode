@@ -531,6 +531,7 @@ bool CControlUI::IsFocused() const
 {
     return m_bFocused;
 }
+
 void CControlUI::SetFocus()
 {
     if( m_pManager != NULL ) m_pManager->SetFocus(this);
