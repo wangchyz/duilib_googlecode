@@ -96,7 +96,7 @@
 #define ID_FORMEDIT_ALIGN_RIGHT         322
 #define IDD_PROJECT_NEW                 322
 #define ID_FORMEDIT_ALIGN_TOP           323
-#define IDD_UIFILE_NEW                  323
+#define IDD_SKINFIlE_NEW                323
 #define ID_FORMEDIT_ALIGN_BOTTOM        324
 #define ID_FORMEDIT_ALIGN_CENTER_VERTICALLY 325
 #define ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY 326

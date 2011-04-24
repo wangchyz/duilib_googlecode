@@ -6,7 +6,7 @@
 #include "UIDesigner.h"
 
 #include "UIDesignerDoc.h"
-#include "DialogUIFileNew.h"
+#include "DialogSkinFileNew.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -41,7 +41,7 @@ BOOL CUIDesignerDoc::OnNewDocument()
 
 	// TODO: 在此添加重新初始化代码
 	// (SDI 文档将重用该文档)
-	CDialogUIFileNew dlg;
+	CDialogSkinFileNew dlg;
 	dlg.m_strFileName = this->GetTitle();
 	if(dlg.DoModal() == IDOK)
 	{
@@ -95,4 +95,19 @@ void CUIDesignerDoc::Dump(CDumpContext& dc) const
 void CUIDesignerDoc::OnTemplateSave()
 {
 	// TODO: 在此添加命令处理程序代码
+}
+
+BOOL CUIDesignerDoc::OnSaveDocument(LPCTSTR lpszPathName)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	POSITION pos = this->GetFirstViewPosition();
+	while(pos)
+	{
+		CView* pView = this->GetNextView(pos);
+		CUIDesignerView* pUIView = DYNAMIC_DOWNCAST(CUIDesignerView, pView);
+		ASSERT(pUIView);
+		pUIView->OnSaveSkinFile(lpszPathName);
+	}
+
+	return TRUE/*CDocument::OnSaveDocument(lpszPathName)*/;
 }

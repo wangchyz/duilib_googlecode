@@ -50,7 +50,7 @@ void CFileViewTree::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO: 在此添加控件通知处理程序代码
 	*pResult = 0;
-	g_pFileView->OpenUIFile(GetSelectedItem());
+	g_pFileView->OpenSkinFile(GetSelectedItem());
 }
 
 void CFileViewTree::OnTvnEndlabeledit(NMHDR *pNMHDR, LRESULT *pResult)
@@ -244,7 +244,7 @@ void CFileView::OnFileDelete()
 			_T("警告"), MB_YESNO | MB_ICONWARNING) == IDNO)
 			return;
 
-		DeleteUIFile(hSelectedItem);
+		DeleteSkinFile(hSelectedItem);
 	}
 	else if(dwInfo == INFO_DIRECTORY)
 	{
@@ -256,12 +256,12 @@ void CFileView::OnFileDelete()
 	}
 }
 
-BOOL CFileView::DeleteUIFile(HTREEITEM hItem)
+BOOL CFileView::DeleteSkinFile(HTREEITEM hItem)
 {
 	CString strFilePath;
 	strFilePath = GetFileRelativePath(hItem) + _T(".xml");
 	strFilePath = CGlobalVariable::m_strProjectPath + strFilePath;
-	CloseUIFile(strFilePath);
+	CloseSkinFile(strFilePath);
 	if(DeleteFile(strFilePath))
 	{
 		m_wndFileView.DeleteItem(hItem);
@@ -279,7 +279,7 @@ BOOL CFileView::DeleteDirectory(HTREEITEM hItem)
 		DWORD dwInfo = m_wndFileView.GetItemData(hChild);
 		HTREEITEM hNext = m_wndFileView.GetNextItem(hChild, TVGN_NEXT);
 		if(dwInfo == INFO_FILE)
-			DeleteUIFile(hChild);
+			DeleteSkinFile(hChild);
 		else if(dwInfo == INFO_DIRECTORY)
 			DeleteDirectory(hChild);
 
@@ -310,7 +310,7 @@ CString CFileView::GetFileRelativePath(HTREEITEM hItem)
 	return strRelativePath;
 }
 
-void CFileView::OpenUIFile(HTREEITEM hItem)
+void CFileView::OpenSkinFile(HTREEITEM hItem)
 {
 	if(m_wndFileView.GetItemData(hItem) != INFO_FILE)
 		return;
@@ -319,7 +319,7 @@ void CFileView::OpenUIFile(HTREEITEM hItem)
 	AfxGetApp()->OpenDocumentFile(CGlobalVariable::m_strProjectPath + strFilePath);
 }
 
-CDocument* CFileView::FindUIFile(CString& strPath)
+CDocument* CFileView::FindSkinFile(CString& strPath)
 {
 	POSITION pos = theApp.GetFirstDocTemplatePosition();
 	while (pos != NULL)
@@ -339,9 +339,9 @@ CDocument* CFileView::FindUIFile(CString& strPath)
 	return NULL;
 }
 
-BOOL CFileView::CloseUIFile(CString& strPath)
+BOOL CFileView::CloseSkinFile(CString& strPath)
 {
-	CDocument* pDoc = FindUIFile(strPath);
+	CDocument* pDoc = FindSkinFile(strPath);
 	if(pDoc == NULL)
 		return FALSE;
 
@@ -354,7 +354,7 @@ void CFileView::OnFileOpen()
 {
 	// TODO: 在此处添加命令处理程序代码
 	HTREEITEM hSelectedItem = m_wndFileView.GetSelectedItem();
-	OpenUIFile(hSelectedItem);
+	OpenSkinFile(hSelectedItem);
 }
 
 void CFileView::OnPaint()
@@ -473,7 +473,7 @@ BOOL CFileView::RenameFile(CString strNewName, HTREEITEM hItem)
 		strOldName += _T(".xml");
 		strNewName += _T(".xml");
 
-		if(FindUIFile(strFilePath + strOldName))
+		if(FindSkinFile(strFilePath + strOldName))
 		{
 			MessageBox(_T("此文件正处于打开状态，请先关闭后再进行重命名。"), _T("提示"), MB_ICONINFORMATION);
 			return FALSE;

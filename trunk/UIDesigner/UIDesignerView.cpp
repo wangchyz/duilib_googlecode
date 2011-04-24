@@ -957,3 +957,8 @@ void CUIDesignerView::ReleaseExtendedAttributes(CControlUI* pControl)
 		ReleaseExtendedAttributes(pContainer->GetItemAt(i));
 	}
 }
+
+void CUIDesignerView::OnSaveSkinFile(LPCTSTR lpszPathName)
+{
+	m_LayoutManager.SaveSkinFile(lpszPathName);
+}

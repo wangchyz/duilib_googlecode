@@ -204,7 +204,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DialogUIFileNew.cpp"
+				RelativePath=".\DialogSkinFileNew.cpp"
 				>
 			</File>
 			<File
@@ -322,7 +322,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DialogUIFileNew.h"
+				RelativePath=".\DialogSkinFileNew.h"
 				>
 			</File>
 			<File

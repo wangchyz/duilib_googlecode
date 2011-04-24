@@ -1233,9 +1233,9 @@ void CPropertiesWnd::ShowContainerProperty(CControlUI* pControl)
 	//mousechild
 	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetValue((_variant_t)pContainer->IsMouseChildEnabled());
 	//hscrollbar
-	pPropContainer->GetSubItem(tagHScrollBar-tagContainer)->SetValue((_variant_t)(pContainer->GetHorizontalScrollbar()==NULL?false:true));
+	pPropContainer->GetSubItem(tagHScrollBar-tagContainer)->SetValue((_variant_t)(pContainer->GetHorizontalScrollBar()==NULL?false:true));
 	//vscrollbar
-	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetValue((_variant_t)(pContainer->GetVerticalScrollbar()==NULL?false:true));
+	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetValue((_variant_t)(pContainer->GetVerticalScrollBar()==NULL?false:true));
 
 	pPropContainer->Show(TRUE,FALSE);
 }
