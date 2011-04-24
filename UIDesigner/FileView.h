@@ -65,11 +65,11 @@ public:
 
 protected:
 	CString GetFileRelativePath(HTREEITEM hItem);
-	BOOL DeleteUIFile(HTREEITEM hItem);
+	BOOL DeleteSkinFile(HTREEITEM hItem);
 	BOOL DeleteDirectory(HTREEITEM hItem);
-	void OpenUIFile(HTREEITEM hItem);
-	CDocument* FindUIFile(CString& strPath);
-	BOOL CloseUIFile(CString& strPath);
+	void OpenSkinFile(HTREEITEM hItem);
+	CDocument* FindSkinFile(CString& strPath);
+	BOOL CloseSkinFile(CString& strPath);
 	BOOL RenameFile(CString strNewName, HTREEITEM hItem);
 
 	void ExpandFileViewTree(HTREEITEM hItem, UINT nCode);

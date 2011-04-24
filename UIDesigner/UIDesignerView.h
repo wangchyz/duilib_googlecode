@@ -50,6 +50,8 @@ public:
 
 	void OnShowPropertyDialog();
 
+	void OnSaveSkinFile(LPCTSTR lpszPathName);
+
 protected:
 	void UpDateDPtoLPOffset();
 	CTrackerElement* CreateTracker(CControlUI* pControl);

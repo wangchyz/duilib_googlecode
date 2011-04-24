@@ -140,30 +140,26 @@ public:
 	void MicoMoveLeft(CArray<CControlUI*,CControlUI*>& arrSelected,int nMoved);
 	void MicoMoveRight(CArray<CControlUI*,CControlUI*>& arrSelected,int nMoved);
 
+	void SaveSkinFile(LPCTSTR lpszPathName);
+	void SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode);
+
 protected:
 	CControlUI* CopyControls(CControlUI* pControl);
 	CControlUI* CopyControl(CControlUI* pControl);
 
-#if defined(EXPORT_UI_SCRIPT)
-	void SaveSkinFile();
-
-	void Save_Properties(CControlUI* pControlUI, TiXmlElement* pParentNode);
-	void Save_SingleProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
-	void Save_ContainerProperties(CControlUI* pControlUI, TiXmlElement* pParentNode);
-	void Save_CControlUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CLabelUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CButtonUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_COptionUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CProgressUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CSliderUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CEditUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CScrollbarUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CListUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CComboUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CListHeaderItemUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CListElementUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-	void Save_CContainerUI_Properties(CControlUI* pControlUI, TiXmlElement* pNode);
-#endif
+	void SaveControlProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveOptionProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveProgressProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveSliderProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveEditProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveListProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveListHeaderItemProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveListElementProperty(CControlUI* pControl, TiXmlElement* pNode);
+	void SaveContainerProperty(CControlUI* pControl, TiXmlElement* pNode);
 
 private:
 	CPaintManagerUI m_Manager;
