@@ -1423,6 +1423,7 @@ void CPaintManagerUI::SetDefaultFont(LPCTSTR pStrFontName, int nSize, bool bBold
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
     _tcscpy(lf.lfFaceName, pStrFontName);
+    lf.lfCharSet = DEFAULT_CHARSET;
     lf.lfHeight = -nSize;
     if( bBold ) lf.lfWeight += FW_BOLD;
     if( bUnderline ) lf.lfUnderline = TRUE;
@@ -1455,6 +1456,7 @@ HFONT CPaintManagerUI::AddFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
     _tcscpy(lf.lfFaceName, pStrFontName);
+    lf.lfCharSet = DEFAULT_CHARSET;
     lf.lfHeight = -nSize;
     if( bBold ) lf.lfWeight += FW_BOLD;
     if( bUnderline ) lf.lfUnderline = TRUE;
