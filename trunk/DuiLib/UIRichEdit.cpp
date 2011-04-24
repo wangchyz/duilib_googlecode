@@ -1131,6 +1131,7 @@ void CRichEditUI::SetFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnd
         LOGFONT lf = { 0 };
         ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
         _tcscpy(lf.lfFaceName, pStrFontName);
+        lf.lfCharSet = DEFAULT_CHARSET;
         lf.lfHeight = -nSize;
         if( bBold ) lf.lfWeight += FW_BOLD;
         if( bUnderline ) lf.lfUnderline = TRUE;
