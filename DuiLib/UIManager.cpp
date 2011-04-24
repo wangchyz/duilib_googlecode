@@ -83,14 +83,13 @@ m_pParentResourcePM(NULL)
     m_dwDefalutSelectedBkColor = 0xFFBAE4FF;
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
-    //lf.lfHeight = -12;
     HFONT hDefaultFont = ::CreateFontIndirect(&lf);
     m_DefaultFontInfo.hFont = hDefaultFont;
     m_DefaultFontInfo.sFontName = lf.lfFaceName;
     m_DefaultFontInfo.iSize = -lf.lfHeight;
-    m_DefaultFontInfo.bBold = false;
-    m_DefaultFontInfo.bUnderline = false;
-    m_DefaultFontInfo.bItalic = false;
+    m_DefaultFontInfo.bBold = (lf.lfWeight >= FW_BOLD);
+    m_DefaultFontInfo.bUnderline = lf.lfUnderline;
+    m_DefaultFontInfo.bItalic = lf.lfItalic;
     ::ZeroMemory(&m_DefaultFontInfo.tm, sizeof(m_DefaultFontInfo.tm));
 
 
@@ -216,6 +215,11 @@ void CPaintManagerUI::SetResourceZip(LPCTSTR pStrPath)
 HWND CPaintManagerUI::GetPaintWindow() const
 {
     return m_hWndPaint;
+}
+
+HWND CPaintManagerUI::GetTooltipWindow() const
+{
+    return m_hwndTooltip;
 }
 
 HDC CPaintManagerUI::GetPaintDC() const

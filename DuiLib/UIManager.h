@@ -171,6 +171,7 @@ public:
 
     HDC GetPaintDC() const;
     HWND GetPaintWindow() const;
+    HWND GetTooltipWindow() const;
 
     POINT GetMousePos() const;
     SIZE GetClientSize() const;
