@@ -183,8 +183,10 @@ public:
     void SetCaptionRect(RECT& rcCaption);
     SIZE GetRoundCorner() const;
     void SetRoundCorner(int cx, int cy);
-	SIZE GetMinMaxInfo() const;
-    void SetMinMaxInfo(int cx, int cy);
+	SIZE GetMinInfo() const;
+    void SetMinInfo(int cx, int cy);
+    SIZE GetMaxInfo() const;
+    void SetMaxInfo(int cx, int cy);
     void SetTransparent(int nOpacity);
     void SetBackgroundTransparent(bool bTrans);
 	bool IsShowUpdateRect() const;
@@ -322,6 +324,7 @@ private:
     //
     POINT m_ptLastMousePos;
     SIZE m_szMinWindow;
+    SIZE m_szMaxWindow;
     SIZE m_szInitWindowSize;
     RECT m_rcSizeBox;
     SIZE m_szRoundCorner;

@@ -88,10 +88,9 @@ m_pParentResourcePM(NULL)
     m_DefaultFontInfo.sFontName = lf.lfFaceName;
     m_DefaultFontInfo.iSize = -lf.lfHeight;
     m_DefaultFontInfo.bBold = (lf.lfWeight >= FW_BOLD);
-    m_DefaultFontInfo.bUnderline = lf.lfUnderline;
-    m_DefaultFontInfo.bItalic = lf.lfItalic;
+    m_DefaultFontInfo.bUnderline = (lf.lfUnderline == TRUE);
+    m_DefaultFontInfo.bItalic = (lf.lfItalic == TRUE);
     ::ZeroMemory(&m_DefaultFontInfo.tm, sizeof(m_DefaultFontInfo.tm));
-
 
     if( m_hUpdateRectPen == NULL ) {
         m_hUpdateRectPen = ::CreatePen(PS_SOLID, 1, RGB(220, 0, 0));
@@ -102,6 +101,8 @@ m_pParentResourcePM(NULL)
 
     m_szMinWindow.cx = 0;
     m_szMinWindow.cy = 0;
+    m_szMaxWindow.cx = 0;
+    m_szMaxWindow.cy = 0;
     m_szInitWindowSize.cx = 0;
     m_szInitWindowSize.cy = 0;
     m_szRoundCorner.cx = m_szRoundCorner.cy = 0;
@@ -249,7 +250,7 @@ void CPaintManagerUI::SetInitSize(int cx, int cy)
     m_szInitWindowSize.cx = cx;
     m_szInitWindowSize.cy = cy;
     if( m_pRoot == NULL && m_hWndPaint != NULL ) {
-        ::SetWindowPos(m_hWndPaint, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE);
+        ::SetWindowPos(m_hWndPaint, NULL, 0, 0, cx, cy, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
     }
 }
 
@@ -284,16 +285,28 @@ void CPaintManagerUI::SetRoundCorner(int cx, int cy)
     m_szRoundCorner.cy = cy;
 }
 
-SIZE CPaintManagerUI::GetMinMaxInfo() const
+SIZE CPaintManagerUI::GetMinInfo() const
 {
 	return m_szMinWindow;
 }
 
-void CPaintManagerUI::SetMinMaxInfo(int cx, int cy)
+void CPaintManagerUI::SetMinInfo(int cx, int cy)
 {
     ASSERT(cx>=0 && cy>=0);
     m_szMinWindow.cx = cx;
     m_szMinWindow.cy = cy;
+}
+
+SIZE CPaintManagerUI::GetMaxInfo() const
+{
+    return m_szMaxWindow;
+}
+
+void CPaintManagerUI::SetMaxInfo(int cx, int cy)
+{
+    ASSERT(cx>=0 && cy>=0);
+    m_szMaxWindow.cx = cx;
+    m_szMaxWindow.cy = cy;
 }
 
 void CPaintManagerUI::SetTransparent(int nOpacity)
@@ -595,8 +608,10 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
     case WM_GETMINMAXINFO:
         {
             LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
-            lpMMI->ptMinTrackSize.x = m_szMinWindow.cx;
-            lpMMI->ptMinTrackSize.y = m_szMinWindow.cy;
+            if( m_szMinWindow.cx > 0 ) lpMMI->ptMinTrackSize.x = m_szMinWindow.cx;
+            if( m_szMinWindow.cy > 0 ) lpMMI->ptMinTrackSize.y = m_szMinWindow.cy;
+            if( m_szMaxWindow.cx > 0 ) lpMMI->ptMaxTrackSize.x = m_szMaxWindow.cx;
+            if( m_szMaxWindow.cy > 0 ) lpMMI->ptMaxTrackSize.y = m_szMaxWindow.cy;
         }
         break;
     case WM_SIZE:

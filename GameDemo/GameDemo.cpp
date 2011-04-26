@@ -48,10 +48,6 @@ public:
         LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
         styleValue &= ~WS_CAPTION;
         ::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-        RECT rcClient;
-        ::GetClientRect(*this, &rcClient);
-        ::SetWindowPos(*this, NULL, rcClient.left, rcClient.top, rcClient.right - rcClient.left, \
-            rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
 
         m_pm.Init(m_hWnd);
         m_pm.AddPreMessageFilter(this);
@@ -233,7 +229,7 @@ public:
 
         CLoginFrameWnd* pLoginFrame = new CLoginFrameWnd();
         if( pLoginFrame == NULL ) { Close(); return; }
-        pLoginFrame->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, UI_WNDSTYLE_EX_DIALOG, 0, 0, 0, 0, NULL);
+        pLoginFrame->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, 0, 0, 0, 0, 0, NULL);
         pLoginFrame->CenterWindow();
         ShowModal(*pLoginFrame);
     }
@@ -436,10 +432,6 @@ public:
         LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
         styleValue &= ~WS_CAPTION;
         ::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-        RECT rcClient;
-        ::GetClientRect(*this, &rcClient);
-        ::SetWindowPos(*this, NULL, rcClient.left, rcClient.top, rcClient.right - rcClient.left, \
-            rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
 
         m_pm.Init(m_hWnd);
         CDialogBuilder builder;
