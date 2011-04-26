@@ -942,7 +942,7 @@ public:
                _T("        <Control />")
                _T("        <HorizontalLayout height=\"22\">")
                _T("            <Control />")
-               _T("            <Button name=\"ok\" text=\"È·¶¨\" bordercolor=\"#FF000000\" width=\"60\"/>")
+               _T("            <Button name=\"ok\" text=\"È·\" bordercolor=\"#FF000000\" width=\"60\"/>")
                _T("            <Control />")
                _T("        </HorizontalLayout>")
                _T("    </VerticalLayout>")
@@ -1233,8 +1233,7 @@ void CWindowWnd::ResizeClient(int cx /*= -1*/, int cy /*= -1*/)
     if( cx != -1 ) rc.right = cx;
     if( cy != -1 ) rc.bottom = cy;
     if( !::AdjustWindowRectEx(&rc, GetWindowStyle(m_hWnd), (!(GetWindowStyle(m_hWnd) & WS_CHILD) && (::GetMenu(m_hWnd) != NULL)), GetWindowExStyle(m_hWnd)) ) return;
-    UINT uFlags = SWP_NOZORDER | SWP_NOMOVE;
-    ::SetWindowPos(m_hWnd, NULL, 0, 0, rc.right - rc.left, rc.bottom - rc.top, uFlags);
+    ::SetWindowPos(m_hWnd, NULL, 0, 0, rc.right - rc.left, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
 LRESULT CWindowWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -160,7 +160,13 @@ CControlUI* CDialogBuilder::Create(IDialogBuilderCallback* pCallback, CPaintMana
                         LPTSTR pstr = NULL;
                         int cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
                         int cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr); 
-                        pManager->SetMinMaxInfo(cx, cy);
+                        pManager->SetMinInfo(cx, cy);
+                    }
+                    else if( _tcscmp(pstrName, _T("maxinfo")) == 0 ) {
+                        LPTSTR pstr = NULL;
+                        int cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+                        int cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr); 
+                        pManager->SetMaxInfo(cx, cy);
                     }
                     else if( _tcscmp(pstrName, _T("showdirty")) == 0 ) {
                         pManager->SetShowUpdateRect(_tcscmp(pstrValue, _T("true")) == 0);
