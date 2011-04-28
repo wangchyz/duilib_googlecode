@@ -279,6 +279,7 @@ public:
     void SetNativeEditBkColor(DWORD dwBkColor);
     DWORD GetNativeEditBkColor() const;
 
+    void SetPos(RECT rc);
     void SetVisible(bool bVisible = true);
     void SetInternVisible(bool bVisible = true);
     SIZE EstimateSize(SIZE szAvailable);

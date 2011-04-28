@@ -274,6 +274,9 @@ void CButtonUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_CONTEXTMENU )
     {
+        if( IsContextMenuUsed() ) {
+            m_pManager->SendNotify(this, _T("menu"), event.wParam, event.lParam);
+        }
         return;
     }
     if( event.Type == UIEVENT_MOUSEENTER )
@@ -1204,6 +1207,7 @@ public:
     CEditWnd();
 
     void Init(CEditUI* pOwner);
+    RECT CalPos();
 
     LPCTSTR GetWindowClassName() const;
     LPCTSTR GetSuperClassName() const;
@@ -1225,31 +1229,37 @@ CEditWnd::CEditWnd() : m_pOwner(NULL), m_hBkBrush(NULL)
 
 void CEditWnd::Init(CEditUI* pOwner)
 {
-    CRect rcPos = pOwner->GetPos();
-    RECT rcInset = pOwner->GetTextPadding();
+    m_pOwner = pOwner;
+    RECT rcPos = CalPos();
+    UINT uStyle = WS_CHILD | ES_AUTOHSCROLL;
+    if( m_pOwner->IsPasswordMode() ) uStyle |= ES_PASSWORD;
+    Create(m_pOwner->GetManager()->GetPaintWindow(), NULL, uStyle, 0, rcPos);
+    SetWindowFont(m_hWnd, m_pOwner->GetManager()->GetDefaultFontInfo()->hFont, TRUE);
+    Edit_LimitText(m_hWnd, m_pOwner->GetMaxChar());
+    if( m_pOwner->IsPasswordMode() ) Edit_SetPasswordChar(m_hWnd, m_pOwner->GetPasswordChar());
+    Edit_SetText(m_hWnd, m_pOwner->GetText());
+    Edit_SetModify(m_hWnd, FALSE);
+    SendMessage(EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, MAKELPARAM(0, 0));
+    Edit_Enable(m_hWnd, m_pOwner->IsEnabled() == true);
+    Edit_SetReadOnly(m_hWnd, m_pOwner->IsReadOnly() == true);
+    ::ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
+    ::SetFocus(m_hWnd);
+}
+
+RECT CEditWnd::CalPos()
+{
+    CRect rcPos = m_pOwner->GetPos();
+    RECT rcInset = m_pOwner->GetTextPadding();
     rcPos.left += rcInset.left;
     rcPos.top += rcInset.top;
     rcPos.right -= rcInset.right;
     rcPos.bottom -= rcInset.bottom;
-    LONG lEditHeight = pOwner->GetManager()->GetDefaultFontInfo()->tm.tmHeight;
+    LONG lEditHeight = m_pOwner->GetManager()->GetDefaultFontInfo()->tm.tmHeight;
     if( lEditHeight < rcPos.GetHeight() ) {
         rcPos.top += (rcPos.GetHeight() - lEditHeight) / 2;
         rcPos.bottom = rcPos.top + lEditHeight;
     }
-    UINT uStyle = WS_CHILD | ES_AUTOHSCROLL;
-    if( pOwner->IsPasswordMode() ) uStyle |= ES_PASSWORD;
-    Create(pOwner->GetManager()->GetPaintWindow(), NULL, uStyle, 0, rcPos);
-    SetWindowFont(m_hWnd, pOwner->GetManager()->GetDefaultFontInfo()->hFont, TRUE);
-    Edit_LimitText(m_hWnd, pOwner->GetMaxChar());
-    if( pOwner->IsPasswordMode() ) Edit_SetPasswordChar(m_hWnd, pOwner->GetPasswordChar());
-    Edit_SetText(m_hWnd, pOwner->GetText());
-    Edit_SetModify(m_hWnd, FALSE);
-    SendMessage(EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, MAKELPARAM(0, 0));
-    Edit_Enable(m_hWnd, pOwner->IsEnabled() == true);
-    Edit_SetReadOnly(m_hWnd, pOwner->IsReadOnly() == true);
-    m_pOwner = pOwner;
-    ::ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
-    ::SetFocus(m_hWnd);
+    return rcPos;
 }
 
 LPCTSTR CEditWnd::GetWindowClassName() const
@@ -1552,6 +1562,16 @@ void CEditUI::SetNativeEditBkColor(DWORD dwBkColor)
 DWORD CEditUI::GetNativeEditBkColor() const
 {
     return m_dwEditbkColor;
+}
+
+void CEditUI::SetPos(RECT rc)
+{
+    CControlUI::SetPos(rc);
+    if( m_pWindow != NULL ) {
+        RECT rcPos = m_pWindow->CalPos();
+        ::SetWindowPos(m_pWindow->GetHWND(), NULL, rcPos.left, rcPos.top, rcPos.right - rcPos.left, 
+            rcPos.bottom - rcPos.top, SWP_NOZORDER | SWP_NOACTIVATE);        
+    }
 }
 
 void CEditUI::SetVisible(bool bVisible)
