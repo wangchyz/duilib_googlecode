@@ -748,7 +748,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             m_pEventClick = pControl;
             pControl->SetFocus();
             SetCapture();
-            m_bMouseCapture = true;
             TEventUI event = { 0 };
             event.Type = UIEVENT_BUTTONDOWN;
             event.wParam = wParam;
@@ -767,8 +766,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             CControlUI* pControl = FindControl(pt);
             if( pControl == NULL ) break;
             if( pControl->GetManager() != this ) break;
-            ::SetCapture(m_hWndPaint);
-            m_bMouseCapture = true;
+            SetCapture();
             TEventUI event = { 0 };
             event.Type = UIEVENT_DBLCLICK;
             event.ptMouse = pt;
@@ -784,7 +782,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             m_ptLastMousePos = pt;
             if( m_pEventClick == NULL ) break;
             ReleaseCapture();
-            m_bMouseCapture = false;
             TEventUI event = { 0 };
             event.Type = UIEVENT_BUTTONUP;
             event.wParam = wParam;
@@ -806,7 +803,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             if( pControl->GetManager() != this ) break;
             pControl->SetFocus();
             SetCapture();
-            m_bMouseCapture = true;
             TEventUI event = { 0 };
             event.Type = UIEVENT_RBUTTONDOWN;
             event.wParam = wParam;
@@ -825,7 +821,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             m_ptLastMousePos = pt;
             if( m_pEventClick == NULL ) break;
             ReleaseCapture();
-            m_bMouseCapture = false;
             TEventUI event = { 0 };
             event.Type = UIEVENT_CONTEXTMENU;
             event.ptMouse = pt;
