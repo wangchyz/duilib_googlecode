@@ -92,7 +92,6 @@ bool CListUI::SetItemIndex(CControlUI* pControl, int iIndex)
     }
 
     SelectItem(FindSelectable(m_iCurSel, false));
-    EnsureVisible(m_iCurSel);
 
     return true;
 }
@@ -190,7 +189,6 @@ bool CListUI::Remove(CControlUI* pControl)
     }
 
     SelectItem(FindSelectable(m_iCurSel, false));
-    EnsureVisible(m_iCurSel);
     return true;
 }
 
@@ -208,7 +206,6 @@ bool CListUI::RemoveAt(int iIndex)
     }
 
     SelectItem(FindSelectable(m_iCurSel, false));
-    EnsureVisible(m_iCurSel);
     return true;
 }
 
@@ -275,11 +272,9 @@ void CListUI::DoEvent(TEventUI& event)
         switch( event.chKey ) {
         case VK_UP:
             SelectItem(FindSelectable(m_iCurSel - 1, false));
-            EnsureVisible(m_iCurSel);
             return;
         case VK_DOWN:
             SelectItem(FindSelectable(m_iCurSel + 1, true));
-            EnsureVisible(m_iCurSel);
             return;
         case VK_PRIOR:
             PageUp();
@@ -289,11 +284,9 @@ void CListUI::DoEvent(TEventUI& event)
             return;
         case VK_HOME:
             SelectItem(FindSelectable(0, false));
-            EnsureVisible(m_iCurSel);
             return;
         case VK_END:
             SelectItem(FindSelectable(GetCount() - 1, true));
-            EnsureVisible(m_iCurSel);
             return;
         case VK_RETURN:
             if( m_iCurSel != -1 ) GetItemAt(m_iCurSel)->Activate();
@@ -305,11 +298,9 @@ void CListUI::DoEvent(TEventUI& event)
             switch( LOWORD(event.wParam) ) {
             case SB_LINEUP:
                 SelectItem(FindSelectable(m_iCurSel - 1, false));
-                EnsureVisible(m_iCurSel);
                 return;
             case SB_LINEDOWN:
                 SelectItem(FindSelectable(m_iCurSel + 1, true));
-                EnsureVisible(m_iCurSel);
                 return;
             }
         }
@@ -361,6 +352,7 @@ bool CListUI::SelectItem(int iIndex)
         m_iCurSel = -1;
         return false;
     }
+    EnsureVisible(m_iCurSel);
     pControl->SetFocus();
     if( m_pManager != NULL ) {
         m_pManager->SendNotify(this, _T("itemselect"));
