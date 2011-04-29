@@ -20,6 +20,7 @@ m_bScrollProcess(false)
 
 CContainerUI::~CContainerUI()
 {
+    m_bDelayedDestroy = false;
     RemoveAll();
     if( m_pVerticalScrollBar ) delete m_pVerticalScrollBar;
     if( m_pHorizontalScrollBar ) delete m_pHorizontalScrollBar;

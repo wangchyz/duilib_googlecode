@@ -255,6 +255,7 @@ public:
 
     CControlUI* GetFocus() const;
     void SetFocus(CControlUI* pControl);
+    void SetFocusNeeded(CControlUI* pControl);
 
     bool SetNextTabControl(bool bForward = true);
 
@@ -303,7 +304,7 @@ private:
     static CControlUI* CALLBACK __FindControlFromTab(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromShortcut(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromUpdate(CControlUI* pThis, LPVOID pData);
-	static CControlUI* CALLBACK __FindControlFromNameByParent(CControlUI* pThis, LPVOID pData);
+	static CControlUI* CALLBACK __FindControlFromName(CControlUI* pThis, LPVOID pData);
 
 private:
     HWND m_hWndPaint;
