@@ -34,7 +34,7 @@ void CClassViewTree::OnTvnSelChanged(NMHDR *pNMHDR, LRESULT *pResult)
 	CControlUI* pControl=(CControlUI*)GetItemData(pNMTreeView->itemNew.hItem);
 	CUIDesignerView* pUIView=g_pMainFrame->GetActiveUIView();
 	if(pUIView)
-		pUIView->SelectControl(pControl);
+		pUIView->SelectUI(pControl);
 }
 
 void CClassViewTree::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -43,7 +43,7 @@ void CClassViewTree::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	switch(nChar)
 	{
 	case VK_DELETE:
-		g_pMainFrame->GetActiveUIView()->OnRemoveControl();
+		g_pMainFrame->GetActiveUIView()->OnRemoveUI();
 		break;
 	}
 
@@ -219,10 +219,7 @@ void CClassView::InsertUITreeItem(CControlUI* pControl,LPCTSTR pstrName/*=NULL*/
 
 	CString strName(pstrName);
 	if(strName.IsEmpty())
-		strName=pControl->GetClass();
-	CString strText=pControl->GetText();
-	if(!strText.IsEmpty())
-		strName=strName+_T('(')+strText+_T(')');
+		strName=pControl->GetName();
 
 	HTREEITEM hItem=m_wndClassView.InsertItem(strName,0,0,hParent);
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
@@ -265,4 +262,13 @@ void CClassView::SelectUITreeItem(CControlUI* pControl)
 
 	HTREEITEM hSelect=(HTREEITEM)(((ExtendedAttributes*)pControl->GetTag())->hItem);
 	m_wndClassView.SelectItem(hSelect);
+}
+
+void CClassView::RenameUITreeItem(CControlUI* pControl, LPCTSTR lpszName)
+{
+	if(pControl==NULL)
+		return;
+
+	HTREEITEM hSelect=(HTREEITEM)(((ExtendedAttributes*)pControl->GetTag())->hItem);
+	m_wndClassView.SetItemText(hSelect, lpszName);
 }

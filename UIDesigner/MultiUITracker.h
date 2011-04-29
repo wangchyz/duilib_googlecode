@@ -1,9 +1,11 @@
 #pragma once
 #include "resource.h"
-#include "..\UIlib\UIlib.h"
+#include "..\DuiLib\UIlib.h"
+using DuiLib::CControlUI;
+using DuiLib::INotifyUI;
 
 /////////////////////////////////////////////////////////////////////////////
-// CControlTracker - Modified according to CRectTracker
+// CUITracker - Modified according to CRectTracker
 
 // the struct below is used to determine the qualities of a particular handle
 typedef struct tagHandleInfo
@@ -41,12 +43,12 @@ enum TrackerHit
 	hitTop = 4, hitRight = 5, hitBottom = 6, hitLeft = 7, hitMiddle = 8,
 };
 
-class CControlTracker
+class CUITracker
 {
 public:
 	// Constructors
-	CControlTracker();
-	CControlTracker(LPCRECT lpSrcRect, UINT nStyle);
+	CUITracker();
+	CUITracker(LPCRECT lpSrcRect, UINT nStyle);
 
 	// Operations
 	void GetTrueRect(LPRECT lpTrueRect) const;
@@ -72,7 +74,7 @@ public:
 
 	// Implementation
 public:
-	virtual ~CControlTracker();
+	virtual ~CUITracker();
 
 protected:
 	// Attributes
@@ -113,37 +115,36 @@ protected:
 ////////////////////////////////////////////////////////////
 // CTrackerElement
 
-class CMultiControlTracker;
+class CMultiUITracker;
 
 class CTrackerElement
 {
 public:
 	CTrackerElement(void);
-	CTrackerElement(CControlUI* pControl,int nType);
+	CTrackerElement(CControlUI* pControl,int nType,INotifyUI* pOwner);
 	virtual ~CTrackerElement(void);
 
-	friend CMultiControlTracker;
+	friend CMultiUITracker;
 
 public:
 	const RECT& GetPos() const;
 	void SetPos(RECT rect,BOOL bMove=FALSE);
 	CControlUI* GetControl() { return m_pControl; }
-	void AddNotifier(INotifyUI* pNotifier);
 
 protected:
 	CControlUI * m_pControl;
-	int m_nControlType;
-	INotifyUI* m_pNotifier;
+	int m_nType;
+	INotifyUI* m_pOwner;
 };
 
 ////////////////////////////////////////////////////////////
-// CMultiControlTracker
+// CMultiUITracker
 
-class CMultiControlTracker : public CControlTracker
+class CMultiUITracker : public CUITracker
 {
 public:
-	CMultiControlTracker(void);
-	virtual ~CMultiControlTracker(void);
+	CMultiUITracker(void);
+	virtual ~CMultiUITracker(void);
 
 public:
 	void Draw(CDC* pDC,LPSIZE pOffset=NULL);
@@ -158,25 +159,27 @@ public:
 	void RemoveAll();
 	BOOL SetFocus(CPoint point);
 	BOOL SetFocus(CControlUI* pControl);
-	CTrackerElement* FindTracker(CControlUI* pControl);
-	CTrackerElement* GetFocused() { return m_pFocused; }
-	BOOL IsEmpty() { return (m_arrTracker.GetSize() == 0); }
-	int  GetSize() { return m_arrTracker.GetSize(); }
+	CTrackerElement* FindTracker(CControlUI* pControl) const;
+	CControlUI* GetFocused() const;
+	BOOL GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected);
+	BOOL IsEmpty() const { return m_arrTracker.IsEmpty(); }
+	int  GetSize() const { return m_arrTracker.GetSize(); }
 
-	RECT GetFormRect() const { return m_rcForm; }
-	void SetFormRect(RECT rect) { m_rcForm=rect; }
+	SIZE GetFormSize() const { return m_szForm; }
+	void SetFormSize(SIZE size) { m_szForm=size; }
 
 protected:
 	BOOL MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo);
-	void CopyControlRect();
-	void ClearControlRect();
-	void UpdateControlRect();
+	void CopyUIRect();
+	void ClearUIRect();
+	void UpdateUIRect();
+	void ExcludeChildren(CArray<CControlUI*,CControlUI*>& arrSelected);
 
 private:
-	CArray<CTrackerElement*, CTrackerElement*> m_arrTracker; //Tracking controls array
-	CArray<RECT, RECT> m_arrCloneRect;//Copies of the tracking rectangle
-	CTrackerElement * m_pFocused; // Control has focus
+	CArray<CTrackerElement*,CTrackerElement*> m_arrTracker; //Tracking controls array
+	CArray<RECT,const RECT&> m_arrCloneRect;//Copies of the tracking rectangle
+	CTrackerElement* m_pFocused; // Control has focus
 
-	CRect m_rcForm;
+	SIZE m_szForm;
 	HCURSOR m_hNoDropCursor;
 };

@@ -1335,6 +1335,19 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	CString strVal;
 	switch(nTag)
 	{
+	case tagName:
+		{
+			CPaintManagerUI* pManager = g_pMainFrame->GetActiveUIView()->GetPaintManager();
+			strVal=pProp->FormatProperty();
+			if(pManager->FindControl(strVal))
+			{
+				MessageBox(strVal + _T(" 名称已被其他控件使用！"));
+				pProp->SetValue((_variant_t)m_pControl->GetName());
+				return;
+			}
+			g_pClassView->RenameUITreeItem(m_pControl, strVal);
+			break;
+		}
 	case tagPos:
 	case tagPadding:
 		strVal.Format(_T("%s,%s,%s,%s"),pProp->GetSubItem(0)->FormatProperty(),
@@ -1394,8 +1407,6 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	{
 		CUIDesignerView* pUIView=g_pMainFrame->GetActiveUIView();
 		ASSERT(pUIView);
-		if(pUIView==NULL)
-			return;
 
 		TNotifyUI Msg;
 		Msg.pSender=m_pControl;

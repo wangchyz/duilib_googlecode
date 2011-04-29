@@ -3,7 +3,7 @@
 #pragma once
 #include "..\DuiLib\UIlib.h"
 #include "UIDesignerDoc.h"
-#include "MultiControlTracker.h"
+#include "MultiUITracker.h"
 #include "LayoutManager.h"
 #include "UICommandHistory.h"
 
@@ -42,11 +42,15 @@ public:
 
 public:
 	void Notify(TNotifyUI& msg);
-	void SelectControl(CControlUI* pControl);
+	void SelectUI(CControlUI* pControl);
 	void OnActivated();
-	CPaintManagerUI* GetManager() const;
+	CPaintManagerUI* GetPaintManager() { return m_LayoutManager.GetManager(); }
 
-	BOOL OnRemoveControl();
+	CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent);
+	BOOL RemoveUI(CControlUI* pControl);
+	void RedoUI(CControlUI* pControl, CControlUI* pParent);
+	void OnRemoveUI();
+	void ClearUITracker() { m_MultiTracker.RemoveAll(); }
 
 	void OnShowPropertyDialog();
 
@@ -57,8 +61,6 @@ protected:
 	CTrackerElement* CreateTracker(CControlUI* pControl);
 	int GetControlType(CControlUI* pControl);
 
-	void InitUITree(CControlUI* pControl);
-	void ReleaseExtendedAttributes(CControlUI* pControl);
 	void ShowPropertyDialog(CControlUI* pControl);
 
 	void OnMicoMoveUp();
@@ -66,11 +68,13 @@ protected:
 	void OnMicoMoveLeft();
 	void OnMicoMoveRight();
 
-	void PasteControls(LPCTSTR xml);
+	void InitUI(CControlUI* pControl, int depth, BOOL bForceName = FALSE);
+	void CopyUI(TiXmlElement* pParentNode);
+	void PasteUI(LPCTSTR xml);
 
 private:
 	CLayoutManager m_LayoutManager;
-	CMultiControlTracker m_MultiTracker;
+	CMultiUITracker m_MultiTracker;
 	CUICommandHistory m_UICommandHistory;
 
 	CPoint m_ptDPtoLP;//Device coordinates to Logical coordinates

@@ -1,4 +1,5 @@
 #pragma once
+#include "UIDesignerView.h"
 #include "tinyxml.h"
 #include "..\DuiLib\UIlib.h"
 using DuiLib::CContainerUI;
@@ -19,13 +20,15 @@ enum ActionType
 //CUICommandElement
 
 class CUICommandNode;
+class CUICommandHistory;
 
 class CUICommandElement
 {
 	friend CUICommandNode;
+	friend CUICommandHistory;
 
 public:
-	CUICommandElement(CArray<CControlUI*,CControlUI*>& arrSelected);
+	CUICommandElement(CArray<CControlUI*,CControlUI*>& arrSelected, BOOL bModify);
 	CUICommandElement(const CUICommandElement& copy);
 
 	~CUICommandElement();
@@ -55,7 +58,8 @@ public:
 	void End();
 
 protected:
-	BOOL RemoveSameProperties(CUICommandElement* pBefore, CUICommandElement* pAfter);
+	BOOL RemoveSameProperties(TiXmlNode* pBeforeElem, TiXmlNode* pAfterElem);
+	inline void RemoveSameProperty(TiXmlNode* pBeforeElem, TiXmlNode* pAfterElem);
 
 protected:
 	ActionType m_ActionType;
@@ -66,6 +70,8 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 //CUICommandHistory
+
+typedef void (CALLBACK* UIACTIONPROC)(TiXmlNode*);
 
 class CUICommandHistory
 {
@@ -87,10 +93,16 @@ protected:
 	void UICommandAction(CommandType type);
 
 	void ActionAdd(CUICommandElement* pAfter);
-	void ActionModify(CUICommandElement* pBefore, CUICommandElement* pAfter);
+	void ActionModify(CUICommandElement* pAfter);
 	void ActionDelete(CUICommandElement* pBefore);
+	void SetUIAction(TiXmlNode* pElement, UIACTIONPROC Proc);
+	
+private:
+	static void CALLBACK UIAdd(TiXmlNode* pNode);
+	static void CALLBACK UIModify(TiXmlNode* pNode);
+	static void CALLBACK UIDelete(TiXmlNode* pNode);
 
-protected:
+private:
 	CUICommandNode* m_pNode;
 	int m_nCommandIndex;
 	CList<CUICommandNode*, CUICommandNode*> m_lstCommandNodes;

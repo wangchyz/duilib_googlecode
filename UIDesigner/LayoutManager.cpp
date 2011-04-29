@@ -380,6 +380,7 @@ void CDelayRepos::Repos()
 
 CLayoutManager::CLayoutManager(void):m_bShowGrid(false),m_bShowAuxBorder(true)
 {
+	ZeroMemory(&m_UINameCount, sizeof(m_UINameCount));
 }
 
 CLayoutManager::~CLayoutManager(void)
@@ -388,8 +389,8 @@ CLayoutManager::~CLayoutManager(void)
 
 void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 {
-	CFormUI* pForm=static_cast<CFormUI*>(NewControl(classForm,
-		CRect(0,0,FORM_INIT_WIDTH,FORM_INIT_HEIGHT),&m_Manager,NULL)->GetInterface(_T("Form")));
+	CFormUI* pForm=static_cast<CFormUI*>(NewUI(classForm,
+		CRect(0,0,FORM_INIT_WIDTH,FORM_INIT_HEIGHT),NULL)->GetInterface(_T("Form")));
 	ASSERT(pForm);
 	pForm->SetManager(&m_Manager);
 	pForm->SetInitSize(FORM_INIT_WIDTH,FORM_INIT_HEIGHT);
@@ -472,7 +473,7 @@ void CLayoutManager::DrawGrid(CDC* pDC, CRect& rect)
 	}
 }
 
-CControlUI* CLayoutManager::NewControl(int nClass,CRect& rect,CPaintManagerUI* pManager,CControlUI* pParent)
+CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 {
 	CControlUI* pControl=NULL;
 	
@@ -483,6 +484,8 @@ CControlUI* CLayoutManager::NewControl(int nClass,CRect& rect,CPaintManagerUI* p
 	case classForm:
 		pControl=new CFormUI;
 		pExtended->nClass=classForm;
+		pExtended->nDepth = 0;
+		pControl->SetName(pControl->GetClass());
 		break;
 	case classControl:
 		pControl=new CControlUI;
@@ -567,14 +570,21 @@ CControlUI* CLayoutManager::NewControl(int nClass,CRect& rect,CPaintManagerUI* p
 		return NULL;
 	}
 
-	pControl->SetManager(pManager,pParent);
+	pControl->SetManager(&m_Manager,pParent);
 	pControl->SetTag((UINT_PTR)pExtended);
 
+	//close the delayed destory function
+	CContainerUI* pContainer = static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
+	if(pContainer)
+		pContainer->SetDelayedDestroy(false);
+
 	//default attributes
-	LPCTSTR pDefaultAttributes = pManager->GetDefaultAttributeList(pControl->GetClass());
+	LPCTSTR pDefaultAttributes = m_Manager.GetDefaultAttributeList(pControl->GetClass());
 	if(pDefaultAttributes)
 		pControl->ApplyAttributeList(pDefaultAttributes);
 
+	//name
+	SetDefaultUIName(pControl);
 	//pos
 	CRect rcParent=pParent?pParent->GetPos():CRect(0,0,0,0);
 	pControl->SetFixedXY(CSize(rect.left-rcParent.left,rect.top-rcParent.top));
@@ -583,31 +593,44 @@ CControlUI* CLayoutManager::NewControl(int nClass,CRect& rect,CPaintManagerUI* p
 
 	if(pParent)
 	{
-		CContainerUI* pContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
-		ASSERT(pContainer);
-		if(!pContainer->Add(pControl))
+		CContainerUI* pParentContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
+		ASSERT(pParentContainer);
+		if(!pParentContainer->Add(pControl))
 		{
 			delete pControl;
 			return NULL;
 		}
+		ExtendedAttributes* pParentExtended = (ExtendedAttributes*)pParentContainer->GetTag();
+		pExtended->nDepth = pParentExtended->nDepth + 1;
 		pParent->SetPos(pParent->GetPos());
 	}
 
 	return pControl;
 }
 
-BOOL CLayoutManager::RemoveControl(CControlUI* pControl)
+BOOL CLayoutManager::RemoveUI(CControlUI* pControl)
 {
-	if(pControl==NULL||pControl==GetForm())
+	if(pControl==NULL)
 		return FALSE;
 
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
 	delete pExtended;
 	pControl->SetTag(NULL);
+	m_Manager.ReapObjects(pControl);
 
-	CContainerUI* pParent=static_cast<CContainerUI*>(pControl->GetParent()->GetInterface(_T("Container")));
-	ASSERT(pParent);
-	pParent->Remove(pControl);
+	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
+	if(pContainer != NULL)
+	{
+		for(int i=0; i<pContainer->GetCount(); i++)
+			RemoveUI(pContainer->GetItemAt(i));
+	}
+
+	CControlUI* pParent = pControl->GetParent();
+	if(pParent)
+	{
+		CContainerUI* pParentContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
+		pParentContainer->Remove(pControl);
+	}
 
 	return TRUE;
 }
@@ -1314,7 +1337,6 @@ void CLayoutManager::SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNod
 	}
 }
 
-
 void CLayoutManager::SaveOptionProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
 	SaveButtonProperty(pControl, pNode);
@@ -1789,7 +1811,8 @@ void CLayoutManager::SaveContainerProperty(CControlUI* pControl, TiXmlElement* p
 	}
 }
 
-void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode)
+void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode
+									, BOOL bSaveChildren/* = TRUE*/)
 {
 	if((pControl == NULL) || (pParentNode == NULL))
 		return;
@@ -1847,6 +1870,9 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	delete pNode;
 
+	if(bSaveChildren == FALSE)
+		return;
+
 	CContainerUI* pContainer = static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
 	if(pContainer == NULL)
 		return;
@@ -1868,7 +1894,7 @@ void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
 		CloseHandle(hFile);
 
 	TCHAR szBuf[MAX_PATH] = {0};
-	TiXmlDocument xmlDoc(StringConvertor::TcharToAnsi(lpszPathName));
+	TiXmlDocument xmlDoc(StringConvertor::WideToAnsi(lpszPathName));
 	TiXmlDeclaration Declaration("1.0","utf-8","yes");
 	xmlDoc.InsertEndChild(Declaration);
 
@@ -1992,4 +2018,77 @@ void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
 
 	delete pFormElm;
 	xmlDoc.SaveFile();
+}
+
+void CLayoutManager::SetDefaultUIName(CControlUI* pControl, BOOL bForce/* = FALSE*/)
+{
+	if(!bForce&&!pControl->GetName().IsEmpty())
+		return;
+
+	ExtendedAttributes* pExtended = (ExtendedAttributes*)pControl->GetTag();
+	int nClass = pExtended->nClass;
+	int* pCount;
+
+	switch(nClass)
+	{
+	case classControl:
+		pCount = &m_UINameCount.nControlCount;
+		break;
+	case classLabel:
+		pCount = &m_UINameCount.nLabelCount;
+		break;
+	case classText:
+		pCount = &m_UINameCount.nTextCount;
+		break;
+	case classButton:
+		pCount = &m_UINameCount.nButtonCount;
+		break;
+	case classEdit:
+		pCount = &m_UINameCount.nEditCount;
+		break;
+	case classOption:
+		pCount = &m_UINameCount.nOptionCount;
+		break;
+	case classProgress:
+		pCount = &m_UINameCount.nProgressCount;
+		break;
+	case classSlider:
+		pCount = &m_UINameCount.nSliderCount;
+		break;
+	case classCombo:
+		pCount = &m_UINameCount.nComboCount;
+		break;
+	case classActiveX:
+		pCount = &m_UINameCount.nActiveXCount;
+		break;
+	case classContainer:
+		pCount = &m_UINameCount.nContainerCount;
+		break;
+	case classVerticalLayout:
+		pCount = &m_UINameCount.nVerticalLayoutCount;
+		break;
+	case classHorizontalLayout:
+		pCount = &m_UINameCount.nHorizontalLayoutCount;
+		break;
+	case classDialogLayout:
+		pCount = &m_UINameCount.nDialogLayoutCount;
+		break;
+	case classTileLayout:
+		pCount = &m_UINameCount.nTileLayoutCount;
+		break;
+	case classTabLayout:
+		pCount = &m_UINameCount.nTabLayoutCount;
+		break;
+	default:
+		return;
+	}
+
+	CString strUIName;
+	do 
+	{
+		(*pCount)++;
+		strUIName.Format(_T("%s%d"),pControl->GetClass(),*pCount);
+	}while(m_Manager.FindControl(strUIName));
+	pControl->SetName(strUIName);
+	m_Manager.InitControls(pControl);
 }

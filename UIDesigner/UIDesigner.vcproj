@@ -236,7 +236,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MultiControlTracker.cpp"
+				RelativePath=".\MultiUITracker.cpp"
 				>
 			</File>
 			<File
@@ -354,7 +354,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MultiControlTracker.h"
+				RelativePath=".\MultiUITracker.h"
 				>
 			</File>
 			<File

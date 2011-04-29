@@ -99,6 +99,32 @@ private:
 //////////////////////////////////////////////////////////////////////////
 //CLayoutManager
 
+typedef struct tagDefaultUINameCount{
+	int nControlCount;
+	int nButtonCount;
+	int nEditCount;
+	int nLabelCount;
+	int nTextCount;
+	int nOptionCount;
+	int nComboCount;
+	int nListCount;
+	int nSliderCount;
+	int nProgressCount;
+	int nActiveXCount;
+	int nContainerCount;
+	int nVerticalLayoutCount;
+	int nHorizontalLayoutCount;
+	int nDialogLayoutCount;
+	int nTabLayoutCount;
+	int nTileLayoutCount;
+	int nListHeaderCount;
+	int nListHeaderItemCount;
+	int nListTextElementCount;
+	int nListLabelElementCount;
+	int nListExpandElementCount;
+	int nListContainerElementCount;
+}DefaultUINameCount;
+
 class CLayoutManager
 {
 public:
@@ -112,10 +138,10 @@ public:
 	void DrawAuxBorder(CDC* pDC,CControlUI* pControl);
 	void DrawGrid(CDC* pDC,CRect& rect);
 
-	static CControlUI* NewControl(int nClass,CRect& rect,CPaintManagerUI* pManager,CControlUI* pParent);
-	BOOL RemoveControl(CControlUI* pControl);
+	CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent);
+	BOOL RemoveUI(CControlUI* pControl);
 	CPaintManagerUI* GetManager();
-	CFormUI* GetForm() const;
+	inline CFormUI* GetForm() const;
 	CControlUI* FindControl(CPoint point) const;
 
 	void TestForm();
@@ -141,29 +167,34 @@ public:
 	void MicoMoveRight(CArray<CControlUI*,CControlUI*>& arrSelected,int nMoved);
 
 	void SaveSkinFile(LPCTSTR lpszPathName);
-	void SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode);
+	static void SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode
+		, BOOL bSaveChildren = TRUE);
+
+	void SetDefaultUIName(CControlUI* pControl, BOOL bForce = FALSE);
 
 protected:
 	CControlUI* CopyControls(CControlUI* pControl);
 	CControlUI* CopyControl(CControlUI* pControl);
 
-	void SaveControlProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveOptionProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveProgressProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveSliderProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveEditProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveListProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveListHeaderItemProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveListElementProperty(CControlUI* pControl, TiXmlElement* pNode);
-	void SaveContainerProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveControlProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveOptionProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveProgressProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveSliderProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveEditProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveListProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveListHeaderItemProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveListElementProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveContainerProperty(CControlUI* pControl, TiXmlElement* pNode);
 
 private:
 	CPaintManagerUI m_Manager;
 
 	bool m_bShowGrid;
 	bool m_bShowAuxBorder;
+
+	DefaultUINameCount m_UINameCount;
 };

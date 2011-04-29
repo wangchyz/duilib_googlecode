@@ -171,7 +171,7 @@ BOOL CImageDialog::OnInitDialog()
 	m_ctlFade.SetRange(0,255);
 	m_ctlFade.SetPos(255);
 
-	m_pManager=g_pMainFrame->GetActiveUIView()->GetManager();
+	m_pManager=g_pMainFrame->GetActiveUIView()->GetPaintManager();
 	m_ImagePreview.SetManager(m_pManager);
 
 	g_HookAPI.EnableAddImage(false);

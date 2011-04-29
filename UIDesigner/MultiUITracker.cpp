@@ -1,9 +1,9 @@
 #include "StdAfx.h"
-#include "MultiControlTracker.h"
+#include "MultiUITracker.h"
 
 /////////////////////////////////////////////////////////////////////////////
-// CControlTracker
-// CControlTracker global state
+// CUITracker
+// CUITracker global state
 
 // this array describes all 8 handles (clock-wise)
 const HandleInfo g_HandleInfo[] =
@@ -31,17 +31,17 @@ const RectInfo g_RectInfo[] =
 };
 
 /////////////////////////////////////////////////////////////////////////////
-// CControlTracker intitialization
+// CUITracker intitialization
 
-HCURSOR CControlTracker::m_hCursors[10];
-HBRUSH CControlTracker::m_hHatchBrush=NULL;
+HCURSOR CUITracker::m_hCursors[10];
+HBRUSH CUITracker::m_hHatchBrush=NULL;
 
-CControlTracker::CControlTracker()
+CUITracker::CUITracker()
 {
 	Init();
 }
 
-CControlTracker::CControlTracker(LPCRECT lpSrcRect, UINT nStyle)
+CUITracker::CUITracker(LPCRECT lpSrcRect, UINT nStyle)
 {
 	ASSERT(AfxIsValidAddress(lpSrcRect, sizeof(RECT), FALSE));
 
@@ -51,7 +51,7 @@ CControlTracker::CControlTracker(LPCRECT lpSrcRect, UINT nStyle)
 	m_nStyle = nStyle;
 }
 
-void CControlTracker::Init()
+void CUITracker::Init()
 {
 	m_clrDottedLine=RGB(0,0,0);
 	m_hDottedLinePen=CreatePen(PS_DOT,0,m_clrDottedLine);
@@ -71,7 +71,7 @@ void CControlTracker::Init()
 	Construct();
 }
 
-void CControlTracker::Construct()
+void CUITracker::Construct()
 {
 	// do one-time initialization if necessary
 	static BOOL bInitialized;
@@ -142,14 +142,14 @@ void CControlTracker::Construct()
 	m_bFinalErase =  FALSE;
 }
 
-CControlTracker::~CControlTracker()
+CUITracker::~CUITracker()
 {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// CControlTracker operations
+// CUITracker operations
 
-void CControlTracker::Draw(CDC* pDC) const
+void CUITracker::Draw(CDC* pDC) const
 {
 	// set initial DC state
 	VERIFY(pDC->SaveDC() != 0);
@@ -253,7 +253,7 @@ void CControlTracker::Draw(CDC* pDC) const
 	VERIFY(pDC->RestoreDC(-1));
 }
 
-BOOL CControlTracker::SetCursor(CPoint point, UINT nHitTest) const
+BOOL CUITracker::SetCursor(CPoint point, UINT nHitTest) const
 {
 	// trackers should only be in client area
 	if (nHitTest != HTCLIENT)
@@ -281,7 +281,7 @@ BOOL CControlTracker::SetCursor(CPoint point, UINT nHitTest) const
 	return TRUE;
 }
 
-int CControlTracker::HitTest(CPoint point) const
+int CUITracker::HitTest(CPoint point) const
 {
 	TrackerHit hitResult = hitNothing;
 
@@ -299,7 +299,7 @@ int CControlTracker::HitTest(CPoint point) const
 	return hitResult;
 }
 
-int CControlTracker::NormalizeHit(int nHandle) const
+int CUITracker::NormalizeHit(int nHandle) const
 {
 	ENSURE(nHandle <= 8 && nHandle >= -1);
 	if (nHandle == hitMiddle || nHandle == hitNothing)
@@ -317,7 +317,7 @@ int CControlTracker::NormalizeHit(int nHandle) const
 	return nHandle;
 }
 
-BOOL CControlTracker::Track(CWnd* pWnd, CPoint point, BOOL bAllowInvert,
+BOOL CUITracker::Track(CWnd* pWnd, CPoint point, BOOL bAllowInvert,
 						 CDC* pDCClipTo)
 {
 	// perform hit testing on the handles
@@ -333,7 +333,7 @@ BOOL CControlTracker::Track(CWnd* pWnd, CPoint point, BOOL bAllowInvert,
 	return TrackHandle(nHandle, pWnd, pDCClipTo);
 }
 
-BOOL CControlTracker::TrackRubberBand(CWnd* pWnd, CPoint point, BOOL bAllowInvert)
+BOOL CUITracker::TrackRubberBand(CWnd* pWnd, CPoint point, BOOL bAllowInvert)
 {
 	// simply call helper function to track from bottom right handle
 	m_bAllowInvert = bAllowInvert;
@@ -341,7 +341,7 @@ BOOL CControlTracker::TrackRubberBand(CWnd* pWnd, CPoint point, BOOL bAllowInver
 	return TrackHandle(hitBottomRight, pWnd, NULL);
 }
 
-void CControlTracker::DrawTrackerRect(LPCRECT lpRect, CDC* pDC)
+void CUITracker::DrawTrackerRect(LPCRECT lpRect, CDC* pDC)
 {
 	// first, normalize the rectangle for drawing
 	CRect rect = *lpRect;
@@ -379,7 +379,7 @@ void CControlTracker::DrawTrackerRect(LPCRECT lpRect, CDC* pDC)
 	m_sizeLast = size;
 }
 
-void CControlTracker::AdjustRect(int nHandle, LPRECT)
+void CUITracker::AdjustRect(int nHandle, LPRECT)
 {
 	if (nHandle == hitMiddle)
 		return;
@@ -415,7 +415,7 @@ void CControlTracker::AdjustRect(int nHandle, LPRECT)
 	}
 }
 
-void CControlTracker::GetTrueRect(LPRECT lpTrueRect) const
+void CUITracker::GetTrueRect(LPRECT lpTrueRect) const
 {
 	ASSERT(AfxIsValidAddress(lpTrueRect, sizeof(RECT)));
 
@@ -430,15 +430,15 @@ void CControlTracker::GetTrueRect(LPRECT lpTrueRect) const
 	*lpTrueRect = rect;
 }
 
-void CControlTracker::OnChangedRect(const CRect& /*rectOld*/)
+void CUITracker::OnChangedRect(const CRect& /*rectOld*/)
 {
 	// no default implementation, useful for derived classes
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// CControlTracker implementation helpers
+// CUITracker implementation helpers
 
-void CControlTracker::GetHandleRect(int nHandle, CRect* pHandleRect) const
+void CUITracker::GetHandleRect(int nHandle, CRect* pHandleRect) const
 {
 	ASSERT(nHandle < 8);
 
@@ -474,7 +474,7 @@ void CControlTracker::GetHandleRect(int nHandle, CRect* pHandleRect) const
 	*pHandleRect = rect;
 }
 
-void CControlTracker::GetMoveHandleRect(CRect* pHandleRect) const
+void CUITracker::GetMoveHandleRect(CRect* pHandleRect) const
 {
 	CRect rcTopLeft;
 	CRect rcTop;
@@ -493,7 +493,7 @@ void CControlTracker::GetMoveHandleRect(CRect* pHandleRect) const
 	*pHandleRect=rect;
 }
 
-int CControlTracker::GetHandleSize(LPCRECT lpRect) const
+int CUITracker::GetHandleSize(LPCRECT lpRect) const
 {
 	if (lpRect == NULL)
 		lpRect = &m_rect;
@@ -510,7 +510,7 @@ int CControlTracker::GetHandleSize(LPCRECT lpRect) const
 	return size;
 }
 
-void CControlTracker::SetControlType(int nType)
+void CUITracker::SetControlType(int nType)
 {
 	m_nControlType=nType;
 
@@ -520,7 +520,7 @@ void CControlTracker::SetControlType(int nType)
 		m_nMask=0xFF;
 }
 
-int CControlTracker::HitTestHandles(CPoint point) const
+int CUITracker::HitTestHandles(CPoint point) const
 {
 	CRect rect;
 	UINT mask = GetHandleMask();
@@ -562,7 +562,7 @@ int CControlTracker::HitTestHandles(CPoint point) const
 	return m_nControlType==typeControl?hitMiddle:hitNothing;   // no handle hit, but hit object (or object border)
 }
 
-BOOL CControlTracker::TrackHandle(int nHandle, CWnd* pWnd, CDC* pDCClipTo)
+BOOL CUITracker::TrackHandle(int nHandle, CWnd* pWnd, CDC* pDCClipTo)
 {
 	ASSERT(nHandle >= 0);
 	ASSERT(nHandle <= 8);   // handle 8 is inside the rect
@@ -703,7 +703,7 @@ ExitLoop:
 	return !rectSave.EqualRect(&m_rect);
 }
 
-void CControlTracker::GetModifyPointers(
+void CUITracker::GetModifyPointers(
 									 int nHandle, int** ppx, int** ppy, int* px, int* py)
 {
 	ENSURE(nHandle >= 0);
@@ -746,7 +746,7 @@ void CControlTracker::GetModifyPointers(
 	}
 }
 
-UINT CControlTracker::GetHandleMask() const
+UINT CUITracker::GetHandleMask() const
 {
 	UINT mask = m_nMask;   // always have 4 corner handles
 	int size = m_nHandleSize*3;
@@ -759,7 +759,7 @@ UINT CControlTracker::GetHandleMask() const
 
 
 /////////////////////////////////////////////////////////////////////////////
-// CMultiControlTracker
+// CMultiUITracker
 
 CTrackerElement::CTrackerElement(CControlUI* pControl,int nType,INotifyUI* pOwner)
 :m_pControl(pControl),m_nType(nType),m_pOwner(pOwner)
@@ -803,9 +803,9 @@ void CTrackerElement::SetPos(RECT rect,BOOL bMove/*=FALSE*/)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// CMultiControlTracker
+// CMultiUITracker
 
-CMultiControlTracker::CMultiControlTracker(void):m_pFocused(NULL)
+CMultiUITracker::CMultiUITracker(void):m_pFocused(NULL)
 {
 	m_szForm.cx=0;
 	m_szForm.cy=0;
@@ -815,13 +815,13 @@ CMultiControlTracker::CMultiControlTracker(void):m_pFocused(NULL)
 	m_hNoDropCursor=::LoadCursor(hInst, ATL_MAKEINTRESOURCE(AFX_IDC_NODROPCRSR));
 }
 
-CMultiControlTracker::~CMultiControlTracker(void)
+CMultiUITracker::~CMultiUITracker(void)
 {
 	RemoveAll();
-	ClearControlRect();
+	ClearUIRect();
 }
 
-void CMultiControlTracker::Draw(CDC* pDC,LPSIZE pOffset/*=NULL*/)
+void CMultiUITracker::Draw(CDC* pDC,LPSIZE pOffset/*=NULL*/)
 {
 	HPEN hOldPen=m_hHandlePen;
 	HPEN hWhitePen=CreatePen(PS_SOLID,1,RGB(255,255,255));
@@ -847,7 +847,7 @@ void CMultiControlTracker::Draw(CDC* pDC,LPSIZE pOffset/*=NULL*/)
 			m_hHandleBrush=hBlackBrush;
 		}
 
-		CControlTracker::Draw(pDC);
+		CUITracker::Draw(pDC);
 	}
 
 	m_hHandlePen=hOldPen;
@@ -856,7 +856,7 @@ void CMultiControlTracker::Draw(CDC* pDC,LPSIZE pOffset/*=NULL*/)
 	::DeleteObject(hBlackBrush);
 }
 
-int CMultiControlTracker::HitTest(CPoint point)
+int CMultiUITracker::HitTest(CPoint point)
 {
 	int nHit=hitNothing;
 	for (int i=0;i<m_arrTracker.GetSize();i++)
@@ -865,7 +865,7 @@ int CMultiControlTracker::HitTest(CPoint point)
 
 		m_rect=pArrTracker->GetPos();
 		SetControlType(pArrTracker->m_nType);
-		nHit=CControlTracker::HitTest(point);
+		nHit=CUITracker::HitTest(point);
 		if (nHit!=hitNothing)
 		{
 			return nHit;
@@ -875,7 +875,7 @@ int CMultiControlTracker::HitTest(CPoint point)
 	return hitNothing;
 }
 
-int CMultiControlTracker::HitTestHandles(CPoint point)
+int CMultiUITracker::HitTestHandles(CPoint point)
 {
 	int nHit=hitNothing;
 	for (int i=0;i<m_arrTracker.GetSize();i++)
@@ -884,7 +884,7 @@ int CMultiControlTracker::HitTestHandles(CPoint point)
 
 		m_rect=pArrTracker->GetPos();
 		SetControlType(pArrTracker->m_nType);
-		nHit=CControlTracker::HitTestHandles(point);
+		nHit=CUITracker::HitTestHandles(point);
 		if (nHit!=hitNothing)
 		{
 			return nHit;
@@ -893,7 +893,7 @@ int CMultiControlTracker::HitTestHandles(CPoint point)
 	return hitNothing;
 }
 
-BOOL CMultiControlTracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=FALSE*/,CDC* pDCClipTo/*=NULL*/)
+BOOL CMultiUITracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=FALSE*/,CDC* pDCClipTo/*=NULL*/)
 {
 	if (IsEmpty())
 		return FALSE;
@@ -923,7 +923,7 @@ BOOL CMultiControlTracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=F
 	return bRet;
 }
 
-BOOL CMultiControlTracker::SetCursor(CPoint point, UINT nHitTest)
+BOOL CMultiUITracker::SetCursor(CPoint point, UINT nHitTest)
 {
 	CRect rectSave = m_rect;
 	for (int i=0;i<m_arrTracker.GetSize();i++)
@@ -932,7 +932,7 @@ BOOL CMultiControlTracker::SetCursor(CPoint point, UINT nHitTest)
 
 		m_rect=pArrTracker->GetPos();
 		SetControlType(pArrTracker->m_nType);
-		if (CControlTracker::SetCursor(point, nHitTest))
+		if (CUITracker::SetCursor(point, nHitTest))
 		{
 			m_rect = rectSave;
 			return TRUE;
@@ -942,7 +942,7 @@ BOOL CMultiControlTracker::SetCursor(CPoint point, UINT nHitTest)
 	return FALSE;
 }
 
-BOOL CMultiControlTracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
+BOOL CMultiUITracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 {
 	if (::GetCapture() != NULL)
 		return FALSE;
@@ -962,7 +962,7 @@ BOOL CMultiControlTracker::MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo)
 	pWnd->ScreenToClient(&oldPoint);
 
 	// We work on the rects copies
-	CopyControlRect();
+	CopyUIRect();
 
 	// get DC for drawing
 	CDC* pDrawDC;
@@ -1079,8 +1079,8 @@ ExitLoop:
 
 	// update control's rect pos in case bMoved is TRUE
 	if (bMoved&&!bBeyond)
-		UpdateControlRect();
-	ClearControlRect();
+		UpdateUIRect();
+	ClearUIRect();
 
 	m_bFinalErase = FALSE;
 	m_bErase = FALSE;
@@ -1089,7 +1089,7 @@ ExitLoop:
 	return bMoved;
 }
 
-void CMultiControlTracker::CopyControlRect()
+void CMultiUITracker::CopyUIRect()
 {
 	for (int i=0;i<m_arrTracker.GetSize();i++)
 	{
@@ -1097,12 +1097,12 @@ void CMultiControlTracker::CopyControlRect()
 	}
 }
 
-void CMultiControlTracker::ClearControlRect()
+void CMultiUITracker::ClearUIRect()
 {
 	m_arrCloneRect.RemoveAll();
 }
 
-void CMultiControlTracker::UpdateControlRect()
+void CMultiUITracker::UpdateUIRect()
 {
 	for (int i=0;i<m_arrTracker.GetSize();i++)
 	{
@@ -1121,7 +1121,7 @@ void CMultiControlTracker::UpdateControlRect()
 	m_pFocused->m_pOwner->Notify(Msg);
 }
 
-BOOL CMultiControlTracker::Add(CTrackerElement * pTracker)
+BOOL CMultiUITracker::Add(CTrackerElement * pTracker)
 {
 	ASSERT(pTracker);
 
@@ -1141,7 +1141,7 @@ BOOL CMultiControlTracker::Add(CTrackerElement * pTracker)
 	return TRUE;
 }
 
-BOOL CMultiControlTracker::Remove(CTrackerElement * pTracker)
+BOOL CMultiUITracker::Remove(CTrackerElement * pTracker)
 {
 	ASSERT(pTracker);
 
@@ -1166,7 +1166,7 @@ BOOL CMultiControlTracker::Remove(CTrackerElement * pTracker)
 	return FALSE;
 }
 
-void CMultiControlTracker::RemoveAll()
+void CMultiUITracker::RemoveAll()
 {
 	int len=m_arrTracker.GetSize();
 	for (int i=0;i<len;i++)
@@ -1178,7 +1178,7 @@ void CMultiControlTracker::RemoveAll()
 	m_pFocused = NULL;
 }
 
-BOOL CMultiControlTracker::SetFocus(CPoint point)
+BOOL CMultiUITracker::SetFocus(CPoint point)
 {
 	for (int i=0;i<m_arrTracker.GetSize();i++)
 	{
@@ -1186,7 +1186,7 @@ BOOL CMultiControlTracker::SetFocus(CPoint point)
 
 		m_rect=pArrTracker->GetPos();
 		SetControlType(pArrTracker->m_nType);
-		if(CControlTracker::HitTest(point)==hitMiddle)
+		if(CUITracker::HitTest(point)==hitMiddle)
 		{
 			m_pFocused=pArrTracker;
 
@@ -1197,7 +1197,7 @@ BOOL CMultiControlTracker::SetFocus(CPoint point)
 	return FALSE;
 }
 
-CControlUI* CMultiControlTracker::GetFocused() const
+CControlUI* CMultiUITracker::GetFocused() const
 {
 	if(m_pFocused==NULL)
 		return NULL;
@@ -1205,7 +1205,7 @@ CControlUI* CMultiControlTracker::GetFocused() const
 	return m_pFocused->m_pControl;
 }
 
-BOOL CMultiControlTracker::GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected) const
+BOOL CMultiUITracker::GetSelected(CArray<CControlUI*,CControlUI*>& arrSelected)
 {
 	if(IsEmpty())
 		return FALSE;
@@ -1216,18 +1216,19 @@ BOOL CMultiControlTracker::GetSelected(CArray<CControlUI*,CControlUI*>& arrSelec
 
 		arrSelected.Add(pArrTracker->m_pControl);
 	}
+	ExcludeChildren(arrSelected);
 
 	return TRUE;
 }
 
-BOOL CMultiControlTracker::SetFocus(CControlUI* pControl)
+BOOL CMultiUITracker::SetFocus(CControlUI* pControl)
 {
 	m_pFocused=FindTracker(pControl);
 
 	return m_pFocused?TRUE:FALSE;
 }
 
-CTrackerElement* CMultiControlTracker::FindTracker(CControlUI* pControl) const
+CTrackerElement* CMultiUITracker::FindTracker(CControlUI* pControl) const
 {
 	for(int i=0;i<m_arrTracker.GetSize();i++)
 	{
@@ -1238,4 +1239,45 @@ CTrackerElement* CMultiControlTracker::FindTracker(CControlUI* pControl) const
 	}
 
 	return NULL;
+}
+
+void CMultiUITracker::ExcludeChildren(CArray<CControlUI*,CControlUI*>& arrSelected)
+{
+	int size = arrSelected.GetSize();
+	int* pDepth = new int[size];
+	for(int i=0; i<size; i++)
+	{
+		ExtendedAttributes* pExtended = (ExtendedAttributes*)arrSelected[i]->GetTag();
+		pDepth[i] = pExtended->nDepth;
+	}
+
+	for(int i=0; i<arrSelected.GetSize()-1; i++)
+	{
+		CControlUI* pControl1 = arrSelected[i];
+		for(int j=i+1; j<arrSelected.GetSize(); j++)
+		{
+			if(pDepth[i] != pDepth[j])
+			{
+				CControlUI* pControl2 = arrSelected[j];
+				if(pDepth[i] < pDepth[j])
+				{
+					int depth = pDepth[j] - pDepth[i];
+					while(depth--)
+						pControl2 = pControl2->GetParent();
+					if(pControl1 == pControl2)
+						arrSelected.RemoveAt(j--);
+				}
+				else
+				{
+					int depth = pDepth[i] - pDepth[j];
+					while(depth--)
+						pControl1 = pControl1->GetParent();
+					if(pControl1 == pControl2)
+						arrSelected.RemoveAt(i--);
+				}
+			}
+		}
+	}
+
+	delete[] pDepth;
 }
