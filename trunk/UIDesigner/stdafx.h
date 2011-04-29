@@ -74,6 +74,8 @@
 #define FORM_OFFSET_X 20
 #define FORM_OFFSET_Y 20
 
+#define COPY_OFFSET_XY 10
+
 #define UI_DEFAULT_WIDTH  60
 #define UI_DEFAULT_HEIGHT 30
 
@@ -127,6 +129,7 @@ typedef struct tagExtendedAttributes
 {
 	HTREEITEM hItem;
 	int nClass;
+	int nDepth;
 }ExtendedAttributes;
 
 //////////////////////////////////////////////////////////////////////////

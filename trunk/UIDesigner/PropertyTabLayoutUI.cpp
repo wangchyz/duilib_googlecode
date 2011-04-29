@@ -204,7 +204,7 @@ void CPropertyTabLayoutUI::OnBnClickedButtonTabLayoutUIAdd()
 	rect.top=(rect.top+rect.bottom)/2;
 	rect.right=rect.left+UI_DEFAULT_WIDTH;
 	rect.bottom=rect.top+UI_DEFAULT_HEIGHT;
-	CControlUI* pNewControl=CLayoutManager::NewControl(nClass,rect,m_pTablayoutUI->GetManager(),m_pTablayoutUI);
+	CControlUI* pNewControl=g_pMainFrame->GetActiveUIView()->NewUI(nClass,rect,m_pTablayoutUI);
 	g_pClassView->InsertUITreeItem(pNewControl);
 
 	CString str;

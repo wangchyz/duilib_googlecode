@@ -37,6 +37,7 @@ public:
 	BOOL RemoveUITreeItem(CControlUI* pControl);
 	BOOL RemoveUITreeItem(HTREEITEM hItem);
 	void SelectUITreeItem(CControlUI* pControl);
+	void RenameUITreeItem(CControlUI* pControl, LPCTSTR lpszName);
 
 protected:
 	BOOL RemoveTreeItem(CControlUI* pControl);

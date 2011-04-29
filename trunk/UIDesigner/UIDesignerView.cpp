@@ -9,6 +9,7 @@
 
 #include "PropertyTabLayoutUI.h"
 #include "tinyxml.h"
+#include "UIUtil.h"
 #include <io.h>
 
 #ifdef _DEBUG
@@ -88,7 +89,7 @@ CUIDesignerView::CUIDesignerView()
 
 CUIDesignerView::~CUIDesignerView()
 {
-	ReleaseExtendedAttributes(m_LayoutManager.GetForm());
+	m_LayoutManager.RemoveUI(m_LayoutManager.GetForm());
 }
 
 BOOL CUIDesignerView::PreCreateWindow(CREATESTRUCT& cs)
@@ -204,7 +205,10 @@ void CUIDesignerView::OnInitialUpdate()
 
 	g_pClassView->InsertUITreeItem(pForm,pDoc->GetTitle());
 	if(pForm->GetCount()>0)
-		InitUITree(pForm->GetItemAt(0));
+	{
+		InitUI(pForm->GetItemAt(0), 1);
+		m_LayoutManager.GetManager()->InitControls(pForm->GetItemAt(0));
+	}
 	g_pClassView->SelectUITreeItem(pForm);
 	m_bInit=true;
 
@@ -246,7 +250,7 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	else
 	{
-		CControlTracker tracker;
+		CUITracker tracker;
 		int nClass=g_pToolBoxWnd->GetCurSel()->GetClass();
 		CRect rect;
 		if (tracker.TrackRubberBand(this, point, TRUE))
@@ -264,7 +268,11 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		if(nClass>classPointer)
 		{
-			CControlUI* pNewControl=CLayoutManager::NewControl(nClass,rect,pControl->GetManager(),pControl);
+			CControlUI* pNewControl=m_LayoutManager.NewUI(nClass,rect,pControl);
+			CArray<CControlUI*,CControlUI*> arrSelected;
+			arrSelected.Add(pNewControl);
+			m_UICommandHistory.Begin(arrSelected, actionAdd);
+			m_UICommandHistory.End();
 			g_pClassView->InsertUITreeItem(pNewControl);
 			g_pToolBoxWnd->SetCurSel(classPointer);
 
@@ -434,7 +442,7 @@ void CUIDesignerView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		OnShowPropertyDialog();
 		break;
 	case VK_DELETE:
-		OnRemoveControl();
+		OnRemoveUI();
 		break;
 	case VK_UP:
 		OnMicoMoveUp();
@@ -453,28 +461,51 @@ void CUIDesignerView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	__super::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
-BOOL CUIDesignerView::OnRemoveControl()
+void CUIDesignerView::OnRemoveUI()
 {
-	CControlUI* pControl=m_MultiTracker.GetFocused();
-	if(pControl==m_LayoutManager.GetForm())
-		return FALSE;
+	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	CControlUI* pParent=pControl->GetParent();
-	HTREEITEM hDelete=(HTREEITEM)(((ExtendedAttributes*)pControl->GetTag())->hItem);
-	BOOL bRet=m_LayoutManager.RemoveControl(pControl);
-	if(bRet)
+	m_MultiTracker.GetSelected(arrSelected);
+	//remove form
+	for (int i=0; i<arrSelected.GetSize(); i++)
 	{
-		g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
-		m_MultiTracker.RemoveAll();
+		CControlUI* pControl = arrSelected[i];
+		if(pControl == m_LayoutManager.GetForm())
+		{
+			arrSelected.RemoveAt(i);
+			break;;
+		}
+	}
+
+	m_UICommandHistory.Begin(arrSelected, actionDelete);
+	for(int i=0; i<arrSelected.GetSize(); i++)
+	{
+		CControlUI* pControl = arrSelected[i];
+		CControlUI* pParent=pControl->GetParent();
+		HTREEITEM hDelete=(HTREEITEM)(((ExtendedAttributes*)pControl->GetTag())->hItem);
 		g_pClassView->RemoveUITreeItem(hDelete);
+		RemoveUI(pControl);
 		if(pParent)
 			pParent->NeedUpdate();
 	}
+	m_UICommandHistory.End();
 
-	return bRet;
+	g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
+	m_MultiTracker.RemoveAll();
 }
 
-void CUIDesignerView::SelectControl(CControlUI* pControl)
+CControlUI* CUIDesignerView::NewUI(int nClass,CRect& rect,CControlUI* pParent)
+{
+	return m_LayoutManager.NewUI(nClass, rect, pParent);
+}
+
+BOOL CUIDesignerView::RemoveUI(CControlUI* pControl)
+{
+	m_MultiTracker.RemoveAll();
+	return m_LayoutManager.RemoveUI(pControl);
+}
+
+void CUIDesignerView::SelectUI(CControlUI* pControl)
 {
 	if(pControl==NULL||pControl==m_MultiTracker.GetFocused())
 		return;
@@ -499,7 +530,7 @@ void CUIDesignerView::OnActivated()
 	g_pPropertiesWnd->ShowProperty(m_MultiTracker.GetFocused());
 }
 
-void CUIDesignerView::InitUITree(CControlUI* pControl)
+void CUIDesignerView::InitUI(CControlUI* pControl, int depth, BOOL bForceName/* = FALSE*/)
 {
 	if(pControl==NULL)
 		return;
@@ -509,14 +540,17 @@ void CUIDesignerView::InitUITree(CControlUI* pControl)
 	pControl->SetTag((UINT_PTR)pExtended);
 
 	pExtended->nClass=g_GetUIClass(pControl);
+	m_LayoutManager.SetDefaultUIName(pControl, bForceName);
 	g_pClassView->InsertUITreeItem(pControl);
+	pExtended->nDepth = depth;
 
 	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
 	if(pContainer==NULL)
 		return;
+	pContainer->SetDelayedDestroy(false);
 	for (int i=0;i<pContainer->GetCount();i++)
 	{
-		InitUITree(pContainer->GetItemAt(i));
+		InitUI(pContainer->GetItemAt(i), ++depth);
 	}
 }
 
@@ -700,34 +734,28 @@ void CUIDesignerView::OnDestroy()
 	g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
 }
 
-CPaintManagerUI* CUIDesignerView::GetManager() const
-{
-	return m_LayoutManager.GetForm()->GetManager();
-}
-
 void CUIDesignerView::OnEditCut()
 {
-
+	OnEditCopy();
+	OnRemoveUI();
 }
 
 void CUIDesignerView::OnEditCopy()
 {
 	ASSERT(m_cfUI != NULL);
 
-	CArray<CControlUI*,CControlUI*> arrSelected;
-
-	m_MultiTracker.GetSelected(arrSelected);
 	TiXmlDocument xmlDoc;
-	char xml[] = {("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Option text=\"游戏大厅\" width=\"64\" group=\"true\" />")};
-// 	TiXmlElement* pRootElm = new TiXmlElement("Window");
-// 	pRootElm->SetAttribute("name","哈哈");
-// 	TiXmlNode* pNode = xmlDoc.InsertEndChild(*pRootElm);
-	xmlDoc.Parse(xml);
+	TiXmlDeclaration Declaration("1.0","utf-8","yes");
+	xmlDoc.InsertEndChild(Declaration);
+	TiXmlElement* pCopyElm = new TiXmlElement("UICopy");
+	CopyUI(pCopyElm);
+	xmlDoc.InsertEndChild(*pCopyElm);
 	TiXmlPrinter printer;
 	xmlDoc.Accept(&printer);
-// 	delete pRootElm;
-	CSharedFile file(GMEM_MOVEABLE, printer.Size()+1);
+	delete pCopyElm;
+	CSharedFile file(GMEM_MOVEABLE, printer.Size() + 1);
 	file.Write(printer.CStr(), printer.Size());
+	file.Write("\0", 1);
 	COleDataSource* pDataSource = NULL;
 	TRY
 	{
@@ -741,6 +769,21 @@ void CUIDesignerView::OnEditCopy()
 		THROW_LAST();
 	}
 	END_CATCH_ALL
+}
+
+void CUIDesignerView::CopyUI(TiXmlElement* pParentNode)
+{
+	ASSERT(pParentNode);
+	CArray<CControlUI*,CControlUI*> arrSelected;
+	TiXmlElement* pContainerNode = new TiXmlElement("Container");
+
+	m_MultiTracker.GetSelected(arrSelected);
+
+	for(int i=0; i<arrSelected.GetSize(); i++)
+		m_LayoutManager.SaveProperties(arrSelected[i], pContainerNode);
+
+	pParentNode->InsertEndChild(*pContainerNode);
+	delete pContainerNode;
 }
 
 void CUIDesignerView::OnEditPaste()
@@ -758,26 +801,14 @@ void CUIDesignerView::OnEditPaste()
 		char* pstrXML  = new char[len];
 		pFile->Read(pstrXML, len);
 
-#ifdef _UNICODE //可以使用UIUtil的函数
-		DWORD dwSize = strlen(pstrXML);
-		DWORD nWide = ::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pstrXML, dwSize, NULL, 0);
-
-		LPTSTR pwstrXML = new TCHAR[nWide + 1];
-		::MultiByteToWideChar( CP_ACP, 0, (LPCSTR)pstrXML, dwSize, pwstrXML, nWide);
-		pwstrXML[nWide] = _T('\0');
-
-		PasteControls(pwstrXML);
-		delete[] pwstrXML;
-#else
-		PasteControls(pstrXML);
-#endif
+		PasteUI(StringConvertor::Utf8ToWide(pstrXML));
 
 		delete[] pstrXML;
 		delete pFile;
 	}
 }
 
-void CUIDesignerView::PasteControls(LPCTSTR xml)
+void CUIDesignerView::PasteUI(LPCTSTR xml)
 {
 	CDialogBuilder builder;
 	CControlUI* pRoot=builder.Create(xml, (UINT)0, NULL, m_LayoutManager.GetManager());
@@ -788,11 +819,34 @@ void CUIDesignerView::PasteControls(LPCTSTR xml)
 			pParent = pParent->GetParent();
 		if(pParent == NULL)
 			pParent = m_LayoutManager.GetForm();
-		CContainerUI* pContainer=static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
-		pContainer->Add(pRoot);
-		InitUITree(pRoot);
+
+		m_MultiTracker.RemoveAll();
+		CContainerUI* pContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
+		CContainerUI* pRootContainer = static_cast<CContainerUI*>(pRoot->GetInterface(_T("Container")));
+		ExtendedAttributes* pExtended = (ExtendedAttributes*)pContainer->GetTag();
+		for(int i=0; i<pRootContainer->GetCount(); i++)
+		{
+			CControlUI* pControl = pRootContainer->GetItemAt(i);
+			if(pControl->IsFloat())
+			{
+				SIZE sz = pControl->GetFixedXY();
+				sz.cx += COPY_OFFSET_XY;
+				sz.cy += COPY_OFFSET_XY;
+				pControl->SetFixedXY(sz);
+			}
+			pContainer->Add(pControl);
+			m_MultiTracker.Add(CreateTracker(pControl));
+			InitUI(pControl, pExtended->nDepth + 1, TRUE);
+		}
+		CArray<CControlUI*,CControlUI*> arrSelected;
+		m_MultiTracker.GetSelected(arrSelected);
+		m_UICommandHistory.Begin(arrSelected, actionAdd);
+		m_UICommandHistory.End();
+
 		pContainer->SetPos(pContainer->GetPos());
-		pContainer->NeedUpdate();
+
+		pRootContainer->SetAutoDestroy(false);
+		delete pRootContainer;
 	}
 }
 
@@ -940,25 +994,21 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 	}
 }
 
-void CUIDesignerView::ReleaseExtendedAttributes(CControlUI* pControl)
-{
-	if(pControl==NULL)
-		return;
-
-	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
-	delete pExtended;
-	pControl->SetTag(NULL);
-
-	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
-	if(pContainer==NULL)
-		return;
-	for (int i=0;i<pContainer->GetCount();i++)
-	{
-		ReleaseExtendedAttributes(pContainer->GetItemAt(i));
-	}
-}
-
 void CUIDesignerView::OnSaveSkinFile(LPCTSTR lpszPathName)
 {
 	m_LayoutManager.SaveSkinFile(lpszPathName);
+}
+
+void CUIDesignerView::RedoUI(CControlUI* pControl, CControlUI* pParent)
+{
+	ASSERT(pControl && pParent);
+	if(!pControl || !pParent)
+		return;
+
+	CContainerUI* pContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
+	ExtendedAttributes* pExtended = (ExtendedAttributes*)pContainer->GetTag();
+	pContainer->Add(pControl);
+	m_MultiTracker.Add(CreateTracker(pControl));
+	InitUI(pControl, pExtended->nDepth + 1, TRUE);
+	pContainer->SetPos(pContainer->GetPos());
 }
