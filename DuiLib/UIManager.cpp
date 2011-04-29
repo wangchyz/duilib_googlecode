@@ -617,19 +617,11 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
     case WM_SIZE:
         {
             if( m_pFocus != NULL ) {
-                CControlUI* pFocus = m_pFocus;
                 TEventUI event = { 0 };
                 event.Type = UIEVENT_WINDOWSIZE;
                 event.dwTimestamp = ::GetTickCount();
                 m_pFocus->Event(event);
-                if( m_pFocus == NULL ) {
-                    FINDTABINFO info = { 0 };
-                    info.pFocus = pFocus;
-                    info.bForward = false;
-                    m_pFocus = m_pRoot->FindControl(__FindControlFromTab, &info, UIFIND_VISIBLE | UIFIND_ENABLED | UIFIND_ME_FIRST);
-                }
             }
-
             if( m_pRoot != NULL ) m_pRoot->NeedUpdate();
         }
         return true;
@@ -988,7 +980,9 @@ void CPaintManagerUI::ReapObjects(CControlUI* pControl)
     if( pControl == m_pFocus ) m_pFocus = NULL;
     
     const CStdString& sName = pControl->GetName();
-    if( !sName.IsEmpty() ) m_mNameHash.Remove(sName);
+    if( !sName.IsEmpty() ) {
+        if( pControl == FindControl(sName) ) m_mNameHash.Remove(sName);
+    }
 }
 
 bool CPaintManagerUI::AddOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl)
@@ -1122,6 +1116,27 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
         m_pFocus->Event(event);
         SendNotify(m_pFocus, _T("setfocus"));
     }
+}
+
+void CPaintManagerUI::SetFocusNeeded(CControlUI* pControl)
+{
+    ::SetFocus(m_hWndPaint);
+    if( pControl == NULL ) return;
+    if( m_pFocus != NULL ) {
+        TEventUI event = { 0 };
+        event.Type = UIEVENT_KILLFOCUS;
+        event.pSender = pControl;
+        event.dwTimestamp = ::GetTickCount();
+        m_pFocus->Event(event);
+        SendNotify(m_pFocus, _T("killfocus"));
+        m_pFocus = NULL;
+    }
+    FINDTABINFO info = { 0 };
+    info.pFocus = pControl;
+    info.bForward = false;
+    m_pFocus = m_pRoot->FindControl(__FindControlFromTab, &info, UIFIND_VISIBLE | UIFIND_ENABLED | UIFIND_ME_FIRST);
+    m_bFocusNeeded = true;
+    if( m_pRoot != NULL ) m_pRoot->NeedUpdate();
 }
 
 bool CPaintManagerUI::SetTimer(CControlUI* pControl, UINT nTimerID, UINT uElapse)
@@ -1319,6 +1334,7 @@ bool CPaintManagerUI::SetPostPaintIndex(CControlUI* pControl, int iIndex)
 
 void CPaintManagerUI::AddDelayedCleanup(CControlUI* pControl)
 {
+    pControl->SetManager(this, NULL, false);
     m_aDelayedCleanup.Add(pControl);
     ::PostMessage(m_hWndPaint, WM_APP + 1, 0, 0L);
 }
@@ -1771,7 +1787,7 @@ CControlUI* CPaintManagerUI::FindControl(LPCTSTR pstrName)
 CControlUI* CPaintManagerUI::FindControl(CControlUI* pParent, LPCTSTR pstrName)
 {
 	ASSERT(pParent);
-	return pParent->FindControl(__FindControlFromNameByParent, (LPVOID)pstrName, UIFIND_ALL);
+	return pParent->FindControl(__FindControlFromName, (LPVOID)pstrName, UIFIND_ALL);
 }
 
 CControlUI* CPaintManagerUI::FindControl(POINT pt) const
@@ -1816,7 +1832,7 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameHash(CControlUI* pThi
     return NULL; // Attempt to add all controls
 }
 
-CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameByParent(CControlUI* pThis, LPVOID pData)
+CControlUI* CALLBACK CPaintManagerUI::__FindControlFromName(CControlUI* pThis, LPVOID pData)
 {
     LPCTSTR pstrName = static_cast<LPCTSTR>(pData);
 	const CStdString& sName = pThis->GetName();

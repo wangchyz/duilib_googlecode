@@ -538,7 +538,7 @@ LPVOID COptionUI::GetInterface(LPCTSTR pstrName)
 void COptionUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit)
 {
     CControlUI::SetManager(pManager, pParent, bInit);
-    if( !m_sGroupName.IsEmpty() ) {
+    if( bInit && !m_sGroupName.IsEmpty() ) {
         if (m_pManager) m_pManager->AddOptionGroup(m_sGroupName, this);
     }
 }
@@ -605,7 +605,7 @@ void COptionUI::Selected(bool bSelected)
 
 bool COptionUI::Activate()
 {
-    if( !CControlUI::Activate() ) return false;
+    if( !CButtonUI::Activate() ) return false;
     if( !m_sGroupName.IsEmpty() ) Selected(true);
     else Selected(!m_bSelected);
 
@@ -1376,11 +1376,11 @@ void CEditUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_WINDOWSIZE )
     {
-        if( m_pWindow != NULL ) m_pManager->SetFocus(NULL);
+        if( m_pWindow != NULL ) m_pManager->SetFocusNeeded(this);
     }
     if( event.Type == UIEVENT_SCROLLWHEEL )
     {
-        if( m_pWindow != NULL ) m_pManager->SetFocus(NULL);
+        if( m_pWindow != NULL ) return;
     }
     if( event.Type == UIEVENT_SETFOCUS && IsEnabled() ) 
     {
