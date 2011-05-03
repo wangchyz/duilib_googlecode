@@ -83,6 +83,7 @@ m_pParentResourcePM(NULL)
     m_dwDefalutSelectedBkColor = 0xFFBAE4FF;
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
+    lf.lfCharSet = DEFAULT_CHARSET;
     HFONT hDefaultFont = ::CreateFontIndirect(&lf);
     m_DefaultFontInfo.hFont = hDefaultFont;
     m_DefaultFontInfo.sFontName = lf.lfFaceName;
@@ -1018,8 +1019,7 @@ void CPaintManagerUI::RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pCont
 	if( lp ) {
 		CStdPtrArray* aOptionGroup = static_cast<CStdPtrArray*>(lp);
 		if( aOptionGroup == NULL ) return;
-		int i = 0;
-		for( i = 0; i < aOptionGroup->GetSize(); i++ ) {
+		for( int i = 0; i < aOptionGroup->GetSize(); i++ ) {
 			if( static_cast<CControlUI*>(aOptionGroup->GetAt(i)) == pControl ) {
 				aOptionGroup->Remove(i);
 				break;
@@ -1028,11 +1028,6 @@ void CPaintManagerUI::RemoveOptionGroup(LPCTSTR pStrGroupName, CControlUI* pCont
 		if( aOptionGroup->IsEmpty() ) {
 			delete aOptionGroup;
 			m_mOptionGroup.Remove(pStrGroupName);
-		}
-		else {
-			pControl = static_cast<CControlUI*>(aOptionGroup->GetAt(i));
-			if( pControl ) pControl->Activate();
-			else static_cast<CControlUI*>(aOptionGroup->GetAt(0))->Activate();
 		}
 	}
 }
@@ -1522,9 +1517,11 @@ HFONT CPaintManagerUI::AddFontAt(int index, LPCTSTR pStrFontName, int nSize, boo
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
     _tcscpy(lf.lfFaceName, pStrFontName);
+    lf.lfCharSet = DEFAULT_CHARSET;
     lf.lfHeight = -nSize;
     if( bBold ) lf.lfWeight += FW_BOLD;
     if( bUnderline ) lf.lfUnderline = TRUE;
+    if( bItalic ) lf.lfItalic = TRUE;
     HFONT hFont = ::CreateFontIndirect(&lf);
     if( hFont == NULL ) return NULL;
 

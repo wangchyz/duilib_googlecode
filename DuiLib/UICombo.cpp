@@ -209,7 +209,6 @@ CComboUI::CComboUI() : m_pWindow(NULL), m_iCurSel(-1), m_uButtonState(0)
     m_ListInfo.dwDisabledBkColor = 0xFFFFFFFF;
     m_ListInfo.dwLineColor = 0;
     m_ListInfo.bShowHtml = false;
-    m_ListInfo.bExpandable = false;
     m_ListInfo.bMultiExpandable = false;
     ::ZeroMemory(&m_ListInfo.rcTextPadding, sizeof(m_ListInfo.rcTextPadding));
     ::ZeroMemory(&m_ListInfo.rcColumn, sizeof(m_ListInfo.rcColumn));

@@ -946,8 +946,7 @@ LRESULT CActiveXUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool
     if( m_pControl->m_pInPlaceObject == NULL ) return 0;
     if( !IsMouseEnabled() && uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST ) return 0;
     bool bWasHandled = true;
-    if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR )
-    {
+    if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR ) {
         // Mouse message only go when captured or inside rect
         DWORD dwHitResult = m_pControl->m_bCaptured ? HITRESULT_HIT : HITRESULT_OUTSIDE;
         if( dwHitResult == HITRESULT_OUTSIDE && m_pControl->m_pViewObject != NULL ) {
@@ -962,13 +961,11 @@ LRESULT CActiveXUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool
         if( dwHitResult != HITRESULT_HIT ) return 0;
         if( uMsg == WM_SETCURSOR ) bWasHandled = false;
     }
-    else if( uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST )
-    {
+    else if( uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST ) {
         // Keyboard messages just go when we have focus
-        if( !m_pControl->m_bFocused ) return 0;
+        if( !IsFocused() ) return 0;
     }
-    else
-    {
+    else {
         switch( uMsg ) {
         case WM_HELP:
         case WM_CONTEXTMENU:

@@ -32,7 +32,6 @@ typedef struct tagTListInfoUI
     CStdString sDisabledImage;
     DWORD dwLineColor;
     bool bShowHtml;
-    bool bExpandable;
     bool bMultiExpandable;
 } TListInfoUI;
 
@@ -152,7 +151,6 @@ public:
 	LPCTSTR GetDisabledItemImage() const;
 	DWORD GetItemLineColor() const;
 
-    void SetExpanding(bool bExpandable);
     void SetMultiExpanding(bool bMultiExpandable); 
     int GetExpandedItem() const;
     bool ExpandItem(int iIndex, bool bExpand = true);
