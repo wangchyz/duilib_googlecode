@@ -27,7 +27,6 @@ CListUI::CListUI() : m_pCallback(NULL), m_iCurSel(-1), m_iExpandedItem(-1)
     m_ListInfo.dwDisabledBkColor = 0xFFFFFFFF;
     m_ListInfo.dwLineColor = 0;
     m_ListInfo.bShowHtml = false;
-    m_ListInfo.bExpandable = false;
     m_ListInfo.bMultiExpandable = false;
     ::ZeroMemory(&m_ListInfo.rcTextPadding, sizeof(m_ListInfo.rcTextPadding));
     ::ZeroMemory(&m_ListInfo.rcColumn, sizeof(m_ListInfo.rcColumn));
@@ -554,11 +553,6 @@ void CListUI::SetItemShowHtml(bool bShowHtml)
     NeedUpdate();
 }
 
-void CListUI::SetExpanding(bool bExpandable)
-{
-    m_ListInfo.bExpandable = bExpandable;
-}
-
 void CListUI::SetMultiExpanding(bool bMultiExpandable)
 {
     m_ListInfo.bMultiExpandable = bMultiExpandable;
@@ -566,7 +560,6 @@ void CListUI::SetMultiExpanding(bool bMultiExpandable)
 
 bool CListUI::ExpandItem(int iIndex, bool bExpand /*= true*/)
 {
-    if( !m_ListInfo.bExpandable ) return false;
     if( m_iExpandedItem >= 0 && !m_ListInfo.bMultiExpandable) {
         CControlUI* pControl = GetItemAt(m_iExpandedItem);
         if( pControl != NULL ) {
@@ -630,7 +623,6 @@ void CListUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("header")) == 0 ) GetHeader()->SetVisible(_tcscmp(pstrValue, _T("hidden")) != 0);
     if( _tcscmp(pstrName, _T("headerbkimage")) == 0 ) GetHeader()->SetBkImage(pstrValue);
-    else if( _tcscmp(pstrName, _T("expanding")) == 0 ) SetExpanding(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("multiexpanding")) == 0 ) SetMultiExpanding(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("itemfont")) == 0 ) m_ListInfo.nFont = _ttoi(pstrValue);
     else if( _tcscmp(pstrName, _T("itemalign")) == 0 ) {
@@ -2106,7 +2098,7 @@ void CListExpandElementUI::DoEvent(TEventUI& event)
         TListInfoUI* pInfo = m_pOwner->GetListInfo();
         RECT rcExpander = { m_rcItem.left + m_rcExpander.left, m_rcItem.top + m_rcExpander.top, 
             m_rcItem.left + m_rcExpander.right, m_rcItem.top + m_rcExpander.bottom };
-        if( pInfo->bExpandable && ::PtInRect(&rcExpander, event.ptMouse) ) Expand(!m_bExpanded);
+        if( ::PtInRect(&rcExpander, event.ptMouse) ) Expand(!m_bExpanded);
         return;
     }
     if( event.Type == UIEVENT_KEYDOWN )
