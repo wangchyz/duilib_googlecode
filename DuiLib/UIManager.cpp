@@ -840,7 +840,11 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             event.lParam = lParam;
             event.wKeyState = MapKeyState();
             event.dwTimestamp = ::GetTickCount();
-            pControl->Event(event);        }
+            pControl->Event(event);
+
+            // Let's make sure that the scroll item below the cursor is the same as before...
+            ::SendMessage(m_hWndPaint, WM_MOUSEMOVE, 0, (LPARAM) MAKELPARAM(m_ptLastMousePos.x, m_ptLastMousePos.y));
+        }
         break;
     case WM_CHAR:
         {
