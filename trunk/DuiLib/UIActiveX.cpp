@@ -934,6 +934,7 @@ void CActiveXUI::DoPaint(HDC hDC, const RECT& rcPaint)
 void CActiveXUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("clsid")) == 0 ) CreateControl(pstrValue);
+    else if( _tcscmp(pstrName, _T("modulename")) == 0 ) SetModuleName(pstrValue);
     else if( _tcscmp(pstrName, _T("delaycreate")) == 0 ) SetDelayCreate(_tcscmp(pstrValue, _T("true")) == 0);
     else CControlUI::SetAttribute(pstrName, pstrValue);
 }
@@ -1042,13 +1043,31 @@ void CActiveXUI::ReleaseControl()
     m_pManager->RemoveMessageFilter(this);
 }
 
+typedef HRESULT (__stdcall *DllGetClassObjectFunc)(REFCLSID rclsid, REFIID riid, LPVOID* ppv); 
+
 bool CActiveXUI::DoCreateControl()
 {
     ReleaseControl();
     // At this point we'll create the ActiveX control
     m_bCreated = true;
     IOleControl* pOleControl = NULL;
-    HRESULT Hr = ::CoCreateInstance(m_clsid, NULL, CLSCTX_ALL, IID_IOleControl, (LPVOID*) &pOleControl);
+
+    HRESULT Hr = -1;
+    if( !m_sModuleName.IsEmpty() ) {
+        HMODULE hModule = ::LoadLibrary((LPCTSTR)m_sModuleName);
+        if( hModule != NULL ) {
+            IClassFactory* aClassFactory = NULL;
+            DllGetClassObjectFunc aDllGetClassObjectFunc = (DllGetClassObjectFunc)::GetProcAddress(hModule, "DllGetClassObject");
+            Hr = aDllGetClassObjectFunc(m_clsid, IID_IClassFactory, (LPVOID*)&aClassFactory);
+            if( SUCCEEDED(Hr) ) {
+                Hr = aClassFactory->CreateInstance(NULL, IID_IOleObject, (LPVOID*)&pOleControl);
+            }
+            aClassFactory->Release();
+        }
+    }
+    if( FAILED(Hr) ) {
+        Hr = ::CoCreateInstance(m_clsid, NULL, CLSCTX_ALL, IID_IOleControl, (LPVOID*)&pOleControl);
+    }
     ASSERT(SUCCEEDED(Hr));
     if( FAILED(Hr) ) return false;
     pOleControl->QueryInterface(IID_IOleObject, (LPVOID*) &m_pUnk);
@@ -1105,6 +1124,16 @@ HRESULT CActiveXUI::GetControl(const IID iid, LPVOID* ppRet)
 CLSID CActiveXUI::GetClisd() const
 {
 	return m_clsid;
+}
+
+CStdString CActiveXUI::GetModuleName() const
+{
+    return m_sModuleName;
+}
+
+void CActiveXUI::SetModuleName(LPCTSTR pstrText)
+{
+    m_sModuleName = pstrText;
 }
 
 } // namespace DuiLib

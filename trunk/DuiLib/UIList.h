@@ -95,6 +95,8 @@ public:
     UINT GetControlFlags() const;
     LPVOID GetInterface(LPCTSTR pstrName);
 
+    bool GetScrollSelect();
+    void SetScrollSelect(bool bScrollSelect);
     int GetCurSel() const;
     bool SelectItem(int iIndex);
 
@@ -182,6 +184,7 @@ public:
     virtual CScrollBarUI* GetHorizontalScrollBar() const;
 
 protected:
+    bool m_bScrollSelect;
     int m_iCurSel;
     int m_iExpandedItem;
     IListCallbackUI* m_pCallback;

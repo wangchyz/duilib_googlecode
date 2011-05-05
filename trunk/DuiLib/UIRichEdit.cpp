@@ -155,8 +155,6 @@ private:
     PARAFORMAT2	pf;					    // Default paragraph format
     LONG		laccelpos;				// Accelerator position
     WCHAR		chPasswordChar;		    // Password character
-
-    BOOL        resized;                // ÐÞÕý¹â±êbug
 };
 
 // Convert Pixels on the X axis to Himetric
@@ -505,8 +503,6 @@ BOOL CTxtWinHost::TxShowCaret(BOOL fShow)
 
 BOOL CTxtWinHost::TxSetCaretPos(INT x, INT y)
 {
-    if( resized ) m_re->GetManager()->Invalidate(rcClient);
-    resized = FALSE;
     return ::SetCaretPos(x, y);
 }
 
@@ -864,7 +860,6 @@ void CTxtWinHost::SetClientRect(RECT *prc)
     sizelExtent.cy = DYtoHimetricY(rcClient.bottom - rcClient.top, yPerInch);
 
     pserv->OnTxPropertyBitsChange(TXTBIT_VIEWINSETCHANGE, TXTBIT_VIEWINSETCHANGE);
-    resized = TRUE;
 }
 
 BOOL CTxtWinHost::SetSaveSelection(BOOL f_SaveSelection)
@@ -1633,6 +1628,8 @@ void CRichEditUI::DoInit()
     CreateHost(this, &cs, &m_pTwh);
     if( m_pTwh ) {
         m_pTwh->SetTransparent(TRUE);
+        LRESULT lResult;
+        m_pTwh->GetTextServices()->TxSendMessage(EM_SETLANGOPTIONS, 0, 0, &lResult);
         if( m_bReadOnly ) m_pTwh->OnTxInPlaceActivate(NULL);
         m_pManager->AddMessageFilter(this);
     }
@@ -1641,12 +1638,10 @@ void CRichEditUI::DoInit()
 HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plresult) const
 {
     if( m_pTwh ) {
-        if( msg == WM_KEYDOWN || msg == WM_KEYUP || msg == WM_CHAR || msg == WM_IME_CHAR ) {
-            if( TCHAR(wparam) == VK_RETURN ) {
-                if( !m_bWantReturn || (::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn) ) {
-                    if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, _T("return"));
-                    return S_OK;
-                }
+        if( msg == WM_KEYDOWN && TCHAR(wparam) == VK_RETURN ) {
+            if( !m_bWantReturn || (::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn) ) {
+                if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, _T("return"));
+                return S_OK;
             }
         }
         return m_pTwh->GetTextServices()->TxSendMessage(msg, wparam, lparam, plresult);
@@ -2074,23 +2069,20 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
 {
     if( !IsVisible() || !IsEnabled() ) return 0;
     if( !IsMouseEnabled() && uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST ) return 0;
-    if( uMsg == WM_MOUSEWHEEL ) return 0;
+    if( uMsg == WM_MOUSEWHEEL && (LOWORD(wParam) & MK_CONTROL) == 0 ) return 0;
 
     bool bWasHandled = true;
-    if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR )
-    {
-        switch (uMsg)
-        {
+    if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR ) {
+        switch (uMsg) {
         case WM_LBUTTONDOWN:
         case WM_LBUTTONUP:
         case WM_LBUTTONDBLCLK:
         case WM_RBUTTONDOWN:
         case WM_RBUTTONUP:
-        case WM_RBUTTONDBLCLK:
             {
                 POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
                 CControlUI* pHover = GetManager()->FindControl(pt);
-                if(pHover != this){
+                if(pHover != this) {
                     bWasHandled = false;
                     return 0;
                 }
@@ -2103,14 +2095,20 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
             RECT rc;
             m_pTwh->GetControlRect(&rc);
             POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-            if( PtInRect(&rc, pt) && !GetManager()->IsCaptured() ) dwHitResult = HITRESULT_HIT;
+            if( uMsg == WM_MOUSEWHEEL ) ::ScreenToClient(GetManager()->GetPaintWindow(), &pt);
+            if( ::PtInRect(&rc, pt) && !GetManager()->IsCaptured() ) dwHitResult = HITRESULT_HIT;
         }
         if( dwHitResult != HITRESULT_HIT ) return 0;
         if( uMsg == WM_SETCURSOR ) bWasHandled = false;
+        else if( uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK || uMsg == WM_RBUTTONDOWN ) {
+            SetFocus();
+        }
     }
-    else if(uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST)
-    {
-        // Keyboard messages just go when we have focus
+#ifdef _UNICODE
+    else if( uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST ) {
+#else
+    else if( (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST) || uMsg == WM_CHAR || uMsg == WM_IME_CHAR ) {
+#endif
         if( !IsFocused() ) return 0;
     }
     else
