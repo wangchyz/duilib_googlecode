@@ -326,10 +326,10 @@ BOOL CTxtWinHost::Init(CRichEditUI *re, const CREATESTRUCT *pcs)
         ::ZeroMemory(lpText, (iLen + 1) * sizeof(WCHAR));
         ::MultiByteToWideChar(CP_ACP, 0, pcs->lpszName, -1, (LPWSTR)lpText, iLen) ;
         if(FAILED(pserv->TxSetText((LPWSTR)lpText))) {
-            delete lpText;
+            delete[] lpText;
             goto err;
         }
-        delete lpText;
+        delete[] lpText;
 #endif
     }
 
@@ -1209,7 +1209,7 @@ CStdString CRichEditUI::GetText() const
     gt.lpUsedDefChar = NULL;
     TxSendMessage(EM_GETTEXTEX, (WPARAM)&gt, (LPARAM)lpText, 0);
     CStdString sText(lpText);
-    delete lpText;
+    delete[] lpText;
     return sText;
 }
 
@@ -1274,7 +1274,7 @@ void CRichEditUI::ReplaceSel(LPCTSTR lpszNewText, bool bCanUndo)
     ::ZeroMemory(lpText, (iLen + 1) * sizeof(WCHAR));
     ::MultiByteToWideChar(CP_ACP, 0, lpszNewText, -1, (LPWSTR)lpText, iLen) ;
     TxSendMessage(EM_REPLACESEL, (WPARAM) bCanUndo, (LPARAM)lpText, 0); 
-    delete lpText;
+    delete[] lpText;
 #endif
 }
 
@@ -1295,7 +1295,7 @@ CStdString CRichEditUI::GetSelText() const
     TxSendMessage(EM_GETSELTEXT, 0, (LPARAM)lpText, 0);
     CStdString sText;
     sText = (LPCWSTR)lpText;
-    delete lpText;
+    delete[] lpText;
     return sText;
 }
 
@@ -1379,7 +1379,7 @@ CStdString CRichEditUI::GetTextRange(long nStartChar, long nEndChar) const
     TxSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)&tr, 0);
     CStdString sText;
     sText = (LPCWSTR)lpText;
-    delete lpText;
+    delete[] lpText;
     return sText;
 }
 
@@ -1531,7 +1531,7 @@ CStdString CRichEditUI::GetLine(int nIndex, int nMaxLength) const
     TxSendMessage(EM_GETLINE, nIndex, (LPARAM)lpText, 0);
     CStdString sText;
     sText = (LPCWSTR)lpText;
-    delete lpText;
+    delete[] lpText;
     return sText;
 }
 
