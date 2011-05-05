@@ -226,6 +226,8 @@ public:
     HFONT GetFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     bool FindFont(HFONT hFont);
     bool FindFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
+    int GetFontIndex(HFONT hFont);
+    int GetFontIndex(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic);
     bool RemoveFont(HFONT hFont);
     bool RemoveFontAt(int index);
     void RemoveAllFonts();

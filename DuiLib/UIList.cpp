@@ -6,7 +6,7 @@ namespace DuiLib {
 //
 //
 
-CListUI::CListUI() : m_pCallback(NULL), m_iCurSel(-1), m_iExpandedItem(-1)
+CListUI::CListUI() : m_pCallback(NULL), m_bScrollSelect(false), m_iCurSel(-1), m_iExpandedItem(-1)
 {
     m_pList = new CListBodyUI(this);
     m_pHeader = new CListHeaderUI;
@@ -296,10 +296,12 @@ void CListUI::DoEvent(TEventUI& event)
         {
             switch( LOWORD(event.wParam) ) {
             case SB_LINEUP:
-                SelectItem(FindSelectable(m_iCurSel - 1, false));
+                if( m_bScrollSelect ) SelectItem(FindSelectable(m_iCurSel - 1, false));
+                else LineUp();
                 return;
             case SB_LINEDOWN:
-                SelectItem(FindSelectable(m_iCurSel + 1, true));
+                if( m_bScrollSelect ) SelectItem(FindSelectable(m_iCurSel + 1, true));
+                else LineDown();
                 return;
             }
         }
@@ -316,6 +318,16 @@ CListHeaderUI* CListUI::GetHeader() const
 CContainerUI* CListUI::GetList() const
 {
     return m_pList;
+}
+
+bool CListUI::GetScrollSelect()
+{
+    return m_bScrollSelect;
+}
+
+void CListUI::SetScrollSelect(bool bScrollSelect)
+{
+    m_bScrollSelect = bScrollSelect;
 }
 
 int CListUI::GetCurSel() const
@@ -622,7 +634,8 @@ void CListUI::Scroll(int dx, int dy)
 void CListUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("header")) == 0 ) GetHeader()->SetVisible(_tcscmp(pstrValue, _T("hidden")) != 0);
-    if( _tcscmp(pstrName, _T("headerbkimage")) == 0 ) GetHeader()->SetBkImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("headerbkimage")) == 0 ) GetHeader()->SetBkImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("scrollselect")) == 0 ) SetScrollSelect(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("multiexpanding")) == 0 ) SetMultiExpanding(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("itemfont")) == 0 ) m_ListInfo.nFont = _ttoi(pstrValue);
     else if( _tcscmp(pstrName, _T("itemalign")) == 0 ) {

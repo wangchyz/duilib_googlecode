@@ -1592,6 +1592,28 @@ bool CPaintManagerUI::FindFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool
     return false;
 }
 
+int CPaintManagerUI::GetFontIndex(HFONT hFont)
+{
+    TFontInfo* pFontInfo = NULL;
+    for( int it = 0; it < m_aCustomFonts.GetSize(); it++ ) {
+        pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[it]);
+        if( pFontInfo->hFont == hFont ) return it;
+    }
+    return -1;
+}
+
+int CPaintManagerUI::GetFontIndex(LPCTSTR pStrFontName, int nSize, bool bBold, bool bUnderline, bool bItalic)
+{
+    TFontInfo* pFontInfo = NULL;
+    for( int it = 0; it < m_aCustomFonts.GetSize(); it++ ) {
+        pFontInfo = static_cast<TFontInfo*>(m_aCustomFonts[it]);
+        if( pFontInfo->sFontName == pStrFontName && pFontInfo->iSize == nSize && 
+            pFontInfo->bBold == bBold && pFontInfo->bUnderline == bUnderline && pFontInfo->bItalic == bItalic) 
+            return it;
+    }
+    return -1;
+}
+
 bool CPaintManagerUI::RemoveFont(HFONT hFont)
 {
     TFontInfo* pFontInfo = NULL;
