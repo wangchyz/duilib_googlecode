@@ -826,19 +826,21 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     case WM_MOUSEWHEEL:
         {
-            if( m_pFocus == NULL ) break;
+            POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+            ::ScreenToClient(m_hWndPaint, &pt);
+            m_ptLastMousePos = pt;
+            CControlUI* pControl = FindControl(pt);
+            if( pControl == NULL ) break;
+            if( pControl->GetManager() != this ) break;
             int zDelta = (int) (short) HIWORD(wParam);
             TEventUI event = { 0 };
             event.Type = UIEVENT_SCROLLWHEEL;
+            event.pSender = pControl;
             event.wParam = MAKELPARAM(zDelta < 0 ? SB_LINEDOWN : SB_LINEUP, 0);
             event.lParam = lParam;
             event.wKeyState = MapKeyState();
             event.dwTimestamp = ::GetTickCount();
-            m_pFocus->Event(event);
-
-            // Let's make sure that the scroll item below the cursor is the same as before...
-            ::SendMessage(m_hWndPaint, WM_MOUSEMOVE, 0, (LPARAM) MAKELPARAM(m_ptLastMousePos.x, m_ptLastMousePos.y));
-        }
+            pControl->Event(event);        }
         break;
     case WM_CHAR:
         {

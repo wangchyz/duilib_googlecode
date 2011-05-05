@@ -571,23 +571,6 @@ public:
         return lRes;
     }
 
-    LRESULT OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-    {
-        // 解决ie控件收不到滚动消息的问题
-        POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-        ::ScreenToClient(m_pm.GetPaintWindow(), &pt);
-        CControlUI* pControl = static_cast<CControlUI*>(m_pm.FindControl(_T("ie")));
-        if( pControl && pControl->IsVisible() ) {
-            RECT rc = pControl->GetPos();
-            if( ::PtInRect(&rc, pt) ) {
-                return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
-            }
-        }
-
-        bHandled = FALSE;
-        return 0;
-    }
-
     LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         LRESULT lRes = 0;
@@ -603,7 +586,6 @@ public:
         case WM_SIZE:          lRes = OnSize(uMsg, wParam, lParam, bHandled); break;
         case WM_GETMINMAXINFO: lRes = OnGetMinMaxInfo(uMsg, wParam, lParam, bHandled); break;
         case WM_SYSCOMMAND:    lRes = OnSysCommand(uMsg, wParam, lParam, bHandled); break;
-        case WM_MOUSEWHEEL:    lRes = OnMouseWheel(uMsg, wParam, lParam, bHandled); break;
         default:
             bHandled = FALSE;
         }

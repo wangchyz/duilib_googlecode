@@ -296,7 +296,7 @@ public:
             ::ZeroMemory(lpText, (iLen + 1) * sizeof(WCHAR));
             ::MultiByteToWideChar(CP_ACP, 0, domain[iIndex].c_str(), -1, (LPWSTR)lpText, iLen) ;
             _stprintf(szBuf, lpText);
-            delete lpText;
+            delete[] lpText;
 #else
             _stprintf(szBuf, domain[iIndex].c_str());
 #endif
@@ -310,7 +310,7 @@ public:
             ::ZeroMemory(lpText, (iLen + 1) * sizeof(WCHAR));
             ::MultiByteToWideChar(CP_ACP, 0, desc[iIndex].c_str(), -1, (LPWSTR)lpText, iLen) ;
             _stprintf(szBuf, lpText);
-            delete lpText;
+            delete[] lpText;
 #else
             _stprintf(szBuf, desc[iIndex].c_str());
 #endif
@@ -366,7 +366,7 @@ public:
             ::ZeroMemory(lpText, (iLen + 1) * sizeof(WCHAR));
             ::MultiByteToWideChar(CP_ACP, 0, domain[iIndex].c_str(), -1, (LPWSTR)lpText, iLen) ;
             sMessage += lpText;
-            delete lpText;
+            delete[] lpText;
 #else
             sMessage += domain[iIndex].c_str();
 
