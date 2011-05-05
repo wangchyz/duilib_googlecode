@@ -111,3 +111,21 @@ BOOL CUIDesignerDoc::OnSaveDocument(LPCTSTR lpszPathName)
 
 	return TRUE/*CDocument::OnSaveDocument(lpszPathName)*/;
 }
+
+void CUIDesignerDoc::SetTitle(LPCTSTR lpszTitle)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if(m_strTitle != lpszTitle)
+	{
+		POSITION pos = this->GetFirstViewPosition();
+		while(pos)
+		{
+			CView* pView = this->GetNextView(pos);
+			CUIDesignerView* pUIView = DYNAMIC_DOWNCAST(CUIDesignerView, pView);
+			ASSERT(pUIView);
+			pUIView->OnTitleChanged(m_strTitle, lpszTitle);
+		}
+	}
+
+	CDocument::SetTitle(lpszTitle);
+}

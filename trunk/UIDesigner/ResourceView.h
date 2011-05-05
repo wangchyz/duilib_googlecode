@@ -23,15 +23,19 @@ protected:
 public:
 	void OnChangeVisualStyle();
 
-	void InsertImage(LPCTSTR pstrImage);
-	const CStringArray* GetAllImage() { return &m_arrImage; }
+	void InsertImageTree(CString strTitle, CString strPath);
+	void RemoveImageTree(CString strTree);
+	void  RenameImageTree(LPCTSTR pstrTree, LPCTSTR pstrNewName);
+	void InsertImage(CString strImage, CString strTree);
+	const CStringArray* GetImageTree(CString strTree) const;
+	void CopyImageToSkinDir(LPCTSTR pstrSkinDir, LPCTSTR pstrTree);
 
 protected:
 	void InitResourceView();
 
 private:
-	HTREEITEM m_hRoot;
-	CStringArray m_arrImage;
+	CMapStringToPtr m_mapTree;
+	CMapStringToPtr m_mapImageArray;
 
 // Implementation
 public:

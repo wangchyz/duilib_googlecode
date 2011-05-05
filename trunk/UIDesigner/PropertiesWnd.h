@@ -224,6 +224,8 @@ protected:
 
 	void SetUIValue(CMFCPropertyGridProperty* pProp,int nTag);
 
+	CString FormatOrigProperty(CMFCPropertyGridProperty* pProp);
+
 protected:
 	CFont m_fntPropList;
 	CPropertiesToolBar m_wndToolBar;

@@ -132,6 +132,12 @@ typedef struct tagExtendedAttributes
 	int nDepth;
 }ExtendedAttributes;
 
+typedef struct tagUIAttribute
+{
+	LPCTSTR pstrName;
+	LPCTSTR pstrValue;
+}UIAttribute;
+
 //////////////////////////////////////////////////////////////////////////
 //Global variables
 

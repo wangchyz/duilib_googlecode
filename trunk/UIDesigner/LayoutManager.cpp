@@ -378,7 +378,8 @@ void CDelayRepos::Repos()
 //////////////////////////////////////////////////////////////////////////
 //CLayoutManager
 
-CLayoutManager::CLayoutManager(void):m_bShowGrid(false),m_bShowAuxBorder(true)
+CLayoutManager::CLayoutManager(void)
+	: m_pFormUI(NULL), m_bShowGrid(false), m_bShowAuxBorder(true)
 {
 	ZeroMemory(&m_UINameCount, sizeof(m_UINameCount));
 }
@@ -389,32 +390,32 @@ CLayoutManager::~CLayoutManager(void)
 
 void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 {
-	CFormUI* pForm=static_cast<CFormUI*>(NewUI(classForm,
+	m_pFormUI=static_cast<CFormUI*>(NewUI(classForm,
 		CRect(0,0,FORM_INIT_WIDTH,FORM_INIT_HEIGHT),NULL)->GetInterface(_T("Form")));
-	ASSERT(pForm);
-	pForm->SetManager(&m_Manager);
-	pForm->SetInitSize(FORM_INIT_WIDTH,FORM_INIT_HEIGHT);
+	ASSERT(m_pFormUI);
+	m_pFormUI->SetManager(&m_Manager);
+	m_pFormUI->SetInitSize(FORM_INIT_WIDTH,FORM_INIT_HEIGHT);
 
 	m_Manager.Init(hWnd);
 	if(*pstrLoad!='\0')
 	{
-		CString strSkinDir(pstrLoad);
-		int nFind=strSkinDir.ReverseFind(_T('\\'));
-		if(nFind != -1)
-			strSkinDir=strSkinDir.Left(nFind + 1);
+		m_strSkinDir = pstrLoad;
+		int nPos = m_strSkinDir.ReverseFind(_T('\\'));
+		if(nPos != -1)
+			m_strSkinDir = m_strSkinDir.Left(nPos + 1);
 		
-		g_HookAPI.SetSkinDir(strSkinDir);
+		g_HookAPI.SetSkinDir(m_strSkinDir);
 		g_HookAPI.EnableCreateFile(true);
 
 		CDialogBuilder builder;
 		CControlUI* pRoot=builder.Create(pstrLoad,(UINT)0,NULL,&m_Manager);
 		if(pRoot)
-			pForm->Add(pRoot);
+			m_pFormUI->Add(pRoot);
 
 		SIZE size=m_Manager.GetInitSize();
-		pForm->SetInitSize(size.cx,size.cy);
+		m_pFormUI->SetInitSize(size.cx,size.cy);
 	}
-	m_Manager.AttachDialog(pForm);
+	m_Manager.AttachDialog(m_pFormUI);
 }
 
 void CLayoutManager::Draw(CDC* pDC)
@@ -642,11 +643,7 @@ CPaintManagerUI* CLayoutManager::GetManager()
 
 CFormUI* CLayoutManager::GetForm() const
 { 
-	CControlUI* pRoot=m_Manager.GetRoot();
-	if(pRoot==NULL)
-		return NULL;
-
-	return static_cast<CFormUI*>(pRoot->GetInterface(_T("Form")));
+	return m_pFormUI;
 }
 
 CControlUI* CLayoutManager::FindControl(CPoint point) const
@@ -676,7 +673,6 @@ void CLayoutManager::TestForm()
 		return;
 
 	g_HookAPI.EnableInvalidate(false);
-	g_HookAPI.EnableAddImage(false);
 
 	pFrame->SetManager(pManager);
 	pRoot->SetManager(NULL,NULL);
@@ -704,7 +700,6 @@ void CLayoutManager::TestForm()
 	if( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
 
 	g_HookAPI.EnableInvalidate(true);
-	g_HookAPI.EnableAddImage(true);
 }
 
 BOOL CLayoutManager::IsEmptyForm() const
@@ -1885,6 +1880,12 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 
 void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
 {
+	CString strPathName(lpszPathName);
+	int nPos = strPathName.ReverseFind(_T('\\'));
+	if(nPos == -1)
+		return;
+	m_strSkinDir = strPathName.Left(nPos + 1);
+
 	HANDLE hFile = ::CreateFile(lpszPathName, GENERIC_ALL, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(hFile == INVALID_HANDLE_VALUE)
 	{
@@ -1898,7 +1899,7 @@ void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
 	TiXmlDeclaration Declaration("1.0","utf-8","yes");
 	xmlDoc.InsertEndChild(Declaration);
 
-	TiXmlElement* pFormElm = new TiXmlElement("Window");		
+	TiXmlElement* pFormElm = new TiXmlElement("Window");
 	CFormUI* pForm = GetForm();
 	ASSERT(pForm);
 	SIZE szSize = pForm->GetInitSize();

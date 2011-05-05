@@ -172,6 +172,8 @@ public:
 
 	void SetDefaultUIName(CControlUI* pControl, BOOL bForce = FALSE);
 
+	LPCTSTR GetSkinDir() const { return m_strSkinDir; }
+
 protected:
 	CControlUI* CopyControls(CControlUI* pControl);
 	CControlUI* CopyControl(CControlUI* pControl);
@@ -192,6 +194,8 @@ protected:
 
 private:
 	CPaintManagerUI m_Manager;
+	CFormUI* m_pFormUI;
+	CString m_strSkinDir;
 
 	bool m_bShowGrid;
 	bool m_bShowAuxBorder;

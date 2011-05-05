@@ -9,9 +9,6 @@ pfnCreateFile CHookAPI::CreateFileAPI=NULL;
 bool CHookAPI::m_bInvalidateEnabled=false;
 HOOKSTRUCT CHookAPI::m_InvalidateHookInfo={0};
 
-bool CHookAPI::m_bAddImageEnabled=false;
-HOOKSTRUCT CHookAPI::m_AddImageHookInfo={0};
-
 bool CHookAPI::m_bGetImageExEnabled=false;
 HOOKSTRUCT CHookAPI::m_GetImageExHookInfo={0};
 
@@ -24,9 +21,6 @@ CHookAPI::CHookAPI(void)
 	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
 	EnableInvalidate(true);
 
-	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?AddImage@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_AddImage,m_AddImageHookInfo);
-	EnableAddImage(true);
-
 	HookAPI(_T("Duilib_ud.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
 	EnableGetImageEx(true);
 #else
@@ -35,9 +29,6 @@ CHookAPI::CHookAPI(void)
 
 	HookAPI(_T("Duilib_u.dll"),LPCSTR("?Invalidate@CPaintManagerUI@DuiLib@@QAEXAAUtagRECT@@@Z"),(FARPROC)Hook_Invalidate,m_InvalidateHookInfo);
 	EnableInvalidate(true);
-
-	HookAPI(_T("Duilib_u.dll"),LPCSTR("?AddImage@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_AddImage,m_AddImageHookInfo);
-	EnableAddImage(true);
 
 	HookAPI(_T("Duilib_u.dll"),LPCSTR("?GetImageEx@CPaintManagerUI@DuiLib@@QAEPAUtagTImageInfo@2@PB_W0K@Z"),(FARPROC)Hook_GetImageEx,m_GetImageExHookInfo);
 	EnableGetImageEx(true);
@@ -171,44 +162,6 @@ __declspec(naked) void WINAPI CHookAPI::Hook_Invalidate(RECT& rcItem)
 		popad;
 		pop ebp;
 		retn 0x04;
-	}
-}
-
-__declspec(naked) TImageInfo* WINAPI CHookAPI::Hook_AddImage(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask)
-{
-	_asm
-	{
-		push ebp;
-		mov ebp,esp;
-		push esi;
-		push edi;
-		push ecx;//save this pointer
-	}
-	EnableHook(m_AddImageHookInfo,FALSE);
-
-	_asm
-	{
-		pop ecx;//load this pointer
-		push mask;
-		push pstrType;
-		push pstrBitmap;
-		call m_AddImageHookInfo.pfnFuncAddr;
-		push eax;//save return value
-	}
-
-	if(m_bAddImageEnabled)
-	{
-		g_pResourceView->InsertImage(pstrBitmap);
-	}
-
-	EnableHook(m_AddImageHookInfo,TRUE);
-	_asm
-	{
-		pop eax;//load return value
-		pop edi;
-		pop esi;
-		pop ebp;
-		retn 0x0C;
 	}
 }
 

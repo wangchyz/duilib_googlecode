@@ -39,6 +39,7 @@ protected:
 public:
 	afx_msg void OnTemplateSave();
 	virtual BOOL OnSaveDocument(LPCTSTR lpszPathName);
+	virtual void SetTitle(LPCTSTR lpszTitle);
 };
 
 

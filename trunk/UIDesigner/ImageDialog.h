@@ -40,6 +40,7 @@ private:
 	CPaintManagerUI* m_pManager;
 
 	static const CString m_strNullImage;
+	CStringArray m_strImageArray;
 
 protected:
 	RECT StringToRect(CString& str);
@@ -49,7 +50,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
-public:
+
+protected:
 	virtual BOOL OnInitDialog();
 	CListBox m_lstImages;
 	CString m_strDest;

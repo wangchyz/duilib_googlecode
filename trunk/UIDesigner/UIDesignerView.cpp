@@ -204,6 +204,7 @@ void CUIDesignerView::OnInitialUpdate()
 	CFormUI* pForm=m_LayoutManager.GetForm();
 
 	g_pClassView->InsertUITreeItem(pForm,pDoc->GetTitle());
+	g_pResourceView->InsertImageTree(pDoc->GetTitle(), pDoc->GetPathName());
 	if(pForm->GetCount()>0)
 	{
 		InitUI(pForm->GetItemAt(0), 1);
@@ -278,6 +279,7 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 
 			m_MultiTracker.RemoveAll();
 			m_MultiTracker.Add(CreateTracker(pNewControl));
+			this->GetDocument()->SetModifiedFlag();
 		}
 	}
 
@@ -366,7 +368,21 @@ void CUIDesignerView::Notify(TNotifyUI& msg)
 {
 	CControlUI* pControl=msg.pSender;
 
-	if(msg.sType==_T("setpos"))
+	if(msg.sType == _T("PropertyBeginChanged"))
+	{
+		UIAttribute* pAttrib = (UIAttribute*)msg.lParam;
+		m_UICommandHistory.Begin(pControl, pAttrib->pstrName, pAttrib->pstrValue);
+	}
+	else if(msg.sType == _T("PropertyEndChanged"))
+	{
+		UIAttribute* pAttrib = (UIAttribute*)msg.lParam;
+		m_UICommandHistory.End(pControl, pAttrib->pstrName, pAttrib->pstrValue);
+	}
+	else if(msg.sType == _T("PosBeginChanged"))
+		m_UICommandHistory.Begin(*(CArray<CControlUI*,CControlUI*>*)msg.lParam, actionModify);
+	else if(msg.sType == _T("PosEndChanged"))
+		m_UICommandHistory.End();
+	else if(msg.sType==_T("setpos"))
 	{
 		if(GetControlType(pControl)==typeForm)
 		{
@@ -492,17 +508,26 @@ void CUIDesignerView::OnRemoveUI()
 
 	g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
 	m_MultiTracker.RemoveAll();
+	this->GetDocument()->SetModifiedFlag();
 }
 
 CControlUI* CUIDesignerView::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 {
-	return m_LayoutManager.NewUI(nClass, rect, pParent);
+	CControlUI* pControl = m_LayoutManager.NewUI(nClass, rect, pParent);
+	if(pControl != NULL)
+		this->GetDocument()->SetModifiedFlag();
+
+	return pControl;
 }
 
 BOOL CUIDesignerView::RemoveUI(CControlUI* pControl)
 {
 	m_MultiTracker.RemoveAll();
-	return m_LayoutManager.RemoveUI(pControl);
+	BOOL bRet = m_LayoutManager.RemoveUI(pControl);
+	if(bRet)
+		this->GetDocument()->SetModifiedFlag();
+
+	return bRet;
 }
 
 void CUIDesignerView::SelectUI(CControlUI* pControl)
@@ -528,6 +553,7 @@ void CUIDesignerView::SelectUI(CControlUI* pControl)
 void CUIDesignerView::OnActivated()
 {
 	g_pPropertiesWnd->ShowProperty(m_MultiTracker.GetFocused());
+	g_HookAPI.SetSkinDir(m_LayoutManager.GetSkinDir());
 }
 
 void CUIDesignerView::InitUI(CControlUI* pControl, int depth, BOOL bForceName/* = FALSE*/)
@@ -564,7 +590,9 @@ void CUIDesignerView::OnAlignLeft()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignLeft(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignRight()
@@ -572,7 +600,9 @@ void CUIDesignerView::OnAlignRight()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignRight(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignTop()
@@ -580,7 +610,9 @@ void CUIDesignerView::OnAlignTop()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignTop(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignBottom()
@@ -588,7 +620,9 @@ void CUIDesignerView::OnAlignBottom()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignBottom(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignCenterVertically()
@@ -596,7 +630,9 @@ void CUIDesignerView::OnAlignCenterVertically()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignCenterVertically(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignCenterHorizontally()
@@ -604,7 +640,9 @@ void CUIDesignerView::OnAlignCenterHorizontally()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignCenterHorizontally(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignHorizontal()
@@ -622,7 +660,9 @@ void CUIDesignerView::OnAlignSameWidth()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignSameWidth(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignSameHeight()
@@ -630,7 +670,9 @@ void CUIDesignerView::OnAlignSameHeight()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignSameHeight(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnAlignSameSize()
@@ -638,7 +680,9 @@ void CUIDesignerView::OnAlignSameSize()
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
 	m_MultiTracker.GetSelected(arrSelected);
+	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignSameSize(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
 }
 
 void CUIDesignerView::OnShowGrid()
@@ -731,6 +775,7 @@ void CUIDesignerView::OnDestroy()
 
 	// TODO: 在此处添加消息处理程序代码
 	g_pClassView->RemoveUITreeItem(m_LayoutManager.GetForm());
+	g_pResourceView->RemoveImageTree(this->GetDocument()->GetTitle());
 	g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
 }
 
@@ -997,6 +1042,13 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 void CUIDesignerView::OnSaveSkinFile(LPCTSTR lpszPathName)
 {
 	m_LayoutManager.SaveSkinFile(lpszPathName);
+	g_pResourceView->CopyImageToSkinDir(m_LayoutManager.GetSkinDir(), this->GetDocument()->GetTitle());
+}
+
+void CUIDesignerView::OnTitleChanged(LPCTSTR pstrOldTitle, LPCTSTR pstrNewTitle)
+{
+	g_pClassView->RenameUITreeItem(m_LayoutManager.GetForm(), pstrNewTitle);
+	g_pResourceView->RenameImageTree(pstrOldTitle, pstrNewTitle);
 }
 
 void CUIDesignerView::RedoUI(CControlUI* pControl, CControlUI* pParent)
@@ -1009,6 +1061,6 @@ void CUIDesignerView::RedoUI(CControlUI* pControl, CControlUI* pParent)
 	ExtendedAttributes* pExtended = (ExtendedAttributes*)pContainer->GetTag();
 	pContainer->Add(pControl);
 	m_MultiTracker.Add(CreateTracker(pControl));
-	InitUI(pControl, pExtended->nDepth + 1, TRUE);
+	InitUI(pControl, pExtended->nDepth + 1);
 	pContainer->SetPos(pContainer->GetPos());
 }
