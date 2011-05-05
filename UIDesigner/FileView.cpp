@@ -5,6 +5,7 @@
 #include "UIDesigner.h"
 
 #include "DialogProjectNew.h"
+#include "UIUtil.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -204,17 +205,150 @@ void CFileView::OnProjectNew()
 	CDialogProjectNew dlg;
 	if(dlg.DoModal() == IDOK)
 	{
-		CGlobalVariable::m_strProjectName = dlg.m_strName;
-		CGlobalVariable::m_strProjectPath = dlg.m_strPath;
-		if(CGlobalVariable::m_strProjectPath[CGlobalVariable::m_strProjectPath.GetLength()] != '\\')
-			CGlobalVariable::m_strProjectPath += '\\';
+		if(CGlobalVariable::m_bIsProjectExist)
+			OnProjectClose();
 
-		CreateDirectory(CGlobalVariable::m_strProjectPath + CGlobalVariable::m_strProjectName, NULL);
+		CGlobalVariable::m_strProjectName = dlg.m_strName;
+		CGlobalVariable::m_strProjectPath = dlg.m_strPath + dlg.m_strName + _T("\\");
+
+		CreateDirectory(CGlobalVariable::m_strProjectPath, NULL);
 		CGlobalVariable::m_bIsProjectExist = true;
 
 		HTREEITEM hRoot = m_wndFileView.InsertItem(CGlobalVariable::m_strProjectName, 0, 0, TVI_ROOT);
 		m_wndFileView.SetItemData(hRoot, INFO_PROJECT);
 		m_wndFileView.SetItemState(hRoot, TVIS_BOLD,TVIS_BOLD);
+	}
+}
+
+void CFileView::OnProjectClose()
+{
+	g_pMainFrame->OnFileCloseAll();
+	SaveProject();
+	m_wndFileView.DeleteAllItems();
+	CGlobalVariable::m_bIsProjectExist = false;
+}
+
+void CFileView::OnProjectOpen()
+{
+	CFileDialog dlg(TRUE, _T(""), NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT
+		, _T("项目文件(*.uiproj)|*.uiproj|所有文件(*.*)|*.*||"));
+	if(dlg.DoModal() == IDOK)
+	{
+		if(CGlobalVariable::m_bIsProjectExist)
+			OnProjectClose();
+
+		CGlobalVariable::m_strProjectName = dlg.GetFileTitle();
+		CString strPath = dlg.GetPathName();
+		int nPos = strPath.ReverseFind(_T('\\'));
+		CGlobalVariable::m_strProjectPath = strPath.Left(nPos + 1);
+
+		LoadUITree(strPath);
+		CGlobalVariable::m_bIsProjectExist = true;
+	}
+}
+
+void CFileView::LoadUITree(CString& strPath)
+{
+	if(strPath.IsEmpty())
+		return;
+
+	TiXmlDocument xmlDoc;
+	xmlDoc.LoadFile(StringConvertor::WideToAnsi(strPath));
+	
+	TiXmlElement* pRootElem = xmlDoc.RootElement();
+	HTREEITEM hRoot = m_wndFileView.InsertItem(CGlobalVariable::m_strProjectName, 0, 0, TVI_ROOT);
+	m_wndFileView.SetItemData(hRoot, INFO_PROJECT);
+	m_wndFileView.SetItemState(hRoot, TVIS_BOLD,TVIS_BOLD);
+	LoadUITree(pRootElem, hRoot);
+	m_wndFileView.Expand(hRoot, TVE_EXPAND);
+}
+
+void CFileView::LoadUITree(TiXmlElement* pElement, HTREEITEM hParent)
+{
+	if(pElement == NULL)
+		return;
+
+	TiXmlNode* pNode = pElement->FirstChild();
+	while(pNode)
+	{
+		if(pNode->Type() == TiXmlNode::ELEMENT)
+		{
+			DWORD dwInfo = 0;
+			CStringA strName = pNode->ToElement()->Attribute("Name");
+			HTREEITEM hItem;
+			if(strcmp(pNode->Value(), "File") == 0)
+			{
+				hItem = m_wndFileView.InsertItem(StringConvertor::Utf8ToWide(strName), 1, 1, hParent);
+				dwInfo = INFO_FILE;
+			}
+			else if(strcmp(pNode->Value(), "Directory") == 0)
+			{
+				hItem = m_wndFileView.InsertItem(StringConvertor::Utf8ToWide(strName), 0, 0, hParent);
+				dwInfo = INFO_DIRECTORY;
+			}
+			m_wndFileView.SetItemData(hItem, dwInfo);
+			if(dwInfo == INFO_DIRECTORY)
+			{
+				LoadUITree(pNode->ToElement(), hItem);
+			}
+		}
+
+		pNode = pNode->NextSibling();
+	}
+}
+
+void CFileView::SaveProject()
+{
+	if(CGlobalVariable::m_bIsProjectExist == false)
+		return;
+
+	CString strPathName = CGlobalVariable::m_strProjectPath + CGlobalVariable::m_strProjectName + _T(".uiproj");
+	TiXmlDocument xmlDoc(StringConvertor::WideToAnsi(strPathName));
+	TiXmlDeclaration Declaration("1.0","utf-8","yes");
+	xmlDoc.InsertEndChild(Declaration);
+
+	TiXmlElement xmlElem("DirectUIProject");
+	xmlElem.SetAttribute("Name", StringConvertor::WideToUtf8(CGlobalVariable::m_strProjectName));
+	xmlElem.SetAttribute("Version", 1);
+	TiXmlNode* pNode = xmlDoc.InsertEndChild(xmlElem);
+
+	SaveUITree(m_wndFileView.GetRootItem(), pNode->ToElement());
+	xmlDoc.SaveFile();
+}
+
+void CFileView::SaveUITree(HTREEITEM hItem, TiXmlElement* pParentNode)
+{
+	if(hItem == NULL || pParentNode == NULL)
+		return;
+
+	TiXmlElement* pNode = NULL;
+	HTREEITEM hChild = m_wndFileView.GetChildItem(hItem);
+	while(hChild != NULL)
+	{
+		DWORD dwInfo = m_wndFileView.GetItemData(hChild);
+		CString strName = m_wndFileView.GetItemText(hChild);
+		HTREEITEM hNext = m_wndFileView.GetNextItem(hChild, TVGN_NEXT);
+		if(dwInfo == INFO_FILE)
+		{
+			 pNode = new TiXmlElement("File");
+			 pNode->SetAttribute("Name", StringConvertor::WideToUtf8(strName));
+			 pParentNode->InsertEndChild(*pNode);
+
+			 delete pNode;
+			 pNode = NULL;
+		}
+		else if(dwInfo == INFO_DIRECTORY)
+		{
+			pNode = new TiXmlElement("Directory");
+			pNode->SetAttribute("Name", StringConvertor::WideToUtf8(strName));
+			TiXmlNode* pChildNode = pParentNode->InsertEndChild(*pNode);
+			SaveUITree(hChild, pChildNode->ToElement());
+
+			delete pNode;
+			pNode = NULL;
+		}
+
+		hChild = hNext;
 	}
 }
 
@@ -224,14 +358,14 @@ void CFileView::OnFileNew()
 		theApp.m_pDocManager->OnFileNew();
 
 	CDocument* pDoc = g_pMainFrame->MDIGetActive()->GetActiveDocument();
+	CString strFilePath = CGlobalVariable::m_strProjectPath + pDoc->GetTitle() + _T(".xml");
+	pDoc->DoSave(strFilePath);
 	HTREEITEM hSelectedItem = m_wndFileView.GetSelectedItem();
 	DWORD dwInfo = m_wndFileView.GetItemData(hSelectedItem);
-	HTREEITEM hParent = (dwInfo != INFO_FILE)?hSelectedItem:m_wndFileView.GetParentItem(hSelectedItem);
+	HTREEITEM hParent = (dwInfo != INFO_FILE) ? hSelectedItem : m_wndFileView.GetParentItem(hSelectedItem);
 	HTREEITEM hNewItem = m_wndFileView.InsertItem(pDoc->GetTitle(), 1, 1, hParent);
 	m_wndFileView.SetItemData(hNewItem, INFO_FILE);
 	m_wndFileView.Expand(hParent, TVE_EXPAND);
-	CString strFilePath = GetFileRelativePath(hNewItem) + _T(".xml");
-	pDoc->DoSave(CGlobalVariable::m_strProjectPath + strFilePath);
 }
 
 void CFileView::OnFileDelete()
@@ -248,7 +382,7 @@ void CFileView::OnFileDelete()
 	}
 	else if(dwInfo == INFO_DIRECTORY)
 	{
-		if(MessageBox(_T("您确定删除此目录以及该目录中的所有内容，删除后将无法恢复？\n点击“是”，确认删除，“否”取消删除。"),
+		if(MessageBox(_T("您确定该目录中的所有内容，删除后将无法恢复？\n点击“是”，确认删除，“否”取消删除。"),
 			_T("警告"), MB_YESNO | MB_ICONWARNING) == IDNO)
 			return;
 
@@ -259,8 +393,7 @@ void CFileView::OnFileDelete()
 BOOL CFileView::DeleteSkinFile(HTREEITEM hItem)
 {
 	CString strFilePath;
-	strFilePath = GetFileRelativePath(hItem) + _T(".xml");
-	strFilePath = CGlobalVariable::m_strProjectPath + strFilePath;
+	strFilePath = CGlobalVariable::m_strProjectPath + m_wndFileView.GetItemText(hItem);
 	CloseSkinFile(strFilePath);
 	if(DeleteFile(strFilePath))
 	{
@@ -285,29 +418,9 @@ BOOL CFileView::DeleteDirectory(HTREEITEM hItem)
 
 		hChild = hNext;
 	}
-	CString strDirPath;
-	strDirPath = GetFileRelativePath(hItem);
-	if(RemoveDirectory(CGlobalVariable::m_strProjectPath + strDirPath))
-	{
-		m_wndFileView.DeleteItem(hItem);
-		return TRUE;
-	}
 
+	m_wndFileView.DeleteItem(hItem);
 	return FALSE;
-}
-
-CString CFileView::GetFileRelativePath(HTREEITEM hItem)
-{
-	CString strRelativePath = m_wndFileView.GetItemText(hItem);
-
-	hItem = m_wndFileView.GetParentItem(hItem);
-	while(hItem)
-	{
-		strRelativePath = m_wndFileView.GetItemText(hItem) + _T("\\") + strRelativePath;
-		hItem = m_wndFileView.GetParentItem(hItem);
-	}
-
-	return strRelativePath;
 }
 
 void CFileView::OpenSkinFile(HTREEITEM hItem)
@@ -315,8 +428,8 @@ void CFileView::OpenSkinFile(HTREEITEM hItem)
 	if(m_wndFileView.GetItemData(hItem) != INFO_FILE)
 		return;
 
-	CString strFilePath = GetFileRelativePath(hItem) + _T(".xml");
-	AfxGetApp()->OpenDocumentFile(CGlobalVariable::m_strProjectPath + strFilePath);
+	CString strFilePath = CGlobalVariable::m_strProjectPath + m_wndFileView.GetItemText(hItem);
+	AfxGetApp()->OpenDocumentFile(strFilePath);
 }
 
 CDocument* CFileView::FindSkinFile(CString& strPath)
@@ -334,6 +447,25 @@ CDocument* CFileView::FindSkinFile(CString& strPath)
 				return pDoc;
 			}
 		}
+	}
+
+	return NULL;
+}
+
+HTREEITEM CFileView::FindDirectory(CString& strDirName, HTREEITEM hParent)
+{
+	HTREEITEM hChild = m_wndFileView.GetChildItem(hParent);
+	while(hChild != NULL)
+	{
+		DWORD dwInfo = m_wndFileView.GetItemData(hChild);
+		if(dwInfo == INFO_DIRECTORY)
+		{
+			CString strName = m_wndFileView.GetItemText(hChild);
+			if(strDirName == strName)
+				return hChild;
+		}
+
+		hChild = m_wndFileView.GetNextItem(hChild, TVGN_NEXT);;
 	}
 
 	return NULL;
@@ -411,17 +543,17 @@ void CFileView::OnDirectoryNew()
 	// TODO: 在此添加命令处理程序代码
 	HTREEITEM hSelectedItem = m_wndFileView.GetSelectedItem();
 	DWORD dwInfo = m_wndFileView.GetItemData(hSelectedItem);
-	HTREEITEM hParent = (dwInfo != INFO_FILE)?hSelectedItem:m_wndFileView.GetParentItem(hSelectedItem);
-	CString strDirName = _T("新建文件夹");
-	CString strDirPath = CGlobalVariable::m_strProjectPath + GetFileRelativePath(hParent) + _T("\\");
+	HTREEITEM hParent = (dwInfo != INFO_FILE) ? hSelectedItem:m_wndFileView.GetParentItem(hSelectedItem);
 	int nCount = 2;
-	while(!CreateDirectory(strDirPath + strDirName, NULL))
-	{
+	CString strDirName = _T("新建文件夹");
+	while(FindDirectory(strDirName, hParent))
 		strDirName.Format(_T("新建文件夹(%d)"), nCount++);
-	}
+
 	HTREEITEM hNewItem = m_wndFileView.InsertItem(strDirName, 0, 0, hParent);
 	m_wndFileView.SetItemData(hNewItem, INFO_DIRECTORY);
 	m_wndFileView.Expand(hParent, TVE_EXPAND);
+	m_wndFileView.SelectItem(hNewItem);
+	m_wndFileView.EditLabel(hNewItem);
 }
 
 void CFileView::OnCreateCopy()
@@ -431,24 +563,20 @@ void CFileView::OnCreateCopy()
 	if(m_wndFileView.GetItemData(hSelectedItem) != INFO_FILE)
 		return;
 
-	CString strFilePath= GetFileRelativePath(hSelectedItem) + _T(".xml");
-	int nFind = strFilePath.ReverseFind('\\');
-	if(nFind == -1)
-		return;
-	CString strNewFilePath = strFilePath;
-	strNewFilePath.Insert(nFind + 1, _T("复件 "));
+	CString strFileName= m_wndFileView.GetItemText(hSelectedItem);
+	CString strNewFileName = strFileName;
+	strNewFileName.Insert(0, _T("复件 "));
 	int nCount = 0;
-	while(!CopyFile(CGlobalVariable::m_strProjectPath + strFilePath,
-		CGlobalVariable::m_strProjectPath + strNewFilePath, TRUE))
+	while(!CopyFile(CGlobalVariable::m_strProjectPath + strFileName,
+		CGlobalVariable::m_strProjectPath + strNewFileName, TRUE))
 	{
-		strNewFilePath = strFilePath;
+		strNewFileName = strFileName;
 		CString strCount;
 		strCount.Format(_T("复件(%d) "), nCount++);
-		strNewFilePath.Insert(nFind + 1, strCount);
+		strNewFileName.Insert(0, strCount);
 	}
-	CString strCopyName = strNewFilePath.Mid(nFind + 1, strNewFilePath.GetLength() - nFind - 5);
 	HTREEITEM hParent  = m_wndFileView.GetParentItem(hSelectedItem);
-	HTREEITEM hNewItem = m_wndFileView.InsertItem(strCopyName, 1, 1, hParent);
+	HTREEITEM hNewItem = m_wndFileView.InsertItem(strNewFileName, 1, 1, hParent);
 	m_wndFileView.SetItemData(hNewItem, INFO_FILE);
 }
 
@@ -461,28 +589,29 @@ void CFileView::OnFileRename()
 
 BOOL CFileView::RenameFile(CString strNewName, HTREEITEM hItem)
 {
-	CString strFilePath = GetFileRelativePath(hItem);
-	int nFind = strFilePath.ReverseFind('\\');
-	if(nFind == -1)
-		return FALSE;
-	CString strOldName = strFilePath.Right(strFilePath.GetLength() - nFind- 1);
-	strFilePath = CGlobalVariable::m_strProjectPath + strFilePath.Left(nFind + 1);
+	CString strOldName = m_wndFileView.GetItemText(hItem);
 	DWORD dwInfo = m_wndFileView.GetItemData(hItem);
 	if(dwInfo == INFO_FILE)
 	{
-		strOldName += _T(".xml");
-		strNewName += _T(".xml");
-
-		if(FindSkinFile(strFilePath + strOldName))
+		if(FindSkinFile(CGlobalVariable::m_strProjectPath + strOldName))
 		{
 			MessageBox(_T("此文件正处于打开状态，请先关闭后再进行重命名。"), _T("提示"), MB_ICONINFORMATION);
 			return FALSE;
 		}
+		if(!MoveFile(CGlobalVariable::m_strProjectPath + strOldName
+			, CGlobalVariable::m_strProjectPath + strNewName))
+		{
+			MessageBox(_T("此文件已经存在，不能重复命名。"), _T("提示"), MB_ICONINFORMATION);
+			return FALSE;
+		}
 	}
-	if(!MoveFile(strFilePath + strOldName, strFilePath + strNewName))
+	else if(dwInfo == INFO_DIRECTORY)
 	{
-		MessageBox(_T("此文件已经存在，不能重复命名。"), _T("提示"), MB_ICONINFORMATION);
-		return FALSE;
+		if(FindDirectory(strNewName, m_wndFileView.GetParentItem(hItem)))
+		{
+			MessageBox(_T("此目录已经存在，不能重复命名。"), _T("提示"), MB_ICONINFORMATION);
+			return FALSE;
+		}
 	}
 
 	return TRUE;

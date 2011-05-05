@@ -28,12 +28,12 @@ class CUICommandElement
 	friend CUICommandHistory;
 
 public:
+	CUICommandElement();
 	CUICommandElement(CArray<CControlUI*,CControlUI*>& arrSelected, BOOL bModify);
 	CUICommandElement(const CUICommandElement& copy);
 
 	~CUICommandElement();
 
-public:
 protected:
 	TiXmlElement* m_pElementXml;
 };
@@ -55,7 +55,9 @@ public:
 
 public:
 	void Begin(CArray<CControlUI*,CControlUI*>& arrSelected);
+	void Begin(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue);
 	void End();
+	void End(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue);
 
 protected:
 	BOOL RemoveSameProperties(TiXmlNode* pBeforeElem, TiXmlNode* pAfterElem);
@@ -66,6 +68,7 @@ protected:
 	CUICommandElement* m_pBefore;
 	CUICommandElement* m_pAfter;
 	CArray<CControlUI*,CControlUI*>* m_pAllSelected;
+	CControlUI* m_pControl;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -81,7 +84,9 @@ public:
 
 public:
 	void Begin(CArray<CControlUI*,CControlUI*>& arrSelected, ActionType type);
+	void Begin(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue);
 	void End();
+	void End(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue);
 
 	void Undo();
 	void Redo();

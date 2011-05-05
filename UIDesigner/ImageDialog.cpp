@@ -118,6 +118,7 @@ CImageDialog::CImageDialog(const CString& strImageProperty, CWnd* pParent /*=NUL
 
 CImageDialog::~CImageDialog()
 {
+	m_strImageArray.RemoveAll();
 }
 
 void CImageDialog::DoDataExchange(CDataExchange* pDX)
@@ -171,10 +172,9 @@ BOOL CImageDialog::OnInitDialog()
 	m_ctlFade.SetRange(0,255);
 	m_ctlFade.SetPos(255);
 
-	m_pManager=g_pMainFrame->GetActiveUIView()->GetPaintManager();
+	CUIDesignerView* pUIView = g_pMainFrame->GetActiveUIView();
+	m_pManager = pUIView->GetPaintManager();
 	m_ImagePreview.SetManager(m_pManager);
-
-	g_HookAPI.EnableAddImage(false);
 
 	m_strImagePathName=m_strImageProperty;
 	LPCTSTR pStrImage=m_strImageProperty;
@@ -228,19 +228,23 @@ BOOL CImageDialog::OnInitDialog()
 
 	int nIndex=m_lstImages.AddString(_T("(无)"));
 	m_lstImages.SetItemDataPtr(nIndex,(void*)(LPCTSTR)m_strNullImage);
-	const CStringArray* parrImage=g_pResourceView->GetAllImage();
+
 	LPCTSTR pstrImage=NULL;
 	LPTSTR pszFileName=NULL;
-	for(int i=0;i<parrImage->GetSize();i++)
+ 	const CStringArray* parrImage=g_pResourceView->GetImageTree(pUIView->GetDocument()->GetTitle());
+	if(parrImage)
 	{
-		pstrImage=parrImage->GetAt(i);
-		pszFileName=_tcsrchr((LPTSTR)pstrImage,_T('\\'))+1;
-		nIndex=m_lstImages.AddString(pszFileName);
-		m_lstImages.SetItemDataPtr(nIndex,(void*)pstrImage);
+		for(int i=0;i<parrImage->GetSize();i++)
+		{
+			pstrImage=parrImage->GetAt(i);
+			pszFileName=_tcsrchr((LPTSTR)pstrImage,_T('\\'))+1;
+			nIndex=m_lstImages.AddString(pszFileName);
+			m_lstImages.SetItemDataPtr(nIndex,(void*)pstrImage);
+		}
 	}
-	pstrImage=m_strImagePathName;
-	pszFileName=_tcsrchr((LPTSTR)pstrImage,_T('\\'))+1;
-	m_strImagePathName.IsEmpty()?m_lstImages.SelectString(-1,_T("(无)")):m_lstImages.SelectString(-1,pszFileName);
+	int nPos = m_strImagePathName.ReverseFind(_T('\\'));
+	CString strFileName = (nPos==-1) ? m_strImagePathName : m_strImagePathName.Right(m_strImagePathName.GetLength() - nPos - 1);
+	m_strImagePathName.IsEmpty()?m_lstImages.SelectString(-1,_T("(无)")):m_lstImages.SelectString(-1,strFileName);
 
 	UpdateData(FALSE);
 	SetImageProperty(m_strImagePathName);
@@ -265,7 +269,13 @@ void CImageDialog::OnBnClickedButtonImageImport()
 	CFileDialog dlg(TRUE,_T(""),NULL,OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,_T("图片文件(*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|所有文件(*.*)|*.*||"));
 	if(dlg.DoModal()==IDOK)
 	{
-		SetImageProperty(dlg.GetPathName());
+		CString strFileName = dlg.GetFileName();
+		int nIndex = m_lstImages.AddString(strFileName);
+		int nPos = m_strImageArray.Add(dlg.GetPathName());
+		LPCTSTR pstrPath = m_strImageArray[nPos];
+		m_lstImages.SetItemDataPtr(nIndex,(void*)pstrPath);
+		m_lstImages.SelectString(-1, strFileName);
+		SetImageProperty(pstrPath);
 	}
 }
 
@@ -372,7 +382,6 @@ void CImageDialog::OnDestroy()
 	CDialog::OnDestroy();
 
 	// TODO: Add your message handler code here
-	g_HookAPI.EnableAddImage(true);
 }
 void CImageDialog::OnEnKillfocusEditImageDest()
 {
@@ -419,7 +428,8 @@ void CImageDialog::OnBnClickedOk()
 {
 	// TODO: Add your control notification handler code here
 	m_strImageProperty=m_ImagePreview.GetImageProperty();
-	g_pResourceView->InsertImage(m_strImagePathName);
+	CUIDesignerView* pUIView = g_pMainFrame->GetActiveUIView();
+	g_pResourceView->InsertImage(m_strImagePathName, pUIView->GetDocument()->GetTitle());
 
 	OnOK();
 }

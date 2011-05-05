@@ -170,6 +170,7 @@ public:
 
 protected:
 	BOOL MultiTrackHandle(CWnd* pWnd,CDC* pDCClipTo);
+	BOOL OneTrackHandle(int nHandle, CWnd* pWnd, BOOL bAllowInvert, CDC* pDCClipTo);
 	void CopyUIRect();
 	void ClearUIRect();
 	void UpdateUIRect();

@@ -23,15 +23,22 @@ static char THIS_FILE[] = __FILE__;
 
 CResourceViewBar::CResourceViewBar()
 {
-	g_pResourceView=this;
-
-	m_hRoot=NULL;
-	m_arrImage.RemoveAll();
+	g_pResourceView = this;
 }
 
 CResourceViewBar::~CResourceViewBar()
 {
-	m_arrImage.RemoveAll();
+	m_mapTree.RemoveAll();
+
+	POSITION pos;
+	CString strKey;
+	CStringArray* pstrArray;
+	for(pos=m_mapImageArray.GetStartPosition(); pos != NULL; )
+	{
+		m_mapImageArray.GetNextAssoc(pos, strKey, (void*&)pstrArray);
+		delete pstrArray;
+	}
+	m_mapImageArray.RemoveAll();
 }
 
 BEGIN_MESSAGE_MAP(CResourceViewBar, CDockablePane)
@@ -89,8 +96,6 @@ void CResourceViewBar::OnSize(UINT nType, int cx, int cy)
 
 void CResourceViewBar::InitResourceView()
 {
-	m_hRoot = m_wndResourceView.InsertItem(_T("×ÊÔ´"), 0, 0);
-	m_wndResourceView.SetItemState(m_hRoot, TVIS_BOLD, TVIS_BOLD);
 }
 
 void CResourceViewBar::OnContextMenu(CWnd* pWnd, CPoint point)
@@ -191,19 +196,127 @@ void CResourceViewBar::OnChangeVisualStyle()
 	m_wndResourceView.SetImageList(&m_ResourceViewImages, TVSIL_NORMAL);
 }
 
-void CResourceViewBar::InsertImage(LPCTSTR pstrImage)
+void CResourceViewBar::InsertImageTree(CString strTitle, CString strPath)
 {
-	if(pstrImage==NULL||*pstrImage==_T('\0'))
+	HTREEITEM hRoot = m_wndResourceView.InsertItem(strTitle, 0, 0, TVI_ROOT);
+	m_wndResourceView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
+	m_wndResourceView.Expand(hRoot, TVE_EXPAND);
+	m_mapTree.SetAt(strTitle, (void*)hRoot);
+	CStringArray* pstrArray = new CStringArray;
+	m_mapImageArray.SetAt(strTitle, (void*)pstrArray);
+
+	if(strPath.IsEmpty())
 		return;
-	for(int i=0;i<m_arrImage.GetSize();i++)
+
+	int nPos = strPath.ReverseFind('\\');
+	if(nPos == -1)
+		return;
+	CString strDir = strPath.Left(nPos + 1);
+	WIN32_FIND_DATA FindFileData = {0};
+	CString strFind = strDir + _T("*.*");
+	CString strExt = _T("*.bmp;*.jpg;*.png");
+	HANDLE hFind = ::FindFirstFile(strFind, &FindFileData);
+	if(hFind == INVALID_HANDLE_VALUE)
+		return;
+	do
 	{
-		if(m_arrImage.GetAt(i)==pstrImage)
-			return;//already have the image
+		LPCTSTR pstrExt = _tcsrchr(FindFileData.cFileName, _T('.')) + 1;
+		if(*pstrExt != _T('\0') && strExt.Find(pstrExt) != -1)
+		{
+			pstrArray->Add(strDir + FindFileData.cFileName);
+			HTREEITEM hItem = m_wndResourceView.InsertItem(FindFileData.cFileName, 0, 0, hRoot);
+		}
+	}while(::FindNextFile(hFind, &FindFileData));
+	::FindClose(hFind);
+}
+
+void CResourceViewBar::RemoveImageTree(CString strTree)
+{
+	HTREEITEM hTree;
+	if(!m_mapTree.Lookup(strTree, (void*&)hTree))
+		return;
+
+	m_wndResourceView.DeleteItem(hTree);
+	m_mapTree.RemoveKey(strTree);
+
+	CStringArray* pstrArray = NULL;
+	if(!m_mapImageArray.Lookup(strTree, (void*&)pstrArray))
+		return;
+
+	m_mapImageArray.RemoveKey(strTree);
+	delete pstrArray;
+}
+
+void  CResourceViewBar::RenameImageTree(LPCTSTR pstrTree, LPCTSTR pstrNewName)
+{
+	HTREEITEM hTree;
+	if(!m_mapTree.Lookup(pstrTree, (void*&)hTree))
+		return;
+
+	m_wndResourceView.SetItemText(hTree, pstrNewName);
+	m_mapTree.RemoveKey(pstrTree);
+	m_mapTree.SetAt(pstrNewName, (void*)hTree);
+
+	CStringArray* pstrArray = NULL;
+	if(!m_mapImageArray.Lookup(pstrTree, (void*&)pstrArray))
+		return;
+
+	m_mapImageArray.RemoveKey(pstrTree);
+	m_mapImageArray.SetAt(pstrNewName, (void*)pstrArray);
+}
+
+void CResourceViewBar::InsertImage(CString strImage, CString strTree)
+{
+	if(strImage.IsEmpty())
+		return;
+	HTREEITEM hTree;
+	if(!m_mapTree.Lookup(strTree, (void*&)hTree))
+		return;
+	CStringArray* pstrArray = NULL;
+	if(!m_mapImageArray.Lookup(strTree, (void*&)pstrArray))
+		return;
+
+	for(int i=0; i<pstrArray->GetSize(); i++)
+	{
+		if((*pstrArray)[i] == strImage)
+			return;
 	}
 
-	LPTSTR pszFileName=_tcsrchr((LPTSTR)pstrImage,_T('\\'))+1;
-	HTREEITEM hItem=m_wndResourceView.InsertItem(pszFileName,0,0,m_hRoot);
+	int nPos = strImage.ReverseFind('\\');
+	if(nPos == -1)
+		return;
+	CString strName = strImage.Right(strImage.GetLength() - nPos - 1);
+	m_wndResourceView.InsertItem(strName, 0, 0, hTree);
+	pstrArray->Add(strImage);
+}
 
-	//save the image full path
-	m_arrImage.Add(pstrImage);
+const CStringArray* CResourceViewBar::GetImageTree(CString strTree) const
+{
+
+	CStringArray* pstrArray = NULL;
+	m_mapImageArray.Lookup(strTree, (void*&)pstrArray);
+
+	return pstrArray;
+}
+
+void CResourceViewBar::CopyImageToSkinDir(LPCTSTR pstrSkinDir, LPCTSTR pstrTree)
+{
+	CStringArray* pstrArray = NULL;
+	if(!m_mapImageArray.Lookup(pstrTree, (void*&)pstrArray))
+		return;
+
+	for(int i=0; i<pstrArray->GetSize(); i++)
+	{
+		CString strPath = (*pstrArray)[i];
+		int nPos = strPath.ReverseFind('\\');
+		if(nPos == -1)
+			continue;
+
+		CString strDir = strPath.Left(nPos + 1);
+		if(strDir != pstrSkinDir)
+		{
+			CString strName = strPath.Right(strPath.GetLength() - nPos - 1);
+			CopyFile(strPath, pstrSkinDir + strName, TRUE);
+		}
+	}
 }

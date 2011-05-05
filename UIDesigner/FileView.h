@@ -1,5 +1,6 @@
 #pragma once
 #include "ViewTree.h"
+#include "tinyxml.h"
 
 //////////////////////////////////////////////////////////////////////////
 //CFileViewTree
@@ -61,14 +62,20 @@ public:
 	virtual ~CFileView();
 
 public:
-	afx_msg void OnProjectNew();
+	void OnProjectNew();
+	void OnProjectClose();
+	void OnProjectOpen();
+	void SaveProject();
 
 protected:
-	CString GetFileRelativePath(HTREEITEM hItem);
 	BOOL DeleteSkinFile(HTREEITEM hItem);
 	BOOL DeleteDirectory(HTREEITEM hItem);
 	void OpenSkinFile(HTREEITEM hItem);
+	void SaveUITree(HTREEITEM hItem, TiXmlElement* pParentNode);
+	void LoadUITree(CString& strPath);
+	void LoadUITree(TiXmlElement* pElement, HTREEITEM hParent);
 	CDocument* FindSkinFile(CString& strPath);
+	HTREEITEM FindDirectory(CString& strDirName, HTREEITEM hParent);
 	BOOL CloseSkinFile(CString& strPath);
 	BOOL RenameFile(CString strNewName, HTREEITEM hItem);
 

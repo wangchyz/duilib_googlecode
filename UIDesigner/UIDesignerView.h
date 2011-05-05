@@ -55,6 +55,7 @@ public:
 	void OnShowPropertyDialog();
 
 	void OnSaveSkinFile(LPCTSTR lpszPathName);
+	void OnTitleChanged(LPCTSTR pstrOldTitle, LPCTSTR pstrNewTitle);
 
 protected:
 	void UpDateDPtoLPOffset();

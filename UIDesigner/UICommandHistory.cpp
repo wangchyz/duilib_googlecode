@@ -6,6 +6,11 @@
 //////////////////////////////////////////////////////////////////////////
 //CUICommandElement
 
+CUICommandElement::CUICommandElement()
+	: m_pElementXml(NULL)
+{
+}
+
 CUICommandElement::CUICommandElement(CArray<CControlUI*,CControlUI*>& arrSelected, BOOL bModify)
 	: m_pElementXml(NULL)
 {
@@ -14,13 +19,16 @@ CUICommandElement::CUICommandElement(CArray<CControlUI*,CControlUI*>& arrSelecte
 	for(int i=0; i<arrSelected.GetSize(); i++)
 	{
 		CLayoutManager::SaveProperties(arrSelected[i], m_pElementXml, !bModify);
-		if(bModify)
-			continue;
 
 		if(i == 0)
 			pNode = m_pElementXml->FirstChild();
 		else
 			pNode = pNode->NextSibling();
+
+		CControlUI* pControl = arrSelected[i];
+		ASSERT(pNode && pControl);
+		pNode->ToElement()->SetAttribute("myname", StringConvertor::WideToUtf8(pControl->GetName()));
+
 		CControlUI* pParent = arrSelected[i]->GetParent();
 		ASSERT(pNode && pParent);
 		pNode->ToElement()->SetAttribute("parentname", StringConvertor::WideToUtf8(pParent->GetName()));
@@ -43,12 +51,13 @@ CUICommandElement::~CUICommandElement()
 
 CUICommandNode::CUICommandNode(ActionType type)
 	: m_ActionType(type), m_pBefore(NULL), m_pAfter(NULL), m_pAllSelected(NULL)
+	, m_pControl(NULL)
 {
 
 }
 
 CUICommandNode::CUICommandNode(CUICommandElement* pBefore, CUICommandElement* pAfter, ActionType type)
-	: m_ActionType(type), m_pAllSelected(NULL)
+	: m_ActionType(type), m_pAllSelected(NULL), m_pControl(NULL)
 {
 	m_pBefore = pBefore ? new CUICommandElement(*pBefore) : NULL;
 	m_pAfter = pAfter ? new CUICommandElement(*pAfter) : NULL;
@@ -93,6 +102,25 @@ void CUICommandNode::Begin(CArray<CControlUI*,CControlUI*>& arrSelected)
 	}
 }
 
+void CUICommandNode::Begin(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue)
+{
+	ASSERT(m_pBefore == NULL && m_pAfter == NULL);
+	ASSERT(m_pControl == NULL);
+
+	m_pControl = pControl;
+	m_pBefore = new CUICommandElement();
+	TiXmlElement* pElement = new TiXmlElement("UIHistory");
+	CString strClass = m_pControl->GetClass();
+	strClass = strClass.Mid(0, strClass.GetLength() - 2);
+	TiXmlElement* pNode = new TiXmlElement(StringConvertor::WideToUtf8(strClass.GetBuffer()));
+	pNode->SetAttribute("myname", StringConvertor::WideToUtf8(m_pControl->GetName()));
+	pNode->SetAttribute(StringConvertor::WideToUtf8(pstrName), StringConvertor::WideToUtf8(pstrValue));
+	pElement->InsertEndChild(*pNode);
+	m_pBefore->m_pElementXml = pElement;
+
+	delete pNode;
+}
+
 void CUICommandNode::End()
 {
 	ASSERT(m_pAfter == NULL);
@@ -113,6 +141,27 @@ void CUICommandNode::End()
 	}
 
 	m_pAllSelected = NULL;
+}
+
+void CUICommandNode::End(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue)
+{
+	ASSERT(m_pAfter == NULL);
+	ASSERT(m_pControl);
+	if(m_pControl != pControl)
+		return;
+
+	m_pAfter = new CUICommandElement();
+	TiXmlElement* pElement = new TiXmlElement("UIHistory");
+	CString strClass = m_pControl->GetClass();
+	strClass = strClass.Mid(0, strClass.GetLength() - 2);
+	TiXmlElement* pNode = new TiXmlElement(StringConvertor::WideToUtf8(strClass.GetBuffer()));
+	pNode->SetAttribute("myname", StringConvertor::WideToUtf8(m_pControl->GetName()));
+	pNode->SetAttribute(StringConvertor::WideToUtf8(pstrName), StringConvertor::WideToUtf8(pstrValue));
+	pElement->InsertEndChild(*pNode);
+	m_pAfter->m_pElementXml = pElement;
+
+	delete pNode;
+	m_pControl = NULL;
 }
 
 BOOL CUICommandNode::RemoveSameProperties(TiXmlNode* pBeforeElem, TiXmlNode* pAfterElem)
@@ -151,7 +200,7 @@ void CUICommandNode::RemoveSameProperty(TiXmlNode* pBeforeElem, TiXmlNode* pAfte
 	{
 		TiXmlAttribute* pBeforeAttribNext = pBeforeAttrib->Next();
 		TiXmlAttribute* pAfterAttribNext = pAfterAttrib->Next();
-		if(strcmp(pBeforeAttrib->Name(), "name")!=0 && strcmp(pBeforeAttrib->Value(), pAfterAttrib->Value())==0)
+		if(strcmp(pBeforeAttrib->Name(), "myname")!=0 && strcmp(pBeforeAttrib->Value(), pAfterAttrib->Value())==0)
 		{
 			pBeforeElem->ToElement()->RemoveAttribute(pBeforeAttrib->Name());
 			pAfterElem->ToElement()->RemoveAttribute(pAfterAttrib->Name());
@@ -183,11 +232,28 @@ void CUICommandHistory::Begin(CArray<CControlUI*,CControlUI*>& arrSelected, Acti
 	m_pNode->Begin(arrSelected);
 }
 
+void CUICommandHistory::Begin(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue)
+{
+	ASSERT(m_pNode == NULL);
+
+	m_pNode = new CUICommandNode(actionModify);
+	m_pNode->Begin(pControl, pstrName, pstrValue);
+}
+
 void CUICommandHistory::End()
 {
 	ASSERT(m_pNode);
 
 	m_pNode->End();
+	AddUICommand(m_pNode);
+	m_pNode = NULL;
+}
+
+void CUICommandHistory::End(CControlUI* pControl, LPCTSTR pstrName, LPCTSTR pstrValue)
+{
+	ASSERT(m_pNode);
+
+	m_pNode->End(pControl, pstrName, pstrValue);
 	AddUICommand(m_pNode);
 	m_pNode = NULL;
 }
@@ -363,8 +429,8 @@ void CALLBACK CUICommandHistory::UIAdd(TiXmlNode* pNode)
 void CALLBACK CUICommandHistory::UIModify(TiXmlNode* pNode)
 {
 	TiXmlElement* pElement = pNode->ToElement();
-	CStringA strName = pElement->Attribute("name");
-	pElement->RemoveAttribute("name");
+	CStringA strName = pElement->Attribute("myname");
+	pElement->RemoveAttribute("myname");
 	if(strName.IsEmpty())
 		return;
 
@@ -376,8 +442,18 @@ void CALLBACK CUICommandHistory::UIModify(TiXmlNode* pNode)
 
 	while(pAttrib)
 	{
-		pControl->SetAttribute(StringConvertor::Utf8ToWide(pAttrib->Name())
-			, StringConvertor::Utf8ToWide(pAttrib->Value()));
+		if(strcmp(pAttrib->Name(), "name") == 0)
+		{
+			pManager->ReapObjects(pControl);
+			g_pClassView->RenameUITreeItem(pControl, StringConvertor::Utf8ToWide(pAttrib->Value()));
+			pControl->SetAttribute(StringConvertor::Utf8ToWide(pAttrib->Name())
+				, StringConvertor::Utf8ToWide(pAttrib->Value()));
+			pManager->InitControls(pControl);
+		}
+		else
+			pControl->SetAttribute(StringConvertor::Utf8ToWide(pAttrib->Name())
+				, StringConvertor::Utf8ToWide(pAttrib->Value()));
+
 		pAttrib = pAttrib->Next();
 	}
 	CControlUI* pParent = pControl->GetParent();
@@ -387,7 +463,7 @@ void CALLBACK CUICommandHistory::UIModify(TiXmlNode* pNode)
 void CALLBACK CUICommandHistory::UIDelete(TiXmlNode* pNode)
 {
 	TiXmlElement* pElement = pNode->ToElement();
-	CStringA strName = pElement->Attribute("name");
+	CStringA strName = pElement->Attribute("myname");
 	if(strName.IsEmpty())
 		return;
 

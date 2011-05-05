@@ -905,18 +905,10 @@ BOOL CMultiUITracker::Track( CWnd* pWnd, CPoint point,BOOL bAllowInvert/*=FALSE*
 	case hitNothing:
 		break;
 	case hitMiddle:
-		bRet=MultiTrackHandle(pWnd,pDCClipTo);
+		bRet = MultiTrackHandle(pWnd, pDCClipTo);
 		break;
 	default:
-		if(m_arrTracker.GetSize()>1)
-			break;
-		m_rect=m_pFocused->GetPos();
-		m_bAllowInvert=bAllowInvert;
-		bRet=TrackHandle(nHandle,pWnd,pDCClipTo);
-		if(bRet)
-		{
-			m_pFocused->SetPos(m_rect);
-		}
+		bRet = OneTrackHandle(nHandle, pWnd, bAllowInvert, pDCClipTo);
 		break;
 	}
 
@@ -1089,6 +1081,41 @@ ExitLoop:
 	return bMoved;
 }
 
+BOOL CMultiUITracker::OneTrackHandle(int nHandle, CWnd* pWnd, BOOL bAllowInvert, CDC* pDCClipTo)
+{
+	if(m_arrTracker.GetSize()>1)
+		return FALSE;
+
+	CControlUI* pControl = m_pFocused->m_pControl;
+	m_rect = m_pFocused->GetPos();
+	m_bAllowInvert = bAllowInvert;
+	BOOL bRet = TrackHandle(nHandle, pWnd, pDCClipTo);
+	if(bRet)
+	{
+		CString strVal;
+		strVal.Format(_T("%d,%d,%d,%d"),pControl->GetFixedXY().cx, pControl->GetFixedXY().cy
+			, pControl->GetFixedXY().cx + pControl->GetFixedWidth(), pControl->GetFixedXY().cy + pControl->GetFixedHeight());
+		UIAttribute oldAttrib = {_T("pos"), strVal};
+		TNotifyUI Msg;
+		Msg.pSender = pControl;
+		Msg.sType = _T("PropertyBeginChanged");
+		Msg.wParam = 0;
+		Msg.lParam = (LPARAM)&oldAttrib;
+		m_pFocused->m_pOwner->Notify(Msg);
+
+		m_pFocused->SetPos(m_rect);
+
+		strVal.Format(_T("%d,%d,%d,%d"),pControl->GetFixedXY().cx, pControl->GetFixedXY().cy
+			, pControl->GetFixedXY().cx + pControl->GetFixedWidth(), pControl->GetFixedXY().cy + pControl->GetFixedHeight());
+		UIAttribute newAttrib = {_T("pos"), strVal};
+		Msg.sType = _T("PropertyEndChanged");
+		Msg.lParam = (LPARAM)&newAttrib;
+		m_pFocused->m_pOwner->Notify(Msg);
+	}
+
+	return bRet;
+}
+
 void CMultiUITracker::CopyUIRect()
 {
 	for (int i=0;i<m_arrTracker.GetSize();i++)
@@ -1104,7 +1131,21 @@ void CMultiUITracker::ClearUIRect()
 
 void CMultiUITracker::UpdateUIRect()
 {
-	for (int i=0;i<m_arrTracker.GetSize();i++)
+	CArray<CControlUI*,CControlUI*> arrSelected;
+	for(int i=0; i<m_arrTracker.GetSize(); i++)
+	{
+		CTrackerElement* pArrTracker = m_arrTracker.GetAt(i);
+		if(pArrTracker->m_pControl->GetParent() == m_pFocused->m_pControl->GetParent())
+			arrSelected.Add(pArrTracker->m_pControl);
+	}
+	TNotifyUI Msg;
+	Msg.pSender=m_pFocused->m_pControl;
+	Msg.sType=_T("PosBeginChanged");
+	Msg.wParam=0;
+	Msg.lParam=(LPARAM)&arrSelected;
+	m_pFocused->m_pOwner->Notify(Msg);
+
+	for(int i=0;i<m_arrTracker.GetSize();i++)
 	{
 		CTrackerElement* pArrTracker=m_arrTracker.GetAt(i);
 		if(pArrTracker->m_pControl->GetParent()!=m_pFocused->m_pControl->GetParent())
@@ -1113,8 +1154,11 @@ void CMultiUITracker::UpdateUIRect()
 		pArrTracker->SetPos(m_arrCloneRect.GetAt(i),TRUE);
 	}
 
-	TNotifyUI Msg;
-	Msg.pSender=m_pFocused->m_pControl;
+	Msg.sType=_T("PosEndChanged");
+	Msg.wParam=0;
+	Msg.lParam=NULL;
+	m_pFocused->m_pOwner->Notify(Msg);
+
 	Msg.sType=_T("setpos");
 	Msg.wParam=TRUE;//Move
 	Msg.lParam=NULL;

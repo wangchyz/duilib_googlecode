@@ -527,13 +527,13 @@ void CMainFrame::OnProjectNew()
 void CMainFrame::OnProjectOpen()
 {
 	// TODO: Add your command handler code here
-	CGlobalVariable::m_bIsProjectExist = true;
+	g_pFileView->OnProjectOpen();
 }
 
 void CMainFrame::OnProjectClose()
 {
 	// TODO: Add your command handler code here
-	CGlobalVariable::m_bIsProjectExist = false;
+	g_pFileView->OnProjectClose();
 }
 
 void CMainFrame::OnTemplateOpen()

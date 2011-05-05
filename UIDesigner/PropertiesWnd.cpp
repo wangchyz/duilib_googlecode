@@ -305,10 +305,10 @@ void CPropertiesWnd::InitPropList()
 	//Control
 	pPropUI=new CMFCPropertyGridProperty(_T("Control"),classControl);
 
-	pProp=new CMFCPropertyGridProperty(_T("Name"),(_variant_t)_T("Control"),_T("控件的名称"),tagName);//name
+	pProp=new CMFCPropertyGridProperty(_T("Name"),(_variant_t)_T(""),_T("控件的名称"),tagName);//name
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Text"),(_variant_t)_T("Control"),_T("控件的显示文本"),tagText);//text
+	pProp=new CMFCPropertyGridProperty(_T("Text"),(_variant_t)_T(""),_T("控件的显示文本"),tagText);//text
 	pPropUI->AddSubItem(pProp);
 
 	pValueList=new CMFCPropertyGridProperty(_T("Pos"),tagPos,TRUE);//pos
@@ -493,7 +493,7 @@ void CPropertiesWnd::InitPropList()
 	pProp=new CMFCPropertyGridProperty(_T("Selected"),(_variant_t)false,_T("指示是否已被选中"),tagSelected);//selected
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("Group"),(_variant_t)false,_T("指示是否参与组合"),tagGroup);//group
+	pProp=new CMFCPropertyGridProperty(_T("Group"),(_variant_t)_T(""),_T("指定参与组合的名称"),tagGroup);//group
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
@@ -852,6 +852,8 @@ void CPropertiesWnd::ShowFormProperty(CControlUI* pControl)
 	CMFCPropertyGridProperty* pValueList=pPropForm->GetSubItem(tagFormSize-tagForm);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//caption
 	RECT rect=pForm->GetCaptionRect();
 	pValueList=pPropForm->GetSubItem(tagCaption-tagForm);
@@ -859,6 +861,10 @@ void CPropertiesWnd::ShowFormProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//sizebox
 	rect=pForm->GetSizeBox();
 	pValueList=pPropForm->GetSubItem(tagSizeBox-tagForm);
@@ -866,18 +872,27 @@ void CPropertiesWnd::ShowFormProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//roundcorner
 	size=pForm->GetRoundCorner();
 	pValueList=pPropForm->GetSubItem(tagRoundCorner-tagForm);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//mininfo
 	size=pForm->GetMinMaxInfo();
 	pValueList=pPropForm->GetSubItem(tagMinInfo-tagForm);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//showdirty
 	pPropForm->GetSubItem(tagShowDirty-tagForm)->SetValue((_variant_t)pForm->IsShowUpdateRect());
+	pPropForm->GetSubItem(tagShowDirty-tagForm)->SetOriginalValue((_variant_t)pForm->IsShowUpdateRect());
 
 	pPropForm->Show(TRUE,FALSE);
 }
@@ -891,8 +906,10 @@ void CPropertiesWnd::ShowControlProperty(CControlUI* pControl)
 
 	//name
 	pPropControl->GetSubItem(tagName-tagControl)->SetValue((_variant_t)pControl->GetName());
+	pPropControl->GetSubItem(tagName-tagControl)->SetOriginalValue((_variant_t)pControl->GetName());
 	//text
 	pPropControl->GetSubItem(tagText-tagControl)->SetValue((_variant_t)pControl->GetText());
+	pPropControl->GetSubItem(tagText-tagControl)->SetOriginalValue((_variant_t)pControl->GetText());
 	//pos
 	SIZE szXY=pControl->GetFixedXY();
 	int nWidth=pControl->GetFixedWidth();
@@ -902,6 +919,10 @@ void CPropertiesWnd::ShowControlProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)szXY.cy);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)(szXY.cx+nWidth));
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)(szXY.cy+nHeight));
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)szXY.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)szXY.cy);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)(szXY.cx+nWidth));
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)(szXY.cy+nHeight));
 	//relativepos
 	TRelativePosUI posRelative=pControl->GetRelativePos();
 	pValueList=pPropControl->GetSubItem(tagRelativePos-tagControl);
@@ -909,18 +930,28 @@ void CPropertiesWnd::ShowControlProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)posRelative.nMoveYPercent);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)posRelative.nZoomXPercent);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)posRelative.nZoomYPercent);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)posRelative.nMoveXPercent);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)posRelative.nMoveYPercent);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)posRelative.nZoomXPercent);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)posRelative.nZoomYPercent);
 	//size
 	pValueList=pPropControl->GetSubItem(tagSize-tagControl);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pControl->GetWidth());
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pControl->GetHeight());
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pControl->GetWidth());
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pControl->GetHeight());
 	//minsize
 	pValueList=pPropControl->GetSubItem(tagMinSize-tagControl);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pControl->GetMinWidth());
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pControl->GetMinHeight());
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pControl->GetMinWidth());
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pControl->GetMinHeight());
 	//maxsize
 	pValueList=pPropControl->GetSubItem(tagMaxSize-tagControl);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pControl->GetMaxWidth());
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pControl->GetMaxHeight());
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pControl->GetMaxWidth());
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pControl->GetMaxHeight());
 	//padding
 	pValueList=pPropControl->GetSubItem(tagPadding-tagControl);
 	RECT rect=pControl->GetPadding();
@@ -928,22 +959,34 @@ void CPropertiesWnd::ShowControlProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//bkimage
 	pPropControl->GetSubItem(tagBkImage-tagControl)->SetValue((_variant_t)pControl->GetBkImage());
+	pPropControl->GetSubItem(tagBkImage-tagControl)->SetOriginalValue((_variant_t)pControl->GetBkImage());
 	//bkcolor
 	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor-tagControl))->SetColor((_variant_t)(LONG)(pControl->GetBkColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor-tagControl))->SetOriginalValue((_variant_t)(LONG)(pControl->GetBkColor()));
 	//bkcolor2
 	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor2-tagControl))->SetColor((_variant_t)(LONG)(pControl->GetBkColor2()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBkColor2-tagControl))->SetOriginalValue((_variant_t)(LONG)(pControl->GetBkColor2()));
 	//bordercolor
 	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBorderColor-tagControl))->SetColor((_variant_t)(LONG)(pControl->GetBorderColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropControl->GetSubItem(tagBorderColor-tagControl))->SetOriginalValue((_variant_t)(LONG)(pControl->GetBorderColor()));
 	//bordersize
 	pPropControl->GetSubItem(tagBorderSize-tagControl)->SetValue((_variant_t)(LONG)pControl->GetBorderSize());
+	pPropControl->GetSubItem(tagBorderSize-tagControl)->SetOriginalValue((_variant_t)(LONG)pControl->GetBorderSize());
 	//enabled
 	pPropControl->GetSubItem(tagEnabled-tagControl)->SetValue((_variant_t)pControl->IsEnabled());
+	pPropControl->GetSubItem(tagEnabled-tagControl)->SetOriginalValue((_variant_t)pControl->IsEnabled());
 	//float
 	pPropControl->GetSubItem(tagFloat-tagControl)->SetValue((_variant_t)pControl->IsFloat());
+	pPropControl->GetSubItem(tagFloat-tagControl)->SetOriginalValue((_variant_t)pControl->IsFloat());
 	//visible
 	pPropControl->GetSubItem(tagVisible-tagControl)->SetValue((_variant_t)pControl->IsVisible());
+	pPropControl->GetSubItem(tagVisible-tagControl)->SetOriginalValue((_variant_t)pControl->IsVisible());
 
 	pPropControl->Show(TRUE,FALSE);
 }
@@ -973,10 +1016,13 @@ void CPropertiesWnd::ShowLabelProperty(CControlUI* pControl)
 	else if(uStyle&DT_BOTTOM)
 		strStyle=_T("Bottom");
 	pPropLabel->GetSubItem(tagAlign-tagLabel)->SetValue((_variant_t)strStyle);
+	pPropLabel->GetSubItem(tagAlign-tagLabel)->SetOriginalValue((_variant_t)strStyle);
 	//textcolor
 	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetColor((_variant_t)(LONG)(pLabel->GetTextColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetOriginalValue((_variant_t)(LONG)(pLabel->GetTextColor()));
 	//disabledtextcolor
 	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetColor((_variant_t)(LONG)(pLabel->GetTextColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetOriginalValue((_variant_t)(LONG)(pLabel->GetTextColor()));
 	//font
 	//textpadding
 	CMFCPropertyGridProperty* pValueList=pPropLabel->GetSubItem(tagTextPadding-tagLabel);
@@ -985,8 +1031,13 @@ void CPropertiesWnd::ShowLabelProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//showhtml
 	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetValue((_variant_t)pLabel->IsShowHtml());
+	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetOriginalValue((_variant_t)pLabel->IsShowHtml());
 
 	pPropLabel->Show(TRUE,FALSE);
 }
@@ -1004,14 +1055,19 @@ void CPropertiesWnd::ShowButtonProperty(CControlUI* pControl)
 
 	//normalimage
 	pPropButton->GetSubItem(tagNormalImage-tagButton)->SetValue((_variant_t)pButton->GetNormalImage());
+	pPropButton->GetSubItem(tagNormalImage-tagButton)->SetOriginalValue((_variant_t)pButton->GetNormalImage());
 	//hotimage
 	pPropButton->GetSubItem(tagHotImage-tagButton)->SetValue((_variant_t)pButton->GetHotImage());
+	pPropButton->GetSubItem(tagHotImage-tagButton)->SetOriginalValue((_variant_t)pButton->GetHotImage());
 	//pushedimage
 	pPropButton->GetSubItem(tagPushedImage-tagButton)->SetValue((_variant_t)pButton->GetPushedImage());
+	pPropButton->GetSubItem(tagPushedImage-tagButton)->SetOriginalValue((_variant_t)pButton->GetPushedImage());
 	//focusedimage
 	pPropButton->GetSubItem(tagFocusedImage-tagButton)->SetValue((_variant_t)pButton->GetFocusedImage());
+	pPropButton->GetSubItem(tagFocusedImage-tagButton)->SetOriginalValue((_variant_t)pButton->GetFocusedImage());
 	//disabledimage
 	pPropButton->GetSubItem(tagDisabledImage-tagButton)->SetValue((_variant_t)pButton->GetDisabledImage());
+	pPropButton->GetSubItem(tagDisabledImage-tagButton)->SetOriginalValue((_variant_t)pButton->GetDisabledImage());
 
 	pPropButton->Show(TRUE,FALSE);
 }
@@ -1029,16 +1085,22 @@ void CPropertiesWnd::ShowEditProperty(CControlUI* pControl)
 
 	//normalimage
 	pPropEdit->GetSubItem(tagEditNormalImage-tagEdit)->SetValue((_variant_t)pEdit->GetNormalImage());
+	pPropEdit->GetSubItem(tagEditNormalImage-tagEdit)->SetOriginalValue((_variant_t)pEdit->GetNormalImage());
 	//hotimage
 	pPropEdit->GetSubItem(tagEditHotImage-tagEdit)->SetValue((_variant_t)pEdit->GetHotImage());
+	pPropEdit->GetSubItem(tagEditHotImage-tagEdit)->SetOriginalValue((_variant_t)pEdit->GetHotImage());
 	//focusedimage
 	pPropEdit->GetSubItem(tagEditFocusedImage-tagEdit)->SetValue((_variant_t)pEdit->GetFocusedImage());
+	pPropEdit->GetSubItem(tagEditFocusedImage-tagEdit)->SetOriginalValue((_variant_t)pEdit->GetFocusedImage());
 	//disabledimage
 	pPropEdit->GetSubItem(tagEditDisabledImage-tagEdit)->SetValue((_variant_t)pEdit->GetDisabledImage());
+	pPropEdit->GetSubItem(tagEditDisabledImage-tagEdit)->SetOriginalValue((_variant_t)pEdit->GetDisabledImage());
 	//readonly
 	pPropEdit->GetSubItem(tagReadOnly-tagEdit)->SetValue((_variant_t)pEdit->IsReadOnly());
+	pPropEdit->GetSubItem(tagReadOnly-tagEdit)->SetOriginalValue((_variant_t)pEdit->IsReadOnly());
 	//password
 	pPropEdit->GetSubItem(tagPassword-tagEdit)->SetValue((_variant_t)pEdit->IsPasswordMode());
+	pPropEdit->GetSubItem(tagPassword-tagEdit)->SetOriginalValue((_variant_t)pEdit->IsPasswordMode());
 
 	pPropEdit->Show(TRUE,FALSE);
 }
@@ -1056,10 +1118,13 @@ void CPropertiesWnd::ShowOptionProperty(CControlUI* pControl)
 
 	//selectedimage
 	pPropOption->GetSubItem(tagSelectedImage-tagOption)->SetValue((_variant_t)pOption->GetSelectedImage());
+	pPropOption->GetSubItem(tagSelectedImage-tagOption)->SetOriginalValue((_variant_t)pOption->GetSelectedImage());
 	//selected
 	pPropOption->GetSubItem(tagSelected-tagOption)->SetValue((_variant_t)pOption->IsSelected());
+	pPropOption->GetSubItem(tagSelected-tagOption)->SetOriginalValue((_variant_t)pOption->IsSelected());
 	//group
 	pPropOption->GetSubItem(tagGroup-tagOption)->SetValue((_variant_t)pOption->GetGroup());
+	pPropOption->GetSubItem(tagGroup-tagOption)->SetOriginalValue((_variant_t)pOption->GetGroup());
 
 	pPropOption->Show(TRUE,FALSE);
 }
@@ -1077,14 +1142,19 @@ void CPropertiesWnd::ShowProgressProperty(CControlUI* pControl)
 
 	//fgimage
 	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetValue((_variant_t)pProgress->GetFgImage());
+	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetOriginalValue((_variant_t)pProgress->GetFgImage());
 	//minmax
 	CMFCPropertyGridProperty* pValueList=pPropProgress->GetSubItem(tagMinMax-tagProgress);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pProgress->GetMinValue());
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pProgress->GetMaxValue());
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pProgress->GetMinValue());
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pProgress->GetMaxValue());
 	//value
 	pPropProgress->GetSubItem(tagValue-tagProgress)->SetValue((_variant_t)(LONG)pProgress->GetValue());
+	pPropProgress->GetSubItem(tagValue-tagProgress)->SetOriginalValue((_variant_t)(LONG)pProgress->GetValue());
 	//hor
 	pPropProgress->GetSubItem(tagHor-tagProgress)->SetValue((_variant_t)pProgress->IsHorizontal());
+	pPropProgress->GetSubItem(tagHor-tagProgress)->SetOriginalValue((_variant_t)pProgress->IsHorizontal());
 
 	pPropProgress->Show(TRUE,FALSE);
 }
@@ -1102,15 +1172,20 @@ void CPropertiesWnd::ShowSliderProperty(CControlUI* pControl)
 
 	//thumbimage
 	pPropSlider->GetSubItem(tagThumbImage-tagSlider)->SetValue((_variant_t)pSlider->GetThumbImage());
+	pPropSlider->GetSubItem(tagThumbImage-tagSlider)->SetOriginalValue((_variant_t)pSlider->GetThumbImage());
 	//thumbhotimage
 	pPropSlider->GetSubItem(tagThumbHotImage-tagSlider)->SetValue((_variant_t)pSlider->GetThumbHotImage());
+	pPropSlider->GetSubItem(tagThumbHotImage-tagSlider)->SetOriginalValue((_variant_t)pSlider->GetThumbHotImage());
 	//thumbpushedimage
 	pPropSlider->GetSubItem(tagThumbPushedImage-tagSlider)->SetValue((_variant_t)pSlider->GetThumbPushedImage());
+	pPropSlider->GetSubItem(tagThumbPushedImage-tagSlider)->SetOriginalValue((_variant_t)pSlider->GetThumbPushedImage());
 	//thumbsize
 	CMFCPropertyGridProperty* pValueList=pPropSlider->GetSubItem(tagThumbSize-tagSlider);
 	RECT rect=pSlider->GetThumbRect();
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)(rect.right-rect.left));
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)(rect.bottom-rect.top));
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)(rect.right-rect.left));
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)(rect.bottom-rect.top));
 
 	pPropSlider->Show(TRUE,FALSE);
 }
@@ -1128,23 +1203,32 @@ void CPropertiesWnd::ShowComboProperty(CControlUI* pControl)
 
 	//normalimage
 	pPropCombo->GetSubItem(tagComboNormalImage-tagCombo)->SetValue((_variant_t)pCombo->GetNormalImage());
+	pPropCombo->GetSubItem(tagComboNormalImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetNormalImage());
 	//hotimage
 	pPropCombo->GetSubItem(tagComboHotImage-tagCombo)->SetValue((_variant_t)pCombo->GetHotImage());
+	pPropCombo->GetSubItem(tagComboHotImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetHotImage());
 	//pushedimage
 	pPropCombo->GetSubItem(tagComboPushedImage-tagCombo)->SetValue((_variant_t)pCombo->GetPushedImage());
+	pPropCombo->GetSubItem(tagComboPushedImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetPushedImage());
 	//focusedimage
 	pPropCombo->GetSubItem(tagComboFocusedImage-tagCombo)->SetValue((_variant_t)pCombo->GetFocusedImage());
+	pPropCombo->GetSubItem(tagComboFocusedImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetFocusedImage());
 	//disabledimage
 	pPropCombo->GetSubItem(tagComboDisabledImage-tagCombo)->SetValue((_variant_t)pCombo->GetDisabledImage());
+	pPropCombo->GetSubItem(tagComboDisabledImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetDisabledImage());
 	//itemimage
 	TListInfoUI* pListInfo=pCombo->GetListInfo();
 	pPropCombo->GetSubItem(tagItemImage-tagCombo)->SetValue((_variant_t)pListInfo->sImage);
+	pPropCombo->GetSubItem(tagItemImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sImage);
 	//itemhotimage
 	pPropCombo->GetSubItem(tagItemHotImage-tagCombo)->SetValue((_variant_t)pListInfo->sHotImage);
+	pPropCombo->GetSubItem(tagItemHotImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sHotImage);
 	//itemselectedimage
 	pPropCombo->GetSubItem(tagItemSelectedImage-tagCombo)->SetValue((_variant_t)pListInfo->sSelectedImage);
+	pPropCombo->GetSubItem(tagItemSelectedImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sSelectedImage);
 	//itemdisabledimage
 	pPropCombo->GetSubItem(tagItemDisabledImage-tagCombo)->SetValue((_variant_t)pListInfo->sDisabledImage);
+	pPropCombo->GetSubItem(tagItemDisabledImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sDisabledImage);
 	//textpadding
 	RECT rect=pCombo->GetTextPadding();
 	CMFCPropertyGridProperty* pValueList=pPropCombo->GetSubItem(tagComboTextPadding-tagCombo);
@@ -1152,12 +1236,20 @@ void CPropertiesWnd::ShowComboProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//itemtextpadding
 	pValueList=pPropCombo->GetSubItem(tagItemTextPadding-tagCombo);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.left);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.right);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.bottom);
 	//itemalign
 	CString strStyle;
 	if(pListInfo->uTextStyle&DT_CENTER)
@@ -1167,26 +1259,37 @@ void CPropertiesWnd::ShowComboProperty(CControlUI* pControl)
 	else if(pListInfo->uTextStyle&DT_RIGHT)
 		strStyle=_T("Right");
 	pPropCombo->GetSubItem(tagItemAlign-tagCombo)->SetValue((_variant_t)strStyle);
+	pPropCombo->GetSubItem(tagItemAlign-tagCombo)->SetOriginalValue((_variant_t)strStyle);
 	//itemtextcolor
 	pPropCombo->GetSubItem(tagItemTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwTextColor);
+	pPropCombo->GetSubItem(tagItemTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwTextColor);
 	//itembkcolor
 	pPropCombo->GetSubItem(tagItemBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwBkColor);
+	pPropCombo->GetSubItem(tagItemBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwBkColor);
 	//itemselectedtextcolor
 	pPropCombo->GetSubItem(tagItemSelectedTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwSelectedTextColor);
+	pPropCombo->GetSubItem(tagItemSelectedTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwSelectedTextColor);
 	//itemselectedbkcolor
 	pPropCombo->GetSubItem(tagItemSelectedBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwSelectedBkColor);
+	pPropCombo->GetSubItem(tagItemSelectedBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwSelectedBkColor);
 	//itemhottextcolor
 	pPropCombo->GetSubItem(tagItemHotTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwHotTextColor);
+	pPropCombo->GetSubItem(tagItemHotTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwHotTextColor);
 	//itemhotbkcolor
 	pPropCombo->GetSubItem(tagItemHotBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwHotBkColor);
+	pPropCombo->GetSubItem(tagItemHotBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwHotBkColor);
 	//itemdisabledtextcolor
 	pPropCombo->GetSubItem(tagItemDisabledTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwDisabledTextColor);
+	pPropCombo->GetSubItem(tagItemDisabledTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwDisabledTextColor);
 	//itemdisabledbkcolor
 	pPropCombo->GetSubItem(tagItemDisabledBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwDisabledBkColor);
+	pPropCombo->GetSubItem(tagItemDisabledBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwDisabledBkColor);
 	//itemlinecolor
 	pPropCombo->GetSubItem(tagItemLineColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwLineColor);
+	pPropCombo->GetSubItem(tagItemLineColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwLineColor);
 	//itemshowhtml
 	pPropCombo->GetSubItem(tagItemShowHtml-tagCombo)->SetValue((_variant_t)pCombo->IsItemShowHtml());
+	pPropCombo->GetSubItem(tagItemShowHtml-tagCombo)->SetOriginalValue((_variant_t)pCombo->IsItemShowHtml());
 
 	pPropCombo->Show(TRUE,FALSE);
 }
@@ -1205,7 +1308,9 @@ void CPropertiesWnd::ShowActiveXProperty(CControlUI* pControl)
 	CLSID clsid=pActiveX->GetClisd();
 	TCHAR strCLSID[48];
 	StringFromGUID2(clsid,strCLSID,48);
-	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetValue((_variant_t)strCLSID);//clsid
+	//clsid
+	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetValue((_variant_t)strCLSID);
+	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetOriginalValue((_variant_t)strCLSID);
 
 	pPropActiveX->Show(TRUE,FALSE);
 }
@@ -1228,14 +1333,22 @@ void CPropertiesWnd::ShowContainerProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)rect.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)rect.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//childpadding
 	pPropContainer->GetSubItem(tagChildPadding-tagContainer)->SetValue((_variant_t)(LONG)pContainer->GetChildPadding());
+	pPropContainer->GetSubItem(tagChildPadding-tagContainer)->SetOriginalValue((_variant_t)(LONG)pContainer->GetChildPadding());
 	//mousechild
 	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetValue((_variant_t)pContainer->IsMouseChildEnabled());
+	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetOriginalValue((_variant_t)pContainer->IsMouseChildEnabled());
 	//hscrollbar
 	pPropContainer->GetSubItem(tagHScrollBar-tagContainer)->SetValue((_variant_t)(pContainer->GetHorizontalScrollBar()==NULL?false:true));
+	pPropContainer->GetSubItem(tagHScrollBar-tagContainer)->SetOriginalValue((_variant_t)(pContainer->GetHorizontalScrollBar()==NULL?false:true));
 	//vscrollbar
 	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetValue((_variant_t)(pContainer->GetVerticalScrollBar()==NULL?false:true));
+	pPropContainer->GetSubItem(tagMouseChild-tagContainer)->SetOriginalValue((_variant_t)(pContainer->GetVerticalScrollBar()==NULL?false:true));
 
 	pPropContainer->Show(TRUE,FALSE);
 }
@@ -1253,8 +1366,10 @@ void CPropertiesWnd::ShowHorizontalLayoutProperty(CControlUI* pControl)
 
 	//sepwidth
 	pPropHorizontalLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetValue((_variant_t)(LONG)pHorizontalLayout->GetSepWidth());
+	pPropHorizontalLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetOriginalValue((_variant_t)(LONG)pHorizontalLayout->GetSepWidth());
 	//sepimm
 	pPropHorizontalLayout->GetSubItem(tagSepImm-tagHorizontalLayout)->SetValue((_variant_t)pHorizontalLayout->IsSepImmMode());
+	pPropHorizontalLayout->GetSubItem(tagSepImm-tagHorizontalLayout)->SetOriginalValue((_variant_t)pHorizontalLayout->IsSepImmMode());
 
 	pPropHorizontalLayout->Show(TRUE,FALSE);
 }
@@ -1272,6 +1387,7 @@ void CPropertiesWnd::ShowTileLayoutProperty(CControlUI* pControl)
 
 	//sepwidth
 	pPropTileLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetValue((_variant_t)(LONG)pTileLayout->GetColumns());
+	pPropTileLayout->GetSubItem(tagSepWidth-tagHorizontalLayout)->SetOriginalValue((_variant_t)(LONG)pTileLayout->GetColumns());
 
 	pPropTileLayout->Show(TRUE,FALSE);
 }
@@ -1293,6 +1409,8 @@ void CPropertiesWnd::SetPropValue(CControlUI* pControl,int nTag)
 			pValueList=pPropUI->GetSubItem(tagFormSize-tagForm);
 			pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)(rect.right-rect.left));
 			pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)(rect.bottom-rect.top));
+			pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)(rect.right-rect.left));
+			pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)(rect.bottom-rect.top));
 
 			break;
 		}
@@ -1308,6 +1426,10 @@ void CPropertiesWnd::SetPropValue(CControlUI* pControl,int nTag)
 			pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)szXY.cy);
 			pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)(szXY.cx+nWidth));
 			pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)(szXY.cy+nHeight));
+			pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)szXY.cx);
+			pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)szXY.cy);
+			pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)(szXY.cx+nWidth));
+			pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)(szXY.cy+nHeight));
 
 			break;
 		}
@@ -1318,6 +1440,8 @@ void CPropertiesWnd::SetPropValue(CControlUI* pControl,int nTag)
 			pValueList=pPropUI->GetSubItem(tagSize-tagControl);
 			pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pControl->GetWidth());
 			pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pControl->GetHeight());
+			pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pControl->GetWidth());
+			pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pControl->GetHeight());
 
 			break;
 		}
@@ -1332,39 +1456,38 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	int nUpdate=UPDATE_REDRAW_CONTROL;
 	CString strName=pProp->GetName();
 	strName.MakeLower();
-	CString strVal;
+	CString strNewVal;
+	CString strOldVal;
+	strNewVal = pProp->FormatProperty();
+	strOldVal = FormatOrigProperty(pProp);
+	if(nTag!=tagName && nTag!=tagText && strName.Find(_T("image"))==-1)
+	{
+		strNewVal.MakeLower();
+		strOldVal.MakeLower();
+	}
+
 	switch(nTag)
 	{
 	case tagName:
 		{
 			CPaintManagerUI* pManager = g_pMainFrame->GetActiveUIView()->GetPaintManager();
-			strVal=pProp->FormatProperty();
-			if(pManager->FindControl(strVal))
+			if(pManager->FindControl(strNewVal))
 			{
-				MessageBox(strVal + _T(" 名称已被其他控件使用！"));
+				MessageBox(strNewVal + _T(" 名称已被其他控件使用！"));
 				pProp->SetValue((_variant_t)m_pControl->GetName());
 				return;
 			}
-			g_pClassView->RenameUITreeItem(m_pControl, strVal);
+			else
+				pManager->ReapObjects(m_pControl);
+
+			g_pClassView->RenameUITreeItem(m_pControl, strNewVal);
 			break;
 		}
 	case tagPos:
 	case tagPadding:
-		strVal.Format(_T("%s,%s,%s,%s"),pProp->GetSubItem(0)->FormatProperty(),
-			pProp->GetSubItem(1)->FormatProperty(),
-			pProp->GetSubItem(2)->FormatProperty(),
-			pProp->GetSubItem(3)->FormatProperty());
 		SetPropValue(m_pControl,tagSize);
 
 		nUpdate=UPDATE_POS;
-		break;
-	case tagInset:
-	case tagTextPadding:
-		strVal.Format(_T("%s,%s,%s,%s"),pProp->GetSubItem(0)->FormatProperty(),
-			pProp->GetSubItem(1)->FormatProperty(),
-			pProp->GetSubItem(2)->FormatProperty(),
-			pProp->GetSubItem(3)->FormatProperty());
-
 		break;
 	case tagSize:
 	case tagMinSize:
@@ -1378,42 +1501,40 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 		break;
 	case tagFloat:
 	case tagColumns:
-		strVal=pProp->FormatProperty();
-
 		nUpdate=UPDATE_POS;
 		break;
 	case tagVisible:
-		strVal=pProp->FormatProperty();
-
 		nUpdate=UPDATE_REDRAW_PARENT;
 		break;
-	case tagThumbSize:
-		strVal.Format(_T("%s,%s"),pProp->GetSubItem(0)->FormatProperty(),
-			pProp->GetSubItem(1)->FormatProperty());
-
-		break;
-	default:
-		strVal=pProp->FormatProperty();
-
-		break;
 	}
-	if(strName.Find(_T("image"))==-1)
-	{
-		strVal.MakeLower();
-	}
-	m_pControl->SetAttribute(strName,strVal);
+	m_pControl->SetAttribute(strName,strNewVal);
+	pProp->SetOriginalValue(pProp->GetValue());
+
+	CUIDesignerView* pUIView=g_pMainFrame->GetActiveUIView();
+	ASSERT(pUIView);
+	TNotifyUI Msg;
+	UIAttribute oldAttrib = {strName, strOldVal};
+	Msg.pSender=m_pControl;
+	Msg.sType=_T("PropertyBeginChanged");
+	Msg.wParam=0;
+	Msg.lParam=(LPARAM)&oldAttrib;
+	pUIView->Notify(Msg);
+
+	UIAttribute newAttrib = {strName, strNewVal};
+	Msg.sType = _T("PropertyEndChanged");
+	Msg.lParam = (LPARAM)&newAttrib;
+	pUIView->Notify(Msg);
 
 	if(nTag==tagFormSize)
 	{
-		CUIDesignerView* pUIView=g_pMainFrame->GetActiveUIView();
-		ASSERT(pUIView);
-
-		TNotifyUI Msg;
-		Msg.pSender=m_pControl;
 		Msg.sType=_T("formsize");
-		Msg.wParam=0;
-		Msg.lParam=NULL;
+		Msg.lParam = NULL;
 		pUIView->Notify(Msg);
+	}
+	else if(nTag == tagName)
+	{
+		CPaintManagerUI* pManager = pUIView->GetPaintManager();
+		pManager->InitControls(m_pControl);
 	}
 
 	CControlUI* pParent=m_pControl->GetParent();
@@ -1432,4 +1553,82 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	case UPDATE_REDRAW_PARENT:
 		pParent->NeedUpdate();
 	}
+}
+
+CString CPropertiesWnd::FormatOrigProperty(CMFCPropertyGridProperty* pProp)
+{
+	ASSERT(pProp);
+
+	COleVariant var = pProp->GetOriginalValue();
+	CString strOrigVal;
+
+	int nCount = pProp->GetSubItemsCount();
+	if(nCount > 0)
+	{
+		for (int i=0; i<nCount; i++)
+		{
+			CMFCPropertyGridProperty* pSubProp = pProp->GetSubItem(i);
+			ASSERT_VALID(pSubProp);
+
+			strOrigVal += FormatOrigProperty(pSubProp);
+
+			if (i != nCount-1)
+			{
+				strOrigVal += _T(',');
+				strOrigVal += _T(' ');
+			}
+		}
+
+		return strOrigVal;
+	}
+
+	switch (var.vt)
+	{
+	case VT_BSTR:
+		strOrigVal = var.bstrVal;
+		break;
+
+	case VT_I2:
+		strOrigVal.Format(_T("%d"), (short)var.iVal);
+		break;
+
+	case VT_I4:
+	case VT_INT:
+		strOrigVal.Format(_T("%ld"), (long)var.lVal);
+		break;
+
+	case VT_UI1:
+		if ((BYTE)var.bVal != 0)
+		{
+			strOrigVal.Format(_T("%c"), (TCHAR)(BYTE)var.bVal);
+		}
+		break;
+
+	case VT_UI2:
+		strOrigVal.Format(_T("%u"), var.uiVal);
+		break;
+
+	case VT_UINT:
+	case VT_UI4:
+		strOrigVal.Format(_T("%u"), var.ulVal);
+		break;
+
+	case VT_R4:
+		strOrigVal.Format(_T("%f"), (float)var.fltVal);
+		break;
+
+	case VT_R8:
+		strOrigVal.Format(_T("%lf"), (double)var.dblVal);
+		break;
+
+	case VT_BOOL:
+		strOrigVal = var.boolVal == VARIANT_TRUE ? _T("True") : _T("False");
+		break;
+
+	default:
+		// Unsupported type
+		strOrigVal = _T("*** error ***");
+	}
+
+	return strOrigVal;
 }

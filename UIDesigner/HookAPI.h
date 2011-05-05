@@ -21,7 +21,6 @@ typedef HANDLE (WINAPI *pfnCreateFile)(
 									 HANDLE hTemplateFile
 							   );
 typedef void (WINAPI *pfnInvalidate)(RECT& rcItem);
-typedef TImageInfo* (WINAPI *pfnAddImage)(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask);
 typedef TImageInfo* (WINAPI *pfnGetImageEx)(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask);
 
 class CHookAPI
@@ -51,9 +50,6 @@ public:
 	static void WINAPI Hook_Invalidate(RECT& rcItem);
 	static void EnableInvalidate(bool bEnable=true) { m_bInvalidateEnabled=bEnable; }
 
-	static TImageInfo* WINAPI Hook_AddImage(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask);
-	static void EnableAddImage(bool bEnable=true) { m_bAddImageEnabled=bEnable; }
-
 	static TImageInfo* WINAPI Hook_GetImageEx(LPCTSTR pstrBitmap, LPCTSTR pstrType, DWORD mask);
 	static void EnableGetImageEx(bool bEnable=true) { m_bGetImageExEnabled=bEnable; }
 
@@ -64,9 +60,6 @@ private:
 
 	static bool m_bInvalidateEnabled;
 	static HOOKSTRUCT m_InvalidateHookInfo;
-
-	static bool m_bAddImageEnabled;
-	static HOOKSTRUCT m_AddImageHookInfo;
 
 	static bool m_bGetImageExEnabled;
 	static HOOKSTRUCT m_GetImageExHookInfo;

@@ -108,6 +108,9 @@ void CDialogProjectNew::OnBnClickedOk()
 		MessageBox(_T("所设路径已不存在，可能被移除。"),_T("提示"));
 		return;
 	}
+	if(m_strPath.Right(1) != _T("\\"))
+		m_strPath += _T("\\");
 
+	UpdateData(FALSE);
 	OnOK();
 }
