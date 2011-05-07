@@ -865,6 +865,11 @@ LPVOID CActiveXUI::GetInterface(LPCTSTR pstrName)
 	return CControlUI::GetInterface(pstrName);
 }
 
+HWND CActiveXUI::GetHostWindow() const
+{
+    return m_hwndHost;
+}
+
 static void PixelToHiMetric(const SIZEL* lpSizeInPix, LPSIZEL lpSizeInHiMetric)
 {
 #define HIMETRIC_PER_INCH   2540

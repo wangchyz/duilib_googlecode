@@ -34,6 +34,8 @@ public:
     LPCTSTR GetClass() const;
 	LPVOID GetInterface(LPCTSTR pstrName);
 
+    HWND GetHostWindow() const;
+
     bool IsDelayCreate() const;
     void SetDelayCreate(bool bDelayCreate = true);
 
