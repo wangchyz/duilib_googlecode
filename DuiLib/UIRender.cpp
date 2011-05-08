@@ -1060,7 +1060,7 @@ void CRenderEngine::DrawText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, LPCTS
     ::SetBkMode(hDC, TRANSPARENT);
     ::SetTextColor(hDC, RGB(GetBValue(dwTextColor), GetGValue(dwTextColor), GetRValue(dwTextColor)));
     HFONT hOldFont = (HFONT)::SelectObject(hDC, pManager->GetFont(iFont));
-    ::DrawText(hDC, pstrText, -1, &rc, uStyle);
+    ::DrawText(hDC, pstrText, -1, &rc, uStyle | DT_NOPREFIX);
     ::SelectObject(hDC, hOldFont);
 }
 
