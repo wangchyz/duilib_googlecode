@@ -27,11 +27,16 @@ public:
 // й╣ож
 	UINT  m_nAppLook;
 	BOOL  m_bHiColorIcons;
+	CMultiDocTemplate* m_pUIDocTemplate;
 
 	virtual void PreLoadState();
 	virtual void LoadCustomState();
 	virtual void SaveCustomState();
 
+	void RemoveLastFromMRU();
+	CMultiDocTemplate* GetUIDocTemplate() const { return m_pUIDocTemplate; }
+
+	afx_msg void OnFileNew();
 	afx_msg void OnAppAbout();
 	DECLARE_MESSAGE_MAP()
 	virtual int ExitInstance();

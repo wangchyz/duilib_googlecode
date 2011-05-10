@@ -82,15 +82,26 @@ void CFormUI::SetRoundCorner(int cx, int cy)
 	m_pManager->SetRoundCorner(cx,cy);
 }
 
-SIZE CFormUI::GetMinMaxInfo() const
+SIZE CFormUI::GetMinInfo() const
 {
-	return m_pManager->GetMinMaxInfo();
+	return m_pManager->GetMinInfo();
 }
 
-void CFormUI::SetMinMaxInfo(int cx, int cy)
+SIZE CFormUI::GetMaxInfo() const
+{
+	return m_pManager->GetMaxInfo();
+}
+
+void CFormUI::SetMinInfo(int cx, int cy)
 {
 	ASSERT(cx>=0 && cy>=0);
-	m_pManager->SetMinMaxInfo(cx,cy);
+	m_pManager->SetMinInfo(cx,cy);
+}
+
+void CFormUI::SetMaxInfo(int cx, int cy)
+{
+	ASSERT(cx>=0 && cy>=0);
+	m_pManager->SetMaxInfo(cx,cy);
 }
 
 bool CFormUI::IsShowUpdateRect() const
@@ -151,7 +162,13 @@ void CFormUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 		LPTSTR pstr = NULL;
 		int cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
 		int cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr); 
-		SetMinMaxInfo(cx, cy);
+		SetMinInfo(cx, cy);
+	}
+	else if( _tcscmp(pstrName, _T("maxinfo")) == 0 ) {
+		LPTSTR pstr = NULL;
+		int cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+		int cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr); 
+		SetMaxInfo(cx, cy);
 	}
 	else if( _tcscmp(pstrName, _T("showdirty")) == 0 ) {
 		SetShowUpdateRect(_tcscmp(pstrValue, _T("true")) == 0);
@@ -420,15 +437,15 @@ void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 
 void CLayoutManager::Draw(CDC* pDC)
 {
-	CSize szForm=GetForm()->GetInitSize();
-	CRect rcPaint(0,0,szForm.cx,szForm.cy);
-	CControlUI* pForm=m_Manager.GetRoot();
+	CSize szForm = GetForm()->GetInitSize();
+	CRect rcPaint(0, 0, szForm.cx, szForm.cy);
+	CControlUI* pForm = m_Manager.GetRoot();
 
-	pForm->DoPaint(pDC->GetSafeHdc(),rcPaint);
+	pForm->DoPaint(pDC->GetSafeHdc(), rcPaint);
 
-	CContainerUI* pContainer=static_cast<CContainerUI*>(pForm->GetInterface(_T("Container")));
+	CContainerUI* pContainer = static_cast<CContainerUI*>(pForm->GetInterface(_T("Container")));
 	ASSERT(pContainer);
-	DrawAuxBorder(pDC,pContainer->GetItemAt(0));
+	DrawAuxBorder(pDC, pContainer->GetItemAt(0));
 	DrawGrid(pDC, rcPaint);
 }
 
@@ -611,8 +628,25 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 
 BOOL CLayoutManager::RemoveUI(CControlUI* pControl)
 {
-	if(pControl==NULL)
+	if(pControl == NULL || pControl == m_pFormUI)
 		return FALSE;
+
+	ReleaseExtendedAttrib(pControl);
+	CControlUI* pParent = pControl->GetParent();
+	ASSERT(pParent);
+	if(pParent)
+	{
+		CContainerUI* pContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
+		pContainer->Remove(pControl);
+	}
+
+	return TRUE;
+}
+
+void CLayoutManager::ReleaseExtendedAttrib(CControlUI* pControl)
+{
+	if(pControl == NULL)
+		return;
 
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
 	delete pExtended;
@@ -622,18 +656,10 @@ BOOL CLayoutManager::RemoveUI(CControlUI* pControl)
 	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
 	if(pContainer != NULL)
 	{
-		for(int i=0; i<pContainer->GetCount(); i++)
-			RemoveUI(pContainer->GetItemAt(i));
+		int nCount = pContainer->GetCount();
+		for(int i=0; i<nCount; i++)
+			ReleaseExtendedAttrib(pContainer->GetItemAt(i));
 	}
-
-	CControlUI* pParent = pControl->GetParent();
-	if(pParent)
-	{
-		CContainerUI* pParentContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
-		pParentContainer->Remove(pControl);
-	}
-
-	return TRUE;
 }
 
 CPaintManagerUI* CLayoutManager::GetManager()
@@ -661,8 +687,10 @@ void CLayoutManager::TestForm()
 	pManager->SetCaptionRect(m_Manager.GetCaptionRect());
 	size=m_Manager.GetRoundCorner();
 	pManager->SetRoundCorner(size.cx,size.cy);
-	size=m_Manager.GetMinMaxInfo();
-	pManager->SetMinMaxInfo(size.cx,size.cy);
+	size=m_Manager.GetMinInfo();
+	pManager->SetMinInfo(size.cx,size.cy);
+	size=m_Manager.GetMaxInfo();
+	pManager->SetMaxInfo(size.cx,size.cy);
 	pManager->SetShowUpdateRect(m_Manager.IsShowUpdateRect());
 
 	if( pFrame == NULL )
@@ -1261,6 +1289,10 @@ void CLayoutManager::SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode
 		pNode->SetAttribute("disabledtextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
+	int nFont = pLabelUI->GetFont();
+	if(nFont != -1)
+		pNode->SetAttribute("font", nFont);
+
 	if(pLabelUI->IsShowHtml())
 		pNode->SetAttribute("showhtml", "true");
 
@@ -1806,6 +1838,16 @@ void CLayoutManager::SaveContainerProperty(CControlUI* pControl, TiXmlElement* p
 	}
 }
 
+void CLayoutManager::SaveHorizontalLayoutProperty(CControlUI* pControl, TiXmlElement* pNode)
+{
+	SaveContainerProperty(pControl, pNode);
+}
+
+void CLayoutManager::SaveTileLayoutProperty(CControlUI* pControl, TiXmlElement* pNode)
+{
+	SaveContainerProperty(pControl, pNode);
+}
+
 void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode
 									, BOOL bSaveChildren/* = TRUE*/)
 {
@@ -1853,10 +1895,10 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		SaveContainerProperty(pControl, pNode);
 		break;
 	case classHorizontalLayout:
-// 		SaveHorizontalLayoutProperty(pControl, pNode);
+		SaveHorizontalLayoutProperty(pControl, pNode);
 		break;
 	case classTileLayout:
-// 		SaveTileLayoutProperty(pControl, pNode);
+		SaveTileLayoutProperty(pControl, pNode);
 		break;
 	default:
 		delete pNode;
@@ -1878,15 +1920,15 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	}
 }
 
-void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
+void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 {
-	CString strPathName(lpszPathName);
+	CString strPathName(pstrPathName);
 	int nPos = strPathName.ReverseFind(_T('\\'));
 	if(nPos == -1)
 		return;
 	m_strSkinDir = strPathName.Left(nPos + 1);
 
-	HANDLE hFile = ::CreateFile(lpszPathName, GENERIC_ALL, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = ::CreateFile(pstrPathName, GENERIC_ALL, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(hFile == INVALID_HANDLE_VALUE)
 	{
 		return;
@@ -1895,7 +1937,7 @@ void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
 		CloseHandle(hFile);
 
 	TCHAR szBuf[MAX_PATH] = {0};
-	TiXmlDocument xmlDoc(StringConvertor::WideToAnsi(lpszPathName));
+	TiXmlDocument xmlDoc(StringConvertor::WideToAnsi(pstrPathName));
 	TiXmlDeclaration Declaration("1.0","utf-8","yes");
 	xmlDoc.InsertEndChild(Declaration);
 
@@ -1924,11 +1966,17 @@ void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
 	}
 	else
 		pFormElm->SetAttribute("caption", "0,0,0,30");
-	SIZE szMinWindow = pForm->GetMinMaxInfo();
+	SIZE szMinWindow = pForm->GetMinInfo();
 	if((szMinWindow.cx != 0) || (szMinWindow.cy != 0))
 	{
 		_stprintf_s(szBuf, _T("%d,%d"), szMinWindow.cx, szMinWindow.cy);
 		pFormElm->SetAttribute("mininfo", StringConvertor::WideToUtf8(szBuf));
+	}
+	SIZE szMaxWindow = pForm->GetMaxInfo();
+	if((szMaxWindow.cx != 0) || (szMaxWindow.cy != 0))
+	{
+		_stprintf_s(szBuf, _T("%d,%d"), szMinWindow.cx, szMinWindow.cy);
+		pFormElm->SetAttribute("maxinfo", StringConvertor::WideToUtf8(szBuf));
 	}
 	SIZE szRoundCorner = pForm->GetRoundCorner();
 	if((szRoundCorner.cx != 0) || (szRoundCorner.cy != 0))
@@ -2005,8 +2053,9 @@ void CLayoutManager::SaveSkinFile(LPCTSTR lpszPathName)
 			TiXmlElement* pAttributeElem = new TiXmlElement("Default");
 			pAttributeElem->SetAttribute("name", StringConvertor::WideToUtf8(lpstrKey));
 
-			std::wstring tstrAttribute(lpstrAttribute);
-			pAttributeElem->SetAttribute("value", StringConvertor::WideToUtf8(tstrAttribute.c_str()));
+			CString strAttrib(lpstrAttribute);
+			strAttrib.Replace(_T("\""), _T("&quot;"));
+			pAttributeElem->SetAttribute("value", StringConvertor::WideToUtf8(strAttrib));
 
 			pNode->ToElement()->InsertEndChild(*pAttributeElem);
 

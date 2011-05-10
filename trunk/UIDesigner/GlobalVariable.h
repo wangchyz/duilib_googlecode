@@ -8,6 +8,8 @@ public:
 
 public:
 	static CString& GetCurPath();
+	static CString& GetTemplatesDir();
+	static CString& GetStylesDir();
 
 public:
 	static bool m_bIsProjectExist;
@@ -16,4 +18,6 @@ public:
 
 private:
 	static CString m_strCurPath;
+	static CString m_strTemplatesDir;
+	static CString m_strStylesDir;
 };

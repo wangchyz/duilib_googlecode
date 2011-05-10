@@ -20,7 +20,7 @@
 BEGIN_MESSAGE_MAP(CUIDesignerApp, CWinAppEx)
 	ON_COMMAND(ID_APP_ABOUT, &CUIDesignerApp::OnAppAbout)
 	// 基于文件的标准文档命令
-	ON_COMMAND(ID_FILE_NEW, &CWinAppEx::OnFileNew)
+	ON_COMMAND(ID_FILE_NEW, &CUIDesignerApp::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, &CWinAppEx::OnFileOpen)
 END_MESSAGE_MAP()
 
@@ -34,6 +34,7 @@ CUIDesignerApp::CUIDesignerApp()
 
 	// TODO: 在此处添加构造代码，
 	// 将所有重要的初始化放置在 InitInstance 中
+	m_pUIDocTemplate = NULL;
 }
 
 // 唯一的一个 CUIDesignerApp 对象
@@ -88,14 +89,13 @@ BOOL CUIDesignerApp::InitInstance()
 	// 注册应用程序的文档模板。文档模板
 	// 将用作文档、框架窗口和视图之间的连接
 
-	CMultiDocTemplate* pUIDocTemplate = NULL;
-	pUIDocTemplate = new CMultiDocTemplate(IDR_UIDESIGNER,
+	m_pUIDocTemplate = new CMultiDocTemplate(IDR_UIDESIGNER,
 		RUNTIME_CLASS(CUIDesignerDoc),
 		RUNTIME_CLASS(CChildFrame), // 自定义 MDI 子框架
 		RUNTIME_CLASS(CUIDesignerView));
-	if (!pUIDocTemplate)
+	if (!m_pUIDocTemplate)
 		return FALSE;
-	AddDocTemplate(pUIDocTemplate);
+	AddDocTemplate(m_pUIDocTemplate);
 
 	// 创建主 MDI 框架窗口
 	CMainFrame* pMainFrame = new CMainFrame;
@@ -153,6 +153,23 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
+void CUIDesignerApp::OnFileNew()
+{
+	// TODO: 在此添加命令处理程序代码
+	ASSERT(m_pUIDocTemplate);
+
+	CDocument* pDoc = m_pUIDocTemplate->OpenDocumentFile(NULL);
+	if(pDoc == NULL)
+		return;
+
+	CString strPathName = pDoc->GetPathName();
+	if(!strPathName.IsEmpty())
+	{
+		pDoc->SetPathName(_T(""));
+		RemoveLastFromMRU();
+	}
+}
+
 // 用于运行对话框的应用程序命令
 void CUIDesignerApp::OnAppAbout()
 {
@@ -193,4 +210,9 @@ int CUIDesignerApp::ExitInstance()
 	// TODO: 在此添加专用代码和/或调用基类
 
 	return CWinAppEx::ExitInstance();
+}
+
+void CUIDesignerApp::RemoveLastFromMRU()
+{
+	m_pRecentFileList->Remove(0);
 }

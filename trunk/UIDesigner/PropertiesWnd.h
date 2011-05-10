@@ -37,6 +37,21 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//CMFCPropertyGridCustomFontsProperty
+
+class CMFCPropertyGridCustomFontsProperty : public CMFCPropertyGridProperty
+{
+	DECLARE_DYNAMIC(CMFCPropertyGridCustomFontsProperty)
+
+public:
+	CMFCPropertyGridCustomFontsProperty(const CString& strName, const CString& strFonts, LPCTSTR lpszDescr = NULL, DWORD_PTR dwData = 0);
+	virtual ~CMFCPropertyGridCustomFontsProperty();
+
+public:
+	virtual void OnClickButton(CPoint point);
+};
+
+//////////////////////////////////////////////////////////////////////////
 //CPropertiesToolBar
 
 class CPropertiesToolBar : public CMFCToolBar
@@ -68,7 +83,9 @@ enum PropertyTag
 	tagSizeBox,
 	tagRoundCorner,
 	tagMinInfo,
+	tagMaxInfo,
 	tagShowDirty,
+	tagCustomFonts,
 
 	//Control
 	tagControl,
@@ -158,8 +175,8 @@ enum PropertyTag
 	tagItemDisabledTextColor,
 	tagItemDisabledBkColor,
 	tagItemLineColor,
-	tagItemShowHtml,
 	tagItemFont,
+	tagItemShowHtml,
 
 	//ActiveX
 	tagActiveX,

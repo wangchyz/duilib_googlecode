@@ -32,14 +32,16 @@ public:
 #endif
 
 protected:
+	afx_msg void OnMdiCopyFullPath();
+	afx_msg void OnMdiOpenFullPath();
 
 // 生成的消息映射函数
 protected:
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnTemplateSave();
 	virtual BOOL OnSaveDocument(LPCTSTR lpszPathName);
 	virtual void SetTitle(LPCTSTR lpszTitle);
+	virtual void SetPathName(LPCTSTR lpszPathName, BOOL bAddToMRU = TRUE);
 };
 
 

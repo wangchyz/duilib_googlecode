@@ -14,6 +14,7 @@
 
 #include "targetver.h"
 
+#define _CRT_SECURE_NO_WARNINGS
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // 某些 CString 构造函数将是显式的
 
 // 关闭 MFC 对某些常见但经常可放心忽略的警告消息的隐藏
@@ -86,6 +87,8 @@
 #define DIR_TEMPLATES _T("Templates\\")
 
 #define UI_COMMAND_HISTORY 10
+
+#define UIDESIGNER_VERSION _T("V1.0")
 
 //UI type
 enum UIType

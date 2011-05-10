@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "UIDesigner.h"
 #include "MainFrm.h"
+#include "DialogTemplateOpen.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -34,6 +35,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(ID_FILE_SAVE_ALL, &CMainFrame::OnFileSaveAll)
 	ON_UPDATE_COMMAND_UI(ID_PROJECT_CLOSE, &CMainFrame::OnUpdateProjectExist)
 	ON_UPDATE_COMMAND_UI(ID_FILE_CLOSE_ALL, &CMainFrame::OnUpdateFileCloseAll)
+	ON_COMMAND(ID_MDITABS_MOVE_TO_NEXT_GROUP, OnMdiMoveToNextGroup)
+	ON_COMMAND(ID_MDITABS_MOVE_TO_PREV_GROUP, OnMdiMoveToPrevGroup)
+	ON_COMMAND(ID_MDITABS_NEW_HORZ_TAB_GROUP, OnMdiNewHorzTabGroup)
+	ON_COMMAND(ID_MDITABS_NEW_VERT_TAB_GROUP, OnMdiNewVertTabGroup)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -160,8 +165,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndResourceView.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndFileView);
 	CDockablePane* pTabbedBar = NULL;
-	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, TRUE, &pTabbedBar);
-	m_wndResourceView.AttachToTabWnd(pTabbedBar, DM_SHOW, TRUE, &pTabbedBar);
+	m_wndClassView.AttachToTabWnd(&m_wndFileView, DM_SHOW, FALSE, &pTabbedBar);
+	m_wndResourceView.AttachToTabWnd(pTabbedBar, DM_SHOW, FALSE, &pTabbedBar);
 	m_wndProperties.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolBox.EnableDocking(CBRS_ALIGN_ANY);
 	DockPane(&m_wndProperties);
@@ -539,6 +544,8 @@ void CMainFrame::OnProjectClose()
 void CMainFrame::OnTemplateOpen()
 {
 	// TODO: Add your command handler code here
+	CDialogTemplateOpen dlg;
+	dlg.DoModal();
 }
 
 void CMainFrame::OnFileCloseAll()
@@ -551,6 +558,7 @@ void CMainFrame::OnFileSaveAll()
 {
 	// TODO: 在此添加命令处理程序代码
 	AfxGetApp()->SaveAllModified();
+	g_pFileView->SaveProject();
 }
 
 void CMainFrame::OnUpdateProjectExist(CCmdUI *pCmdUI)
@@ -563,4 +571,65 @@ void CMainFrame::OnUpdateFileCloseAll(CCmdUI *pCmdUI)
 {
 	// TODO: 在此添加命令更新用户界面处理程序代码
 	pCmdUI->Enable(MDIGetActive() ? TRUE:FALSE);
+}
+
+BOOL CMainFrame::OnShowMDITabContextMenu(CPoint point, DWORD dwAllowedItems, BOOL bDrop)
+{
+	CMenu menu;
+	VERIFY(menu.LoadMenu(IDR_POPUP_MDITABS));
+
+	CMenu* pPopup = menu.GetSubMenu(0);
+	ASSERT(pPopup != NULL);
+
+	if (pPopup)
+	{
+		if ((dwAllowedItems & AFX_MDI_CREATE_HORZ_GROUP) == 0)
+		{
+			pPopup->DeleteMenu(ID_MDITABS_NEW_HORZ_TAB_GROUP, MF_BYCOMMAND);
+		}
+
+		if ((dwAllowedItems & AFX_MDI_CREATE_VERT_GROUP) == 0)
+		{
+			pPopup->DeleteMenu(ID_MDITABS_NEW_VERT_TAB_GROUP, MF_BYCOMMAND);
+		}
+
+		if ((dwAllowedItems & AFX_MDI_CAN_MOVE_NEXT) == 0)
+		{
+			pPopup->DeleteMenu(ID_MDITABS_MOVE_TO_NEXT_GROUP, MF_BYCOMMAND);
+		}
+
+		if ((dwAllowedItems & AFX_MDI_CAN_MOVE_PREV) == 0)
+		{
+			pPopup->DeleteMenu(ID_MDITABS_MOVE_TO_PREV_GROUP, MF_BYCOMMAND);
+		}
+
+		CMFCPopupMenu* pPopupMenu = new CMFCPopupMenu;
+		if (pPopupMenu)
+		{
+			pPopupMenu->SetAutoDestroy(FALSE);
+			pPopupMenu->Create(this, point.x, point.y, pPopup->GetSafeHmenu());
+		}
+	}
+
+	return TRUE;
+}
+
+void CMainFrame::OnMdiMoveToNextGroup()
+{
+	MDITabMoveToNextGroup();
+}
+
+void CMainFrame::OnMdiMoveToPrevGroup()
+{
+	MDITabMoveToNextGroup(FALSE);
+}
+
+void CMainFrame::OnMdiNewHorzTabGroup()
+{
+	MDITabNewGroup(FALSE);
+}
+
+void CMainFrame::OnMdiNewVertTabGroup()
+{
+	MDITabNewGroup();
 }

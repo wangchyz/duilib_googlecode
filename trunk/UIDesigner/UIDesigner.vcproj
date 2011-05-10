@@ -208,6 +208,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogTemplateOpen.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogTemplateSaveAs.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FileView.cpp"
 				>
 			</File>
@@ -272,6 +280,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\TemplateImagePreview.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ToolBoxCtrl.cpp"
 				>
 			</File>
@@ -323,6 +335,14 @@
 			</File>
 			<File
 				RelativePath=".\DialogSkinFileNew.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogTemplateOpen.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogTemplateSaveAs.h"
 				>
 			</File>
 			<File
@@ -382,6 +402,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TemplateImagePreview.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ToolBoxCtrl.h"
 				>
 			</File>
@@ -420,6 +444,18 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\res\ToolBox\Active.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Button.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\CheckBox.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\class_view.ico"
 				>
 			</File>
@@ -433,6 +469,30 @@
 			</File>
 			<File
 				RelativePath=".\res\classview_hc.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Combo.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\ComboBox.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Container.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Control.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\DialogLayout.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Edit.ico"
 				>
 			</File>
 			<File
@@ -468,7 +528,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\ToolBox\HorizontalLayout.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\icon1.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Label.ico"
 				>
 			</File>
 			<File
@@ -481,6 +549,18 @@
 			</File>
 			<File
 				RelativePath=".\res\movehandle.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Option.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Pointer.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Progress.ico"
 				>
 			</File>
 			<File
@@ -520,11 +600,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\ToolBox\ScrollBar.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Slider.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\sort.bmp"
 				>
 			</File>
 			<File
 				RelativePath=".\res\sort_hc.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\TabLayout.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\TabTabLayout.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\Text.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\TileLayout.ico"
 				>
 			</File>
 			<File
@@ -565,6 +669,10 @@
 			</File>
 			<File
 				RelativePath=".\UserImages.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\ToolBox\VerticalLayout.ico"
 				>
 			</File>
 		</Filter>

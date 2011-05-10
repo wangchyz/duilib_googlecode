@@ -84,6 +84,24 @@ IDI_PROPERTIES_WND_HC   ICON                    "res\\properties_wnd_hc.ico"
 IDI_RES_VIEW            ICON                    "res\\res_view.ico"
 IDI_RES_VIEW_HC         ICON                    "res\\res_view_hc.ico"
 IDI_TOOLBOX_WND_HC      ICON                    "res\\toolbox_wnd_hc.ico"
+IDI_TOOLBOX_ACTIVE      ICON                    "res\\ToolBox\\Active.ico"
+IDI_TOOLBOX_BUTTON      ICON                    "res\\ToolBox\\Button.ico"
+IDI_TOOLBOX_OPTION      ICON                    "res\\ToolBox\\Option.ico"
+IDI_TOOLBOX_COMBO       ICON                    "res\\ToolBox\\Combo.ico"
+IDI_TOOLBOX_CONTAINER   ICON                    "res\\ToolBox\\Container.ico"
+IDI_TOOLBOX_CONTROL     ICON                    "res\\ToolBox\\Control.ico"
+IDI_TOOLBOX_DIALOG_LAYOUT ICON                    "res\\ToolBox\\DialogLayout.ico"
+IDI_TOOLBOX_EDIT        ICON                    "res\\ToolBox\\Edit.ico"
+IDI_TOOLBOX_HORIZONTAL_LAYOUT ICON                    "res\\ToolBox\\HorizontalLayout.ico"
+IDI_TOOLBOX_LABEL       ICON                    "res\\ToolBox\\Label.ico"
+IDI_TOOLBOX_POINTER     ICON                    "res\\ToolBox\\Pointer.ico"
+IDI_TOOLBOX_PROGRESS    ICON                    "res\\ToolBox\\Progress.ico"
+IDI_TOOLBOX_SCROLLBAR   ICON                    "res\\ToolBox\\ScrollBar.ico"
+IDI_TOOLBOX_SLIDER      ICON                    "res\\ToolBox\\Slider.ico"
+IDI_TOOLBOX_TAB_LAYOUT  ICON                    "res\\ToolBox\\TabLayout.ico"
+IDI_TOOLBOX_TEXT        ICON                    "res\\ToolBox\\Text.ico"
+IDI_TOOLBOX_TILE_LAYOUT ICON                    "res\\ToolBox\\TileLayout.ico"
+IDI_TOOLBOX_VERTICAL_LAYOUT ICON                    "res\\ToolBox\\VerticalLayout.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -225,13 +243,13 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
-        MENUITEM "全部关闭(&K)",                    ID_FILE_CLOSE_ALL
+        MENUITEM "关闭全部(&K)",                    ID_FILE_CLOSE_ALL
         MENUITEM "关闭项目(&P)",                    ID_PROJECT_CLOSE
         MENUITEM SEPARATOR
         MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
         MENUITEM "另存为(&A)...",                  ID_FILE_SAVE_AS
         MENUITEM "保存全部(&L)...\tCtrl+Shift+S",   ID_FILE_SAVE_ALL
-        MENUITEM "保存模板(&T)...",                 ID_TEMPLATE_SAVE
+        MENUITEM "保存为模板(&T)...",                ID_TEMPLATE_SAVE_AS
         MENUITEM SEPARATOR
         MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1
         MENUITEM SEPARATOR
@@ -289,7 +307,7 @@ BEGIN
         MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
         MENUITEM "另存为(&A)...",                  ID_FILE_SAVE_AS
         MENUITEM "保存全部(&L)...\tCtrl+Shift+S",   ID_FILE_SAVE_ALL
-        MENUITEM "保存模板(&T)...",                 ID_TEMPLATE_SAVE
+        MENUITEM "保存为模板(&T)...",                ID_TEMPLATE_SAVE_AS
         MENUITEM SEPARATOR
         MENUITEM "最近的文件",                       ID_FILE_MRU_FILE1
         MENUITEM SEPARATOR
@@ -422,6 +440,24 @@ BEGIN
     END
 END
 
+IDR_POPUP_MDITABS MENU 
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+        MENUITEM "保存(&S)\tCtrl+S",              ID_FILE_SAVE
+        MENUITEM "关闭(&C)",                      ID_FILE_CLOSE
+        MENUITEM "关闭全部(&K)",                    ID_FILE_CLOSE_ALL
+        MENUITEM SEPARATOR
+        MENUITEM "复制完整路径(&F)",                  ID_MDITABS_COPY_FULLPATH
+        MENUITEM "打开所在的文件夹(&O)",                ID_MDITABS_OPEN_FULLPATH
+        MENUITEM SEPARATOR
+        MENUITEM "新建水平选项卡组(&Z)",                ID_MDITABS_NEW_HORZ_TAB_GROUP
+        MENUITEM "新建垂直选项卡组(&V)",                ID_MDITABS_NEW_VERT_TAB_GROUP
+        MENUITEM "移动到下一个选项卡组(&X)",              ID_MDITABS_MOVE_TO_NEXT_GROUP
+        MENUITEM "移动到上一个选项卡组(&R)",              ID_MDITABS_MOVE_TO_PREV_GROUP
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -524,13 +560,37 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "新建UI文件"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    EDITTEXT        IDC_EDIT_FILE_NAME,35,8,70,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "确定",IDOK,273,191,50,14
     PUSHBUTTON      "取消",IDCANCEL,339,191,50,14
     LTEXT           "名称:",IDC_STATIC,11,11,20,8
-    EDITTEXT        IDC_EDIT_FILE_NAME,35,8,70,14,ES_AUTOHSCROLL
     LISTBOX         IDC_LIST_STYLE,12,41,93,139,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "样式预览（未完成）",IDC_STATIC_PREVIEW,121,7,268,172
     LTEXT           "样式:",IDC_STATIC,11,29,20,8
+END
+
+IDD_DIALOG_TEMPLATE_SAVE_AS DIALOGEX 0, 0, 223, 69
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "保存模板"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_TEMPLATE_NAME,38,18,178,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "确定",IDOK,105,48,50,14
+    PUSHBUTTON      "取消",IDCANCEL,166,48,50,14
+    LTEXT           "名称：",IDC_STATIC,11,21,25,8
+END
+
+IDD_DIALOG_TEMPLATE_OPEN DIALOGEX 0, 0, 447, 268
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "打开模板"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "打开",IDOK,324,247,50,14
+    PUSHBUTTON      "取消",IDCANCEL,390,247,50,14
+    LISTBOX         IDC_LIST_TEMPLATES,7,9,115,228,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "模板预览",IDC_STATIC_TEMPLATE_PREVIEW,138,17,294,214
+    PUSHBUTTON      "删除",IDC_BUTTON_TEMPLATE_DELETE,41,247,50,14
+    GROUPBOX        "模板预览",IDC_STATIC,130,7,310,232
 END
 
 
@@ -540,8 +600,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -556,14 +616,11 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "CompanyName", "TODO: <公司名>"
-            VALUE "FileDescription", "TODO: <文件说明>"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileDescription", "UIDesigner V1.0"
+            VALUE "FileVersion", "V1.0"
             VALUE "InternalName", "UIDesigner.exe"
-            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
-            VALUE "OriginalFilename", "UIDesigner.exe"
-            VALUE "ProductName", "TODO: <产品名>"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "LegalCopyright", " (C) 踏雪流云。保留所有权利。"
+            VALUE "ProductName", "UIDesigner"
         END
     END
     BLOCK "VarFileInfo"
@@ -620,6 +677,22 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 205
     END
+
+    IDD_DIALOG_TEMPLATE_SAVE_AS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 216
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 62
+    END
+
+    IDD_DIALOG_TEMPLATE_OPEN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 440
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 261
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -638,7 +711,7 @@ END
 STRINGTABLE 
 BEGIN
     IDR_MAINFRAME           "UIDesigner"
-    IDR_UIDESIGNER          "\nUIDesigner\nUIDesigner\nUIDesigner Files (*.xml)\n.xml\nUIDesigner.Document\nUIDesigner.Document"
+    IDR_UIDESIGNER          "\nUISkin\nUIDesigner\nUISkin Files (*.xml)\n.xml\nUIDesigner.Document\nUIDesigner.Document"
     IDS_WINDOWS_MANAGER     "窗口(&W)..."
 END
 
@@ -762,8 +835,8 @@ STRINGTABLE
 BEGIN
     ID_PROPERTIES_TOOLBAR_ALPHABETIC "\n按字母顺序"
     ID_PROPERTIES_TOOLBAR_SORT "\n按分类顺序"
-    IDS_FILE_VIEW           "文件视图"
-    IDS_CLASS_VIEW          "类视图"
+    IDS_FILE_VIEW           "项目视图"
+    IDS_CLASS_VIEW          "控件视图"
     IDS_RESOURCE_VIEW       "资源视图"
     IDS_PROPERTIES_WND      "属性"
     IDS_TOOLBOX_WND         "工具箱"
@@ -811,8 +884,18 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_TEMPLATE_SAVE        "保存模板\n模板"
+    ID_TEMPLATE_SAVE_AS     "保存为模板\n模板"
     ID_FILE_CLOSE_ALL       "关闭全部活动文档\n关闭全部"
+    ID_MDITABS_COPY_FULLPATH "复制此文件的完整路径"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_MDITABS_OPEN_FULLPATH "打开此文件所在的文件夹"
+    ID_MDITABS_NEW_HORZ_TAB_GROUP "新建一个新的水平选项卡组"
+    ID_MDITABS_NEW_VERT_TAB_GROUP "新建一个新的垂直选项卡组"
+    ID_MDITABS_MOVE_TO_NEXT_GROUP "将当前视图移动到下一个选项卡组"
+    ID_MDITABS_MOVE_TO_PREV_GROUP "将当前视图移动到上一个选项卡组"
 END
 
 #endif    // 中文(中华人民共和国) resources

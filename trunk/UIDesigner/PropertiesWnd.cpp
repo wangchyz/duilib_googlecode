@@ -45,6 +45,8 @@ BOOL CMFCPropertyGridColor32Property::OnUpdateValue()
 	COLORREF colorCurr = m_Color;
 	int nA = 0,nR = 0, nG = 0, nB = 0;
 	_stscanf_s(strText, _T("%2x%2x%2x%2x"), &nA, &nR, &nG, &nB);
+	if(nA == 0)
+		nA = 0xFF;
 	m_Color = ARGB(nA, nR, nG, nB);
 
 	if (colorCurr != m_Color)
@@ -88,7 +90,7 @@ CString CMFCPropertyGridColor32Property::FormatProperty()
 IMPLEMENT_DYNAMIC(CMFCPropertyGridImageProperty, CMFCPropertyGridProperty)
 
 CMFCPropertyGridImageProperty::CMFCPropertyGridImageProperty(const CString& strName, const CString& strImage, LPCTSTR lpszDescr/* = NULL*/, DWORD_PTR dwData/* = 0*/)
-:CMFCPropertyGridProperty(strName, COleVariant((LPCTSTR)strImage), lpszDescr, dwData)
+	: CMFCPropertyGridProperty(strName, COleVariant((LPCTSTR)strImage), lpszDescr, dwData)
 {
 	m_dwFlags = AFX_PROP_HAS_BUTTON;
 }
@@ -99,6 +101,58 @@ CMFCPropertyGridImageProperty::~CMFCPropertyGridImageProperty()
 }
 
 void CMFCPropertyGridImageProperty::OnClickButton(CPoint point)
+{
+	ASSERT_VALID(this);
+	ASSERT_VALID(m_pWndList);
+	ASSERT_VALID(m_pWndInPlace);
+	ASSERT(::IsWindow(m_pWndInPlace->GetSafeHwnd()));
+
+	m_bButtonIsDown = TRUE;
+	Redraw();
+
+	CString strImage = m_varValue.bstrVal;
+	CImageDialog dlg(strImage);
+	if(dlg.DoModal()==IDOK)
+	{
+		strImage=dlg.GetImage();
+	}
+
+	if (m_pWndInPlace != NULL)
+	{
+		m_pWndInPlace->SetWindowText(strImage);
+	}
+	m_varValue = (LPCTSTR) strImage;
+
+	m_bButtonIsDown = FALSE;
+	Redraw();
+
+	if (m_pWndInPlace != NULL)
+	{
+		m_pWndInPlace->SetFocus();
+	}
+	else
+	{
+		m_pWndList->SetFocus();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+//CMFCPropertyGridImageProperty
+
+IMPLEMENT_DYNAMIC(CMFCPropertyGridCustomFontsProperty, CMFCPropertyGridProperty)
+
+CMFCPropertyGridCustomFontsProperty::CMFCPropertyGridCustomFontsProperty(const CString& strName, const CString& strFonts, LPCTSTR lpszDescr/* = NULL*/, DWORD_PTR dwData/* = 0*/)
+	: CMFCPropertyGridProperty(strName, COleVariant((LPCTSTR)strFonts), lpszDescr, dwData)
+{
+	m_dwFlags = AFX_PROP_HAS_BUTTON;
+}
+
+CMFCPropertyGridCustomFontsProperty::~CMFCPropertyGridCustomFontsProperty()
+{
+
+}
+
+void CMFCPropertyGridCustomFontsProperty::OnClickButton(CPoint point)
 {
 	ASSERT_VALID(this);
 	ASSERT_VALID(m_pWndList);
@@ -297,8 +351,19 @@ void CPropertiesWnd::InitPropList()
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
+	pValueList=new CMFCPropertyGridProperty(_T("MaxInfo"),tagMinInfo,TRUE);//maxinfo
+	pProp=new CMFCPropertyGridProperty(_T("MaxWidth"),(_variant_t)(LONG)0,_T("窗口的最大跟踪宽度"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("Maxeight"),(_variant_t)(LONG)0,_T("窗口的最大跟踪高度"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
 	pProp=new CMFCPropertyGridProperty(_T("ShowDirty"),(_variant_t)false,_T("指示是否显示更新区域"),tagShowDirty);//showdirty
 	pPropUI->AddSubItem(pProp);
+
+// 	pProp=new CMFCPropertyGridCustomFontsProperty(_T("CustomFonts"),(_variant_t)_T(""),_T("指定自定义的字体"),tagCustomFonts);//customfonts
+// 	pProp->AllowEdit(FALSE);
+// 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
 
@@ -419,10 +484,7 @@ void CPropertiesWnd::InitPropList()
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	LOGFONT lf;
-	CFont* font = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
-	font->GetLogFont(&lf);
-	pProp=new CMFCPropertyGridFontProperty(_T("Font"),lf,CF_EFFECTS|CF_SCREENFONTS,_T("指定文本的字体"),tagFont);//font
+	pProp=new CMFCPropertyGridProperty(_T("Font"),(_variant_t)(LONG)-1,_T("指定文本的字体"),tagFont);//font
 	pPropUI->AddSubItem(pProp);
 
 	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagTextPadding,TRUE);//textpadding
@@ -680,12 +742,10 @@ void CPropertiesWnd::InitPropList()
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pProp=new CMFCPropertyGridProperty(_T("ItemShowHtml"),(_variant_t)false,_T("指示是否使用Html格式文本"),tagItemShowHtml);//itemshowhtml
+	pProp=new CMFCPropertyGridProperty(_T("ItemFont"),(_variant_t)(LONG)-1,_T("指定组项文本的字体"),tagItemFont);//itemfont
 	pPropUI->AddSubItem(pProp);
 
-	font = CFont::FromHandle((HFONT) GetStockObject(DEFAULT_GUI_FONT));
-	font->GetLogFont(&lf);
-	pProp=new CMFCPropertyGridFontProperty(_T("ItemFont"),lf,CF_EFFECTS|CF_SCREENFONTS,_T("指定组项文本的字体"),tagItemFont);//itemfont
+	pProp=new CMFCPropertyGridProperty(_T("ItemShowHtml"),(_variant_t)false,_T("指示是否使用Html格式文本"),tagItemShowHtml);//itemshowhtml
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
@@ -884,8 +944,15 @@ void CPropertiesWnd::ShowFormProperty(CControlUI* pControl)
 	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//mininfo
-	size=pForm->GetMinMaxInfo();
+	size=pForm->GetMinInfo();
 	pValueList=pPropForm->GetSubItem(tagMinInfo-tagForm);
+	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
+	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
+	//maxinfo
+	size=pForm->GetMaxInfo();
+	pValueList=pPropForm->GetSubItem(tagMaxInfo-tagForm);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
 	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
@@ -1024,6 +1091,8 @@ void CPropertiesWnd::ShowLabelProperty(CControlUI* pControl)
 	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetColor((_variant_t)(LONG)(pLabel->GetTextColor()));
 	static_cast<CMFCPropertyGridColor32Property*>(pPropLabel->GetSubItem(tagTextColor-tagLabel))->SetOriginalValue((_variant_t)(LONG)(pLabel->GetTextColor()));
 	//font
+	pPropLabel->GetSubItem(tagFont-tagLabel)->SetValue((_variant_t)(LONG)pLabel->GetFont());
+	pPropLabel->GetSubItem(tagFont-tagLabel)->SetOriginalValue((_variant_t)(LONG)pLabel->GetFont());
 	//textpadding
 	CMFCPropertyGridProperty* pValueList=pPropLabel->GetSubItem(tagTextPadding-tagLabel);
 	RECT rect=pLabel->GetTextPadding();
@@ -1287,6 +1356,9 @@ void CPropertiesWnd::ShowComboProperty(CControlUI* pControl)
 	//itemlinecolor
 	pPropCombo->GetSubItem(tagItemLineColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwLineColor);
 	pPropCombo->GetSubItem(tagItemLineColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwLineColor);
+	//itemfont
+	pPropCombo->GetSubItem(tagItemFont-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->nFont);
+	pPropCombo->GetSubItem(tagItemFont-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->nFont);
 	//itemshowhtml
 	pPropCombo->GetSubItem(tagItemShowHtml-tagCombo)->SetValue((_variant_t)pCombo->IsItemShowHtml());
 	pPropCombo->GetSubItem(tagItemShowHtml-tagCombo)->SetOriginalValue((_variant_t)pCombo->IsItemShowHtml());

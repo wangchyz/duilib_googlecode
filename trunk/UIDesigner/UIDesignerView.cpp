@@ -8,9 +8,11 @@
 #include "UIDesignerView.h"
 
 #include "PropertyTabLayoutUI.h"
+#include "DialogTemplateSaveAs.h"
 #include "tinyxml.h"
 #include "UIUtil.h"
 #include <io.h>
+#include <atlimage.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -66,6 +68,7 @@ BEGIN_MESSAGE_MAP(CUIDesignerView, CScrollView)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_UNDO, &CUIDesignerView::OnUpdateEditUndo)
 	ON_COMMAND(ID_EDIT_REDO, &CUIDesignerView::OnEditRedo)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_REDO, &CUIDesignerView::OnUpdateEditRedo)
+	ON_COMMAND(ID_TEMPLATE_SAVE_AS, &CUIDesignerView::OnTemplateSaveAs)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_SETCURSOR()
 	ON_WM_SIZE()
@@ -89,7 +92,7 @@ CUIDesignerView::CUIDesignerView()
 
 CUIDesignerView::~CUIDesignerView()
 {
-	m_LayoutManager.RemoveUI(m_LayoutManager.GetForm());
+	m_LayoutManager.ReleaseExtendedAttrib(m_LayoutManager.GetForm());
 }
 
 BOOL CUIDesignerView::PreCreateWindow(CREATESTRUCT& cs)
@@ -119,15 +122,15 @@ void CUIDesignerView::OnDraw(CDC* pDrawDC)
 	rectClient.OffsetRect(point);
 	pDC->FillSolidRect(rectClient,RGB(255, 255, 255));
 
-	CSize szFormSize=m_LayoutManager.GetForm()->GetInitSize();
+	CSize szForm=m_LayoutManager.GetForm()->GetInitSize();
 	CSize szFormOffset(FORM_OFFSET_X,FORM_OFFSET_Y);
 	CDC hCloneDC;
 	HBITMAP hNewBitmap;
 	hCloneDC.CreateCompatibleDC(pDC);
-	hNewBitmap=::CreateCompatibleBitmap(pDC->GetSafeHdc(),szFormSize.cx,szFormSize.cy);
+	hNewBitmap=::CreateCompatibleBitmap(pDC->GetSafeHdc(),szForm.cx,szForm.cy);
 	HBITMAP hOldBitmap=(HBITMAP)hCloneDC.SelectObject(hNewBitmap);
 	m_LayoutManager.Draw(&hCloneDC);
-	pDC->BitBlt(szFormOffset.cx,szFormOffset.cy,szFormSize.cx,szFormSize.cy,&hCloneDC,0,0,SRCCOPY);
+	pDC->BitBlt(szFormOffset.cx,szFormOffset.cy,szForm.cx,szForm.cy,&hCloneDC,0,0,SRCCOPY);
 	hCloneDC.SelectObject(hOldBitmap);
 	::DeleteDC(hCloneDC);
 	::DeleteObject(hNewBitmap);
@@ -421,6 +424,8 @@ void CUIDesignerView::Notify(TNotifyUI& msg)
 			size.cy+FORM_OFFSET_Y+80));
 		m_MultiTracker.SetFormSize(size);
 	}
+
+	this->GetDocument()->SetModifiedFlag();
 }
 
 void CUIDesignerView::UpDateDPtoLPOffset()
@@ -1039,9 +1044,9 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 	}
 }
 
-void CUIDesignerView::OnSaveSkinFile(LPCTSTR lpszPathName)
+void CUIDesignerView::SaveSkinFile(LPCTSTR pstrPathName)
 {
-	m_LayoutManager.SaveSkinFile(lpszPathName);
+	m_LayoutManager.SaveSkinFile(pstrPathName);
 	g_pResourceView->CopyImageToSkinDir(m_LayoutManager.GetSkinDir(), this->GetDocument()->GetTitle());
 }
 
@@ -1063,4 +1068,39 @@ void CUIDesignerView::RedoUI(CControlUI* pControl, CControlUI* pParent)
 	m_MultiTracker.Add(CreateTracker(pControl));
 	InitUI(pControl, pExtended->nDepth + 1);
 	pContainer->SetPos(pContainer->GetPos());
+}
+
+void CUIDesignerView::OnTemplateSaveAs()
+{
+	// TODO: 在此添加命令处理程序代码
+	CDialogTemplateSaveAs dlg;
+	if(dlg.DoModal() != IDOK)
+		return;
+
+	CString strTemplateName = dlg.GetTemplateName();
+	CString strTemplatesDir = CGlobalVariable::GetTemplatesDir();
+	CreateDirectory(strTemplatesDir + strTemplateName, NULL);
+	CString strTemplatePathName = strTemplatesDir + strTemplateName
+		+ _T("\\template.xml");
+	CString strTemplateImage = strTemplatesDir + strTemplateName
+		+ _T("\\template.ui");
+
+	SaveSkinImage(strTemplateImage);
+	SaveSkinFile(strTemplatePathName);
+}
+
+BOOL CUIDesignerView::SaveSkinImage(LPCTSTR pstrPathName)
+{
+	CImage image;
+	CFormUI* pForm = m_LayoutManager.GetForm();
+	ASSERT(pForm);
+
+	CSize szForm = pForm->GetInitSize();
+	CRect rcPaint(0,0,szForm.cx,szForm.cy);
+	image.Create(szForm.cx, szForm.cy, 32);
+	pForm->DoPaint(image.GetDC(), rcPaint);
+	BOOL bRet = image.Save(pstrPathName, Gdiplus::ImageFormatJPEG);
+
+	image.ReleaseDC();
+	return bRet;
 }
