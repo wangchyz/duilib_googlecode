@@ -200,7 +200,6 @@ void CResourceViewBar::InsertImageTree(CString strTitle, CString strPath)
 {
 	HTREEITEM hRoot = m_wndResourceView.InsertItem(strTitle, 0, 0, TVI_ROOT);
 	m_wndResourceView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
-	m_wndResourceView.Expand(hRoot, TVE_EXPAND);
 	m_mapTree.SetAt(strTitle, (void*)hRoot);
 	CStringArray* pstrArray = new CStringArray;
 	m_mapImageArray.SetAt(strTitle, (void*)pstrArray);
@@ -214,20 +213,29 @@ void CResourceViewBar::InsertImageTree(CString strTitle, CString strPath)
 	CString strDir = strPath.Left(nPos + 1);
 	WIN32_FIND_DATA FindFileData = {0};
 	CString strFind = strDir + _T("*.*");
-	CString strExt = _T("*.bmp;*.jpg;*.png");
 	HANDLE hFind = ::FindFirstFile(strFind, &FindFileData);
 	if(hFind == INVALID_HANDLE_VALUE)
 		return;
 	do
 	{
-		LPCTSTR pstrExt = _tcsrchr(FindFileData.cFileName, _T('.')) + 1;
-		if(*pstrExt != _T('\0') && strExt.Find(pstrExt) != -1)
+		CString strExt = _tcsrchr(FindFileData.cFileName, _T('.')) + 1;
+		if(strExt.IsEmpty())
+			continue;
+		int nType = 0;
+		if(strExt == _T("bmp"))
+			nType = 1;
+		else if(strExt == _T("jpg"))
+			nType = 2;
+		else if(strExt == _T("png"))
+			nType = 3;
+		if(nType > 0)
 		{
 			pstrArray->Add(strDir + FindFileData.cFileName);
-			HTREEITEM hItem = m_wndResourceView.InsertItem(FindFileData.cFileName, 0, 0, hRoot);
+			HTREEITEM hItem = m_wndResourceView.InsertItem(FindFileData.cFileName, nType, nType, hRoot);
 		}
 	}while(::FindNextFile(hFind, &FindFileData));
 	::FindClose(hFind);
+	m_wndResourceView.Expand(hRoot, TVE_EXPAND);
 }
 
 void CResourceViewBar::RemoveImageTree(CString strTree)
@@ -286,7 +294,18 @@ void CResourceViewBar::InsertImage(CString strImage, CString strTree)
 	if(nPos == -1)
 		return;
 	CString strName = strImage.Right(strImage.GetLength() - nPos - 1);
-	m_wndResourceView.InsertItem(strName, 0, 0, hTree);
+	nPos = strName.ReverseFind('.');
+	if(nPos == -1)
+		return;
+	CString strExt = strName.Right(strName.GetLength() - nPos - 1);
+	int nType = 0;
+	if(strExt == _T("bmp"))
+		nType = 1;
+	else if(strExt == _T("jpg"))
+		nType = 2;
+	else if(strExt == _T("png"))
+		nType = 3;
+	m_wndResourceView.InsertItem(strName, nType, nType, hTree);
 	pstrArray->Add(strImage);
 }
 

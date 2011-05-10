@@ -457,6 +457,8 @@ void CALLBACK CUICommandHistory::UIModify(TiXmlNode* pNode)
 		pAttrib = pAttrib->Next();
 	}
 	CControlUI* pParent = pControl->GetParent();
+	if(pParent == NULL)
+		pParent = pControl;
 	pParent->SetPos(pParent->GetPos());
 }
 

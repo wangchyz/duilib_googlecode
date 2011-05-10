@@ -54,7 +54,8 @@ public:
 
 	void OnShowPropertyDialog();
 
-	void OnSaveSkinFile(LPCTSTR lpszPathName);
+	void SaveSkinFile(LPCTSTR pstrPathName);
+	BOOL SaveSkinImage(LPCTSTR pstrPathName);
 	void OnTitleChanged(LPCTSTR pstrOldTitle, LPCTSTR pstrNewTitle);
 
 protected:
@@ -138,8 +139,9 @@ public:
 	afx_msg void OnUpdateNeedClip(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateEditUndo(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateEditRedo(CCmdUI* pCmdUI);
-public:
+
 	afx_msg void OnDestroy();
+	afx_msg void OnTemplateSaveAs();
 };
 
 #ifndef _DEBUG  // UIDesignerView.cpp 中的调试版本

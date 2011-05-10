@@ -66,6 +66,13 @@ protected:
 	BOOL CreateDockingWindows();
 	void SetDockingWindowIcons(BOOL bHiColorIcons);
 	virtual void OnUpdateFrameTitle(BOOL bAddToTitle);
+	virtual BOOL OnShowMDITabContextMenu(CPoint point, DWORD dwAllowedItems, BOOL bDrop);
+
+	afx_msg void OnMdiMoveToNextGroup();
+	afx_msg void OnMdiMoveToPrevGroup();
+	afx_msg void OnMdiNewHorzTabGroup();
+	afx_msg void OnMdiNewVertTabGroup();
+
 public:
 	afx_msg void OnProjectNew();
 	afx_msg void OnProjectOpen();

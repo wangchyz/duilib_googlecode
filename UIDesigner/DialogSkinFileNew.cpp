@@ -12,9 +12,8 @@ IMPLEMENT_DYNAMIC(CDialogSkinFileNew, CDialog)
 
 CDialogSkinFileNew::CDialogSkinFileNew(CWnd* pParent /*=NULL*/)
 	: CDialog(CDialogSkinFileNew::IDD, pParent)
-	, m_strFileName(_T(""))
+	, m_strUITitle(_T(""))
 	, m_strStyleFile(_T(""))
-	, m_strStyleDir(_T(""))
 {
 
 }
@@ -26,14 +25,14 @@ CDialogSkinFileNew::~CDialogSkinFileNew()
 void CDialogSkinFileNew::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Text(pDX, IDC_EDIT_FILE_NAME, m_strFileName);
-	DDX_Control(pDX, IDC_LIST_STYLE, m_lstStyle);
-	DDX_Control(pDX, IDC_STATIC_PREVIEW, m_Preview);
+	DDX_Text(pDX, IDC_EDIT_FILE_NAME, m_strUITitle);
+	DDX_Control(pDX, IDC_LIST_STYLE, m_lstStyles);
+	DDX_Control(pDX, IDC_STATIC_PREVIEW, m_StylePreview);
 }
 
 
 BEGIN_MESSAGE_MAP(CDialogSkinFileNew, CDialog)
-	ON_LBN_DBLCLK(IDC_LIST_STYLE, &CDialogSkinFileNew::OnLbnDblclkListStyle)
+	ON_LBN_SELCHANGE(IDC_LIST_STYLE, &CDialogSkinFileNew::OnLbnSelchangeListStyle)
 	ON_BN_CLICKED(IDOK, &CDialogSkinFileNew::OnBnClickedOk)
 END_MESSAGE_MAP()
 
@@ -45,16 +44,15 @@ BOOL CDialogSkinFileNew::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	// TODO:  Add extra initialization here
-	m_lstStyle.AddString(_T("(无)"));
-	m_lstStyle.SetCurSel(0);
-	m_strStyleDir = CGlobalVariable::GetCurPath() + DIR_STYLES;
-	FindStyleFiles(m_strStyleDir);
+	m_lstStyles.AddString(_T("(无)"));
+	m_lstStyles.SetCurSel(0);
+	FindStyleFiles(CGlobalVariable::GetStylesDir());
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// EXCEPTION: OCX Property Pages should return FALSE
 }
 
-CString CDialogSkinFileNew::GetStyleFilePath() const
+CString& CDialogSkinFileNew::GetStyleFilePath()
 {
 	return m_strStyleFile;
 }
@@ -62,24 +60,37 @@ CString CDialogSkinFileNew::GetStyleFilePath() const
 void CDialogSkinFileNew::FindStyleFiles(CString& strDir)
 {
 	WIN32_FIND_DATA FindFileData = {0};
-	CString strFind = strDir + _T("*.xml");
+	CString strFind = strDir + _T("*.*");
 	HANDLE hFind = ::FindFirstFile(strFind, &FindFileData);
 	if(hFind == INVALID_HANDLE_VALUE)
 		return;
 	do
 	{
-		m_lstStyle.AddString(FindFileData.cFileName);
+		if((FindFileData.dwFileAttributes | FILE_ATTRIBUTE_DIRECTORY) != 0)
+		{
+			if(FindFileData.cFileName[0] == '.')
+				if (FindFileData.cFileName[1] == '\0' ||
+					(FindFileData.cFileName[1] == '.' &&
+					FindFileData.cFileName[2] == '\0'))
+					continue;
+
+			m_lstStyles.AddString(FindFileData.cFileName);
+		}
 	}while(::FindNextFile(hFind, &FindFileData));
 	::FindClose(hFind);
 }
 
-void CDialogSkinFileNew::OnLbnDblclkListStyle()
+void CDialogSkinFileNew::OnLbnSelchangeListStyle()
 {
 	// TODO: Add your control notification handler code here
-	CString strStyleFileName;
-	int nIndex = m_lstStyle.GetCurSel();
-	m_lstStyle.GetText(nIndex, strStyleFileName);
-	m_strStyleFile = (strStyleFileName == _T("(无)")) ? _T(""):m_strStyleDir + strStyleFileName;
+	CString strText;
+	int nIndex = m_lstStyles.GetCurSel();
+	if(nIndex == -1)
+		return;
+
+	m_lstStyles.GetText(nIndex, strText);
+	m_strStyleFile = (strText == _T("(无)")) ? _T(""):CGlobalVariable::GetStylesDir() \
+		+ strText + _T("\\style.xml");
 }
 
 void CDialogSkinFileNew::OnBnClickedOk()

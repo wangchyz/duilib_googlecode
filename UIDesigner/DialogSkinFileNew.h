@@ -18,22 +18,22 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 public:
-	CString GetStyleFilePath() const;
+	CString& GetStyleFilePath();
 
 private:
 	void FindStyleFiles(CString& strDir);
 
 	DECLARE_MESSAGE_MAP()
 public:
-	CString m_strFileName;
+	CString m_strUITitle;
 
 private:
-	CListBox m_lstStyle;
-	CStatic m_Preview;
+	CListBox m_lstStyles;
+	CStatic m_StylePreview;
 	CString m_strStyleFile;
-	CString m_strStyleDir;
+
 public:
 	virtual BOOL OnInitDialog();
-	afx_msg void OnLbnDblclkListStyle();
+	afx_msg void OnLbnSelchangeListStyle();
 	afx_msg void OnBnClickedOk();
 };

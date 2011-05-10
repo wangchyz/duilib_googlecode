@@ -5,6 +5,8 @@ bool CGlobalVariable::m_bIsProjectExist = false;
 CString CGlobalVariable::m_strProjectName;
 CString CGlobalVariable::m_strProjectPath;
 CString CGlobalVariable::m_strCurPath;
+CString CGlobalVariable::m_strTemplatesDir;
+CString CGlobalVariable::m_strStylesDir;
 
 CGlobalVariable::CGlobalVariable(void)
 {
@@ -27,4 +29,26 @@ CString& CGlobalVariable::GetCurPath()
 	}
 
 	return m_strCurPath;
+}
+
+CString& CGlobalVariable::GetTemplatesDir()
+{
+	if(m_strTemplatesDir.IsEmpty())
+	{
+		m_strTemplatesDir = GetCurPath() + DIR_TEMPLATES;
+		CreateDirectory(m_strTemplatesDir, NULL);
+	}
+
+	return m_strTemplatesDir;
+}
+
+CString& CGlobalVariable::GetStylesDir()
+{
+	if(m_strStylesDir.IsEmpty())
+	{
+		m_strStylesDir = GetCurPath() + DIR_STYLES;
+		CreateDirectory(m_strStylesDir, NULL);
+	}
+
+	return m_strStylesDir;
 }

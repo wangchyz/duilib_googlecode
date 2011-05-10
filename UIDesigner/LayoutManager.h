@@ -34,8 +34,10 @@ public:
 	void SetCaptionRect(RECT& rcCaption);
 	SIZE GetRoundCorner() const;
 	void SetRoundCorner(int cx, int cy);
-	SIZE GetMinMaxInfo() const;
-	void SetMinMaxInfo(int cx, int cy);
+	SIZE GetMinInfo() const;
+	SIZE GetMaxInfo() const;
+	void SetMinInfo(int cx, int cy);
+	void SetMaxInfo(int cx, int cy);
 	bool IsShowUpdateRect() const;
 	void SetShowUpdateRect(bool show);
 	void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
@@ -140,6 +142,7 @@ public:
 
 	CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent);
 	BOOL RemoveUI(CControlUI* pControl);
+	void ReleaseExtendedAttrib(CControlUI* pControl);
 	CPaintManagerUI* GetManager();
 	inline CFormUI* GetForm() const;
 	CControlUI* FindControl(CPoint point) const;
@@ -166,7 +169,7 @@ public:
 	void MicoMoveLeft(CArray<CControlUI*,CControlUI*>& arrSelected,int nMoved);
 	void MicoMoveRight(CArray<CControlUI*,CControlUI*>& arrSelected,int nMoved);
 
-	void SaveSkinFile(LPCTSTR lpszPathName);
+	void SaveSkinFile(LPCTSTR pstrPathName);
 	static void SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode
 		, BOOL bSaveChildren = TRUE);
 
@@ -191,6 +194,8 @@ protected:
 	static void SaveListHeaderItemProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveListElementProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveContainerProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveHorizontalLayoutProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveTileLayoutProperty(CControlUI* pControl, TiXmlElement* pNode);
 
 private:
 	CPaintManagerUI m_Manager;

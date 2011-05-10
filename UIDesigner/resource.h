@@ -98,22 +98,44 @@
 #define ID_FORMEDIT_ALIGN_TOP           323
 #define IDD_SKINFIlE_NEW                323
 #define ID_FORMEDIT_ALIGN_BOTTOM        324
+#define IDI_TOOLBOX_ACTIVE              324
 #define ID_FORMEDIT_ALIGN_CENTER_VERTICALLY 325
+#define IDI_TOOLBOX_BUTTON              325
 #define ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY 326
+#define IDI_TOOLBOX_OPTION              326
 #define ID_FORMEDIT_ALIGN_HORIZONTAL    327
+#define IDI_TOOLBOX_COMBO               327
 #define ID_FORMEDIT_ALIGN_VERTICAL      328
+#define IDI_TOOLBOX_CONTAINER           328
 #define ID_FORMEDIT_ALIGN_SAME_WIDTH    329
+#define IDI_TOOLBOX_CONTROL             329
 #define ID_FORMEDIT_ALIGN_SAME_HEIGHT   330
+#define IDI_TOOLBOX_DIALOG_LAYOUT       330
 #define ID_FORMEDIT_ALIGN_SAME_SIZE     331
+#define IDI_TOOLBOX_EDIT                331
 #define ID_FORMEDIT_SHOW_GRID           332
+#define IDI_TOOLBOX_HORIZONTAL_LAYOUT   332
 #define ID_FORMEDIT_SHOW_AUXBORDER      333
+#define IDI_TOOLBOX_LABEL               333
 #define ID_PROJECT_NEW                  334
+#define IDI_TOOLBOX_POINTER             334
 #define ID_FILE_SAVE_ALL                335
+#define IDI_TOOLBOX_PROGRESS            335
 #define IDR_FILE_NEW                    336
+#define IDI_TOOLBOX_SCROLLBAR           336
 #define IDR_FILE_DELETE                 337
+#define IDI_TOOLBOX_SLIDER              337
 #define ID_FILE_RENAME                  338
+#define IDI_TOOLBOX_TAB_LAYOUT          338
 #define ID_TREE_EXPAND                  339
+#define IDI_TOOLBOX_TEXT                339
 #define ID_TREE_COLLAPSE                340
+#define IDI_TOOLBOX_TILELAYOUT          340
+#define IDI_TOOLBOX_TILE_LAYOUT         340
+#define IDI_TOOLBOX_VERTICAL_LAYOUT     341
+#define IDD_DIALOG_TEMPLATE_SAVE_AS     342
+#define IDD_DIALOG_TEMPLATE_OPEN        343
+#define IDR_POPUP_MDITABS               344
 #define IDC_BUTTON_IMAGE_IMPORT         1000
 #define IDC_BUTTON_IMAGE_CLEAR          1001
 #define IDC_LIST_IMAGE_RESOURCE         1002
@@ -137,6 +159,10 @@
 #define IDC_LIST_STYLE                  1020
 #define IDC_STATIC_                     1021
 #define IDC_STATIC_PREVIEW              1021
+#define IDC_EDIT_TEMPLATE_NAME          1022
+#define IDC_LIST_TEMPLATES              1023
+#define IDC_BUTTON_TEMPLATE_DELETE      1024
+#define IDC_STATIC_TEMPLATE_PREVIEW     1025
 #define ID_UI_CONTROL_BUTTON            32793
 #define ID_UI_CONTROL_CONTROL           32794
 #define ID_UI_CONTROL_LABEL             32795
@@ -157,16 +183,32 @@
 #define ID_TEMPLATE_OPEN                32826
 #define ID_PROJECT_CLOSE                32828
 #define ID_TAMPLATE_SAVE                32836
-#define ID_TEMPLATE_SAVE                32837
+#define ID_TEMPLATE_SAVE_AS             32837
 #define ID_FILE_CLOSE_ALL               32840
+#define ID_DUMMY_32842                  32842
+#define ID_DUMMY_32843                  32843
+#define ID_DUMMY_32844                  32844
+#define ID_DUMMY_32845                  32845
+#define ID_MDITABS_COPY_FULLPATH        32846
+#define ID_DUMMY_32847                  32847
+#define ID_MDITABS_OPEN_FULLPATH        32848
+#define ID_DUMMY_                       32849
+#define ID_DUMMY_32850                  32850
+#define ID_MDITABS_NEW_HORZ_TAB_GROUP   32851
+#define ID_DUMMY_32852                  32852
+#define ID_MDITABS_NEW_VERT_TAB_GROUP       32853
+#define ID_DUMMY_32854                  32854
+#define ID_MDITABS_MOVE_TO_NEXT_GROUP   32855
+#define ID_DUMMY_32856                  32856
+#define ID_MDITABS_MOVE_TO_PREV_GROUP   32857
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        324
-#define _APS_NEXT_COMMAND_VALUE         32842
-#define _APS_NEXT_CONTROL_VALUE         1022
+#define _APS_NEXT_RESOURCE_VALUE        345
+#define _APS_NEXT_COMMAND_VALUE         32858
+#define _APS_NEXT_CONTROL_VALUE         1026
 #define _APS_NEXT_SYMED_VALUE           316
 #endif
 #endif

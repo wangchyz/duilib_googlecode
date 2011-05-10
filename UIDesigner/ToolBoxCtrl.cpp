@@ -326,8 +326,7 @@ void CToolElement::OnDrawIcon(CDC* pDC, CRect rect)
 		return;
 	}
 
- 	rect.DeflateRect(2,2);
-
+ 	rect.OffsetRect(3, 2);
 	DrawIconEx(pDC->GetSafeHdc(),rect.left,rect.top,m_hIcon,16,16,0,NULL,DI_NORMAL);
 }
 
@@ -698,7 +697,7 @@ BOOL CToolBoxCtrl::OnDrawTool(CDC* pDC, CToolElement* pTool) const
 		}
 
 		CRect rectIcon = pTool->m_Rect;
-		rectIcon.right = nHeight;
+		rectIcon.right = rectIcon.left + nHeight;
 
 		CRgn rgnClipIcon;
 		CRect rectIconClip = rectIcon;
@@ -710,7 +709,7 @@ BOOL CToolBoxCtrl::OnDrawTool(CDC* pDC, CToolElement* pTool) const
 		pTool->OnDrawIcon(pDC, rectIcon);
 
 		CRgn rgnClipName;
-		rectName.left += nHeight;
+		rectName.left += rectIcon.right;
 		CRect rectNameClip = rectName;
 		rectNameClip.bottom = min(rectNameClip.bottom, m_rectList.bottom);
 
