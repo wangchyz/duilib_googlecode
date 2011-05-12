@@ -28,18 +28,6 @@ LPVOID CFormUI::GetInterface(LPCTSTR pstrName)
 	return CContainerUI::GetInterface(pstrName);
 }
 
-void CFormUI::SetManager(CPaintManagerUI* pPaintManager)
-{
-	ASSERT(pPaintManager);
-
-	m_pManager=pPaintManager;
-}
-
-CPaintManagerUI* CFormUI::GetManager() const
-{
-	return m_pManager;
-}
-
 SIZE CFormUI::GetInitSize()
 {
 	return m_pManager->GetInitSize();
@@ -354,45 +342,6 @@ LRESULT CFormTestWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 //////////////////////////////////////////////////////////////////////////
-//CDelayResize
-
-CDelayRepos::CDelayRepos()
-{
-}
-
-CDelayRepos::~CDelayRepos()
-{
-	m_arrDelay.RemoveAll();
-}
-
-BOOL CDelayRepos::AddParent(CControlUI* pControl)
-{
-	if(pControl==NULL)
-		return FALSE;
-
-	for(int i=0;i<m_arrDelay.GetSize();i++)
-	{
-		CControlUI* pParent=m_arrDelay.GetAt(i);
-
-		if(pControl==pParent)
-			return FALSE;
-	}
-	m_arrDelay.Add(pControl);
-
-	return TRUE;
-}
-
-void CDelayRepos::Repos()
-{
-	for(int i=0;i<m_arrDelay.GetSize();i++)
-	{
-		CControlUI* pParent=m_arrDelay.GetAt(i);
-
-		pParent->SetPos(pParent->GetPos());
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////
 //CLayoutManager
 
 CLayoutManager::CLayoutManager(void)
@@ -408,9 +357,9 @@ CLayoutManager::~CLayoutManager(void)
 void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 {
 	m_pFormUI=static_cast<CFormUI*>(NewUI(classForm,
-		CRect(0,0,FORM_INIT_WIDTH,FORM_INIT_HEIGHT),NULL)->GetInterface(_T("Form")));
+		CRect(0,0,FORM_INIT_WIDTH,FORM_INIT_HEIGHT),NULL, NULL)->GetInterface(_T("Form")));
 	ASSERT(m_pFormUI);
-	m_pFormUI->SetManager(&m_Manager);
+	m_pFormUI->SetManager(&m_Manager, NULL);
 	m_pFormUI->SetInitSize(FORM_INIT_WIDTH,FORM_INIT_HEIGHT);
 
 	m_Manager.Init(hWnd);
@@ -491,7 +440,7 @@ void CLayoutManager::DrawGrid(CDC* pDC, CRect& rect)
 	}
 }
 
-CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent)
+CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CLayoutManager* pLayout)
 {
 	CControlUI* pControl=NULL;
 	
@@ -582,32 +531,23 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 		delete pExtended;
 		return NULL;
 	}
-	if(pControl==NULL)
+	if(pControl == NULL)
 	{
 		delete pExtended;
 		return NULL;
 	}
-
-	pControl->SetManager(&m_Manager,pParent);
 	pControl->SetTag((UINT_PTR)pExtended);
+
+	//pos
+	CRect rcParent = pParent ? pParent->GetPos() : CRect(0,0,0,0);
+	pControl->SetFixedXY(CSize(rect.left-rcParent.left, rect.top-rcParent.top));
+	pControl->SetFixedWidth(rect.right - rect.left);
+	pControl->SetFixedHeight(rect.bottom - rect.top);
 
 	//close the delayed destory function
 	CContainerUI* pContainer = static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
 	if(pContainer)
 		pContainer->SetDelayedDestroy(false);
-
-	//default attributes
-	LPCTSTR pDefaultAttributes = m_Manager.GetDefaultAttributeList(pControl->GetClass());
-	if(pDefaultAttributes)
-		pControl->ApplyAttributeList(pDefaultAttributes);
-
-	//name
-	SetDefaultUIName(pControl);
-	//pos
-	CRect rcParent=pParent?pParent->GetPos():CRect(0,0,0,0);
-	pControl->SetFixedXY(CSize(rect.left-rcParent.left,rect.top-rcParent.top));
-	pControl->SetFixedWidth(rect.right - rect.left);
-	pControl->SetFixedHeight(rect.bottom - rect.top);
 
 	if(pParent)
 	{
@@ -615,6 +555,7 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 		ASSERT(pParentContainer);
 		if(!pParentContainer->Add(pControl))
 		{
+			delete pExtended;
 			delete pControl;
 			return NULL;
 		}
@@ -623,27 +564,44 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 		pParent->SetPos(pParent->GetPos());
 	}
 
+	if(pLayout)
+	{
+		CPaintManagerUI* pManager = pLayout->GetManager();
+		pControl->SetManager(pManager,pParent);
+
+		//default attributes
+		CString strClass = pControl->GetClass();
+		strClass = strClass.Left(strClass.GetLength() - 2);
+		LPCTSTR pDefaultAttributes = pManager->GetDefaultAttributeList(strClass);
+		if(pDefaultAttributes)
+			pControl->ApplyAttributeList(pDefaultAttributes);
+
+		//name
+		pLayout->SetDefaultUIName(pControl);
+	}
+
 	return pControl;
 }
 
 BOOL CLayoutManager::RemoveUI(CControlUI* pControl)
 {
-	if(pControl == NULL || pControl == m_pFormUI)
+	if(pControl == NULL)
 		return FALSE;
 
-	ReleaseExtendedAttrib(pControl);
+	ReleaseExtendedAttrib(pControl, pControl->GetManager());
 	CControlUI* pParent = pControl->GetParent();
-	ASSERT(pParent);
 	if(pParent)
 	{
 		CContainerUI* pContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
 		pContainer->Remove(pControl);
 	}
+	else
+		delete pControl;
 
 	return TRUE;
 }
 
-void CLayoutManager::ReleaseExtendedAttrib(CControlUI* pControl)
+void CLayoutManager::ReleaseExtendedAttrib(CControlUI* pControl, CPaintManagerUI* pManager)
 {
 	if(pControl == NULL)
 		return;
@@ -651,14 +609,15 @@ void CLayoutManager::ReleaseExtendedAttrib(CControlUI* pControl)
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
 	delete pExtended;
 	pControl->SetTag(NULL);
-	m_Manager.ReapObjects(pControl);
+	if(pManager)
+		pManager->ReapObjects(pControl);
 
 	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
 	if(pContainer != NULL)
 	{
 		int nCount = pContainer->GetCount();
 		for(int i=0; i<nCount; i++)
-			ReleaseExtendedAttrib(pContainer->GetItemAt(i));
+			ReleaseExtendedAttrib(pContainer->GetItemAt(i), pManager);
 	}
 }
 
@@ -675,6 +634,42 @@ CFormUI* CLayoutManager::GetForm() const
 CControlUI* CLayoutManager::FindControl(CPoint point) const
 {
 	return m_Manager.FindControl(point);
+}
+
+CLayoutManager::CDelayRepos::CDelayRepos()
+{
+}
+
+CLayoutManager::CDelayRepos::~CDelayRepos()
+{
+	m_arrDelay.RemoveAll();
+}
+
+BOOL CLayoutManager::CDelayRepos::AddParent(CControlUI* pControl)
+{
+	if(pControl==NULL)
+		return FALSE;
+
+	for(int i=0;i<m_arrDelay.GetSize();i++)
+	{
+		CControlUI* pParent=m_arrDelay.GetAt(i);
+
+		if(pControl==pParent)
+			return FALSE;
+	}
+	m_arrDelay.Add(pControl);
+
+	return TRUE;
+}
+
+void CLayoutManager::CDelayRepos::Repos()
+{
+	for(int i=0;i<m_arrDelay.GetSize();i++)
+	{
+		CControlUI* pParent=m_arrDelay.GetAt(i);
+
+		pParent->SetPos(pParent->GetPos());
+	}
 }
 
 void CLayoutManager::TestForm()
@@ -760,57 +755,73 @@ CControlUI* CLayoutManager::CopyControls(CControlUI* pControl)
 
 CControlUI* CLayoutManager::CopyControl(CControlUI* pControl)
 {
-	LPCTSTR pstrClass=pControl->GetClass();
-	SIZE_T cchLen = _tcslen(pstrClass);
 	CControlUI* pCopyControl = NULL;
-	switch( cchLen ) {
-		case 6:
-			if( _tcscmp(pstrClass, _T("EditUI")) == 0 )                   pCopyControl = new CEditUI(*static_cast<CEditUI*>(pControl->GetInterface(_T("Edit"))));
-			else if( _tcscmp(pstrClass, _T("ListUI")) == 0 )              pCopyControl = new CListUI(*static_cast<CListUI*>(pControl->GetInterface(_T("List"))));
-			else if( _tcscmp(pstrClass, _T("TextUI")) == 0 )              pCopyControl = new CTextUI(*static_cast<CTextUI*>(pControl->GetInterface(_T("Text"))));
-			break;
-		case 7:
-			if( _tcscmp(pstrClass, _T("ComboUI")) == 0 )                  pCopyControl = new CComboUI(*static_cast<CComboUI*>(pControl->GetInterface(_T("Combo"))));
-			else if( _tcscmp(pstrClass, _T("LabelUI")) == 0 )             pCopyControl = new CLabelUI(*static_cast<CLabelUI*>(pControl->GetInterface(_T("Label"))));
-		case 8:
-			if( _tcscmp(pstrClass, _T("ButtonUI")) == 0 )                 pCopyControl = new CButtonUI(*static_cast<CButtonUI*>(pControl->GetInterface(_T("Button"))));
-			else if( _tcscmp(pstrClass, _T("OptionUI")) == 0 )            pCopyControl = new COptionUI(*static_cast<COptionUI*>(pControl->GetInterface(_T("Option"))));
-			else if( _tcscmp(pstrClass, _T("SliderUI")) == 0 )            pCopyControl = new CSliderUI(*static_cast<CSliderUI*>(pControl->GetInterface(_T("Slider"))));
-			break;
-		case 9:
-			if( _tcscmp(pstrClass, _T("ControlUI")) == 0 )                pCopyControl = new CControlUI(*static_cast<CControlUI*>(pControl->GetInterface(_T("Control"))));
-			else if( _tcscmp(pstrClass, _T("ActiveXUI")) == 0 )           pCopyControl = new CActiveXUI(*static_cast<CActiveXUI*>(pControl->GetInterface(_T("ActiveX"))));
-			break;
-		case 10:
-			if( _tcscmp(pstrClass, _T("ProgressUI")) == 0 )               pCopyControl = new CProgressUI(*static_cast<CProgressUI*>(pControl->GetInterface(_T("Progress"))));
-		case 11:
-			if( _tcscmp(pstrClass, _T("ContainerUI")) == 0 )              pCopyControl = new CContainerUI(*static_cast<CContainerUI*>(pControl->GetInterface(_T("Container"))));
-			else if( _tcscmp(pstrClass, _T("TabLayoutUI")) == 0 )         pCopyControl = new CTabLayoutUI(*static_cast<CTabLayoutUI*>(pControl->GetInterface(_T("TabLayout"))));
-			break;
-		case 12:
-			if( _tcscmp(pstrClass, _T("ListHeaderUI")) == 0 )             pCopyControl = new CListHeaderUI(*static_cast<CListHeaderUI*>(pControl->GetInterface(_T("ListHeader"))));
-			else if( _tcscmp(pstrClass, _T("TileLayoutUI")) == 0 )        pCopyControl = new CTileLayoutUI(*static_cast<CTileLayoutUI*>(pControl->GetInterface(_T("TileLayout"))));
-			break;
-		case 14:
-			if( _tcscmp(pstrClass, _T("DialogLayoutUI")) == 0 )           pCopyControl = new CDialogLayoutUI(*static_cast<CDialogLayoutUI*>(pControl->GetInterface(_T("DialogLayout"))));
-			break;
-		case 16:
-			if( _tcscmp(pstrClass, _T("VerticalLayoutUI")) == 0 )         pCopyControl = new CVerticalLayoutUI(*static_cast<CVerticalLayoutUI*>(pControl->GetInterface(_T("VerticalLayout"))));
-			else if( _tcscmp(pstrClass, _T("ListHeaderItemUI")) == 0 )    pCopyControl = new CListHeaderItemUI(*static_cast<CListHeaderItemUI*>(pControl->GetInterface(_T("ListHeaderItem"))));
-			break;
-		case 17:
-			if( _tcscmp(pstrClass, _T("ListTextElementUI")) == 0 )        pCopyControl = new CListTextElementUI(*static_cast<CListTextElementUI*>(pControl->GetInterface(_T("ListTextElement"))));
-			break;
-		case 18:
-			if( _tcscmp(pstrClass, _T("HorizontalLayoutUI")) == 0 )       pCopyControl = new CHorizontalLayoutUI(*static_cast<CHorizontalLayoutUI*>(pControl->GetInterface(_T("HorizontalLayout"))));
-			else if( _tcscmp(pstrClass, _T("ListLabelElementUI")) == 0 )  pCopyControl = new CListLabelElementUI(*static_cast<CListLabelElementUI*>(pControl->GetInterface(_T("ListLabelElement"))));
-			break;
-		case 19:
-			if( _tcscmp(pstrClass, _T("ListExpandElementUI")) == 0 )      pCopyControl = new CListExpandElementUI(*static_cast<CListExpandElementUI*>(pControl->GetInterface(_T("ListExpandElement"))));
-			break;
-		case 22:
-			if( _tcscmp(pstrClass, _T("ListContainerElementUI")) == 0 )   pCopyControl = new CListContainerElementUI(*static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement"))));
-			break;
+	int nClass = ((ExtendedAttributes*)pControl->GetTag())->nClass;
+	switch(nClass)
+	{
+	case classControl:
+		pCopyControl = new CControlUI(*static_cast<CControlUI*>(pControl->GetInterface(_T("Control"))));
+		break;
+	case classLabel:
+		pCopyControl = new CLabelUI(*static_cast<CLabelUI*>(pControl->GetInterface(_T("Label"))));
+		break;
+	case classText:
+		pCopyControl = new CTextUI(*static_cast<CTextUI*>(pControl->GetInterface(_T("Text"))));
+		break;
+	case classButton:
+		pCopyControl = new CButtonUI(*static_cast<CButtonUI*>(pControl->GetInterface(_T("Button"))));
+		break;
+	case classEdit:
+		pCopyControl = new CEditUI(*static_cast<CEditUI*>(pControl->GetInterface(_T("Edit"))));
+		break;
+	case classOption:
+		pCopyControl = new COptionUI(*static_cast<COptionUI*>(pControl->GetInterface(_T("Option"))));
+		break;
+	case classProgress:
+		pCopyControl = new CProgressUI(*static_cast<CProgressUI*>(pControl->GetInterface(_T("Progress"))));
+		break;
+	case classSlider:
+		pCopyControl = new CSliderUI(*static_cast<CSliderUI*>(pControl->GetInterface(_T("Slider"))));
+		break;
+	case classCombo:
+		pCopyControl = new CComboUI(*static_cast<CComboUI*>(pControl->GetInterface(_T("Combo"))));
+		break;
+	case classActiveX:
+		pCopyControl = new CActiveXUI(*static_cast<CActiveXUI*>(pControl->GetInterface(_T("ActiveX"))));
+		break;
+	case classContainer:
+		pCopyControl = new CContainerUI(*static_cast<CContainerUI*>(pControl->GetInterface(_T("Container"))));
+		break;
+	case classVerticalLayout:
+		pCopyControl = new CVerticalLayoutUI(*static_cast<CVerticalLayoutUI*>(pControl->GetInterface(_T("VerticalLayout"))));
+		break;
+	case classHorizontalLayout:
+		pCopyControl = new CHorizontalLayoutUI(*static_cast<CHorizontalLayoutUI*>(pControl->GetInterface(_T("HorizontalLayout"))));
+		break;
+	case classDialogLayout:
+		pCopyControl = new CDialogLayoutUI(*static_cast<CDialogLayoutUI*>(pControl->GetInterface(_T("DialogLayout"))));
+		break;
+	case classTileLayout:
+		pCopyControl = new CTileLayoutUI(*static_cast<CTileLayoutUI*>(pControl->GetInterface(_T("TileLayout"))));
+		break;
+	case classTabLayout:
+		pCopyControl = new CTabLayoutUI(*static_cast<CTabLayoutUI*>(pControl->GetInterface(_T("TabLayout"))));
+		break;
+	case classListHeaderItem:
+		pCopyControl = new CListHeaderItemUI(*static_cast<CListHeaderItemUI*>(pControl->GetInterface(_T("ListHeaderItem"))));
+		break;
+	case classListTextElement:
+		pCopyControl = new CListTextElementUI(*static_cast<CListTextElementUI*>(pControl->GetInterface(_T("ListTextElement"))));
+		break;
+	case classListLabelElement:
+		pCopyControl = new CListLabelElementUI(*static_cast<CListLabelElementUI*>(pControl->GetInterface(_T("ListLabelElement"))));
+		break;
+	case classListExpandElement:
+		pCopyControl = new CListExpandElementUI(*static_cast<CListExpandElementUI*>(pControl->GetInterface(_T("ListExpandElement"))));
+		break;
+	case classListContainerElement:
+		pCopyControl = new CListContainerElementUI(*static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement"))));
+		break;
 	}
 
 	return pCopyControl;
@@ -2054,7 +2065,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 			pAttributeElem->SetAttribute("name", StringConvertor::WideToUtf8(lpstrKey));
 
 			CString strAttrib(lpstrAttribute);
-			strAttrib.Replace(_T("\""), _T("&quot;"));
 			pAttributeElem->SetAttribute("value", StringConvertor::WideToUtf8(strAttrib));
 
 			pNode->ToElement()->InsertEndChild(*pAttributeElem);
@@ -2072,7 +2082,16 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 
 void CLayoutManager::SetDefaultUIName(CControlUI* pControl, BOOL bForce/* = FALSE*/)
 {
-	if(!bForce&&!pControl->GetName().IsEmpty())
+	BOOL bDitto = FALSE;
+	CString strName = pControl->GetName();
+	if(strName.IsEmpty())
+		bForce = TRUE;
+	else
+	{
+		if(m_Manager.FindControl(strName))
+			bDitto = TRUE;
+	}
+	if(!bForce && !bDitto)
 		return;
 
 	ExtendedAttributes* pExtended = (ExtendedAttributes*)pControl->GetTag();

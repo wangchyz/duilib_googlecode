@@ -1,5 +1,6 @@
 #pragma once
 #include "afxwin.h"
+#include "UIImagePreview.h"
 
 // CDialogSkinFileNew dialog
 
@@ -29,7 +30,7 @@ public:
 
 private:
 	CListBox m_lstStyles;
-	CStatic m_StylePreview;
+	CUIImagePreview m_StylePreview;
 	CString m_strStyleFile;
 
 public:

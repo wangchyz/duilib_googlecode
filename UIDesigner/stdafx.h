@@ -88,6 +88,7 @@
 
 #define UI_COMMAND_HISTORY 10
 
+#define UIDESIGNER_NAME _T("UIDesigner ")##UIDESIGNER_VERSION
 #define UIDESIGNER_VERSION _T("V1.0")
 
 //UI type
@@ -210,4 +211,5 @@ extern CHookAPI g_HookAPI;
 //////////////////////////////////////////////////////////////////////////
 //Global functions
 
-extern int g_GetUIClass(CControlUI* pControl);
+extern int gGetUIClass(CControlUI* pControl);
+extern int gGetUIClass(LPCTSTR pstrcClass);

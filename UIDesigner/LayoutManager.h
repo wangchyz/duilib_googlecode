@@ -23,8 +23,6 @@ public:
 public:
 	LPCTSTR GetClass() const;
 	LPVOID GetInterface(LPCTSTR pstrName);
-	void SetManager(CPaintManagerUI* pPaintManager);
-	CPaintManagerUI* GetManager() const;
 
 	SIZE GetInitSize();
 	void SetInitSize(int cx, int cy);
@@ -43,9 +41,6 @@ public:
 	void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
 	void SetPos(RECT rc);
-
-private:
-	CPaintManagerUI* m_pManager;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -79,23 +74,6 @@ public:
 private:
 	CPaintManagerUI* m_pManager;
 	CControlUI* m_pRoot;
-};
-
-//////////////////////////////////////////////////////////////////////////
-//CDelayResize
-
-class CDelayRepos
-{
-public:
-	CDelayRepos();
-	~CDelayRepos();
-
-public:
-	BOOL AddParent(CControlUI* pControl);
-	void Repos();
-
-private:
-	CArray<CControlUI*,CControlUI*> m_arrDelay;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -140,9 +118,9 @@ public:
 	void DrawAuxBorder(CDC* pDC,CControlUI* pControl);
 	void DrawGrid(CDC* pDC,CRect& rect);
 
-	CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent);
-	BOOL RemoveUI(CControlUI* pControl);
-	void ReleaseExtendedAttrib(CControlUI* pControl);
+	static CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent, CLayoutManager* pLayout);
+	static BOOL RemoveUI(CControlUI* pControl);
+	static void ReleaseExtendedAttrib(CControlUI* pControl, CPaintManagerUI* pManager);
 	CPaintManagerUI* GetManager();
 	inline CFormUI* GetForm() const;
 	CControlUI* FindControl(CPoint point) const;
@@ -177,10 +155,10 @@ public:
 
 	LPCTSTR GetSkinDir() const { return m_strSkinDir; }
 
-protected:
-	CControlUI* CopyControls(CControlUI* pControl);
-	CControlUI* CopyControl(CControlUI* pControl);
+	static CControlUI* CopyControls(CControlUI* pControl);
+	static CControlUI* CopyControl(CControlUI* pControl);
 
+protected:
 	static void SaveControlProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNode);
@@ -196,6 +174,21 @@ protected:
 	static void SaveContainerProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveHorizontalLayoutProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveTileLayoutProperty(CControlUI* pControl, TiXmlElement* pNode);
+
+protected:
+	class CDelayRepos
+	{
+	public:
+		CDelayRepos();
+		~CDelayRepos();
+
+	public:
+		BOOL AddParent(CControlUI* pControl);
+		void Repos();
+
+	private:
+		CArray<CControlUI*,CControlUI*> m_arrDelay;
+	};
 
 private:
 	CPaintManagerUI m_Manager;

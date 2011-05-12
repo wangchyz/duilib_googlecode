@@ -1,33 +1,33 @@
-// TemplateImagePreview.cpp : 实现文件
+// UIImagePreview.cpp : 实现文件
 //
 
 #include "stdafx.h"
 #include "UIDesigner.h"
-#include "TemplateImagePreview.h"
+#include "UIImagePreview.h"
 
 
-// CTemplateImagePreview
+// CUIImagePreview
 
-IMPLEMENT_DYNAMIC(CTemplateImagePreview, CStatic)
+IMPLEMENT_DYNAMIC(CUIImagePreview, CStatic)
 
-CTemplateImagePreview::CTemplateImagePreview()
+CUIImagePreview::CUIImagePreview()
 {
 
 }
 
-CTemplateImagePreview::~CTemplateImagePreview()
+CUIImagePreview::~CUIImagePreview()
 {
 }
 
 
-BEGIN_MESSAGE_MAP(CTemplateImagePreview, CStatic)
+BEGIN_MESSAGE_MAP(CUIImagePreview, CStatic)
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
-// CTemplateImagePreview 消息处理程序
+// CUIImagePreview 消息处理程序
 
-void CTemplateImagePreview::OnPaint()
+void CUIImagePreview::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 	// TODO: 在此处添加消息处理程序代码
@@ -45,7 +45,7 @@ void CTemplateImagePreview::OnPaint()
 		m_imgPreview.BitBlt(pDC->GetSafeHdc(), 0, 0);
 }
 
-void CTemplateImagePreview::SetPreviewImage(LPCTSTR pstrImage)
+void CUIImagePreview::SetPreviewImage(LPCTSTR pstrImage)
 {
 	if(!m_imgPreview.IsNull())
 		m_imgPreview.Destroy();

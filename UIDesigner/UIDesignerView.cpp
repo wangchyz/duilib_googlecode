@@ -92,7 +92,7 @@ CUIDesignerView::CUIDesignerView()
 
 CUIDesignerView::~CUIDesignerView()
 {
-	m_LayoutManager.ReleaseExtendedAttrib(m_LayoutManager.GetForm());
+	m_LayoutManager.ReleaseExtendedAttrib(m_LayoutManager.GetForm(), m_LayoutManager.GetManager());
 }
 
 BOOL CUIDesignerView::PreCreateWindow(CREATESTRUCT& cs)
@@ -272,7 +272,7 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 
 		if(nClass>classPointer)
 		{
-			CControlUI* pNewControl=m_LayoutManager.NewUI(nClass,rect,pControl);
+			CControlUI* pNewControl=m_LayoutManager.NewUI(nClass, rect, pControl, &m_LayoutManager);
 			CArray<CControlUI*,CControlUI*> arrSelected;
 			arrSelected.Add(pNewControl);
 			m_UICommandHistory.Begin(arrSelected, actionAdd);
@@ -290,7 +290,7 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 	if(m_MultiTracker.GetSize()==1)
 		g_pPropertiesWnd->ShowProperty(m_MultiTracker.GetFocused());
 	else
-		g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
+		g_pPropertiesWnd->ShowProperty(NULL);
 	
 	this->Invalidate(FALSE);
 
@@ -511,14 +511,14 @@ void CUIDesignerView::OnRemoveUI()
 	}
 	m_UICommandHistory.End();
 
-	g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
+	g_pPropertiesWnd->ShowProperty(NULL);
 	m_MultiTracker.RemoveAll();
 	this->GetDocument()->SetModifiedFlag();
 }
 
 CControlUI* CUIDesignerView::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 {
-	CControlUI* pControl = m_LayoutManager.NewUI(nClass, rect, pParent);
+	CControlUI* pControl = m_LayoutManager.NewUI(nClass, rect, pParent, &m_LayoutManager);
 	if(pControl != NULL)
 		this->GetDocument()->SetModifiedFlag();
 
@@ -570,7 +570,7 @@ void CUIDesignerView::InitUI(CControlUI* pControl, int depth, BOOL bForceName/* 
 	ZeroMemory(pExtended,sizeof(ExtendedAttributes));
 	pControl->SetTag((UINT_PTR)pExtended);
 
-	pExtended->nClass=g_GetUIClass(pControl);
+	pExtended->nClass=gGetUIClass(pControl);
 	m_LayoutManager.SetDefaultUIName(pControl, bForceName);
 	g_pClassView->InsertUITreeItem(pControl);
 	pExtended->nDepth = depth;
@@ -781,7 +781,7 @@ void CUIDesignerView::OnDestroy()
 	// TODO: 在此处添加消息处理程序代码
 	g_pClassView->RemoveUITreeItem(m_LayoutManager.GetForm());
 	g_pResourceView->RemoveImageTree(this->GetDocument()->GetTitle());
-	g_pPropertiesWnd->HideAllProperties(TRUE,TRUE);
+	g_pPropertiesWnd->ShowProperty(NULL);
 }
 
 void CUIDesignerView::OnEditCut()
@@ -1103,4 +1103,9 @@ BOOL CUIDesignerView::SaveSkinImage(LPCTSTR pstrPathName)
 
 	image.ReleaseDC();
 	return bRet;
+}
+
+void CUIDesignerView::ReDrawForm()
+{
+	m_LayoutManager.GetForm()->NeedUpdate();
 }

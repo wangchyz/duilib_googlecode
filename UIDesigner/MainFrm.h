@@ -83,5 +83,3 @@ public:
 	afx_msg void OnUpdateProjectExist(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateFileCloseAll(CCmdUI *pCmdUI);
 };
-
-

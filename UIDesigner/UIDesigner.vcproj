@@ -200,6 +200,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogCustomFonts.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogDefaultAttribList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DialogProjectNew.cpp"
 				>
 			</File>
@@ -213,6 +221,10 @@
 			</File>
 			<File
 				RelativePath=".\DialogTemplateSaveAs.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogUIAttribEdit.cpp"
 				>
 			</File>
 			<File
@@ -280,10 +292,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\TemplateImagePreview.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ToolBoxCtrl.cpp"
 				>
 			</File>
@@ -305,6 +313,14 @@
 			</File>
 			<File
 				RelativePath=".\UIDesignerView.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UIImagePreview.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UIProperties.cpp"
 				>
 			</File>
 			<File
@@ -330,6 +346,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogCustomFonts.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogDefaultAttribList.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DialogProjectNew.h"
 				>
 			</File>
@@ -343,6 +367,10 @@
 			</File>
 			<File
 				RelativePath=".\DialogTemplateSaveAs.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DialogUIAttribEdit.h"
 				>
 			</File>
 			<File
@@ -402,10 +430,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\TemplateImagePreview.h"
-				>
-			</File>
-			<File
 				RelativePath=".\ToolBoxCtrl.h"
 				>
 			</File>
@@ -427,6 +451,14 @@
 			</File>
 			<File
 				RelativePath=".\UIDesignerView.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UIImagePreview.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UIProperties.h"
 				>
 			</File>
 			<File

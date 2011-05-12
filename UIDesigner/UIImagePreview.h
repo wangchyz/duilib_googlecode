@@ -1,15 +1,15 @@
 #pragma once
 #include <atlimage.h>
 
-// CTemplateImagePreview
+// CUIImagePreview
 
-class CTemplateImagePreview : public CStatic
+class CUIImagePreview : public CStatic
 {
-	DECLARE_DYNAMIC(CTemplateImagePreview)
+	DECLARE_DYNAMIC(CUIImagePreview)
 
 public:
-	CTemplateImagePreview();
-	virtual ~CTemplateImagePreview();
+	CUIImagePreview();
+	virtual ~CUIImagePreview();
 
 private:
 	CImage m_imgPreview;
