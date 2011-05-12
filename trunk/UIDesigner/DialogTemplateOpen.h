@@ -1,6 +1,6 @@
 #pragma once
 #include "afxwin.h"
-#include "TemplateImagePreview.h"
+#include "UIImagePreview.h"
 
 // CDialogTemplateOpen ¶Ô»°¿ò
 
@@ -21,7 +21,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	CListBox m_lstTemplates;
-	CTemplateImagePreview m_TemplatePreview;
+	CUIImagePreview m_TemplatePreview;
 
 public:
 	virtual BOOL OnInitDialog();

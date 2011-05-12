@@ -35,7 +35,7 @@ public:
 	enum { IDD = IDD_PROPERTY_TABLAYOUTUI };
 
 private:
-	CSingleCheckListBox m_ctlTab;
+	CSingleCheckListBox m_lstTab;
 	CMFCMenuButton m_btnAdd;
 	CMenu m_menuUI;
 

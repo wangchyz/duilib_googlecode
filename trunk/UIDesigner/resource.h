@@ -136,6 +136,10 @@
 #define IDD_DIALOG_TEMPLATE_SAVE_AS     342
 #define IDD_DIALOG_TEMPLATE_OPEN        343
 #define IDR_POPUP_MDITABS               344
+#define IDD_DIALOG_CUSTOM_FONTS         345
+#define IDD_DIALOG_DEFAULT_ATTRIB_LIST  346
+#define ID_UI_PROP_WND                  347
+#define IDD_DIALOG_UI_ATTRIB_EDIT       348
 #define IDC_BUTTON_IMAGE_IMPORT         1000
 #define IDC_BUTTON_IMAGE_CLEAR          1001
 #define IDC_LIST_IMAGE_RESOURCE         1002
@@ -163,6 +167,15 @@
 #define IDC_LIST_TEMPLATES              1023
 #define IDC_BUTTON_TEMPLATE_DELETE      1024
 #define IDC_STATIC_TEMPLATE_PREVIEW     1025
+#define IDC_LIST_CUSTOM_FONTS           1026
+#define IDC_BUTTON_FONT_DELETE          1027
+#define IDC_BUTTON_FONT_ADD             1028
+#define IDC_BUTTON_FONT_MODIFY          1029
+#define IDC_STATIC_UI_PROP_LOCATION     1032
+#define IDC_BUTTON_ATTRIB_ADD           1033
+#define IDC_BUTTON_ATTRIB_DELETE        1034
+#define IDC_BUTTON_ATTRIB_MODIFY        1035
+#define IDC_LIST_DEFAULT_ATTRIB         1037
 #define ID_UI_CONTROL_BUTTON            32793
 #define ID_UI_CONTROL_CONTROL           32794
 #define ID_UI_CONTROL_LABEL             32795
@@ -196,7 +209,7 @@
 #define ID_DUMMY_32850                  32850
 #define ID_MDITABS_NEW_HORZ_TAB_GROUP   32851
 #define ID_DUMMY_32852                  32852
-#define ID_MDITABS_NEW_VERT_TAB_GROUP       32853
+#define ID_MDITABS_NEW_VERT_TAB_GROUP   32853
 #define ID_DUMMY_32854                  32854
 #define ID_MDITABS_MOVE_TO_NEXT_GROUP   32855
 #define ID_DUMMY_32856                  32856
@@ -208,7 +221,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        345
 #define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1026
-#define _APS_NEXT_SYMED_VALUE           316
+#define _APS_NEXT_CONTROL_VALUE         1038
+#define _APS_NEXT_SYMED_VALUE           349
 #endif
 #endif

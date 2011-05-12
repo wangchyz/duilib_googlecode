@@ -16,7 +16,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(中华人民共和国) resources
+// Chinese (P.R.C.) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 #ifdef _WIN32
@@ -53,11 +53,11 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
-    "#include ""res\\UIDesigner.rc2""  // 非 Microsoft Visual C++ 编辑的资源\r\n"
-    "#include ""l.CHS\\afxres.rc""          // 标准组件\r\n"
-    "#include ""l.CHS\\afxprint.rc""        // 打印/打印预览资源\r\n"
+    "#include ""res\\UIDesigner.rc2""  // ??è? Microsoft Visual C++ ?¨¤?§?è?-|¨???¨￠?§o???\r\n"
+    "#include ""l.CHS\\afxres.rc""          // ?¨¤?§o?¨￠??¨￠?§|?t\r\n"
+    "#include ""l.CHS\\afxprint.rc""        // ???§???§??/???§???§????¨¨?§?è?§?è?¨￠?§o???\r\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxribbon.rc""               // MFC 功能区和控件条资源\r\n"
+    "#include ""l.CHS\\afxribbon.rc""               // MFC 1|??§1??o?§a???t?§???¨￠?§o???\r\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -593,6 +593,41 @@ BEGIN
     GROUPBOX        "模板预览",IDC_STATIC,130,7,310,232
 END
 
+IDD_DIALOG_CUSTOM_FONTS DIALOGEX 0, 0, 210, 163
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "字体管理"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "退出",IDOK,119,142,50,14
+    PUSHBUTTON      "删除",IDC_BUTTON_FONT_DELETE,119,120,50,14
+    PUSHBUTTON      "添加",IDC_BUTTON_FONT_ADD,40,120,50,14
+    PUSHBUTTON      "修改",IDC_BUTTON_FONT_MODIFY,40,142,50,14
+    CONTROL         "",IDC_LIST_CUSTOM_FONTS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,196,103
+END
+
+IDD_DIALOG_DEFAULT_ATTRIB_LIST DIALOGEX 0, 0, 280, 270
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "默认属性列表管理"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "退出",IDOK,210,249,50,14
+    LTEXT           "默认属性显示",IDC_STATIC_UI_PROP_LOCATION,115,7,158,230,NOT WS_VISIBLE
+    PUSHBUTTON      "添加",IDC_BUTTON_ATTRIB_ADD,18,249,50,14
+    PUSHBUTTON      "删除",IDC_BUTTON_ATTRIB_DELETE,82,249,50,14
+    PUSHBUTTON      "修改",IDC_BUTTON_ATTRIB_MODIFY,146,249,50,14
+    LISTBOX         IDC_LIST_DEFAULT_ATTRIB,7,7,96,230,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DIALOG_UI_ATTRIB_EDIT DIALOGEX 0, 0, 175, 319
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "默认属性编辑"
+FONT 9, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,24,298,50,14
+    PUSHBUTTON      "取消",IDCANCEL,100,298,50,14
+    LTEXT           "静态",IDC_STATIC_UI_PROP_LOCATION,7,7,161,276,NOT WS_VISIBLE
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -692,6 +727,30 @@ BEGIN
         RIGHTMARGIN, 440
         TOPMARGIN, 7
         BOTTOMMARGIN, 261
+    END
+
+    IDD_DIALOG_CUSTOM_FONTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 203
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 156
+    END
+
+    IDD_DIALOG_DEFAULT_ATTRIB_LIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 273
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 263
+    END
+
+    IDD_DIALOG_UI_ATTRIB_EDIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 168
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 312
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -898,7 +957,7 @@ BEGIN
     ID_MDITABS_MOVE_TO_PREV_GROUP "将当前视图移动到上一个选项卡组"
 END
 
-#endif    // 中文(中华人民共和国) resources
+#endif    // Chinese (P.R.C.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -915,11 +974,11 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
 #pragma code_page(936)
-#include "res\UIDesigner.rc2"  // 非 Microsoft Visual C++ 编辑的资源
-#include "l.CHS\afxres.rc"          // 标准组件
-#include "l.CHS\afxprint.rc"        // 打印/打印预览资源
+#include "res\UIDesigner.rc2"  // ?¤? Microsoft Visual C++ ?à¨¤?-|ì??á¨o???
+#include "l.CHS\afxres.rc"          // ?à¨o?á??á¨|?t
+#include "l.CHS\afxprint.rc"        // ??¨°¨??/??¨°¨????è¨¤¨¤?á¨o???
 #if !defined(_AFXDLL)
-#include "l.CHS\afxribbon.rc"               // MFC 功能区和控件条资源
+#include "l.CHS\afxribbon.rc"               // MFC 1|?¨1??o¨a???t¨???á¨o???
 #endif
 #endif
 

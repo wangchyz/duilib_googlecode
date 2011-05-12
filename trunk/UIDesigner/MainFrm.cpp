@@ -228,7 +228,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 		return FALSE;
 	// TODO: 在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
-
+	cs.lpszName = UIDESIGNER_NAME;
 	cs.style = WS_OVERLAPPED | WS_CAPTION /*| FWS_ADDTOTITLE 去除基于文档修改标题的风格*/
 		 | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE | WS_SYSMENU;
 

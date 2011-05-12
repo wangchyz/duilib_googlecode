@@ -12,13 +12,9 @@ CClassView* g_pClassView = NULL;
 CResourceViewBar* g_pResourceView = NULL;
 CHookAPI g_pHookAPI;
 
-int g_GetUIClass(CControlUI* pControl)
+int gGetUIClass(LPCTSTR pstrClass)
 {
-	if(pControl==NULL)
-		return classPointer;
-
-	int nClass=classPointer;
-	LPCTSTR pstrClass=pControl->GetClass();
+	int nClass = classPointer;
 	SIZE_T cchLen = _tcslen(pstrClass);
 	switch( cchLen ) {
 		case 6:
@@ -72,4 +68,11 @@ int g_GetUIClass(CControlUI* pControl)
 	}
 
 	return nClass;
+}
+int gGetUIClass(CControlUI* pControl)
+{
+	if(pControl==NULL)
+		return classPointer;
+
+	return gGetUIClass(pControl->GetClass());
 }

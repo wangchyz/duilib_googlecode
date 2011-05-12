@@ -44,6 +44,7 @@ public:
 	void Notify(TNotifyUI& msg);
 	void SelectUI(CControlUI* pControl);
 	void OnActivated();
+	void ReDrawForm();
 	CPaintManagerUI* GetPaintManager() { return m_LayoutManager.GetManager(); }
 
 	CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent);

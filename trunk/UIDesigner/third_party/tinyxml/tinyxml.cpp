@@ -1222,21 +1222,11 @@ void TiXmlAttribute::Print( FILE* cfile, int /*depth*/, TIXML_STRING* str ) cons
 	EncodeString( name, &n );
 	EncodeString( value, &v );
 
-	if (value.find ('\"') == TIXML_STRING::npos) {
-		if ( cfile ) {
+	if ( cfile ) {
 		fprintf (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
-		}
-		if ( str ) {
-			(*str) += n; (*str) += "=\""; (*str) += v; (*str) += "\"";
-		}
 	}
-	else {
-		if ( cfile ) {
-		fprintf (cfile, "%s='%s'", n.c_str(), v.c_str() );
-		}
-		if ( str ) {
-			(*str) += n; (*str) += "='"; (*str) += v; (*str) += "'";
-		}
+	if ( str ) {
+		(*str) += n; (*str) += "=\""; (*str) += v; (*str) += "\"";
 	}
 }
 

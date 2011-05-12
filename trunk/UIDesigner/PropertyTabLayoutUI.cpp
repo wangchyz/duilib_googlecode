@@ -100,7 +100,7 @@ CPropertyTabLayoutUI::~CPropertyTabLayoutUI()
 void CPropertyTabLayoutUI::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST_TABLAYOUTUI_TAB, m_ctlTab);
+	DDX_Control(pDX, IDC_LIST_TABLAYOUTUI_TAB, m_lstTab);
 	DDX_Control(pDX, IDC_BUTTON_TABLAYOUTUI_ADD, m_btnAdd);
 }
 
@@ -125,8 +125,8 @@ BOOL CPropertyTabLayoutUI::OnInitDialog()
 		bool bVisible=pControl->IsVisible();
 
 		str.Format(_T("Tab%d"),i);
-		m_ctlTab.AddString(str);
-		m_ctlTab.SetCheck(i,bVisible);
+		m_lstTab.AddString(str);
+		m_lstTab.SetCheck(i,bVisible);
 
 		if(bVisible==true)
 			CSingleCheckListBox::m_nLastChecked=i;
@@ -208,19 +208,19 @@ void CPropertyTabLayoutUI::OnBnClickedButtonTabLayoutUIAdd()
 	g_pClassView->InsertUITreeItem(pNewControl);
 
 	CString str;
-	int nCount=m_ctlTab.GetCount();
+	int nCount=m_lstTab.GetCount();
 	str.Format(_T("Tab%d"),nCount);
-	m_ctlTab.AddString(str);
+	m_lstTab.AddString(str);
 	if(nCount==0)
-		m_ctlTab.SetCheck(0,1);
+		m_lstTab.SetCheck(0,1);
 }
 
 void CPropertyTabLayoutUI::OnBnClickedOk()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	for(int i=0;i<m_ctlTab.GetCount();i++)
+	for(int i=0;i<m_lstTab.GetCount();i++)
 	{
-		int nCheck=m_ctlTab.GetCheck(i);
+		int nCheck=m_lstTab.GetCheck(i);
 
 		if(nCheck==1)
 		{
