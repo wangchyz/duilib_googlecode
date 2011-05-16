@@ -39,4 +39,5 @@ public:
 	afx_msg void OnBnClickedButtonAttribModify();
 	afx_msg void OnLbnSelchangeListDefaultAttrib();
 	afx_msg void OnDestroy();
+	afx_msg void OnBnClickedButtonSaveAsStyle();
 };

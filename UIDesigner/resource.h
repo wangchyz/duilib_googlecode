@@ -96,7 +96,7 @@
 #define ID_FORMEDIT_ALIGN_RIGHT         322
 #define IDD_PROJECT_NEW                 322
 #define ID_FORMEDIT_ALIGN_TOP           323
-#define IDD_SKINFIlE_NEW                323
+#define IDD_SKINFILE_NEW                323
 #define ID_FORMEDIT_ALIGN_BOTTOM        324
 #define IDI_TOOLBOX_ACTIVE              324
 #define ID_FORMEDIT_ALIGN_CENTER_VERTICALLY 325
@@ -133,13 +133,17 @@
 #define IDI_TOOLBOX_TILELAYOUT          340
 #define IDI_TOOLBOX_TILE_LAYOUT         340
 #define IDI_TOOLBOX_VERTICAL_LAYOUT     341
-#define IDD_DIALOG_TEMPLATE_SAVE_AS     342
+#define IDD_DIALOG__SAVE_AS_NAME        342
 #define IDD_DIALOG_TEMPLATE_OPEN        343
 #define IDR_POPUP_MDITABS               344
 #define IDD_DIALOG_CUSTOM_FONTS         345
 #define IDD_DIALOG_DEFAULT_ATTRIB_LIST  346
+#define IDB_BITMAP_ABOUT_BANNER         346
+#define IDB_ABOUT_BANNER                346
 #define ID_UI_PROP_WND                  347
 #define IDD_DIALOG_UI_ATTRIB_EDIT       348
+#define IDR_MENU_UI                     349
+#define IDD_DIALOG_CHECK_UPDATE         350
 #define IDC_BUTTON_IMAGE_IMPORT         1000
 #define IDC_BUTTON_IMAGE_CLEAR          1001
 #define IDC_LIST_IMAGE_RESOURCE         1002
@@ -161,7 +165,6 @@
 #define IDC_EDIT_PROJECT_PATH           1016
 #define IDC_EDIT_FILE_NAME              1017
 #define IDC_LIST_STYLE                  1020
-#define IDC_STATIC_                     1021
 #define IDC_STATIC_PREVIEW              1021
 #define IDC_EDIT_TEMPLATE_NAME          1022
 #define IDC_LIST_TEMPLATES              1023
@@ -176,6 +179,14 @@
 #define IDC_BUTTON_ATTRIB_DELETE        1034
 #define IDC_BUTTON_ATTRIB_MODIFY        1035
 #define IDC_LIST_DEFAULT_ATTRIB         1037
+#define IDC_BUTTON_SAVE_AS_STYLE        1038
+#define IDC_BUTTON_VERSION_UPDATE_LINK  1038
+#define IDC_BUTTON_MY_BLOG_LINK         1038
+#define IDC_STATIC_CURRENT_VERSION      1039
+#define IDC_STATIC_LATEST_VERSION       1040
+#define IDC_STATIC_UPDATE_INFO          1041
+#define IDC_BUTTON_DUILIB_LINK          1042
+#define	ID_UI_CONTROL_LISTBOX			32792
 #define ID_UI_CONTROL_BUTTON            32793
 #define ID_UI_CONTROL_CONTROL           32794
 #define ID_UI_CONTROL_LABEL             32795
@@ -214,14 +225,28 @@
 #define ID_MDITABS_MOVE_TO_NEXT_GROUP   32855
 #define ID_DUMMY_32856                  32856
 #define ID_MDITABS_MOVE_TO_PREV_GROUP   32857
+#define ID_32858                        32858
+#define ID_                             32859
+#define ID_APP_CHECK_UPDATE             32860
+#define ID_32861                        32861
+#define ID_32862                        32862
+#define ID_32863                        32863
+#define ID_EDIT_DELETE                  32864
+#define ID_32868                        32868
+#define ID_32869                        32869
+#define ID_32870                        32870
+#define ID_32871                        32871
+#define ID_32872                        32872
+#define ID_32873                        32873
+#define ID_32874                        32874
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        345
-#define _APS_NEXT_COMMAND_VALUE         32858
-#define _APS_NEXT_CONTROL_VALUE         1038
-#define _APS_NEXT_SYMED_VALUE           349
+#define _APS_NEXT_RESOURCE_VALUE        348
+#define _APS_NEXT_COMMAND_VALUE         32885
+#define _APS_NEXT_CONTROL_VALUE         1043
+#define _APS_NEXT_SYMED_VALUE           351
 #endif
 #endif

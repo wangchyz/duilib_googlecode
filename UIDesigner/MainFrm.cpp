@@ -5,6 +5,7 @@
 #include "UIDesigner.h"
 #include "MainFrm.h"
 #include "DialogTemplateOpen.h"
+#include "DialogCheckUpdate.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -39,6 +40,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(ID_MDITABS_MOVE_TO_PREV_GROUP, OnMdiMoveToPrevGroup)
 	ON_COMMAND(ID_MDITABS_NEW_HORZ_TAB_GROUP, OnMdiNewHorzTabGroup)
 	ON_COMMAND(ID_MDITABS_NEW_VERT_TAB_GROUP, OnMdiNewVertTabGroup)
+	ON_COMMAND(ID_APP_CHECK_UPDATE, &CMainFrame::OnAppCheckUpdate)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -152,6 +154,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// 加载菜单项图像(不在任何标准工具栏上):
 	CMFCToolBar::AddToolBarForImageCollection(IDR_MENU_IMAGES, theApp.m_bHiColorIcons ? IDB_MENU_IMAGES_24 : 0);
+	CMFCToolBar::AddToolBarForImageCollection(IDR_MENU_UI);
 
 	// 创建停靠窗口
 	if (!CreateDockingWindows())
@@ -181,15 +184,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 启用快速(按住 Alt 拖动)工具栏自定义
 	CMFCToolBar::EnableQuickCustomization();
 
-	if (CMFCToolBar::GetUserImages() == NULL)
-	{
-		// 加载用户定义的工具栏图像
-		if (m_UserImages.Load(_T(".\\UserImages.bmp")))
-		{
-			m_UserImages.SetImageSize(CSize(16, 16), FALSE);
-			CMFCToolBar::SetUserImages(&m_UserImages);
-		}
-	}
+// 	if (CMFCToolBar::GetUserImages() == NULL)
+// 	{
+// 		// 加载用户定义的工具栏图像
+// 		if (m_UserImages.Load(_T(".\\UserImages.bmp")))
+// 		{
+// 			m_UserImages.SetImageSize(CSize(16, 16), FALSE);
+// 			CMFCToolBar::SetUserImages(&m_UserImages);
+// 		}
+// 	}
 
 	// 启用菜单个性化(最近使用的命令)
 	// TODO: 定义您自己的基本命令，确保每个下拉菜单至少有一个基本命令。
@@ -228,7 +231,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 		return FALSE;
 	// TODO: 在此处通过修改
 	//  CREATESTRUCT cs 来修改窗口类或样式
-	cs.lpszName = UIDESIGNER_NAME;
 	cs.style = WS_OVERLAPPED | WS_CAPTION /*| FWS_ADDTOTITLE 去除基于文档修改标题的风格*/
 		 | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_MAXIMIZE | WS_SYSMENU;
 
@@ -632,4 +634,11 @@ void CMainFrame::OnMdiNewHorzTabGroup()
 void CMainFrame::OnMdiNewVertTabGroup()
 {
 	MDITabNewGroup();
+}
+
+void CMainFrame::OnAppCheckUpdate()
+{
+	// TODO: Add your command handler code here
+	CDialogCheckUpdate dlg;
+	dlg.DoModal();
 }

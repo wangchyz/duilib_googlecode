@@ -104,9 +104,10 @@ BOOL CUIDesignerDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		CUIDesignerView* pUIView = DYNAMIC_DOWNCAST(CUIDesignerView, pView);
 		ASSERT(pUIView);
 		pUIView->SaveSkinFile(lpszPathName);
+		this->SetModifiedFlag(FALSE);
 	}
 
-	return TRUE/*CDocument::OnSaveDocument(lpszPathName)*/;
+	return TRUE;/*CDocument::OnSaveDocument(lpszPathName);*/
 }
 
 void CUIDesignerDoc::SetTitle(LPCTSTR lpszTitle)

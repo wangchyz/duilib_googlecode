@@ -43,7 +43,7 @@ void CClassViewTree::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	switch(nChar)
 	{
 	case VK_DELETE:
-		g_pMainFrame->GetActiveUIView()->OnRemoveUI();
+		g_pMainFrame->GetActiveUIView()->OnDeleteUI();
 		break;
 	}
 

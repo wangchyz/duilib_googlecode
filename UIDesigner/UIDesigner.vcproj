@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogCheckUpdate.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DialogCustomFonts.cpp"
 				>
 			</File>
@@ -212,15 +216,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogSaveAsName.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DialogSkinFileNew.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\DialogTemplateOpen.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\DialogTemplateSaveAs.cpp"
 				>
 			</File>
 			<File
@@ -346,6 +350,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogCheckUpdate.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DialogCustomFonts.h"
 				>
 			</File>
@@ -358,15 +366,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DialogSaveAsName.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DialogSkinFileNew.h"
 				>
 			</File>
 			<File
 				RelativePath=".\DialogTemplateOpen.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DialogTemplateSaveAs.h"
 				>
 			</File>
 			<File
@@ -477,6 +485,14 @@
 			>
 			<File
 				RelativePath=".\res\ToolBox\Active.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\banner.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\res\bitmap1.bmp"
 				>
 			</File>
 			<File
@@ -697,6 +713,10 @@
 			</File>
 			<File
 				RelativePath=".\res\UIDesignerDoc.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\uimenu.bmp"
 				>
 			</File>
 			<File

@@ -35,7 +35,7 @@ BOOL CMFCPropertyGridColor32Property::OnUpdateValue()
 	COLORREF colorCurr = m_Color;
 	int nA = 0,nR = 0, nG = 0, nB = 0;
 	_stscanf_s(strText, _T("%2x%2x%2x%2x"), &nA, &nR, &nG, &nB);
-	if(nA == 0)
+	if(nA == 0 && (nR !=0 || nG != 0 || nB !=  0))
 		nA = 0xFF;
 	m_Color = ARGB(nA, nR, nG, nB);
 
@@ -475,6 +475,7 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pValueList);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("BkImage"),_T(""),_T("指定控件的背景图片"),tagBkImage);//bkimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropColor=new CMFCPropertyGridColor32Property(_T("BkColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定控件的背景颜色"),tagBkColor);//bkcolor
@@ -551,18 +552,23 @@ void CUIProperties::InitPropList()
 	pPropUI=new CMFCPropertyGridProperty(_T("Button"),classButton);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定按钮正常显示时的图片"),tagNormalImage);//normalimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定按钮获得热点时的图片"),tagHotImage);//hotimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("指定按钮被按压下时的图片"),tagPushedImage);//pushedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定按钮获得焦点后的图片"),tagFocusedImage);//focusedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定按钮被禁用后的图片"),tagDisabledImage);//disabledimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	m_wndPropList.AddProperty(pPropUI);
@@ -571,15 +577,19 @@ void CUIProperties::InitPropList()
 	pPropUI=new CMFCPropertyGridProperty(_T("Edit"),classEdit);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定编辑框正常显示时的图片"),tagEditNormalImage);//normalimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定编辑框获得热点时的图片"),tagEditHotImage);//hotimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定编辑框获得焦点后的图片"),tagEditFocusedImage);//focusedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定编辑框被禁用后的图片"),tagEditDisabledImage);//disabledimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pProp=new CMFCPropertyGridProperty(_T("ReadOnly"),(_variant_t)false,_T("指示是否只读"),tagReadOnly);//readonly
@@ -594,6 +604,7 @@ void CUIProperties::InitPropList()
 	pPropUI=new CMFCPropertyGridProperty(_T("Option"),classOption);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("SelectedImage"),_T(""),_T("指定复选框被选择后的图片"),tagSelectedImage);//selectedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pProp=new CMFCPropertyGridProperty(_T("Selected"),(_variant_t)false,_T("指示是否已被选中"),tagSelected);//selected
@@ -608,6 +619,7 @@ void CUIProperties::InitPropList()
 	pPropUI=new CMFCPropertyGridProperty(_T("Progress"),classProgress);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("FgImage"),_T(""),_T("指定进度条的前景图片"),tagFgImage);//fgimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pValueList=new CMFCPropertyGridProperty(_T("MinMax"),tagMinMax,TRUE);//minmax
@@ -629,12 +641,15 @@ void CUIProperties::InitPropList()
 	pPropUI=new CMFCPropertyGridProperty(_T("Slider"),classSlider);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbImage"),_T(""),_T("指定滑块的滑条图片"),tagThumbImage);//thumbimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbHotImage"),_T(""),_T("指定滑条获得热点时的图片"),tagThumbHotImage);//thumbhotimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbPushedImage"),_T(""),_T("指定滑条被按压后的图片"),tagThumbPushedImage);//thumbpushedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pValueList=new CMFCPropertyGridProperty(_T("ThumbSize"),tagThumbSize,TRUE);//thumbsize
@@ -686,30 +701,39 @@ void CUIProperties::InitPropList()
 	pPropUI=new CMFCPropertyGridProperty(_T("Combo"),classCombo);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定组合框正常显示时的图片"),tagComboNormalImage);//normalimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定组合框获得热点时的图片"),tagComboHotImage);//hotimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("指定组合框被按压下时的图片"),tagComboPushedImage);//pushedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定组合框获得焦点后的图片"),tagComboFocusedImage);//focusedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定组合框被禁用后的图片"),tagComboDisabledImage);//disabledimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemImage"),_T(""),_T("指定组项正常显示时的图片"),tagItemImage);//itemimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemHotImage"),_T(""),_T("指定组项获得热点时的图片"),tagItemHotImage);//itemhotimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemSelectedImage"),_T(""),_T("指定组项被选择时的图片"),tagItemSelectedImage);//itemselectedimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemDisabledImage"),_T(""),_T("指定组项被禁用后的图片"),tagItemDisabledImage);//itemdisabledimage
+	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
 	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagComboTextPadding,TRUE);//textpadding

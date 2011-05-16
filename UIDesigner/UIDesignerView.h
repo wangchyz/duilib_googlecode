@@ -48,9 +48,8 @@ public:
 	CPaintManagerUI* GetPaintManager() { return m_LayoutManager.GetManager(); }
 
 	CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent);
-	BOOL RemoveUI(CControlUI* pControl);
+	BOOL DeleteUI(CControlUI* pControl);
 	void RedoUI(CControlUI* pControl, CControlUI* pParent);
-	void OnRemoveUI();
 	void ClearUITracker() { m_MultiTracker.RemoveAll(); }
 
 	void OnShowPropertyDialog();
@@ -58,6 +57,7 @@ public:
 	void SaveSkinFile(LPCTSTR pstrPathName);
 	BOOL SaveSkinImage(LPCTSTR pstrPathName);
 	void OnTitleChanged(LPCTSTR pstrOldTitle, LPCTSTR pstrNewTitle);
+	void SetModifiedFlag(BOOL bModified = TRUE);
 
 protected:
 	void UpDateDPtoLPOffset();
@@ -71,9 +71,11 @@ protected:
 	void OnMicoMoveLeft();
 	void OnMicoMoveRight();
 
-	void InitUI(CControlUI* pControl, int depth, BOOL bForceName = FALSE);
+	void InitUI(CControlUI* pControl, int depth);
 	void CopyUI(TiXmlElement* pParentNode);
 	void PasteUI(LPCTSTR xml);
+
+	void RemoveForm(CArray<CControlUI*,CControlUI*>& arrSelected);
 
 private:
 	CLayoutManager m_LayoutManager;
@@ -134,6 +136,7 @@ public:
 	afx_msg void OnEditCut();
 	afx_msg void OnEditCopy();
 	afx_msg void OnEditPaste();
+	afx_msg void OnDeleteUI();
 	afx_msg void OnEditUndo();
 	afx_msg void OnEditRedo();
 	afx_msg void OnUpdateNeedSel(CCmdUI* pCmdUI);
@@ -143,6 +146,7 @@ public:
 
 	afx_msg void OnDestroy();
 	afx_msg void OnTemplateSaveAs();
+	afx_msg void OnStyleSaveAs();
 };
 
 #ifndef _DEBUG  // UIDesignerView.cpp 中的调试版本
