@@ -13,7 +13,7 @@ public:
 	virtual ~CDialogSkinFileNew();
 
 // Dialog Data
-	enum { IDD = IDD_SKINFIlE_NEW };
+	enum { IDD = IDD_SKINFILE_NEW };
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CDialogDefaultAttribList, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_ATTRIB_MODIFY, &CDialogDefaultAttribList::OnBnClickedButtonAttribModify)
 	ON_LBN_SELCHANGE(IDC_LIST_DEFAULT_ATTRIB, &CDialogDefaultAttribList::OnLbnSelchangeListDefaultAttrib)
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BUTTON_SAVE_AS_STYLE, &CDialogDefaultAttribList::OnBnClickedButtonSaveAsStyle)
 END_MESSAGE_MAP()
 
 
@@ -56,6 +57,10 @@ BOOL CDialogDefaultAttribList::OnInitDialog()
 	m_btnAdd.m_hMenu = m_menuUI.GetSubMenu(0)->GetSafeHmenu();
 	m_btnAdd.SizeToContent();
 	m_btnAdd.m_bOSMenu = FALSE;
+
+#ifdef _DEBUG
+	this->GetDlgItem(IDC_BUTTON_SAVE_AS_STYLE)->ShowWindow(SW_SHOW);
+#endif
 
 	m_pManager = g_pMainFrame->GetActiveUIView()->GetPaintManager();
 	ASSERT(m_pManager);
@@ -134,7 +139,7 @@ void CDialogDefaultAttribList::OnBnClickedButtonAttribAdd()
 	if(m_pManager->GetDefaultAttributeList(strName) != NULL)
 	{
 		MessageBox(_T("此控件的默认属性已经存在，无法创建！"), _T("提示"), MB_ICONINFORMATION);
-		CLayoutManager::RemoveUI(pControl);
+		CLayoutManager::DeleteUI(pControl);
 		return;
 	}
 
@@ -145,7 +150,7 @@ void CDialogDefaultAttribList::OnBnClickedButtonAttribAdd()
 		if(GetDefaultAttrib(pControl, strValue) == FALSE)
 		{
 			MessageBox(_T("创建默认属性失败！"), _T("提示"), MB_ICONINFORMATION);
-			CLayoutManager::RemoveUI(pControl);
+			CLayoutManager::DeleteUI(pControl);
 			return;
 		}
 		m_pManager->AddDefaultAttributeList(strName, strValue);
@@ -153,9 +158,10 @@ void CDialogDefaultAttribList::OnBnClickedButtonAttribAdd()
 		m_lstDefaultAttrib.SetItemDataPtr(nIndex, pControl);
 		m_lstDefaultAttrib.SetCurSel(nIndex);
 		m_wndUIProperties.ShowProperty(pControl);
+		g_pMainFrame->GetActiveUIView()->SetModifiedFlag();
 	}
 	else
-		CLayoutManager::RemoveUI(pControl);
+		CLayoutManager::DeleteUI(pControl);
 }
 
 void CDialogDefaultAttribList::OnBnClickedButtonAttribDelete()
@@ -174,11 +180,12 @@ void CDialogDefaultAttribList::OnBnClickedButtonAttribDelete()
 	if(m_pManager->RemoveDefaultAttributeList(strUIName))
 	{
 		CControlUI* pControl = (CControlUI*)m_lstDefaultAttrib.GetItemDataPtr(nIndex);
-		CLayoutManager::RemoveUI(pControl);
+		CLayoutManager::DeleteUI(pControl);
 		m_lstDefaultAttrib.DeleteString(nIndex);
 		MessageBox(_T("已成功将此默认属性删除，请重新打开此UI文件，更新显示！")
 			, _T("提示"), MB_ICONINFORMATION);
 		m_wndUIProperties.ShowProperty(NULL);
+		g_pMainFrame->GetActiveUIView()->SetModifiedFlag();
 	}
 }
 
@@ -189,14 +196,13 @@ void CDialogDefaultAttribList::OnBnClickedButtonAttribModify()
 	if(nIndex == -1)
 		return;
 
-	CString strUIName;
-	m_lstDefaultAttrib.GetText(nIndex, strUIName);
-	LPCTSTR pstrDefaultAttrib = m_pManager->GetDefaultAttributeList(strUIName);
+	CString strDefaultAttribName;
+	m_lstDefaultAttrib.GetText(nIndex, strDefaultAttribName);
+	LPCTSTR pstrDefaultAttrib = m_pManager->GetDefaultAttributeList(strDefaultAttribName);
 	CControlUI* pControl = (CControlUI*)m_lstDefaultAttrib.GetItemDataPtr(nIndex);
 	if(pControl == NULL)
 	{
-		strUIName += _T("UI");
-		int nClass = gGetUIClass(strUIName);
+		int nClass = gGetUIClass(strDefaultAttribName + _T("UI"));
 		if(nClass == classPointer)
 		{
 			MessageBox(_T("无法识别此控件！"), _T("提示"), MB_ICONINFORMATION);
@@ -208,7 +214,7 @@ void CDialogDefaultAttribList::OnBnClickedButtonAttribModify()
 		m_lstDefaultAttrib.SetItemDataPtr(nIndex, pControl);
 	}
 
-	CControlUI* pCopyControl = CLayoutManager::CopyControl(pControl);
+	CControlUI* pCopyControl = CLayoutManager::CloneControl(pControl);
 	CDialogUIAttribEdit dlg(pCopyControl);
 	if(dlg.DoModal() == IDOK)
 	{
@@ -219,10 +225,13 @@ void CDialogDefaultAttribList::OnBnClickedButtonAttribModify()
 			delete pCopyControl;
 			return;
 		}
+		m_pManager->RemoveDefaultAttributeList(strDefaultAttribName);
+		m_pManager->AddDefaultAttributeList(strDefaultAttribName, strValue);
 
 		delete pControl;
 		m_lstDefaultAttrib.SetItemDataPtr(nIndex, pCopyControl);
 		m_wndUIProperties.ShowProperty(pCopyControl);
+		g_pMainFrame->GetActiveUIView()->SetModifiedFlag();
 	}
 	else
 		delete pCopyControl;
@@ -264,7 +273,7 @@ void CDialogDefaultAttribList::OnDestroy()
 	for(int i=0; i<m_lstDefaultAttrib.GetCount(); i++)
 	{
 		CControlUI* pControl = (CControlUI*)m_lstDefaultAttrib.GetItemDataPtr(i);
-		CLayoutManager::RemoveUI(pControl);
+		CLayoutManager::DeleteUI(pControl);
 	}
 }
 
@@ -297,4 +306,10 @@ BOOL CDialogDefaultAttribList::GetDefaultAttrib(CControlUI* pControl, CString& s
 
 	strValue = StringConvertor::Utf8ToWide(strValueA);
 	return TRUE;
+}
+
+void CDialogDefaultAttribList::OnBnClickedButtonSaveAsStyle()
+{
+	// TODO: Add your control notification handler code here
+	g_pMainFrame->GetActiveUIView()->OnStyleSaveAs();
 }

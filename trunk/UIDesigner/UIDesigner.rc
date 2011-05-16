@@ -53,11 +53,11 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
     "LANGUAGE 4, 2\r\n"
     "#pragma code_page(936)\r\n"
-    "#include ""res\\UIDesigner.rc2""  // ??è? Microsoft Visual C++ ?¨¤?§?è?-|¨???¨￠?§o???\r\n"
-    "#include ""l.CHS\\afxres.rc""          // ?¨¤?§o?¨￠??¨￠?§|?t\r\n"
-    "#include ""l.CHS\\afxprint.rc""        // ???§???§??/???§???§????¨¨?§?è?§?è?¨￠?§o???\r\n"
+    "#include ""res\\UIDesigner.rc2""  // ????¨???¨?? Microsoft Visual C++ ????§????ì??ì????ì????¨???¨??-|???§???????§????ì|????ì?o???\r\n"
+    "#include ""l.CHS\\afxres.rc""          // ????§????ì??ì????ì?o????§????ì|?????§????ì|????ì?|?t\r\n"
+    "#include ""l.CHS\\afxprint.rc""        // ??????ì???????ì???/??????ì???????ì????????§????§?????ì????¨???¨?????ì????¨???¨?????§????ì|????ì?o???\r\n"
     "#if !defined(_AFXDLL)\r\n"
-    "#include ""l.CHS\\afxribbon.rc""               // MFC 1|??§1??o?§a???t?§???¨￠?§o???\r\n"
+    "#include ""l.CHS\\afxribbon.rc""               // MFC 1|?????ì?1??o????ì?a???t????ì???????§????ì|????ì?o???\r\n"
     "#endif\r\n"
     "#endif\r\n"
     "\0"
@@ -126,6 +126,8 @@ IDB_RESOURCE_VIEW       BITMAP                  "res\\resource.bmp"
 IDB_RESOURCE_VIEW24     BITMAP                  "res\\resource24.bmp"
 IDB_BITMAP_MOVEHANDLE   BITMAP                  "res\\movehandle.bmp"
 IDR_FORMEDIT            BITMAP                  "res\\formedit_hc.bmp"
+IDR_MENU_UI             BITMAP                  "res\\uimenu.bmp"
+IDB_ABOUT_BANNER        BITMAP                  "res\\banner.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -141,9 +143,6 @@ BEGIN
     BUTTON      ID_EDIT_CUT
     BUTTON      ID_EDIT_COPY
     BUTTON      ID_EDIT_PASTE
-    SEPARATOR
-    BUTTON      ID_FILE_PRINT
-    BUTTON      ID_APP_ABOUT
 END
 
 IDR_MAINFRAME_HC TOOLBAR  16, 16
@@ -160,8 +159,6 @@ BEGIN
     SEPARATOR
     BUTTON      ID_EDIT_UNDO
     BUTTON      ID_EDIT_REDO
-    SEPARATOR
-    BUTTON      ID_APP_ABOUT
 END
 
 IDR_SORT TOOLBAR  16, 16
@@ -189,6 +186,10 @@ BEGIN
     BUTTON      ID_SORTING_SORTBYTYPE
     BUTTON      ID_SORTING_SORTBYACCESS
     BUTTON      ID_SORTING_GROUPBYTYPE
+    BUTTON      ID_EDIT_DELETE
+    BUTTON      ID_MDITABS_NEW_HORZ_TAB_GROUP
+    BUTTON      ID_MDITABS_NEW_VERT_TAB_GROUP
+    BUTTON      ID_PROJECT_OPEN
 END
 
 IDR_PROPERTIES TOOLBAR  16, 16
@@ -218,6 +219,28 @@ BEGIN
     SEPARATOR
     BUTTON      ID_FORMEDIT_SHOW_GRID
     BUTTON      ID_FORMEDIT_SHOW_AUXBORDER
+END
+
+IDR_MENU_UI TOOLBAR  16, 16
+BEGIN
+    BUTTON      ID_UI_CONTROL_BUTTON
+    BUTTON      ID_UI_CONTROL_CONTROL
+    BUTTON      ID_UI_CONTROL_LABEL
+    BUTTON      ID_UI_CONTROL_TEXT
+    BUTTON      ID_UI_CONTROL_EDIT
+    BUTTON      ID_UI_CONTROL_OPTION
+    BUTTON      ID_UI_CONTROL_COMBO
+    BUTTON      ID_UI_CONTROL_LISTBOX
+    BUTTON      ID_UI_CONTROL_PROGRESS
+    BUTTON      ID_UI_CONTROL_SLIDER
+    BUTTON      ID_UI_CONTROL_ACTIVEX
+    SEPARATOR
+    BUTTON      ID_UI_LAYOUT_CONTAINER
+    BUTTON      ID_UI_LAYOUT_VERTICAL
+    BUTTON      ID_UI_LAYOUT_HORIZONTAL
+    BUTTON      ID_UI_LAYOUT_DIALOG
+    BUTTON      ID_UI_LAYOUT_TAB
+    BUTTON      ID_UI_LAYOUT_TILE
 END
 
 
@@ -262,13 +285,13 @@ BEGIN
             MENUITEM "<占位符>",                       ID_VIEW_TOOLBAR
         END
         MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
-        POPUP "外观样式(&A)"
+        POPUP "外观(&A)"
         BEGIN
             MENUITEM "Windows 2000(&2)",            ID_VIEW_APPLOOK_WIN_2000
             MENUITEM "Office XP(&X)",               ID_VIEW_APPLOOK_OFF_XP
             MENUITEM "Windows XP(&W)",              ID_VIEW_APPLOOK_WIN_XP
             MENUITEM "Office 2003(&3)",             ID_VIEW_APPLOOK_OFF_2003
-            MENUITEM "Visual Studio.NET 2005(&5)",  ID_VIEW_APPLOOK_VS_2005
+            MENUITEM "Visual Studio 2005(&5)",      ID_VIEW_APPLOOK_VS_2005
             POPUP "Office 2007(&7)"
             BEGIN
                 MENUITEM "蓝色样式(&B)",                    ID_VIEW_APPLOOK_OFF_2007_BLUE
@@ -280,6 +303,7 @@ BEGIN
     END
     POPUP "帮助(&H)"
     BEGIN
+        MENUITEM "检查更新(&U)...",                 ID_APP_CHECK_UPDATE
         MENUITEM "关于 UIDesigner(&A)...",        ID_APP_ABOUT
     END
 END
@@ -316,25 +340,55 @@ BEGIN
     POPUP "编辑(&E)"
     BEGIN
         MENUITEM "撤消(&U)\tCtrl+Z",              ID_EDIT_UNDO
+        MENUITEM "重复(&R)\tCtrl+Y",              ID_EDIT_REDO
         MENUITEM SEPARATOR
         MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
         MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
         MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "删除(&D)\t Delete",             ID_EDIT_DELETE
+    END
+    POPUP "格式(&O)"
+    BEGIN
+        MENUITEM "测试窗体(&T)\tCtrl+T",            ID_FORMEDIT_TEST
+        POPUP "对齐(&A)"
+        BEGIN
+            MENUITEM "左对齐(&L)\tCtrl+Alt+左箭头",       ID_FORMEDIT_ALIGN_LEFT
+            MENUITEM "右对齐(&R)\tCtrl+Alt+右箭头",       ID_FORMEDIT_ALIGN_RIGHT
+            MENUITEM SEPARATOR
+            MENUITEM "顶端对齐(&S)\tCtrl+Alt+上箭头",      ID_FORMEDIT_ALIGN_TOP
+            MENUITEM "底端对齐(&B)\tCtrl+Alt+下箭头",      ID_FORMEDIT_ALIGN_BOTTOM
+        END
+        POPUP "使大小相同(&M)"
+        BEGIN
+            MENUITEM "宽度(&W)",                      ID_FORMEDIT_ALIGN_SAME_WIDTH
+            MENUITEM "高度(&H)",                      ID_FORMEDIT_ALIGN_SAME_HEIGHT
+            MENUITEM "两者(&B)",                      ID_FORMEDIT_ALIGN_SAME_SIZE
+        END
+        POPUP "均匀隔开(&S)"
+        BEGIN
+            MENUITEM "横向(&A)\tAlt+左箭头",             ID_FORMEDIT_ALIGN_HORIZONTAL
+            MENUITEM "纵向(&D)\tAlt+右箭头",             ID_FORMEDIT_ALIGN_VERTICAL
+        END
+        POPUP "居中(&C)"
+        BEGIN
+            MENUITEM "垂直(&V)\t Ctrl+F9",            ID_FORMEDIT_ALIGN_CENTER_VERTICALLY
+            MENUITEM "水平(&H)\tCtrl+Shift+F9",       ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY
+        END
     END
     POPUP "视图(&V)"
     BEGIN
-        POPUP "工具栏和停靠窗口(&T)"
+        POPUP "工具栏(&T)"
         BEGIN
             MENUITEM "<占位符>",                       ID_VIEW_TOOLBAR
         END
         MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
-        POPUP "应用程序外观(&A)"
+        POPUP "外观(&A)"
         BEGIN
             MENUITEM "Windows 2000(&2)",            ID_VIEW_APPLOOK_WIN_2000
             MENUITEM "Office XP(&X)",               ID_VIEW_APPLOOK_OFF_XP
             MENUITEM "Windows XP(&W)",              ID_VIEW_APPLOOK_WIN_XP
             MENUITEM "Office 2003(&3)",             ID_VIEW_APPLOOK_OFF_2003
-            MENUITEM "Visual Studio.NET 2005(&5)",  ID_VIEW_APPLOOK_VS_2005
+            MENUITEM "Visual Studio 2005(&5)",      ID_VIEW_APPLOOK_VS_2005
             POPUP "Office 2007(&7)"
             BEGIN
                 MENUITEM "蓝色样式(&B)",                    ID_VIEW_APPLOOK_OFF_2007_BLUE
@@ -350,6 +404,7 @@ BEGIN
     END
     POPUP "帮助(&H)"
     BEGIN
+        MENUITEM "检查更新(&U)...",                 ID_APP_CHECK_UPDATE
         MENUITEM "关于 UIDesigner(&A)...",        ID_APP_ABOUT
     END
 END
@@ -470,19 +525,29 @@ BEGIN
     VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
     VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
     "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_EDIT_DELETE,         VIRTKEY, NOINVERT
     "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
     VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
-    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    "Y",            ID_EDIT_REDO,           VIRTKEY, CONTROL, NOINVERT
     "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
     "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL, NOINVERT
     "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE_ALL,       VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
     VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
     "N",            ID_PROJECT_NEW,         VIRTKEY, SHIFT, CONTROL, NOINVERT
     "O",            ID_PROJECT_OPEN,        VIRTKEY, SHIFT, CONTROL, NOINVERT
-    "S",            ID_FILE_SAVE_ALL,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_LEFT,        ID_FORMEDIT_ALIGN_LEFT, VIRTKEY, CONTROL, ALT, NOINVERT
+    VK_RIGHT,       ID_FORMEDIT_ALIGN_RIGHT, VIRTKEY, CONTROL, ALT, NOINVERT
+    VK_UP,          ID_FORMEDIT_ALIGN_TOP,  VIRTKEY, CONTROL, ALT, NOINVERT
+    VK_DOWN,        ID_FORMEDIT_ALIGN_BOTTOM, VIRTKEY, CONTROL, ALT, NOINVERT
+    VK_LEFT,        ID_FORMEDIT_ALIGN_HORIZONTAL, VIRTKEY, ALT, NOINVERT
+    VK_RIGHT,       ID_FORMEDIT_ALIGN_VERTICAL, VIRTKEY, ALT, NOINVERT
+    VK_F9,          ID_FORMEDIT_ALIGN_CENTER_VERTICALLY, VIRTKEY, CONTROL, NOINVERT
+    VK_F9,          ID_FORMEDIT_ALIGN_CENTER_HORIZONTALLY, VIRTKEY, CONTROL, ALT, NOINVERT
+    "T",            ID_FORMEDIT_TEST,       VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -491,15 +556,20 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
+IDD_ABOUTBOX DIALOGEX 0, 0, 231, 119
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "关于 UIDesigner"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
-    LTEXT           "UIDesigner，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2010",IDC_STATIC,42,26,114,8
-    DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
+    CONTROL         346,IDC_STATIC,"Static",SS_BITMAP,0,0,229,57
+    LTEXT           "UIDesigner",IDC_STATIC,7,61,37,8,SS_NOPREFIX
+    LTEXT           "贡献者:  achellies,Thinker",IDC_STATIC,7,89,114,8
+    DEFPUSHBUTTON   "确定",IDOK,174,98,50,14,WS_GROUP
+    LTEXT           "版本号",IDC_STATIC_CURRENT_VERSION,46,61,178,8
+    LTEXT           "作者:  踏雪流云",IDC_STATIC,7,75,49,8
+    LTEXT           "博客: ",IDC_STATIC,65,75,19,8
+    PUSHBUTTON      "http://www.taxue.org/",IDC_BUTTON_MY_BLOG_LINK,85,74,92,14
+    PUSHBUTTON      "http://code.google.com/p/duilib/",IDC_BUTTON_DUILIB_LINK,7,101,120,14
 END
 
 IDD_DIALOG_IMAGE DIALOGEX 0, 0, 316, 250
@@ -530,15 +600,15 @@ BEGIN
     CONTROL         "true",IDC_RADIO_IMAGE_HOLE_TRUE,"Button",BS_AUTORADIOBUTTON,85,200,29,10
 END
 
-IDD_PROPERTY_TABLAYOUTUI DIALOGEX 0, 0, 320, 200
+IDD_PROPERTY_TABLAYOUTUI DIALOGEX 0, 0, 184, 203
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Dialog"
+CAPTION "选项页属性"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
-    DEFPUSHBUTTON   "确定",IDOK,209,179,50,14
-    PUSHBUTTON      "取消",IDCANCEL,263,179,50,14
-    LISTBOX         IDC_LIST_TABLAYOUTUI_TAB,42,25,105,68,LBS_SORT | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "添加Tab",IDC_BUTTON_TABLAYOUTUI_ADD,198,42,50,14
+    DEFPUSHBUTTON   "确定",IDOK,67,182,50,14
+    PUSHBUTTON      "取消",IDCANCEL,127,182,50,14
+    LISTBOX         IDC_LIST_TABLAYOUTUI_TAB,7,7,170,161,LBS_SORT | LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "添加Tab",IDC_BUTTON_TABLAYOUTUI_ADD,7,182,50,14
 END
 
 IDD_PROJECT_NEW DIALOGEX 0, 0, 299, 105
@@ -555,23 +625,24 @@ BEGIN
     EDITTEXT        IDC_EDIT_PROJECT_PATH,51,43,176,14,ES_AUTOHSCROLL
 END
 
-IDD_SKINFIlE_NEW DIALOGEX 0, 0, 396, 212
+IDD_SKINFILE_NEW DIALOGEX 0, 0, 396, 252
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "新建UI文件"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_FILE_NAME,35,8,70,14,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "确定",IDOK,273,191,50,14
-    PUSHBUTTON      "取消",IDCANCEL,339,191,50,14
+    DEFPUSHBUTTON   "确定",IDOK,273,231,50,14
+    PUSHBUTTON      "取消",IDCANCEL,339,231,50,14
     LTEXT           "名称:",IDC_STATIC,11,11,20,8
-    LISTBOX         IDC_LIST_STYLE,12,41,93,139,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "样式预览（未完成）",IDC_STATIC_PREVIEW,121,7,268,172
+    LISTBOX         IDC_LIST_STYLE,12,42,93,174,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "样式预览",IDC_STATIC_PREVIEW,121,19,260,188
     LTEXT           "样式:",IDC_STATIC,11,29,20,8
+    GROUPBOX        "样式预览",IDC_STATIC,114,7,275,209
 END
 
-IDD_DIALOG_TEMPLATE_SAVE_AS DIALOGEX 0, 0, 223, 69
+IDD_DIALOG__SAVE_AS_NAME DIALOGEX 0, 0, 223, 69
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "保存模板"
+CAPTION "设置名称"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     EDITTEXT        IDC_EDIT_TEMPLATE_NAME,38,18,178,14,ES_AUTOHSCROLL
@@ -612,10 +683,11 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "退出",IDOK,210,249,50,14
     LTEXT           "默认属性显示",IDC_STATIC_UI_PROP_LOCATION,115,7,158,230,NOT WS_VISIBLE
-    PUSHBUTTON      "添加",IDC_BUTTON_ATTRIB_ADD,18,249,50,14
+    PUSHBUTTON      "添加   ",IDC_BUTTON_ATTRIB_ADD,18,249,50,14
     PUSHBUTTON      "删除",IDC_BUTTON_ATTRIB_DELETE,82,249,50,14
     PUSHBUTTON      "修改",IDC_BUTTON_ATTRIB_MODIFY,146,249,50,14
     LISTBOX         IDC_LIST_DEFAULT_ATTRIB,7,7,96,230,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "保存为样式",IDC_BUTTON_SAVE_AS_STYLE,28,238,50,11,NOT WS_VISIBLE
 END
 
 IDD_DIALOG_UI_ATTRIB_EDIT DIALOGEX 0, 0, 175, 319
@@ -628,6 +700,21 @@ BEGIN
     LTEXT           "静态",IDC_STATIC_UI_PROP_LOCATION,7,7,161,276,NOT WS_VISIBLE
 END
 
+IDD_DIALOG_CHECK_UPDATE DIALOGEX 0, 0, 181, 98
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "检查更新"
+FONT 9, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,65,77,50,14
+    LTEXT           "正在检查是否有更新版本的UIDesigner...",IDC_STATIC,7,7,124,8
+    LTEXT           "当前版本号",IDC_STATIC_CURRENT_VERSION,45,20,129,8
+    LTEXT           "最新版本号",IDC_STATIC_LATEST_VERSION,45,33,129,8
+    LTEXT           "您的版本是:",IDC_STATIC,7,20,38,8
+    LTEXT           "最新版本是:",IDC_STATIC,7,33,38,8
+    LTEXT           "更新提示",IDC_STATIC_UPDATE_INFO,7,46,167,8
+    PUSHBUTTON      "点击我下载最新版本",IDC_BUTTON_VERSION_UPDATE_LINK,55,62,78,14,NOT WS_VISIBLE
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -635,8 +722,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,0
- PRODUCTVERSION 1,0,0,0
+ FILEVERSION 1,0,5,143
+ PRODUCTVERSION 1,0,5,143
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -651,11 +738,11 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "FileDescription", "UIDesigner V1.0"
-            VALUE "FileVersion", "V1.0"
+            VALUE "FileDescription", "DuiLib UI Designer"
+            VALUE "FileVersion", "1.0.5.143"
             VALUE "InternalName", "UIDesigner.exe"
-            VALUE "LegalCopyright", " (C) 踏雪流云。保留所有权利。"
             VALUE "ProductName", "UIDesigner"
+            VALUE "ProductVersion", "1, 0, 5, 143"
         END
     END
     BLOCK "VarFileInfo"
@@ -676,9 +763,9 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 163
+        RIGHTMARGIN, 224
         TOPMARGIN, 7
-        BOTTOMMARGIN, 55
+        BOTTOMMARGIN, 112
     END
 
     IDD_DIALOG_IMAGE, DIALOG
@@ -692,9 +779,9 @@ BEGIN
     IDD_PROPERTY_TABLAYOUTUI, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 313
+        RIGHTMARGIN, 177
         TOPMARGIN, 7
-        BOTTOMMARGIN, 193
+        BOTTOMMARGIN, 196
     END
 
     IDD_PROJECT_NEW, DIALOG
@@ -705,15 +792,15 @@ BEGIN
         BOTTOMMARGIN, 98
     END
 
-    IDD_SKINFIlE_NEW, DIALOG
+    IDD_SKINFILE_NEW, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 389
         TOPMARGIN, 7
-        BOTTOMMARGIN, 205
+        BOTTOMMARGIN, 245
     END
 
-    IDD_DIALOG_TEMPLATE_SAVE_AS, DIALOG
+    IDD_DIALOG__SAVE_AS_NAME, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 216
@@ -752,6 +839,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 312
     END
+
+    IDD_DIALOG_CHECK_UPDATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 174
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 91
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -764,7 +859,7 @@ END
 STRINGTABLE 
 BEGIN
     IDP_OLE_INIT_FAILED     "OLE 初始化失败。请确保 OLE 库是正确的版本。"
-    IDS_TOOLBAR_FORMEDIT    "窗口编辑"
+    IDS_TOOLBAR_FORMEDIT    "窗体编辑"
 END
 
 STRINGTABLE 
@@ -856,7 +951,7 @@ BEGIN
     ID_EDIT_REPLACE         "用其他文本替换特定的文本\n替换"
     ID_EDIT_SELECT_ALL      "选定整个文档\n全选"
     ID_EDIT_UNDO            "撤消上一操作\n撤消"
-    ID_EDIT_REDO            "恢复上次撤消的操作\n重做"
+    ID_EDIT_REDO            "恢复上次撤消的操作\n重复"
 END
 
 STRINGTABLE 
@@ -911,7 +1006,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_FORMEDIT_TEST        "\n测试窗口"
+    ID_FORMEDIT_TEST        "\n测试窗体"
     ID_FORMEDIT_ALIGN_LEFT  "\n左对齐"
     ID_FORMEDIT_ALIGN_RIGHT "\n右对齐"
     ID_FORMEDIT_ALIGN_TOP   "\n顶端对齐"
@@ -955,6 +1050,12 @@ BEGIN
     ID_MDITABS_NEW_VERT_TAB_GROUP "新建一个新的垂直选项卡组"
     ID_MDITABS_MOVE_TO_NEXT_GROUP "将当前视图移动到下一个选项卡组"
     ID_MDITABS_MOVE_TO_PREV_GROUP "将当前视图移动到上一个选项卡组"
+    ID_APP_CHECK_UPDATE     "检查是否有新版本\n检查更新"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_EDIT_DELETE          "删除选中的控件\\删除"
 END
 
 #endif    // Chinese (P.R.C.) resources
@@ -974,11 +1075,11 @@ END
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
 #pragma code_page(936)
-#include "res\UIDesigner.rc2"  // ?¤? Microsoft Visual C++ ?à¨¤?-|ì??á¨o???
-#include "l.CHS\afxres.rc"          // ?à¨o?á??á¨|?t
-#include "l.CHS\afxprint.rc"        // ??¨°¨??/??¨°¨????è¨¤¨¤?á¨o???
+#include "res\UIDesigner.rc2"  // ????ì??ì? Microsoft Visual C++ ???¨???§?§???§????ì??ì?-|??¨??????¨???§|???§?o???
+#include "l.CHS\afxres.rc"          // ???¨???§?§???§?o???¨???§|????¨???§|???§?|?t
+#include "l.CHS\afxprint.rc"        // ?????§??????§???/?????§??????§???????¨???¨????§????ì??ì???§????ì??ì???¨???§|???§?o???
 #if !defined(_AFXDLL)
-#include "l.CHS\afxribbon.rc"               // MFC 1|?¨1??o¨a???t¨???á¨o???
+#include "l.CHS\afxribbon.rc"               // MFC 1|????§?1??o???§?a???t???§??????¨???§|???§?o???
 #endif
 #endif
 

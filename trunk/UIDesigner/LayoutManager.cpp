@@ -105,6 +105,8 @@ void CFormUI::SetShowUpdateRect(bool show)
 void CFormUI::SetPos(RECT rc)
 {
 	CControlUI::SetPos(rc);
+	m_cxyFixed.cx = rc.right - rc.left;
+	m_cxyFixed.cy = rc.bottom - rc.top;
 
 	if(m_items.GetSize()==0)
 		return;
@@ -160,6 +162,15 @@ void CFormUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	}
 	else if( _tcscmp(pstrName, _T("showdirty")) == 0 ) {
 		SetShowUpdateRect(_tcscmp(pstrValue, _T("true")) == 0);
+	}
+	else if( _tcscmp(pstrName, _T("pos")) == 0 ) {
+		RECT rcPos = { 0 };
+		LPTSTR pstr = NULL;
+		rcPos.left = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+		rcPos.top = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
+		rcPos.right = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
+		rcPos.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);    
+		SetInitSize(rcPos.right - rcPos.left, rcPos.bottom - rcPos.top);
 	}
 }
 
@@ -347,7 +358,6 @@ LRESULT CFormTestWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 CLayoutManager::CLayoutManager(void)
 	: m_pFormUI(NULL), m_bShowGrid(false), m_bShowAuxBorder(true)
 {
-	ZeroMemory(&m_UINameCount, sizeof(m_UINameCount));
 }
 
 CLayoutManager::~CLayoutManager(void)
@@ -583,7 +593,7 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CL
 	return pControl;
 }
 
-BOOL CLayoutManager::RemoveUI(CControlUI* pControl)
+BOOL CLayoutManager::DeleteUI(CControlUI* pControl)
 {
 	if(pControl == NULL)
 		return FALSE;
@@ -691,7 +701,7 @@ void CLayoutManager::TestForm()
 	if( pFrame == NULL )
 		return;
 
-	CControlUI* pRoot=CopyControls(GetForm()->GetItemAt(0));
+	CControlUI* pRoot=CloneControls(GetForm()->GetItemAt(0));
 	if(pRoot==NULL)
 		return;
 
@@ -730,22 +740,22 @@ BOOL CLayoutManager::IsEmptyForm() const
 	return GetForm()->GetItemAt(0)==NULL;
 }
 
-CControlUI* CLayoutManager::CopyControls(CControlUI* pControl)
+CControlUI* CLayoutManager::CloneControls(CControlUI* pControl)
 {
 	if(pControl==NULL)
 		return NULL;
 
 	CContainerUI* pContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
 	if(pContainer==NULL)
-		return CopyControl(pControl);
+		return CloneControl(pControl);
 
-	CContainerUI* pCopyContainer=static_cast<CContainerUI*>(CopyControl(pContainer)->GetInterface(_T("Container")));
+	CContainerUI* pCopyContainer=static_cast<CContainerUI*>(CloneControl(pContainer)->GetInterface(_T("Container")));
 	pCopyContainer->SetAutoDestroy(false);
 	pCopyContainer->RemoveAll();
 	pCopyContainer->SetAutoDestroy(true);
 	for(int i=0;i<pContainer->GetCount();i++)
 	{
-		CControlUI* pCopyControl=CopyControls(pContainer->GetItemAt(i));
+		CControlUI* pCopyControl=CloneControls(pContainer->GetItemAt(i));
 		pCopyControl->SetManager(NULL,pCopyContainer);
 		pCopyContainer->Add(pCopyControl);
 	}
@@ -753,7 +763,7 @@ CControlUI* CLayoutManager::CopyControls(CControlUI* pControl)
 	return pCopyContainer;
 }
 
-CControlUI* CLayoutManager::CopyControl(CControlUI* pControl)
+CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 {
 	CControlUI* pCopyControl = NULL;
 	int nClass = ((ExtendedAttributes*)pControl->GetTag())->nClass;
@@ -922,19 +932,19 @@ void CLayoutManager::AlignCenterVertically(CControlUI* pFocused,CArray<CControlU
 	for(int i=0;i<arrSelected.GetSize();i++)
 	{
 		CControlUI* pControl=arrSelected.GetAt(i);
-		if(pControl->GetParent()!=pFocused->GetParent())
+		if(pControl->GetParent()!=pParent)
+		{
+			arrSelected.RemoveAt(i);
 			continue;
+		}
 
 		rectUnion.UnionRect(&rectUnion,&pControl->GetPos());
 	}
 
-	int nOffsetY;
-	nOffsetY=(rcParent.top+rcParent.bottom)/2-(rectUnion.top+rectUnion.bottom)/2;
+	int nOffsetY=(rcParent.top+rcParent.bottom)/2-(rectUnion.top+rectUnion.bottom)/2;
 	for(int i=0;i<arrSelected.GetSize();i++)
 	{
 		CControlUI* pControl=arrSelected.GetAt(i);
-		if(pControl->GetParent()!=pFocused->GetParent())
-			continue;
 
 		SIZE szXY=pControl->GetFixedXY();
 		szXY.cy+=nOffsetY;
@@ -957,19 +967,19 @@ void CLayoutManager::AlignCenterHorizontally(CControlUI* pFocused,CArray<CContro
 	for(int i=0;i<arrSelected.GetSize();i++)
 	{
 		CControlUI* pControl=arrSelected.GetAt(i);
-		if(pControl->GetParent()!=pFocused->GetParent())
+		if(pControl->GetParent()!=pParent)
+		{
+			arrSelected.RemoveAt(i);
 			continue;
+		}
 
 		rectUnion.UnionRect(&rectUnion,&pControl->GetPos());
 	}
 
-	int nOffsetX;
-	nOffsetX=(rcParent.left+rcParent.right)/2-(rectUnion.left+rectUnion.right)/2;
+	int nOffsetX=(rcParent.left+rcParent.right)/2-(rectUnion.left+rectUnion.right)/2;
 	for(int i=0;i<arrSelected.GetSize();i++)
 	{
 		CControlUI* pControl=arrSelected.GetAt(i);
-		if(pControl->GetParent()!=pFocused->GetParent())
-			continue;
 
 		SIZE szXY=pControl->GetFixedXY();
 		szXY.cx+=nOffsetX;
@@ -981,12 +991,110 @@ void CLayoutManager::AlignCenterHorizontally(CControlUI* pFocused,CArray<CContro
 
 void CLayoutManager::AlignHorizontal(CControlUI* pFocused,CArray<CControlUI*,CControlUI*>& arrSelected)
 {
+	CControlUI* pParent=pFocused->GetParent();
+	if(!pParent)
+		return;
 
+	CRect rectUnion;
+	rectUnion.SetRectEmpty();
+	int nTotalWidth=0;
+	for(int i=0;i<arrSelected.GetSize();i++)
+	{
+		CControlUI* pControl=arrSelected.GetAt(i);
+		if(pControl->GetParent()!=pParent)
+		{
+			arrSelected.RemoveAt(i);
+			continue;
+		}
+		nTotalWidth+=pControl->GetWidth();
+		rectUnion.UnionRect(&rectUnion,&pControl->GetPos());
+	}
+
+	int nCount=arrSelected.GetSize();
+	if(nCount<3)
+		return;
+	int nSpaceX=(rectUnion.Width()-nTotalWidth)/(nCount-1);
+	int nMin;
+	for(int i=0;i<nCount-1;i++)
+	{
+		nMin=i;
+		int j;
+		for(j=i+1;j<nCount;j++)
+		{
+			if(arrSelected[j]->GetX()<arrSelected[nMin]->GetX())
+				nMin=j;
+		}
+		if(i!=nMin)
+		{
+			CControlUI* pControl=arrSelected[i];
+			arrSelected[i]=arrSelected[nMin];
+			arrSelected[nMin]=pControl;
+		}
+	}
+
+	for(int i=1;i<nCount-1;i++)
+	{
+		int right=arrSelected[i-1]->GetFixedXY().cx+arrSelected[i-1]->GetWidth();
+		SIZE szXY=arrSelected[i]->GetFixedXY();
+		szXY.cx=right+nSpaceX;
+		arrSelected[i]->SetFixedXY(szXY);
+	}
+
+	pParent->SetPos(pParent->GetPos());
 }
 
 void CLayoutManager::AlignVertical(CControlUI* pFocused,CArray<CControlUI*,CControlUI*>& arrSelected)
 {
+	CControlUI* pParent=pFocused->GetParent();
+	if(!pParent)
+		return;
 
+	CRect rectUnion;
+	rectUnion.SetRectEmpty();
+	int nTotalHeight=0;
+	for(int i=0;i<arrSelected.GetSize();i++)
+	{
+		CControlUI* pControl=arrSelected.GetAt(i);
+		if(pControl->GetParent()!=pParent)
+		{
+			arrSelected.RemoveAt(i);
+			continue;
+		}
+		nTotalHeight+=pControl->GetHeight();
+		rectUnion.UnionRect(&rectUnion,&pControl->GetPos());
+	}
+
+	int nCount=arrSelected.GetSize();
+	if(nCount<3)
+		return;
+	int nSpaceY=(rectUnion.Height()-nTotalHeight)/(nCount-1);
+	int nMin;
+	for(int i=0;i<nCount-1;i++)
+	{
+		nMin=i;
+		int j;
+		for(j=i+1;j<nCount;j++)
+		{
+			if(arrSelected[j]->GetY()<arrSelected[nMin]->GetY())
+				nMin=j;
+		}
+		if(i!=nMin)
+		{
+			CControlUI* pControl=arrSelected[i];
+			arrSelected[i]=arrSelected[nMin];
+			arrSelected[nMin]=pControl;
+		}
+	}
+
+	for(int i=1;i<nCount-1;i++)
+	{
+		int bottom=arrSelected[i-1]->GetFixedXY().cy+arrSelected[i-1]->GetHeight();
+		SIZE szXY=arrSelected[i]->GetFixedXY();
+		szXY.cy=bottom+nSpaceY;
+		arrSelected[i]->SetFixedXY(szXY);
+	}
+
+	pParent->SetPos(pParent->GetPos());
 }
 
 void CLayoutManager::AlignSameWidth(CControlUI* pFocused,CArray<CControlUI*,CControlUI*>& arrSelected)
@@ -1207,7 +1315,7 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 
 	if(pControl->GetBkImage() && _tcslen(pControl->GetBkImage()) > 0)
 	{
-		pNode->SetAttribute("bkimage", StringConvertor::WideToUtf8(pControl->GetBkImage()));
+		pNode->SetAttribute("bkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pControl->GetBkImage())));
 	}
 
 	if(pControl->GetBkColor() != 0)
@@ -1339,19 +1447,19 @@ void CLayoutManager::SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNod
 
 	CButtonUI* pButtonUI = static_cast<CButtonUI*>(pControl->GetInterface(_T("Button")));
 	if(pButtonUI->GetNormalImage() && _tcslen(pButtonUI->GetNormalImage()) > 0)
-		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(pButtonUI->GetNormalImage()));
+		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pButtonUI->GetNormalImage())));
 
 	if(pButtonUI->GetHotImage() && _tcslen(pButtonUI->GetHotImage()) > 0)
-		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(pButtonUI->GetHotImage()));
+		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pButtonUI->GetHotImage())));
 
 	if(pButtonUI->GetPushedImage() && _tcslen(pButtonUI->GetPushedImage()) > 0)
-		pNode->SetAttribute("pushedimage", StringConvertor::WideToUtf8(pButtonUI->GetPushedImage()));
+		pNode->SetAttribute("pushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pButtonUI->GetPushedImage())));
 
 	if(pButtonUI->GetFocusedImage() && _tcslen(pButtonUI->GetFocusedImage()) > 0)
-		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(pButtonUI->GetFocusedImage()));
+		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pButtonUI->GetFocusedImage())));
 
 	if(pButtonUI->GetDisabledImage() && _tcslen(pButtonUI->GetDisabledImage()) > 0)
-		pNode->SetAttribute("disabledimage", StringConvertor::WideToUtf8(pButtonUI->GetDisabledImage()));
+		pNode->SetAttribute("disabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pButtonUI->GetDisabledImage())));
 
 	if(pButtonUI->GetFocusedTextColor() != 0)
 	{
@@ -1389,10 +1497,10 @@ void CLayoutManager::SaveOptionProperty(CControlUI* pControl, TiXmlElement* pNod
 		pNode->SetAttribute("selected", pOptionUI->IsSelected()?"true":"false");
 
 	if(pOptionUI->GetForeImage() && _tcslen(pOptionUI->GetForeImage()) > 0)
-		pNode->SetAttribute("foreimage", StringConvertor::WideToUtf8(pOptionUI->GetForeImage()));
+		pNode->SetAttribute("foreimage", StringConvertor::WideToUtf8(ConvertImageFileName(pOptionUI->GetForeImage())));
 
 	if(pOptionUI->GetSelectedImage() && _tcslen(pOptionUI->GetSelectedImage()) > 0)
-		pNode->SetAttribute("selectedimage", StringConvertor::WideToUtf8(pOptionUI->GetSelectedImage()));
+		pNode->SetAttribute("selectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pOptionUI->GetSelectedImage())));
 }
 
 void CLayoutManager::SaveProgressProperty(CControlUI* pControl, TiXmlElement* pNode)
@@ -1403,7 +1511,7 @@ void CLayoutManager::SaveProgressProperty(CControlUI* pControl, TiXmlElement* pN
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if(pProgressUI->GetFgImage() && _tcslen(pProgressUI->GetFgImage()) > 0)
-		pNode->SetAttribute("fgimage", StringConvertor::WideToUtf8(pProgressUI->GetFgImage()));
+		pNode->SetAttribute("fgimage", StringConvertor::WideToUtf8(ConvertImageFileName(pProgressUI->GetFgImage())));
 
 	_stprintf_s(szBuf, _T("%d"), pProgressUI->GetMinValue());
 	pNode->SetAttribute("min", StringConvertor::WideToUtf8(szBuf));
@@ -1427,13 +1535,13 @@ void CLayoutManager::SaveSliderProperty(CControlUI* pControl, TiXmlElement* pNod
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if(pSliderUI->GetThumbImage() && _tcslen(pSliderUI->GetThumbImage()) > 0)
-		pNode->SetAttribute("thumbimage", StringConvertor::WideToUtf8(pSliderUI->GetThumbImage()));
+		pNode->SetAttribute("thumbimage", StringConvertor::WideToUtf8(ConvertImageFileName(pSliderUI->GetThumbImage())));
 
 	if(pSliderUI->GetThumbHotImage() && _tcslen(pSliderUI->GetThumbHotImage()) > 0)
-		pNode->SetAttribute("thumbhotimage", StringConvertor::WideToUtf8(pSliderUI->GetThumbHotImage()));
+		pNode->SetAttribute("thumbhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pSliderUI->GetThumbHotImage())));
 
 	if(pSliderUI->GetThumbPushedImage() && _tcslen(pSliderUI->GetThumbPushedImage()) > 0)
-		pNode->SetAttribute("thumbpushedimage", StringConvertor::WideToUtf8(pSliderUI->GetThumbPushedImage()));
+		pNode->SetAttribute("thumbpushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pSliderUI->GetThumbPushedImage())));
 
 	_stprintf_s(szBuf, _T("%d,%d"), pSliderUI->GetThumbRect().right - pSliderUI->GetThumbRect().left, pSliderUI->GetThumbRect().bottom - pSliderUI->GetThumbRect().top);
 	pNode->SetAttribute("thumbsize", StringConvertor::WideToUtf8(szBuf));
@@ -1460,64 +1568,64 @@ void CLayoutManager::SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* p
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if(pScrollbarUI->GetBkNormalImage() && _tcslen(pScrollbarUI->GetBkNormalImage()) > 0)
-		pNode->SetAttribute("bknormalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkNormalImage()));
+		pNode->SetAttribute("bknormalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetBkNormalImage())));
 
 	if(pScrollbarUI->GetBkHotImage() && _tcslen(pScrollbarUI->GetBkHotImage()) > 0)
-		pNode->SetAttribute("bkhotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkHotImage()));
+		pNode->SetAttribute("bkhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetBkHotImage())));
 
 	if(pScrollbarUI->GetBkPushedImage() && _tcslen(pScrollbarUI->GetBkPushedImage()) > 0)
-		pNode->SetAttribute("bkpushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkPushedImage()));
+		pNode->SetAttribute("bkpushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetBkPushedImage())));
 
 	if(pScrollbarUI->GetBkDisabledImage() && _tcslen(pScrollbarUI->GetBkDisabledImage()) > 0)
-		pNode->SetAttribute("bkdisabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetBkDisabledImage()));
+		pNode->SetAttribute("bkdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetBkDisabledImage())));
 
 	if(pScrollbarUI->GetRailNormalImage() && _tcslen(pScrollbarUI->GetRailNormalImage()) > 0)
-		pNode->SetAttribute("railnormalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailNormalImage()));
+		pNode->SetAttribute("railnormalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetRailNormalImage())));
 
 	if(pScrollbarUI->GetRailHotImage() && _tcslen(pScrollbarUI->GetRailHotImage()) > 0)
-		pNode->SetAttribute("railhotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailHotImage()));
+		pNode->SetAttribute("railhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetRailHotImage())));
 
 	if(pScrollbarUI->GetRailPushedImage() && _tcslen(pScrollbarUI->GetRailPushedImage()) > 0)
-		pNode->SetAttribute("railpushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailPushedImage()));
+		pNode->SetAttribute("railpushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetRailPushedImage())));
 
 	if(pScrollbarUI->GetRailDisabledImage() && _tcslen(pScrollbarUI->GetRailDisabledImage()) > 0)
-		pNode->SetAttribute("raildisabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetRailDisabledImage()));
+		pNode->SetAttribute("raildisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetRailDisabledImage())));
 
 	if(pScrollbarUI->GetThumbNormalImage() && _tcslen(pScrollbarUI->GetThumbNormalImage()) > 0)
-		pNode->SetAttribute("thumbnormalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbNormalImage()));
+		pNode->SetAttribute("thumbnormalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetThumbNormalImage())));
 
 	if(pScrollbarUI->GetThumbHotImage() && _tcslen(pScrollbarUI->GetThumbHotImage()) > 0)
-		pNode->SetAttribute("thumbhotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbHotImage()));
+		pNode->SetAttribute("thumbhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetThumbHotImage())));
 
 	if(pScrollbarUI->GetThumbPushedImage() && _tcslen(pScrollbarUI->GetThumbPushedImage()) > 0)
-		pNode->SetAttribute("thumbpushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbPushedImage()));
+		pNode->SetAttribute("thumbpushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetThumbPushedImage())));
 
 	if(pScrollbarUI->GetThumbDisabledImage() && _tcslen(pScrollbarUI->GetThumbDisabledImage()) > 0)
-		pNode->SetAttribute("thumbdisabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetThumbDisabledImage()));
+		pNode->SetAttribute("thumbdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetThumbDisabledImage())));
 
 	if(pScrollbarUI->GetButton2NormalImage() && _tcslen(pScrollbarUI->GetButton2NormalImage()) > 0)
-		pNode->SetAttribute("button2normalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2NormalImage()));
+		pNode->SetAttribute("button2normalimage", StringConvertor::WideToUtf8((pScrollbarUI->GetButton2NormalImage())));
 
 	if(pScrollbarUI->GetButton2HotImage() && _tcslen(pScrollbarUI->GetButton2HotImage()) > 0)
-		pNode->SetAttribute("button2hotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2HotImage()));
+		pNode->SetAttribute("button2hotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetButton2HotImage())));
 
 	if(pScrollbarUI->GetButton2PushedImage() && _tcslen(pScrollbarUI->GetButton2PushedImage()) > 0)
-		pNode->SetAttribute("button2pushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2PushedImage()));
+		pNode->SetAttribute("button2pushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetButton2PushedImage())));
 
 	if(pScrollbarUI->GetButton2DisabledImage() && _tcslen(pScrollbarUI->GetButton2DisabledImage()) > 0)
-		pNode->SetAttribute("button2disabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton2DisabledImage()));
+		pNode->SetAttribute("button2disabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetButton2DisabledImage())));
 
 	if(pScrollbarUI->GetButton1NormalImage() && _tcslen(pScrollbarUI->GetButton1NormalImage()) > 0)
-		pNode->SetAttribute("button1normalimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1NormalImage()));
+		pNode->SetAttribute("button1normalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetButton1NormalImage())));
 
 	if(pScrollbarUI->GetButton1HotImage() && _tcslen(pScrollbarUI->GetButton1HotImage()) > 0)
-		pNode->SetAttribute("button1hotimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1HotImage()));
+		pNode->SetAttribute("button1hotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetButton1HotImage())));
 
 	if(pScrollbarUI->GetButton1PushedImage() && _tcslen(pScrollbarUI->GetButton1PushedImage()) > 0)
-		pNode->SetAttribute("button1pushedimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1PushedImage()));
+		pNode->SetAttribute("button1pushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetButton1PushedImage())));
 
 	if(pScrollbarUI->GetButton1DisabledImage() && _tcslen(pScrollbarUI->GetButton1DisabledImage()) > 0)
-		pNode->SetAttribute("button1disabledimage", StringConvertor::WideToUtf8(pScrollbarUI->GetButton1DisabledImage()));
+		pNode->SetAttribute("button1disabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pScrollbarUI->GetButton1DisabledImage())));
 
 	_stprintf_s(szBuf, _T("%d"), pScrollbarUI->GetLineSize());
 	pNode->SetAttribute("linesize", StringConvertor::WideToUtf8(szBuf));
@@ -1543,7 +1651,7 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 		pNode->SetAttribute("header", "hidden");
 
 	if(pListUI->GetHeader() && pListUI->GetHeader()->GetBkImage() && _tcslen(pListUI->GetHeader()->GetBkImage()) > 0)
-		pNode->SetAttribute("headerbkimage", StringConvertor::WideToUtf8(pListUI->GetHeader()->GetBkImage()));	
+		pNode->SetAttribute("headerbkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetHeader()->GetBkImage())));	
 
 	RECT rcTextPadding = pListUI->GetItemTextPadding();
 	if((rcTextPadding.left != 0) || (rcTextPadding.right != 0) || (rcTextPadding.bottom != 0) || (rcTextPadding.top != 0))
@@ -1617,16 +1725,16 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 	}
 
 	if(pListUI->GetItemImage() && _tcslen(pListUI->GetItemImage()) > 0)
-		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(pListUI->GetItemImage()));
+		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetItemImage())));
 
 	if(pListUI->GetSelectedItemImage() && _tcslen(pListUI->GetSelectedItemImage()) > 0)
-		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(pListUI->GetSelectedItemImage()));
+		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetSelectedItemImage())));
 
 	if(pListUI->GetHotItemImage() && _tcslen(pListUI->GetHotItemImage()) > 0)
-		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(pListUI->GetHotItemImage()));
+		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetHotItemImage())));
 
 	if(pListUI->GetDisabledItemImage() && _tcslen(pListUI->GetDisabledItemImage()) > 0)
-		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(pListUI->GetDisabledItemImage()));
+		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetDisabledItemImage())));
 
 	if(pListUI->IsItemShowHtml())
 		pNode->SetAttribute("itemshowhtml",pListUI->IsItemShowHtml()?"true":"false");
@@ -1658,10 +1766,25 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 
 void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
-	SaveControlProperty(pControl, pNode);
+	SaveContainerProperty(pControl, pNode);
 	CComboUI* pComboUI = static_cast<CComboUI*>(pControl->GetInterface(_T("Combo")));
 
 	TCHAR szBuf[MAX_PATH] = {0};
+
+	if(pComboUI->GetNormalImage() && _tcslen(pComboUI->GetNormalImage()) > 0)
+		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetNormalImage())));
+
+	if(pComboUI->GetHotImage() && _tcslen(pComboUI->GetHotImage()) > 0)
+		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetHotImage())));
+
+	if(pComboUI->GetPushedImage() && _tcslen(pComboUI->GetPushedImage()) > 0)
+		pNode->SetAttribute("pushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetPushedImage())));
+
+	if(pComboUI->GetFocusedImage() && _tcslen(pComboUI->GetFocusedImage()) > 0)
+		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetFocusedImage())));
+
+	if(pComboUI->GetDisabledImage() && _tcslen(pComboUI->GetDisabledImage()) > 0)
+		pNode->SetAttribute("disabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetDisabledImage())));
 
 	if((pComboUI->GetDropBoxSize().cx != 0) || (pComboUI->GetDropBoxSize().cy != 0))
 	{
@@ -1742,16 +1865,16 @@ void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode
 	}
 
 	if(pComboUI->GetItemImage() && _tcslen(pComboUI->GetItemImage()) > 0)
-		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(pComboUI->GetItemImage()));
+		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetItemImage())));
 
 	if(pComboUI->GetSelectedItemImage() && _tcslen(pComboUI->GetSelectedItemImage()) > 0)
-		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(pComboUI->GetSelectedItemImage()));
+		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetSelectedItemImage())));
 
 	if(pComboUI->GetHotItemImage() && _tcslen(pComboUI->GetHotItemImage()) > 0)
-		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(pComboUI->GetHotItemImage()));
+		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetHotItemImage())));
 
 	if(pComboUI->GetDisabledItemImage() && _tcslen(pComboUI->GetDisabledItemImage()) > 0)
-		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(pComboUI->GetDisabledItemImage()));
+		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetDisabledItemImage())));
 
 	if(pComboUI->IsItemShowHtml())
 		pNode->SetAttribute("itemshowhtml",pComboUI->IsItemShowHtml()?"true":"false");
@@ -1814,19 +1937,19 @@ void CLayoutManager::SaveListHeaderItemProperty(CControlUI* pControl, TiXmlEleme
 		pNode->SetAttribute("align", StringConvertor::WideToUtf8(tstrAlgin.c_str()));
 
 	if(pListHeaderItemUI->GetNormalImage() && _tcslen(pListHeaderItemUI->GetNormalImage()) > 0)
-		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetNormalImage()));
+		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListHeaderItemUI->GetNormalImage())));
 
 	if(pListHeaderItemUI->GetHotImage() && _tcslen(pListHeaderItemUI->GetHotImage()) > 0)
-		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetHotImage()));
+		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListHeaderItemUI->GetHotImage())));
 
 	if(pListHeaderItemUI->GetPushedImage() && _tcslen(pListHeaderItemUI->GetPushedImage()) > 0)
-		pNode->SetAttribute("pushedimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetPushedImage()));
+		pNode->SetAttribute("pushedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListHeaderItemUI->GetPushedImage())));
 
 	if(pListHeaderItemUI->GetFocusedImage() && _tcslen(pListHeaderItemUI->GetFocusedImage()) > 0)
-		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetFocusedImage()));
+		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListHeaderItemUI->GetFocusedImage())));
 
 	if(pListHeaderItemUI->GetSepImage() && _tcslen(pListHeaderItemUI->GetSepImage()) > 0)
-		pNode->SetAttribute("sepimage", StringConvertor::WideToUtf8(pListHeaderItemUI->GetSepImage()));
+		pNode->SetAttribute("sepimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListHeaderItemUI->GetSepImage())));
 }
 
 void CLayoutManager::SaveListElementProperty(CControlUI* pControl, TiXmlElement* pNode)
@@ -2080,84 +2203,73 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 	xmlDoc.SaveFile();
 }
 
-void CLayoutManager::SetDefaultUIName(CControlUI* pControl, BOOL bForce/* = FALSE*/)
+void CLayoutManager::SetDefaultUIName(CControlUI* pControl)
 {
-	BOOL bDitto = FALSE;
+	BOOL bNeedName = FALSE;
 	CString strName = pControl->GetName();
 	if(strName.IsEmpty())
-		bForce = TRUE;
+		bNeedName = TRUE;
 	else
 	{
 		if(m_Manager.FindControl(strName))
-			bDitto = TRUE;
+			bNeedName = TRUE;
+		else
+			m_Manager.InitControls(pControl);
 	}
-	if(!bForce && !bDitto)
+	if(!bNeedName)
 		return;
 
-	ExtendedAttributes* pExtended = (ExtendedAttributes*)pControl->GetTag();
-	int nClass = pExtended->nClass;
-	int* pCount;
-
-	switch(nClass)
-	{
-	case classControl:
-		pCount = &m_UINameCount.nControlCount;
-		break;
-	case classLabel:
-		pCount = &m_UINameCount.nLabelCount;
-		break;
-	case classText:
-		pCount = &m_UINameCount.nTextCount;
-		break;
-	case classButton:
-		pCount = &m_UINameCount.nButtonCount;
-		break;
-	case classEdit:
-		pCount = &m_UINameCount.nEditCount;
-		break;
-	case classOption:
-		pCount = &m_UINameCount.nOptionCount;
-		break;
-	case classProgress:
-		pCount = &m_UINameCount.nProgressCount;
-		break;
-	case classSlider:
-		pCount = &m_UINameCount.nSliderCount;
-		break;
-	case classCombo:
-		pCount = &m_UINameCount.nComboCount;
-		break;
-	case classActiveX:
-		pCount = &m_UINameCount.nActiveXCount;
-		break;
-	case classContainer:
-		pCount = &m_UINameCount.nContainerCount;
-		break;
-	case classVerticalLayout:
-		pCount = &m_UINameCount.nVerticalLayoutCount;
-		break;
-	case classHorizontalLayout:
-		pCount = &m_UINameCount.nHorizontalLayoutCount;
-		break;
-	case classDialogLayout:
-		pCount = &m_UINameCount.nDialogLayoutCount;
-		break;
-	case classTileLayout:
-		pCount = &m_UINameCount.nTileLayoutCount;
-		break;
-	case classTabLayout:
-		pCount = &m_UINameCount.nTabLayoutCount;
-		break;
-	default:
-		return;
-	}
-
+	int nCount = 0;
 	CString strUIName;
 	do 
 	{
-		(*pCount)++;
-		strUIName.Format(_T("%s%d"),pControl->GetClass(),*pCount);
+		nCount++;
+		strUIName.Format(_T("%s%d"), pControl->GetClass(), nCount);
 	}while(m_Manager.FindControl(strUIName));
 	pControl->SetName(strUIName);
 	m_Manager.InitControls(pControl);
+}
+
+CString CLayoutManager::ConvertImageFileName(LPCTSTR pstrImageAttrib)
+{
+	CString strImageAttrib(pstrImageAttrib);
+	CStdString sItem;
+	CStdString sValue;
+	LPTSTR pstr = (LPTSTR)pstrImageAttrib;
+	while( *pstr != _T('\0') ) {
+		sItem.Empty();
+		sValue.Empty();
+		while( *pstr != _T('\0') && *pstr != _T('=') ) {
+			LPTSTR pstrTemp = ::CharNext(pstr);
+			while( pstr < pstrTemp) {
+				sItem += *pstr++;
+			}
+		}
+		if( *pstr++ != _T('=') ) break;
+		if( *pstr++ != _T('\'') ) break;
+		while( *pstr != _T('\0') && *pstr != _T('\'') ) {
+			LPTSTR pstrTemp = ::CharNext(pstr);
+			while( pstr < pstrTemp) {
+				sValue += *pstr++;
+			}
+		}
+		if( *pstr++ != _T('\'') ) break;
+		if( !sValue.IsEmpty() ) {
+			if( sItem == _T("file"))
+				break;
+		}
+		if( *pstr++ != _T(' ') ) break;
+	}
+
+	if(sValue.IsEmpty())
+		sValue = sItem;
+	CString strFileName = sValue;
+	int nPos = strFileName.ReverseFind(_T('\\'));
+	if(nPos != -1)
+	{
+		strFileName = strFileName.Right(strFileName.GetLength() - nPos - 1);
+		strImageAttrib.Replace(sValue, strFileName);
+	}
+
+	return strImageAttrib;
 }

@@ -82,4 +82,5 @@ public:
 	afx_msg void OnFileSaveAll();
 	afx_msg void OnUpdateProjectExist(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateFileCloseAll(CCmdUI *pCmdUI);
+	afx_msg void OnAppCheckUpdate();
 };

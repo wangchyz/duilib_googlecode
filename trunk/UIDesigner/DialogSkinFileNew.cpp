@@ -89,8 +89,19 @@ void CDialogSkinFileNew::OnLbnSelchangeListStyle()
 		return;
 
 	m_lstStyles.GetText(nIndex, strText);
-	m_strStyleFile = (strText == _T("(нч)")) ? _T(""):CGlobalVariable::GetStylesDir() \
-		+ strText + _T("\\style.xml");
+	CString strStyleDir;
+	strStyleDir = (strText == _T("(нч)")) ? _T("") : CGlobalVariable::GetStylesDir() \
+		+ strText;
+	if(!strStyleDir.IsEmpty())
+	{
+		m_strStyleFile = strStyleDir + _T("\\style.xml");
+		m_StylePreview.SetPreviewImage(strStyleDir + _T("\\style.ui"));
+	}
+	else
+	{
+		m_strStyleFile.Empty();
+		m_StylePreview.SetPreviewImage(_T(""));
+	}
 }
 
 void CDialogSkinFileNew::OnBnClickedOk()

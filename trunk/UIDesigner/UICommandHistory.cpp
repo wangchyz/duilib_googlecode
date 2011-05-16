@@ -200,7 +200,17 @@ void CUICommandNode::RemoveSameProperty(TiXmlNode* pBeforeElem, TiXmlNode* pAfte
 	{
 		TiXmlAttribute* pBeforeAttribNext = pBeforeAttrib->Next();
 		TiXmlAttribute* pAfterAttribNext = pAfterAttrib->Next();
-		if(strcmp(pBeforeAttrib->Name(), "myname")!=0 && strcmp(pBeforeAttrib->Value(), pAfterAttrib->Value())==0)
+		if(strcmp(pBeforeAttrib->Name(), "myname") == 0)
+		{
+			CStringA strBeforeName = pBeforeAttrib->Value();
+			CStringA strAfterName = pAfterAttrib->Value();
+			if(strBeforeName != strAfterName)
+			{
+				pBeforeAttrib->SetValue(strAfterName);
+				pAfterAttrib->SetValue(strBeforeName);
+			}
+		}
+		else if(strcmp(pBeforeAttrib->Value(), pAfterAttrib->Value()) == 0)
 		{
 			pBeforeElem->ToElement()->RemoveAttribute(pBeforeAttrib->Name());
 			pAfterElem->ToElement()->RemoveAttribute(pAfterAttrib->Name());
@@ -477,7 +487,7 @@ void CALLBACK CUICommandHistory::UIDelete(TiXmlNode* pNode)
 	CControlUI* pParent=pControl->GetParent();
 	HTREEITEM hDelete=(HTREEITEM)(((ExtendedAttributes*)pControl->GetTag())->hItem);
 	g_pClassView->RemoveUITreeItem(hDelete);
- 	pUIView->RemoveUI(pControl);
+ 	pUIView->DeleteUI(pControl);
 	if(pParent)
 		pParent->NeedUpdate();
 }

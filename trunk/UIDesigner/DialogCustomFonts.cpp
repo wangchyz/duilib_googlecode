@@ -91,6 +91,8 @@ void CDialogCustomFonts::OnBnClickedButtonFontAdd()
 		m_lstCustomFonts.SetItemText(nCount, 3, (lf.lfWeight == FW_BOLD) ? _T("true") : _T("false"));
 		m_lstCustomFonts.SetItemText(nCount, 4, lf.lfItalic ? _T("true") : _T("false"));
 		m_lstCustomFonts.SetItemText(nCount, 5, lf.lfUnderline ? _T("true") : _T("false"));
+
+		g_pMainFrame->GetActiveUIView()->SetModifiedFlag();
 	}
 }
 
@@ -116,6 +118,7 @@ void CDialogCustomFonts::OnBnClickedButtonFontDelete()
 		}
 	}
 	g_pMainFrame->GetActiveUIView()->ReDrawForm();
+	g_pMainFrame->GetActiveUIView()->SetModifiedFlag();
 }
 
 void CDialogCustomFonts::OnBnClickedButtonFontModify()
@@ -158,5 +161,6 @@ void CDialogCustomFonts::OnBnClickedButtonFontModify()
 		m_lstCustomFonts.SetItemText(nIndex, 5, pFontInfo->bUnderline ? _T("true") : _T("false"));
 
 		g_pMainFrame->GetActiveUIView()->ReDrawForm();
+		g_pMainFrame->GetActiveUIView()->SetModifiedFlag();
 	}
 }

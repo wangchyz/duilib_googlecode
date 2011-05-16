@@ -9,6 +9,7 @@
 #include "ChildFrm.h"
 #include "UIDesignerDoc.h"
 #include "UIDesignerView.h"
+#include "afxwin.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -139,6 +140,11 @@ protected:
 // 实现
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	virtual BOOL OnInitDialog();
+private:
+	CMFCLinkCtrl m_btnMyBlogURL;
+	CMFCLinkCtrl m_btnDuiLibURL;
 };
 
 CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
@@ -148,10 +154,29 @@ CAboutDlg::CAboutDlg() : CDialog(CAboutDlg::IDD)
 void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_BUTTON_MY_BLOG_LINK, m_btnMyBlogURL);
+	DDX_Control(pDX, IDC_BUTTON_DUILIB_LINK, m_btnDuiLibURL);
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
+
+BOOL CAboutDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+
+	// TODO:  在此添加额外的初始化
+	this->GetDlgItem(IDC_STATIC_CURRENT_VERSION)->SetWindowText(UIDESIGNER_VERSION);
+	m_btnMyBlogURL.SetURL(_T("http://www.taxue.org/"));
+	m_btnMyBlogURL.SetTooltip(_T("踏雪流云的博客"));
+	m_btnMyBlogURL.SizeToContent();
+	m_btnDuiLibURL.SetURL(_T("http://code.google.com/p/duilib/"));
+	m_btnDuiLibURL.SetTooltip(_T("DuiLib开源项目"));
+	m_btnDuiLibURL.SizeToContent();
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+	// 异常: OCX 属性页应返回 FALSE
+}
 
 void CUIDesignerApp::OnFileNew()
 {

@@ -8,7 +8,7 @@
 #include "UIDesignerView.h"
 
 #include "PropertyTabLayoutUI.h"
-#include "DialogTemplateSaveAs.h"
+#include "DialogSaveAsName.h"
 #include "tinyxml.h"
 #include "UIUtil.h"
 #include <io.h>
@@ -64,6 +64,8 @@ BEGIN_MESSAGE_MAP(CUIDesignerView, CScrollView)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_COPY, &CUIDesignerView::OnUpdateNeedSel)
 	ON_COMMAND(ID_EDIT_PASTE, &CUIDesignerView::OnEditPaste)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_PASTE, &CUIDesignerView::OnUpdateNeedClip)
+	ON_COMMAND(ID_EDIT_DELETE, &CUIDesignerView::OnDeleteUI)
+	ON_UPDATE_COMMAND_UI(ID_EDIT_DELETE, &CUIDesignerView::OnUpdateNeedSel)
 	ON_COMMAND(ID_EDIT_UNDO, &CUIDesignerView::OnEditUndo)
 	ON_UPDATE_COMMAND_UI(ID_EDIT_UNDO, &CUIDesignerView::OnUpdateEditUndo)
 	ON_COMMAND(ID_EDIT_REDO, &CUIDesignerView::OnEditRedo)
@@ -463,7 +465,7 @@ void CUIDesignerView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		OnShowPropertyDialog();
 		break;
 	case VK_DELETE:
-		OnRemoveUI();
+		OnDeleteUI();
 		break;
 	case VK_UP:
 		OnMicoMoveUp();
@@ -482,21 +484,13 @@ void CUIDesignerView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	__super::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
-void CUIDesignerView::OnRemoveUI()
+void CUIDesignerView::OnDeleteUI()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
-
 	m_MultiTracker.GetSelected(arrSelected);
-	//remove form
-	for (int i=0; i<arrSelected.GetSize(); i++)
-	{
-		CControlUI* pControl = arrSelected[i];
-		if(pControl == m_LayoutManager.GetForm())
-		{
-			arrSelected.RemoveAt(i);
-			break;;
-		}
-	}
+	RemoveForm(arrSelected);
+	if(arrSelected.IsEmpty())
+		return;
 
 	m_UICommandHistory.Begin(arrSelected, actionDelete);
 	for(int i=0; i<arrSelected.GetSize(); i++)
@@ -505,7 +499,7 @@ void CUIDesignerView::OnRemoveUI()
 		CControlUI* pParent=pControl->GetParent();
 		HTREEITEM hDelete=(HTREEITEM)(((ExtendedAttributes*)pControl->GetTag())->hItem);
 		g_pClassView->RemoveUITreeItem(hDelete);
-		RemoveUI(pControl);
+		DeleteUI(pControl);
 		if(pParent)
 			pParent->NeedUpdate();
 	}
@@ -525,10 +519,10 @@ CControlUI* CUIDesignerView::NewUI(int nClass,CRect& rect,CControlUI* pParent)
 	return pControl;
 }
 
-BOOL CUIDesignerView::RemoveUI(CControlUI* pControl)
+BOOL CUIDesignerView::DeleteUI(CControlUI* pControl)
 {
 	m_MultiTracker.RemoveAll();
-	BOOL bRet = m_LayoutManager.RemoveUI(pControl);
+	BOOL bRet = m_LayoutManager.DeleteUI(pControl);
 	if(bRet)
 		this->GetDocument()->SetModifiedFlag();
 
@@ -561,7 +555,7 @@ void CUIDesignerView::OnActivated()
 	g_HookAPI.SetSkinDir(m_LayoutManager.GetSkinDir());
 }
 
-void CUIDesignerView::InitUI(CControlUI* pControl, int depth, BOOL bForceName/* = FALSE*/)
+void CUIDesignerView::InitUI(CControlUI* pControl, int depth)
 {
 	if(pControl==NULL)
 		return;
@@ -571,7 +565,7 @@ void CUIDesignerView::InitUI(CControlUI* pControl, int depth, BOOL bForceName/* 
 	pControl->SetTag((UINT_PTR)pExtended);
 
 	pExtended->nClass=gGetUIClass(pControl);
-	m_LayoutManager.SetDefaultUIName(pControl, bForceName);
+	m_LayoutManager.SetDefaultUIName(pControl);
 	g_pClassView->InsertUITreeItem(pControl);
 	pExtended->nDepth = depth;
 
@@ -594,100 +588,148 @@ void CUIDesignerView::OnAlignLeft()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_UICommandHistory.Begin(arrSelected, actionModify);
-	m_LayoutManager.AlignLeft(m_MultiTracker.GetFocused(),arrSelected);
-	m_UICommandHistory.End();
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.AlignLeft(m_MultiTracker.GetFocused(),arrSelected);
+		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
+	}
 }
 
 void CUIDesignerView::OnAlignRight()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_UICommandHistory.Begin(arrSelected, actionModify);
-	m_LayoutManager.AlignRight(m_MultiTracker.GetFocused(),arrSelected);
-	m_UICommandHistory.End();
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.AlignRight(m_MultiTracker.GetFocused(),arrSelected);
+		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
+	}
 }
 
 void CUIDesignerView::OnAlignTop()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_UICommandHistory.Begin(arrSelected, actionModify);
-	m_LayoutManager.AlignTop(m_MultiTracker.GetFocused(),arrSelected);
-	m_UICommandHistory.End();
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.AlignTop(m_MultiTracker.GetFocused(),arrSelected);
+		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
+	}
 }
 
 void CUIDesignerView::OnAlignBottom()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_UICommandHistory.Begin(arrSelected, actionModify);
-	m_LayoutManager.AlignBottom(m_MultiTracker.GetFocused(),arrSelected);
-	m_UICommandHistory.End();
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.AlignBottom(m_MultiTracker.GetFocused(),arrSelected);
+		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
+	}
 }
 
 void CUIDesignerView::OnAlignCenterVertically()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
-
 	m_MultiTracker.GetSelected(arrSelected);
+	RemoveForm(arrSelected);
+	if(arrSelected.IsEmpty())
+		return;
+
 	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignCenterVertically(m_MultiTracker.GetFocused(),arrSelected);
 	m_UICommandHistory.End();
+	this->GetDocument()->SetModifiedFlag();
 }
 
 void CUIDesignerView::OnAlignCenterHorizontally()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
-
 	m_MultiTracker.GetSelected(arrSelected);
+	RemoveForm(arrSelected);
+	if(arrSelected.IsEmpty())
+		return;
+
 	m_UICommandHistory.Begin(arrSelected, actionModify);
 	m_LayoutManager.AlignCenterHorizontally(m_MultiTracker.GetFocused(),arrSelected);
 	m_UICommandHistory.End();
+	this->GetDocument()->SetModifiedFlag();
 }
 
 void CUIDesignerView::OnAlignHorizontal()
 {
+	CArray<CControlUI*,CControlUI*> arrSelected;
+	m_MultiTracker.GetSelected(arrSelected);
+	RemoveForm(arrSelected);
+	if(arrSelected.IsEmpty())
+		return;
+
+	m_UICommandHistory.Begin(arrSelected, actionModify);
+	m_LayoutManager.AlignHorizontal(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
+	this->GetDocument()->SetModifiedFlag();
 
 }
 
 void CUIDesignerView::OnAlignVertical()
 {
+	CArray<CControlUI*,CControlUI*> arrSelected;
+	m_MultiTracker.GetSelected(arrSelected);
+	RemoveForm(arrSelected);
+	if(arrSelected.IsEmpty())
+		return;
 
+	m_UICommandHistory.Begin(arrSelected, actionModify);
+	m_LayoutManager.AlignVertical(m_MultiTracker.GetFocused(),arrSelected);
+	m_UICommandHistory.End();
+	this->GetDocument()->SetModifiedFlag();
 }
 
 void CUIDesignerView::OnAlignSameWidth()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_UICommandHistory.Begin(arrSelected, actionModify);
-	m_LayoutManager.AlignSameWidth(m_MultiTracker.GetFocused(),arrSelected);
-	m_UICommandHistory.End();
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.AlignSameWidth(m_MultiTracker.GetFocused(),arrSelected);
+		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
+	}
 }
 
 void CUIDesignerView::OnAlignSameHeight()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_UICommandHistory.Begin(arrSelected, actionModify);
-	m_LayoutManager.AlignSameHeight(m_MultiTracker.GetFocused(),arrSelected);
-	m_UICommandHistory.End();
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.AlignSameHeight(m_MultiTracker.GetFocused(),arrSelected);
+		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
+	}
 }
 
 void CUIDesignerView::OnAlignSameSize()
 {
 	CArray<CControlUI*,CControlUI*> arrSelected;
 
-	m_MultiTracker.GetSelected(arrSelected);
-	m_UICommandHistory.Begin(arrSelected, actionModify);
-	m_LayoutManager.AlignSameSize(m_MultiTracker.GetFocused(),arrSelected);
-	m_UICommandHistory.End();
+	if(m_MultiTracker.GetSelected(arrSelected))
+	{
+		m_UICommandHistory.Begin(arrSelected, actionModify);
+		m_LayoutManager.AlignSameSize(m_MultiTracker.GetFocused(),arrSelected);
+		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
+	}
 }
 
 void CUIDesignerView::OnShowGrid()
@@ -741,12 +783,12 @@ void CUIDesignerView::OnUpdateAlignCenterHorizontally(CCmdUI* pCmdUI)
 
 void CUIDesignerView::OnUpdateAlignHorizontal(CCmdUI* pCmdUI)
 {
-
+	pCmdUI->Enable(m_MultiTracker.GetSize()>2?TRUE:FALSE);
 }
 
 void CUIDesignerView::OnUpdateAlignVertical(CCmdUI* pCmdUI)
 {
-
+	pCmdUI->Enable(m_MultiTracker.GetSize()>2?TRUE:FALSE);
 }
 
 void CUIDesignerView::OnUpdateAlignSameWidth(CCmdUI* pCmdUI)
@@ -787,7 +829,7 @@ void CUIDesignerView::OnDestroy()
 void CUIDesignerView::OnEditCut()
 {
 	OnEditCopy();
-	OnRemoveUI();
+	OnDeleteUI();
 }
 
 void CUIDesignerView::OnEditCopy()
@@ -886,7 +928,7 @@ void CUIDesignerView::PasteUI(LPCTSTR xml)
 			}
 			pContainer->Add(pControl);
 			m_MultiTracker.Add(CreateTracker(pControl));
-			InitUI(pControl, pExtended->nDepth + 1, TRUE);
+			InitUI(pControl, pExtended->nDepth + 1);
 		}
 		CArray<CControlUI*,CControlUI*> arrSelected;
 		m_MultiTracker.GetSelected(arrSelected);
@@ -897,6 +939,7 @@ void CUIDesignerView::PasteUI(LPCTSTR xml)
 
 		pRootContainer->SetAutoDestroy(false);
 		delete pRootContainer;
+		this->GetDocument()->SetModifiedFlag();
 	}
 }
 
@@ -943,6 +986,7 @@ void CUIDesignerView::OnMicoMoveUp()
 		m_UICommandHistory.Begin(arrSelected, actionModify);
 		m_LayoutManager.MicoMoveUp(arrSelected,MICO_MOVE_SPACE);
 		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
 	}
 }
 
@@ -955,6 +999,7 @@ void CUIDesignerView::OnMicoMoveDown()
 		m_UICommandHistory.Begin(arrSelected, actionModify);
 		m_LayoutManager.MicoMoveDown(arrSelected,MICO_MOVE_SPACE);
 		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
 	}
 }
 
@@ -967,6 +1012,7 @@ void CUIDesignerView::OnMicoMoveLeft()
 		m_UICommandHistory.Begin(arrSelected, actionModify);
 		m_LayoutManager.MicoMoveLeft(arrSelected,MICO_MOVE_SPACE);
 		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
 	}
 }
 
@@ -979,6 +1025,7 @@ void CUIDesignerView::OnMicoMoveRight()
 		m_UICommandHistory.Begin(arrSelected, actionModify);
 		m_LayoutManager.MicoMoveRight(arrSelected,MICO_MOVE_SPACE);
 		m_UICommandHistory.End();
+		this->GetDocument()->SetModifiedFlag();
 	}
 }
 
@@ -1027,7 +1074,7 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 	case classDialogLayout:
 		break;
 	case classTabLayout:
-		pPropDlg=new CPropertyTabLayoutUI(pControl);
+		pPropDlg = new CPropertyTabLayoutUI(pControl);
 		break;
 	case classHorizontalLayout:
 		break;
@@ -1065,19 +1112,20 @@ void CUIDesignerView::RedoUI(CControlUI* pControl, CControlUI* pParent)
 	CContainerUI* pContainer = static_cast<CContainerUI*>(pParent->GetInterface(_T("Container")));
 	ExtendedAttributes* pExtended = (ExtendedAttributes*)pContainer->GetTag();
 	pContainer->Add(pControl);
-	m_MultiTracker.Add(CreateTracker(pControl));
+ 	pControl->GetManager()->ReapObjects(pControl);
 	InitUI(pControl, pExtended->nDepth + 1);
+	m_MultiTracker.Add(CreateTracker(pControl));
 	pContainer->SetPos(pContainer->GetPos());
 }
 
 void CUIDesignerView::OnTemplateSaveAs()
 {
 	// TODO: 在此添加命令处理程序代码
-	CDialogTemplateSaveAs dlg;
+	CDialogSaveAsName dlg;
 	if(dlg.DoModal() != IDOK)
 		return;
 
-	CString strTemplateName = dlg.GetTemplateName();
+	CString strTemplateName = dlg.GetSaveAsName();
 	CString strTemplatesDir = CGlobalVariable::GetTemplatesDir();
 	CreateDirectory(strTemplatesDir + strTemplateName, NULL);
 	CString strTemplatePathName = strTemplatesDir + strTemplateName
@@ -1087,6 +1135,24 @@ void CUIDesignerView::OnTemplateSaveAs()
 
 	SaveSkinImage(strTemplateImage);
 	SaveSkinFile(strTemplatePathName);
+}
+
+void CUIDesignerView::OnStyleSaveAs()
+{
+	CDialogSaveAsName dlg;
+	if(dlg.DoModal() != IDOK)
+		return;
+
+	CString strStyleName = dlg.GetSaveAsName();
+	CString strStylesDir = CGlobalVariable::GetStylesDir();
+	CreateDirectory(strStylesDir + strStyleName, NULL);
+	CString strStylePathName = strStylesDir + strStyleName
+		+ _T("\\style.xml");
+	CString strStyleImage = strStylesDir + strStyleName
+		+ _T("\\style.ui");
+
+	SaveSkinImage(strStyleImage);
+	SaveSkinFile(strStylePathName);
 }
 
 BOOL CUIDesignerView::SaveSkinImage(LPCTSTR pstrPathName)
@@ -1108,4 +1174,22 @@ BOOL CUIDesignerView::SaveSkinImage(LPCTSTR pstrPathName)
 void CUIDesignerView::ReDrawForm()
 {
 	m_LayoutManager.GetForm()->NeedUpdate();
+}
+
+void CUIDesignerView::RemoveForm(CArray<CControlUI*,CControlUI*>& arrSelected)
+{
+	for (int i=0; i<arrSelected.GetSize(); i++)
+	{
+		CControlUI* pControl = arrSelected[i];
+		if(pControl == m_LayoutManager.GetForm())
+		{
+			arrSelected.RemoveAt(i);
+			break;
+		}
+	}
+}
+
+void CUIDesignerView::SetModifiedFlag(BOOL bModified/* = TRUE*/)
+{
+	this->GetDocument()->SetModifiedFlag(bModified);
 }

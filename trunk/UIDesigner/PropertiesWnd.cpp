@@ -197,8 +197,6 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 		nUpdate=UPDATE_REDRAW_PARENT;
 		break;
 	}
-	pControl->SetAttribute(strName,strNewVal);
-	pProp->SetOriginalValue(pProp->GetValue());
 
 	CUIDesignerView* pUIView=g_pMainFrame->GetActiveUIView();
 	ASSERT(pUIView);
@@ -209,6 +207,9 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	Msg.wParam=0;
 	Msg.lParam=(LPARAM)&oldAttrib;
 	pUIView->Notify(Msg);
+
+	pControl->SetAttribute(strName,strNewVal);
+	pProp->SetOriginalValue(pProp->GetValue());
 
 	UIAttribute newAttrib = {strName, strNewVal};
 	Msg.sType = _T("PropertyEndChanged");

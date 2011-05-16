@@ -79,32 +79,6 @@ private:
 //////////////////////////////////////////////////////////////////////////
 //CLayoutManager
 
-typedef struct tagDefaultUINameCount{
-	int nControlCount;
-	int nButtonCount;
-	int nEditCount;
-	int nLabelCount;
-	int nTextCount;
-	int nOptionCount;
-	int nComboCount;
-	int nListCount;
-	int nSliderCount;
-	int nProgressCount;
-	int nActiveXCount;
-	int nContainerCount;
-	int nVerticalLayoutCount;
-	int nHorizontalLayoutCount;
-	int nDialogLayoutCount;
-	int nTabLayoutCount;
-	int nTileLayoutCount;
-	int nListHeaderCount;
-	int nListHeaderItemCount;
-	int nListTextElementCount;
-	int nListLabelElementCount;
-	int nListExpandElementCount;
-	int nListContainerElementCount;
-}DefaultUINameCount;
-
 class CLayoutManager
 {
 public:
@@ -119,7 +93,7 @@ public:
 	void DrawGrid(CDC* pDC,CRect& rect);
 
 	static CControlUI* NewUI(int nClass,CRect& rect,CControlUI* pParent, CLayoutManager* pLayout);
-	static BOOL RemoveUI(CControlUI* pControl);
+	static BOOL DeleteUI(CControlUI* pControl);
 	static void ReleaseExtendedAttrib(CControlUI* pControl, CPaintManagerUI* pManager);
 	CPaintManagerUI* GetManager();
 	inline CFormUI* GetForm() const;
@@ -151,12 +125,12 @@ public:
 	static void SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode
 		, BOOL bSaveChildren = TRUE);
 
-	void SetDefaultUIName(CControlUI* pControl, BOOL bForce = FALSE);
+	void SetDefaultUIName(CControlUI* pControl);
 
 	LPCTSTR GetSkinDir() const { return m_strSkinDir; }
 
-	static CControlUI* CopyControls(CControlUI* pControl);
-	static CControlUI* CopyControl(CControlUI* pControl);
+	static CControlUI* CloneControls(CControlUI* pControl);
+	static CControlUI* CloneControl(CControlUI* pControl);
 
 protected:
 	static void SaveControlProperty(CControlUI* pControl, TiXmlElement* pNode);
@@ -174,6 +148,8 @@ protected:
 	static void SaveContainerProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveHorizontalLayoutProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveTileLayoutProperty(CControlUI* pControl, TiXmlElement* pNode);
+
+	static CString ConvertImageFileName(LPCTSTR pstrImageAttrib);
 
 protected:
 	class CDelayRepos
@@ -197,6 +173,4 @@ private:
 
 	bool m_bShowGrid;
 	bool m_bShowAuxBorder;
-
-	DefaultUINameCount m_UINameCount;
 };
