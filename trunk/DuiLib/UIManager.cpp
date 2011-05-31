@@ -921,7 +921,10 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         }
         break;
     case WM_CTLCOLOREDIT:
+	case WM_CTLCOLORSTATIC:
         {
+			// Refer To: http://msdn.microsoft.com/en-us/library/bb761691(v=vs.85).aspx
+			// Read-only or disabled edit controls do not send the WM_CTLCOLOREDIT message; instead, they send the WM_CTLCOLORSTATIC message.
             if( lParam == 0 ) break;
             HWND hWndChild = (HWND) lParam;
             lRes = ::SendMessage(hWndChild, OCM__BASE + uMsg, wParam, lParam);
