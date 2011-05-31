@@ -115,6 +115,10 @@ public:
 
     LPCTSTR GetSelectedImage();
     void SetSelectedImage(LPCTSTR pStrImage);
+	
+	void SetSelectedTextColor(DWORD dwTextColor);
+	DWORD GetSelectedTextColor();
+		
 	LPCTSTR GetForeImage();
 	void SetForeImage(LPCTSTR pStrImage);
 
@@ -127,10 +131,14 @@ public:
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
     void PaintStatusImage(HDC hDC);
+	void PaintText(HDC hDC);
 
 protected:
     bool m_bSelected;
     CStdString m_sGroupName;
+
+	DWORD m_dwSelectedTextColor;
+
     CStdString m_sSelectedImage;
 	CStdString m_sForeImage;
 };

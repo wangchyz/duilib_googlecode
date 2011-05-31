@@ -623,6 +623,17 @@ void COptionUI::SetSelectedImage(LPCTSTR pStrImage)
     Invalidate();
 }
 
+void COptionUI::SetSelectedTextColor(DWORD dwTextColor)
+{
+	m_dwSelectedTextColor = dwTextColor;
+}
+
+DWORD COptionUI::GetSelectedTextColor()
+{
+	if (m_dwSelectedTextColor == 0) m_dwSelectedTextColor = m_pManager->GetDefaultFontColor();
+	return m_dwSelectedTextColor;
+}
+
 LPCTSTR COptionUI::GetForeImage()
 {
 	return m_sForeImage;
@@ -646,6 +657,12 @@ void COptionUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("selected")) == 0 ) Selected(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("selectedimage")) == 0 ) SetSelectedImage(pstrValue);
 	else if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
+	else if( _tcscmp(pstrName, _T("selectedtextcolor")) == 0 ) {
+		if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+		LPTSTR pstr = NULL;
+		DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+		SetSelectedTextColor(clrColor);
+	}
     else CButtonUI::SetAttribute(pstrName, pstrValue);
 }
 
@@ -668,6 +685,36 @@ Label_ForeImage:
 	}
 }
 
+void COptionUI::PaintText(HDC hDC)
+{
+	if( (m_uButtonState & UISTATE_SELECTED) != 0 )
+	{
+		DWORD oldTextColor = m_dwTextColor;
+		if( m_dwSelectedTextColor != 0 ) m_dwTextColor = m_dwSelectedTextColor;
+
+		if( m_dwTextColor == 0 ) m_dwTextColor = m_pManager->GetDefaultFontColor();
+		if( m_dwDisabledTextColor == 0 ) m_dwDisabledTextColor = m_pManager->GetDefaultDisabledColor();
+
+		if( m_sText.IsEmpty() ) return;
+		int nLinks = 0;
+		RECT rc = m_rcItem;
+		rc.left += m_rcTextPadding.left;
+		rc.right -= m_rcTextPadding.right;
+		rc.top += m_rcTextPadding.top;
+		rc.bottom -= m_rcTextPadding.bottom;
+
+		if( m_bShowHtml )
+			CRenderEngine::DrawHtmlText(hDC, m_pManager, rc, m_sText, IsEnabled()?m_dwTextColor:m_dwDisabledTextColor, \
+			NULL, NULL, nLinks, m_uTextStyle);
+		else
+			CRenderEngine::DrawText(hDC, m_pManager, rc, m_sText, IsEnabled()?m_dwTextColor:m_dwDisabledTextColor, \
+			m_iFont, m_uTextStyle);
+
+		m_dwTextColor = oldTextColor;
+	}
+	else
+		CButtonUI::PaintText(hDC);
+}
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
