@@ -1412,13 +1412,30 @@ void CEditUI::DoEvent(TEventUI& event)
                 m_pWindow = new CEditWnd();
                 ASSERT(m_pWindow);
                 m_pWindow->Init(this);
+
+				if( PtInRect(&m_rcItem, event.ptMouse) )
+				{
+					int nSize = GetWindowTextLength(*m_pWindow);
+					if( nSize == 0 )
+						nSize = 1;
+
+					Edit_SetSel(*m_pWindow, 0, nSize);
+				}
             }
             else if( m_pWindow != NULL )
             {
+#if 1
+				int nSize = GetWindowTextLength(*m_pWindow);
+				if( nSize == 0 )
+					nSize = 1;
+
+				Edit_SetSel(*m_pWindow, 0, nSize);
+#else
                 POINT pt = event.ptMouse;
                 pt.x -= m_rcItem.left + m_rcTextPadding.left;
                 pt.y -= m_rcItem.top + m_rcTextPadding.top;
                 ::SendMessage(*m_pWindow, WM_LBUTTONDOWN, event.wParam, MAKELPARAM(pt.x, pt.y));
+#endif
             }
         }
         return;
