@@ -141,6 +141,10 @@ void CLabelUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 			m_uTextStyle |= DT_BOTTOM;
 		}
     }
+    else if( _tcscmp(pstrName, _T("endellipsis")) == 0 ) {
+        if( _tcscmp(pstrValue, _T("true")) == 0 ) m_uTextStyle |= DT_END_ELLIPSIS;
+        else m_uTextStyle &= ~DT_END_ELLIPSIS;
+    }    
     else if( _tcscmp(pstrName, _T("font")) == 0 ) SetFont(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("textcolor")) == 0 ) {
         if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
