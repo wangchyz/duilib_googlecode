@@ -114,7 +114,7 @@ bool CContainerUI::RemoveAt(int iIndex)
 {
     CControlUI* pControl = GetItemAt(iIndex);
     if (pControl != NULL) {
-        return Remove(pControl);
+        return CContainerUI::Remove(pControl);
     }
 
     return false;

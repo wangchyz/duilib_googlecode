@@ -1731,6 +1731,24 @@ const TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, LPCTSTR type, DWORD 
     return data;
 }
 
+const TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, HBITMAP hBitmap, int iWidth, int iHeight, bool bAlpha)
+{
+    if( hBitmap == NULL || iWidth <= 0 || iHeight <= 0 ) return NULL;
+
+    TImageInfo* data = new TImageInfo;
+    data->hBitmap = hBitmap;
+    data->nX = iWidth;
+    data->nY = iHeight;
+    data->alphaChannel = bAlpha;
+
+    if( !m_mImageHash.Insert(bitmap, data) ) {
+        ::DeleteObject(data->hBitmap);
+        delete data;
+    }
+
+    return data;
+}
+
 bool CPaintManagerUI::RemoveImage(LPCTSTR bitmap)
 {
     const TImageInfo* data = GetImage(bitmap);
