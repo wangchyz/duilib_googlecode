@@ -1601,9 +1601,17 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                         cchChars = cchLastGoodWord;
                         cchSize = cchLastGoodSize;                 
                     }
-                    if( (uStyle & DT_END_ELLIPSIS) != 0 && cchChars > 2 ) {
-                        cchChars = cchLastGoodWord;
-                        cchSize = cchLastGoodSize;
+                    if( (uStyle & DT_END_ELLIPSIS) != 0 && cchChars > 0 ) {
+                        cchChars -= 1;
+                        LPCTSTR pstrPrev = ::CharPrev(pstrText, p);
+                        if( cchChars > 0 ) {
+                            cchChars -= 1;
+                            pstrPrev = ::CharPrev(pstrText, pstrPrev);
+                            cchSize -= (int)(p - pstrPrev);
+                        }
+                        else 
+                            cchSize -= (int)(p - pstrPrev);
+                        pt.x = rc.right;
                     }
                     bLineEnd = true;
                     cxMaxWidth = MAX(cxMaxWidth, pt.x);
@@ -1619,16 +1627,16 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 }
                 p = ::CharNext(p);
             }
-            if( cchChars > 0 ) {				
-                ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
-                if( bDraw && bLineDraw ) {
-                    ::TextOut(hDC, ptPos.x, ptPos.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, pstrText, cchSize);
-                    if( pt.x >= rc.right && (uStyle & DT_END_ELLIPSIS) != 0 ) ::TextOut(hDC, rc.right - 10, ptPos.y, _T("..."), 3);
-                }
-                pt.x += szText.cx;
-                cxMaxWidth = MAX(cxMaxWidth, pt.x);
-                pstrText += cchSize;
+            
+            ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
+            if( bDraw && bLineDraw ) {
+                ::TextOut(hDC, ptPos.x, ptPos.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, pstrText, cchSize);
+                if( pt.x >= rc.right && (uStyle & DT_END_ELLIPSIS) != 0 ) 
+                    ::TextOut(hDC, ptPos.x + szText.cx, ptPos.y, _T("..."), 3);
             }
+            pt.x += szText.cx;
+            cxMaxWidth = MAX(cxMaxWidth, pt.x);
+            pstrText += cchSize;
         }
 
         if( pt.x >= rc.right || *pstrText == _T('\n') || *pstrText == _T('\0') ) bLineEnd = true;

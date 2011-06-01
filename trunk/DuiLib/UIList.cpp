@@ -662,6 +662,10 @@ void CListUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
             m_ListInfo.uTextStyle |= DT_RIGHT;
         }
     }
+    else if( _tcscmp(pstrName, _T("itemendellipsis")) == 0 ) {
+        if( _tcscmp(pstrValue, _T("true")) == 0 ) m_ListInfo.uTextStyle |= DT_END_ELLIPSIS;
+        else m_ListInfo.uTextStyle &= ~DT_END_ELLIPSIS;
+    }    
     if( _tcscmp(pstrName, _T("itemtextpadding")) == 0 ) {
         RECT rcTextPadding = { 0 };
         LPTSTR pstr = NULL;
@@ -1265,6 +1269,10 @@ void CListHeaderItemUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
             m_uTextStyle |= DT_RIGHT;
         }
     }
+    else if( _tcscmp(pstrName, _T("endellipsis")) == 0 ) {
+        if( _tcscmp(pstrValue, _T("true")) == 0 ) m_uTextStyle |= DT_END_ELLIPSIS;
+        else m_uTextStyle &= ~DT_END_ELLIPSIS;
+    }    
     else if( _tcscmp(pstrName, _T("font")) == 0 ) SetFont(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("textcolor")) == 0 ) {
         if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
