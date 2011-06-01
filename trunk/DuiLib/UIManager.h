@@ -183,13 +183,13 @@ public:
     void SetCaptionRect(RECT& rcCaption);
     SIZE GetRoundCorner() const;
     void SetRoundCorner(int cx, int cy);
-	SIZE GetMinInfo() const;
+    SIZE GetMinInfo() const;
     void SetMinInfo(int cx, int cy);
     SIZE GetMaxInfo() const;
     void SetMaxInfo(int cx, int cy);
     void SetTransparent(int nOpacity);
     void SetBackgroundTransparent(bool bTrans);
-	bool IsShowUpdateRect() const;
+    bool IsShowUpdateRect() const;
     void SetShowUpdateRect(bool show);
 
     static HINSTANCE GetInstance();
@@ -237,13 +237,14 @@ public:
     const TImageInfo* GetImage(LPCTSTR bitmap);
     const TImageInfo* GetImageEx(LPCTSTR bitmap, LPCTSTR type = NULL, DWORD mask = 0);
     const TImageInfo* AddImage(LPCTSTR bitmap, LPCTSTR type = NULL, DWORD mask = 0);
+    const TImageInfo* AddImage(LPCTSTR bitmap, HBITMAP hBitmap, int iWidth, int iHeight, bool bAlpha);
     bool RemoveImage(LPCTSTR bitmap);
     void RemoveAllImages();
 
     void AddDefaultAttributeList(LPCTSTR pStrControlName, LPCTSTR pStrControlAttrList);
     LPCTSTR GetDefaultAttributeList(LPCTSTR pStrControlName) const;
     bool RemoveDefaultAttributeList(LPCTSTR pStrControlName);
-	const CStdStringPtrMap& GetDefaultAttribultes() const;
+    const CStdStringPtrMap& GetDefaultAttribultes() const;
     void RemoveAllDefaultAttributeList();
 
     bool AttachDialog(CControlUI* pControl);
@@ -289,9 +290,9 @@ public:
 
     CControlUI* GetRoot() const;
     CControlUI* FindControl(POINT pt) const;
-	CControlUI* FindControl(CControlUI* pParent, POINT pt) const;
+    CControlUI* FindControl(CControlUI* pParent, POINT pt) const;
     CControlUI* FindControl(LPCTSTR pstrName);
-	CControlUI* FindControl(CControlUI* pParent, LPCTSTR pstrName);
+    CControlUI* FindControl(CControlUI* pParent, LPCTSTR pstrName);
 
     static void MessageLoop();
     static bool TranslateMessage(const LPMSG pMsg);
@@ -306,7 +307,7 @@ private:
     static CControlUI* CALLBACK __FindControlFromTab(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromShortcut(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromUpdate(CControlUI* pThis, LPVOID pData);
-	static CControlUI* CALLBACK __FindControlFromName(CControlUI* pThis, LPVOID pData);
+    static CControlUI* CALLBACK __FindControlFromName(CControlUI* pThis, LPVOID pData);
 
 private:
     HWND m_hWndPaint;

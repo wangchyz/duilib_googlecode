@@ -187,7 +187,12 @@ bool CListUI::Remove(CControlUI* pControl)
         }
     }
 
-    SelectItem(FindSelectable(m_iCurSel, false));
+    if( iIndex == m_iCurSel ) {
+        int iSel = m_iCurSel;
+        m_iCurSel = -1;
+        SelectItem(FindSelectable(iSel, false));
+    }
+    else if( iIndex < m_iCurSel ) m_iCurSel -= 1;
     return true;
 }
 
@@ -204,7 +209,12 @@ bool CListUI::RemoveAt(int iIndex)
         }
     }
 
-    SelectItem(FindSelectable(m_iCurSel, false));
+    if( iIndex == m_iCurSel ) {
+        int iSel = m_iCurSel;
+        m_iCurSel = -1;
+        SelectItem(FindSelectable(iSel, false));
+    }
+    else if( iIndex < m_iCurSel ) m_iCurSel -= 1;
     return true;
 }
 

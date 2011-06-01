@@ -259,7 +259,7 @@ bool CComboUI::SelectItem(int iIndex)
     IListItemUI* pListItem = static_cast<IListItemUI*>(pControl->GetInterface(_T("ListItem")));
     if( pListItem == NULL ) return false;
     m_iCurSel = iIndex;
-    pControl->SetFocus();
+    //pControl->SetFocus();
     pListItem->Select(true);
     if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("itemselect"));
     Invalidate();
@@ -342,7 +342,12 @@ bool CComboUI::Remove(CControlUI* pControl)
         }
     }
 
-    SelectItem(FindSelectable(m_iCurSel, false));
+    if( iIndex == m_iCurSel ) {
+        int iSel = m_iCurSel;
+        m_iCurSel = -1;
+        SelectItem(FindSelectable(iSel, false));
+    }
+    else if( iIndex < m_iCurSel ) m_iCurSel -= 1;
     return true;
 }
 
@@ -359,7 +364,12 @@ bool CComboUI::RemoveAt(int iIndex)
         }
     }
 
-    SelectItem(FindSelectable(m_iCurSel, false));
+    if( iIndex == m_iCurSel ) {
+        int iSel = m_iCurSel;
+        m_iCurSel = -1;
+        SelectItem(FindSelectable(iSel, false));
+    }
+    else if( iIndex < m_iCurSel ) m_iCurSel -= 1;
     return true;
 }
 
