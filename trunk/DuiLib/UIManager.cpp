@@ -1874,7 +1874,7 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameHash(CControlUI* pThi
     const CStdString& sName = pThis->GetName();
     if( sName.IsEmpty() ) return NULL;
     // Add this control to the hash list
-    pManager->m_mNameHash.Insert(sName, pThis);
+    pManager->m_mNameHash.Set(sName, pThis);
     return NULL; // Attempt to add all controls
 }
 
