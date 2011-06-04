@@ -116,6 +116,7 @@ CPaintManagerUI::~CPaintManagerUI()
 {
     // Delete the control-tree structures
     for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) delete static_cast<CControlUI*>(m_aDelayedCleanup[i]);
+    for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) delete static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
     m_mNameHash.Resize(0);
     delete m_pRoot;
 
@@ -434,6 +435,18 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
            m_aDelayedCleanup.Empty();
         }
         break;
+    case WM_APP + 2:
+        {
+            for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) {
+                TNotifyUI* pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
+                for( int j = 0; j < m_aNotifiers.GetSize(); j++ ) {
+                    static_cast<INotifyUI*>(m_aNotifiers[j])->Notify(*pMsg);
+                }
+                delete pMsg;
+            }
+            m_aAsyncNotify.Empty();
+        }
+        break;
     case WM_CLOSE:
         {
             // Make sure all matching "closing" events are sent
@@ -684,6 +697,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     case WM_MOUSEMOVE:
         {
+            if( ::GetActiveWindow() != m_hWndPaint ) break;
             // Start tracking this entire window again...
             if( !m_bMouseTracking ) {
                 TRACKMOUSEEVENT tme = { 0 };
@@ -1343,23 +1357,36 @@ void CPaintManagerUI::AddDelayedCleanup(CControlUI* pControl)
     ::PostMessage(m_hWndPaint, WM_APP + 1, 0, 0L);
 }
 
-void CPaintManagerUI::SendNotify(CControlUI* pControl, LPCTSTR pstrMessage, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
+void CPaintManagerUI::SendNotify(CControlUI* pControl, LPCTSTR pstrMessage, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/, bool bAsync /*= false*/)
 {
     TNotifyUI Msg;
     Msg.pSender = pControl;
     Msg.sType = pstrMessage;
     Msg.wParam = wParam;
     Msg.lParam = lParam;
-    SendNotify(Msg);
+    SendNotify(Msg, bAsync);
 }
 
-void CPaintManagerUI::SendNotify(TNotifyUI& Msg)
+void CPaintManagerUI::SendNotify(TNotifyUI& Msg, bool bAsync /*= false*/)
 {
     Msg.ptMouse = m_ptLastMousePos;
     Msg.dwTimestamp = ::GetTickCount();
-    // Send to all listeners
-    for( int i = 0; i < m_aNotifiers.GetSize(); i++ ) {
-        static_cast<INotifyUI*>(m_aNotifiers[i])->Notify(Msg);
+    if( !bAsync ) {
+        // Send to all listeners
+        for( int i = 0; i < m_aNotifiers.GetSize(); i++ ) {
+            static_cast<INotifyUI*>(m_aNotifiers[i])->Notify(Msg);
+        }
+    }
+    else {
+        TNotifyUI *pMsg = new TNotifyUI;
+        pMsg->pSender = Msg.pSender;
+        pMsg->sType = Msg.sType;
+        pMsg->wParam = Msg.wParam;
+        pMsg->lParam = Msg.lParam;
+        pMsg->ptMouse = Msg.ptMouse;
+        pMsg->dwTimestamp = Msg.dwTimestamp;
+        m_aAsyncNotify.Add(pMsg);
+        ::PostMessage(m_hWndPaint, WM_APP + 2, 0, 0L);
     }
 }
 

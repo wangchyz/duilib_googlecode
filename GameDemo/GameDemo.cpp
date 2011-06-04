@@ -231,7 +231,7 @@ public:
         if( pLoginFrame == NULL ) { Close(); return; }
         pLoginFrame->Create(m_hWnd, _T(""), UI_WNDSTYLE_DIALOG, 0, 0, 0, 0, 0, NULL);
         pLoginFrame->CenterWindow();
-        ShowModal(*pLoginFrame);
+        pLoginFrame->ShowModal();
     }
 
     void SendChatMessage() {
