@@ -51,42 +51,52 @@ class CMenuWnd : public CWindowWnd, public INotifyUI
 {
 public:
     CMenuWnd() : m_pOwner(NULL) { };
-    void Init(CControlUI* pOwner, CRect rc) {
+    void Init(CControlUI* pOwner, POINT pt) {
         if( pOwner == NULL ) return;
         m_pOwner = pOwner;
-
-        MONITORINFO oMonitor = {};
-        oMonitor.cbSize = sizeof(oMonitor);
-        ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-        CRect rcWork = oMonitor.rcWork;
-        int nWidth = rc.GetWidth();
-        int nHeight = rc.GetHeight();
-        if( rc.bottom > rcWork.bottom ) {
-            if( nHeight >= rcWork.GetHeight() ) {
-                rc.top = 0;
-                rc.bottom = nHeight;
-            }
-            else {
-                rc.bottom = rcWork.bottom;
-                rc.top = rc.bottom - nHeight;
-            }
-        }
-        if( rc.right > rcWork.right ) {
-            if( nWidth >= rcWork.GetWidth() ) {
-                rc.left = 0;
-                rc.right = nWidth;
-            }
-            else {
-                rc.right = rcWork.right;
-                rc.left = rc.right - nWidth;
-            }
-        }
-
-        Create(pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW, rc);
+        m_ptPos = pt;
+        Create(pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW);
         HWND hWndParent = m_hWnd;
         while( ::GetParent(hWndParent) != NULL ) hWndParent = ::GetParent(hWndParent);
         ::ShowWindow(m_hWnd, SW_SHOW);
         ::SendMessage(hWndParent, WM_NCACTIVATE, TRUE, 0L);
+    }
+
+    void AdjustPostion() {
+        CRect rcWnd;
+        GetWindowRect(m_hWnd, &rcWnd);
+        int nWidth = rcWnd.GetWidth();
+        int nHeight = rcWnd.GetHeight();
+        rcWnd.left = m_ptPos.x;
+        rcWnd.top = m_ptPos.y;
+        rcWnd.right = rcWnd.left + nWidth;
+        rcWnd.bottom = rcWnd.top + nHeight;
+        MONITORINFO oMonitor = {};
+        oMonitor.cbSize = sizeof(oMonitor);
+        ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
+        CRect rcWork = oMonitor.rcWork;
+
+        if( rcWnd.bottom > rcWork.bottom ) {
+            if( nHeight >= rcWork.GetHeight() ) {
+                rcWnd.top = 0;
+                rcWnd.bottom = nHeight;
+            }
+            else {
+                rcWnd.bottom = rcWork.bottom;
+                rcWnd.top = rcWnd.bottom - nHeight;
+            }
+        }
+        if( rcWnd.right > rcWork.right ) {
+            if( nWidth >= rcWork.GetWidth() ) {
+                rcWnd.left = 0;
+                rcWnd.right = nWidth;
+            }
+            else {
+                rcWnd.right = rcWork.right;
+                rcWnd.left = rcWnd.right - nWidth;
+            }
+        }
+        ::SetWindowPos(m_hWnd, NULL, rcWnd.left, rcWnd.top, rcWnd.GetWidth(), rcWnd.GetHeight(), SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
     }
 
     LPCTSTR GetWindowClassName() const { return _T("MenuWnd"); };
@@ -99,15 +109,7 @@ public:
         }
         else if( msg.sType == _T("itemclick") ) {
             if( msg.pSender->GetName() == _T("menu_Delete") ) {
-                if( m_pOwner ) {
-                    CListUI* pList = static_cast<CListUI*>(m_pOwner);
-                    int nSel = pList->GetCurSel();
-                    if( nSel < 0 ) return;
-                    pList->RemoveAt(nSel);
-                    domain.erase(domain.begin() + nSel);
-                    desc.erase(desc.begin() + nSel);
-                    MessageBox( _T("测试"), _T("测试"), MB_OK);
-                }
+                if( m_pOwner ) m_pOwner->GetManager()->SendNotify(m_pOwner, _T("menu_Delete"), 0, 0, true);
             }
         }
     }
@@ -128,6 +130,8 @@ public:
             CControlUI* pControl = m_pm.FindControl(_T("menu_Delete"));
             if( pControl ) pControl->SetEnabled(false);
         }
+
+        AdjustPostion();
         return 0;
     }
 
@@ -181,7 +185,7 @@ public:
 public:
     CPaintManagerUI m_pm;
     CControlUI* m_pOwner;
-    bool bFlag; // 菜单Notify中尽量不要调用MessageBox函数，如果确实需要调用，使用此变量修正
+    POINT m_ptPos;
 };
 
 class ListMainForm : public CWindowWnd, public INotifyUI, public IListCallbackUI
@@ -380,7 +384,15 @@ public:
             if( pMenu == NULL ) { return; }
             POINT pt = {msg.ptMouse.x, msg.ptMouse.y};
             ::ClientToScreen(*this, &pt);
-            pMenu->Init(msg.pSender, CRect(pt.x, pt.y, pt.x + 120, pt.y + 82));
+            pMenu->Init(msg.pSender, pt);
+        }
+        else if( msg.sType == _T("menu_Delete") ) {
+            CListUI* pList = static_cast<CListUI*>(msg.pSender);
+            int nSel = pList->GetCurSel();
+            if( nSel < 0 ) return;
+            pList->RemoveAt(nSel);
+            domain.erase(domain.begin() + nSel);
+            desc.erase(desc.begin() + nSel);   
         }
     }
 
