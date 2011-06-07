@@ -789,9 +789,41 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
     ::DeleteDC(hCloneDC);
 }
 
+
+bool DrawImage(HDC hDC, CPaintManagerUI* pManager, const RECT& rc, const RECT& rcPaint, const CStdString& sImageName, \
+		const CStdString& sImageResType, RECT rcItem, RECT rcBmpPart, RECT rcCorner, DWORD dwMask, BYTE bFade, \
+		bool bHole, bool bTiledX, bool bTiledY)
+{
+	const TImageInfo* data = NULL;
+	if( sImageResType.IsEmpty() ) {
+		data = pManager->GetImageEx((LPCTSTR)sImageName, NULL, dwMask);
+	}
+	else {
+		data = pManager->GetImageEx((LPCTSTR)sImageName, (LPCTSTR)sImageResType, dwMask);
+	}
+	if( !data ) return false;    
+
+	if( rcBmpPart.left == 0 && rcBmpPart.right == 0 && rcBmpPart.top == 0 && rcBmpPart.bottom == 0 ) {
+		rcBmpPart.right = data->nX;
+		rcBmpPart.bottom = data->nY;
+	}
+	if (rcBmpPart.right > data->nX) rcBmpPart.right = data->nX;
+	if (rcBmpPart.bottom > data->nY) rcBmpPart.bottom = data->nY;
+
+	RECT rcTemp;
+	if( !::IntersectRect(&rcTemp, &rcItem, &rc) ) return true;
+	if( !::IntersectRect(&rcTemp, &rcItem, &rcPaint) ) return true;
+
+	CRenderEngine::DrawImage(hDC, data->hBitmap, rcItem, rcPaint, rcBmpPart, rcCorner, data->alphaChannel, bFade, bHole, bTiledX, bTiledY);
+
+	return true;
+}
+
 bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RECT& rc, const RECT& rcPaint, 
                                           LPCTSTR pStrImage, LPCTSTR pStrModify)
 {
+	if ((pManager == NULL) || (hDC == NULL)) return false;
+
     // 1¡¢aaa.jpg
     // 2¡¢file='aaa.jpg' res='' restype='0' dest='0,0,0,0' source='0,0,0,0' corner='0,0,0,0' 
     // mask='#FF0000' fade='255' hole='false' xtiled='false' ytiled='false'
@@ -807,14 +839,16 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
     bool bTiledX = false;
     bool bTiledY = false;
 
+	int image_count = 0;
+
     CStdString sItem;
     CStdString sValue;
     LPTSTR pstr = NULL;
 
-    for( int i = 0; i < 2; ++i ) {
-        if( i == 1) {
+    for( int i = 0; i < 2; ++i,image_count = 0 ) {
+        if( i == 1)
             pStrImage = pStrModify;
-        }
+
         if( !pStrImage ) continue;
 
         while( *pStrImage != _T('\0') ) {
@@ -840,10 +874,20 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
             if( *pStrImage++ != _T('\'') ) break;
             if( !sValue.IsEmpty() ) {
                 if( sItem == _T("file") || sItem == _T("res") ) {
+					if( image_count > 0 )
+						DuiLib::DrawImage(hDC, pManager, rc, rcPaint, sImageName, sImageResType,
+							rcItem, rcBmpPart, rcCorner, dwMask, bFade, bHole, bTiledX, bTiledY);
+
                     sImageName = sValue;
+					++image_count;
                 }
                 else if( sItem == _T("restype") ) {
+					if( image_count > 0 )
+						DuiLib::DrawImage(hDC, pManager, rc, rcPaint, sImageName, sImageResType,
+							rcItem, rcBmpPart, rcCorner, dwMask, bFade, bHole, bTiledX, bTiledY);
+
                     sImageResType = sValue;
+					++image_count;
                 }
                 else if( sItem == _T("dest") ) {
                     rcItem.left = rc.left + _tcstol(sValue.GetData(), &pstr, 10);  ASSERT(pstr);    
@@ -886,29 +930,9 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
         }
     }
 
+	DuiLib::DrawImage(hDC, pManager, rc, rcPaint, sImageName, sImageResType,
+		rcItem, rcBmpPart, rcCorner, dwMask, bFade, bHole, bTiledX, bTiledY);
 
-    const TImageInfo* data = NULL;
-    if( sImageResType.IsEmpty() ) {
-        data = pManager->GetImageEx((LPCTSTR)sImageName, NULL, dwMask);
-    }
-    else {
-        data = pManager->GetImageEx((LPCTSTR)sImageName, (LPCTSTR)sImageResType, dwMask);
-    }
-    if( !data ) return false;
-
-    if( hDC == NULL ) return true;
-
-    if( rcBmpPart.left == 0 && rcBmpPart.right == 0 && rcBmpPart.top == 0 && rcBmpPart.bottom == 0 ) {
-        rcBmpPart.right = data->nX;
-        rcBmpPart.bottom = data->nY;
-    }
-	if (rcBmpPart.right > data->nX) rcBmpPart.right = data->nX;
-	if (rcBmpPart.bottom > data->nY) rcBmpPart.bottom = data->nY;
-
-    RECT rcTemp;
-    if( !::IntersectRect(&rcTemp, &rcItem, &rc) ) return true;
-    if( !::IntersectRect(&rcTemp, &rcItem, &rcPaint) ) return true;
-    DrawImage(hDC, data->hBitmap, rcItem, rcPaint, rcBmpPart, rcCorner, data->alphaChannel, bFade, bHole, bTiledX, bTiledY);
     return true;
 }
 
