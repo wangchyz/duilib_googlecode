@@ -616,6 +616,15 @@ bool COptionUI::Activate()
     return true;
 }
 
+void COptionUI::SetEnabled(bool bEnable)
+{
+    CControlUI::SetEnabled(bEnable);
+    if( !IsEnabled() ) {
+        if( m_bSelected ) m_uButtonState = UISTATE_SELECTED;
+        else m_uButtonState = 0;
+    }
+}
+
 LPCTSTR COptionUI::GetSelectedImage()
 {
     return m_sSelectedImage;
@@ -886,8 +895,6 @@ void CTextUI::PaintText(HDC hDC)
 
 CProgressUI::CProgressUI() : m_bHorizontal(true), m_nMin(0), m_nMax(100), m_nValue(0)
 {
-	m_dwBorderColor = 0xFF4EA0D1;
-	m_nBorderSize = 1;
     m_uTextStyle = DT_SINGLELINE | DT_CENTER;
     SetFixedHeight(12);
 }
@@ -1347,23 +1354,16 @@ LRESULT CEditWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else if( uMsg == WM_KEYDOWN && TCHAR(wParam) == VK_RETURN ) {
         m_pOwner->GetManager()->SendNotify(m_pOwner, _T("return"));
     }
-    else if(( uMsg == OCM__BASE + WM_CTLCOLOREDIT ) || ( uMsg == OCM__BASE + WM_CTLCOLORSTATIC ) ){
-		// Refer To: http://msdn.microsoft.com/en-us/library/bb761691(v=vs.85).aspx
-		// Read-only or disabled edit controls do not send the WM_CTLCOLOREDIT message; instead, they send the WM_CTLCOLORSTATIC message.
-		if( m_pOwner->GetNativeEditBkColor() == 0) return NULL;
-		::SetBkMode((HDC)wParam, TRANSPARENT);
-		DWORD dwBkColor = m_pOwner->GetNativeEditBkColor();
-		CRect textPadding = m_pOwner->GetTextPadding();
-		if(( dwBkColor != m_pOwner->GetBkColor() ) && !textPadding.IsNull() )
-			dwBkColor = m_pOwner->GetBkColor();
-
-		DWORD dwTextColor = m_pOwner->GetTextColor();
-		::SetTextColor((HDC)wParam, RGB(GetBValue(dwTextColor),GetGValue(dwTextColor),GetRValue(dwTextColor)));
-
-		if( m_hBkBrush == NULL ) {
-			m_hBkBrush = ::CreateSolidBrush(RGB(GetBValue(dwBkColor), GetGValue(dwBkColor), GetRValue(dwBkColor)));
-		}
-		return (LRESULT)m_hBkBrush;
+    else if( uMsg == OCM__BASE + WM_CTLCOLOREDIT  || uMsg == OCM__BASE + WM_CTLCOLORSTATIC ) {
+        if( m_pOwner->GetNativeEditBkColor() == 0xFFFFFFFF ) return NULL;
+        ::SetBkMode((HDC)wParam, TRANSPARENT);
+        DWORD dwTextColor = m_pOwner->GetTextColor();
+        ::SetTextColor((HDC)wParam, RGB(GetBValue(dwTextColor),GetGValue(dwTextColor),GetRValue(dwTextColor)));
+        if( m_hBkBrush == NULL ) {
+            DWORD clrColor = m_pOwner->GetNativeEditBkColor();
+            m_hBkBrush = ::CreateSolidBrush(RGB(GetBValue(clrColor), GetGValue(clrColor), GetRValue(clrColor)));
+        }
+        return (LRESULT)m_hBkBrush;
     }
     else bHandled = FALSE;
     if( !bHandled ) return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
