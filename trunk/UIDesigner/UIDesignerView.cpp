@@ -871,8 +871,17 @@ void CUIDesignerView::CopyUI(TiXmlElement* pParentNode)
 
 	m_MultiTracker.GetSelected(arrSelected);
 
+	TiXmlNode* pNode;
 	for(int i=0; i<arrSelected.GetSize(); i++)
+	{
 		m_LayoutManager.SaveProperties(arrSelected[i], pContainerNode);
+
+		if(i == 0)
+			pNode = pContainerNode->FirstChild();
+		else
+			pNode = pNode->NextSibling();
+		pNode->ToElement()->RemoveAttribute("name");
+	}
 
 	pParentNode->InsertEndChild(*pContainerNode);
 	delete pContainerNode;
