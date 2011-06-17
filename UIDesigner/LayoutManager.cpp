@@ -2205,6 +2205,8 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 
 void CLayoutManager::SetDefaultUIName(CControlUI* pControl)
 {
+	m_Manager.ReapObjects(pControl);
+
 	BOOL bNeedName = FALSE;
 	CString strName = pControl->GetName();
 	if(strName.IsEmpty())

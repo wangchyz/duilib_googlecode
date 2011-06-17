@@ -161,9 +161,10 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	case tagName:
 		{
 			CPaintManagerUI* pManager = g_pMainFrame->GetActiveUIView()->GetPaintManager();
-			if(pManager->FindControl(strNewVal))
+			if(strNewVal.IsEmpty() || pManager->FindControl(strNewVal))
 			{
-				MessageBox(strNewVal + _T(" 名称已被其他控件使用！"));
+				if(!strNewVal.IsEmpty())
+					MessageBox(strNewVal + _T(" 名称已被其他控件使用！"));
 				pProp->SetValue((_variant_t)pControl->GetName());
 				return;
 			}

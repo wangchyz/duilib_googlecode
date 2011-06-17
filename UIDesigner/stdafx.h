@@ -88,7 +88,7 @@
 
 #define UI_COMMAND_HISTORY 10
 
-#define UIDESIGNER_VERSION _T("1.0.5.143")
+#define UIDESIGNER_VERSION _T("1.0.6.158")
 #define UIDESIGNER_VERSION_CHECK_URL _T("http://www.taxue.org/uidesigner-version.txt")
 
 //UI type
