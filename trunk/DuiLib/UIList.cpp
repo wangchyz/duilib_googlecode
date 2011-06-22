@@ -423,7 +423,7 @@ RECT CListUI::GetItemTextPadding() const
 void CListUI::SetItemTextColor(DWORD dwTextColor)
 {
     m_ListInfo.dwTextColor = dwTextColor;
-    NeedUpdate();
+    Invalidate();
 }
 
 void CListUI::SetItemBkColor(DWORD dwBkColor)
