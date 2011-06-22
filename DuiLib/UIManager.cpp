@@ -483,6 +483,12 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             // Should we paint?
             RECT rcPaint = { 0 };
             if( !::GetUpdateRect(m_hWndPaint, &rcPaint, FALSE) ) return true;
+            if( m_pRoot == NULL ) {
+                PAINTSTRUCT ps = { 0 };
+                ::BeginPaint(m_hWndPaint, &ps);
+                ::EndPaint(m_hWndPaint, &ps);
+                return true;
+            }            
             // Do we need to resize anything?
             // This is the time where we layout the controls on the form.
             // We delay this even from the WM_SIZE messages since resizing can be
@@ -697,7 +703,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     case WM_MOUSEMOVE:
         {
-            if( ::GetActiveWindow() != m_hWndPaint ) break;
+            if( ::GetActiveWindow() != m_hWndPaint && lParam != (LPARAM)-1 ) break;
             // Start tracking this entire window again...
             if( !m_bMouseTracking ) {
                 TRACKMOUSEEVENT tme = { 0 };
