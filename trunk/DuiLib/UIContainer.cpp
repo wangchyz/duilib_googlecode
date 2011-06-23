@@ -560,8 +560,16 @@ void CContainerUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("vscrollbar")) == 0 ) {
         EnableScrollBar(_tcscmp(pstrValue, _T("true")) == 0, GetHorizontalScrollBar() != NULL);
     }
+    else if( _tcscmp(pstrName, _T("vscrollbarstyle")) == 0 ) {
+        EnableScrollBar(true, GetHorizontalScrollBar() != NULL);
+        if( GetVerticalScrollBar() ) GetVerticalScrollBar()->ApplyAttributeList(pstrValue);
+    }
     else if( _tcscmp(pstrName, _T("hscrollbar")) == 0 ) {
         EnableScrollBar(GetVerticalScrollBar() != NULL, _tcscmp(pstrValue, _T("true")) == 0);
+    }
+    else if( _tcscmp(pstrName, _T("hscrollbarstyle")) == 0 ) {
+        EnableScrollBar(GetVerticalScrollBar() != NULL, true);
+        if( GetHorizontalScrollBar() ) GetHorizontalScrollBar()->ApplyAttributeList(pstrValue);
     }
     else if( _tcscmp(pstrName, _T("childpadding")) == 0 ) SetChildPadding(_ttoi(pstrValue));
     else CControlUI::SetAttribute(pstrName, pstrValue);

@@ -13,7 +13,7 @@ m_bFocused(false),
 m_bEnabled(true),
 m_bMouseEnabled(true),
 m_bFloat(false),
-m_bFloatSetPos(false),
+m_bSetPos(false),
 m_chShortcut('\0'),
 m_pTag(NULL),
 m_dwBackColor(0),
@@ -37,11 +37,7 @@ m_nBorderSize(1)
 
 CControlUI::~CControlUI()
 {
-    TEventUI event = { 0 };
-    event.Type = UIEVENT_DESTROY;
-    event.pSender = this;
-    event.dwTimestamp = ::GetTickCount();
-    OnDestroy(event);
+    if( OnDestroy ) OnDestroy(this);
     if( m_pManager != NULL ) m_pManager->ReapObjects(this);
 }
 
@@ -87,13 +83,7 @@ void CControlUI::SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool
 {
     m_pManager = pManager;
     m_pParent = pParent;
-    if( bInit && m_pParent ) {
-        TEventUI event = { 0 };
-        event.Type = UIEVENT_INIT;
-        event.pSender = this;
-        event.dwTimestamp = ::GetTickCount();
-        Init(event);
-    }
+    if( bInit && m_pParent ) Init();
 }
 
 CControlUI* CControlUI::GetParent() const
@@ -238,12 +228,6 @@ void CControlUI::SetPos(RECT rc)
     if( m_pManager == NULL ) return;
 
     if( m_bFloat ) {
-        if( !m_bFloatSetPos ) {
-            m_bFloatSetPos = true;
-            m_pManager->SendNotify(this, _T("setpos"));
-            m_bFloatSetPos = false;
-        }
-
         CControlUI* pParent = GetParent();
         if( pParent != NULL ) {
             RECT rcParentPos = pParent->GetPos();
@@ -253,6 +237,12 @@ void CControlUI::SetPos(RECT rc)
             if( m_cXY.cy >= 0 ) m_cXY.cy = m_rcItem.top - rcParentPos.top;
             else m_cXY.cy = m_rcItem.bottom - rcParentPos.bottom;
         }
+    }
+
+    if( !m_bSetPos ) {
+        m_bSetPos = true;
+        if( OnSize ) OnSize(this);
+        m_bSetPos = false;
     }
 
     m_bUpdateNeeded = false;
@@ -607,10 +597,10 @@ void CControlUI::NeedParentUpdate()
     if( m_pManager != NULL ) m_pManager->NeedUpdate();
 }
 
-void CControlUI::Init(TEventUI& event)
+void CControlUI::Init()
 {
     DoInit();
-    OnInit(event);
+    if( OnInit ) OnInit(this);
 }
 
 void CControlUI::DoInit()
@@ -620,7 +610,7 @@ void CControlUI::DoInit()
 
 void CControlUI::Event(TEventUI& event)
 {
-    if( OnEvent(event) ) DoEvent(event);
+    if( OnEvent(&event) ) DoEvent(event);
 }
 
 void CControlUI::DoEvent(TEventUI& event)
