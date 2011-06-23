@@ -442,7 +442,6 @@ void CButtonUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 
 void CButtonUI::PaintText(HDC hDC)
 {
-
 	if( IsFocused() ) m_uButtonState |= UISTATE_FOCUSED;
 	else m_uButtonState &= ~ UISTATE_FOCUSED;
 	if( !IsEnabled() ) m_uButtonState |= UISTATE_DISABLED;
@@ -519,7 +518,7 @@ void CButtonUI::PaintStatusImage(HDC hDC)
 //
 //
 
-COptionUI::COptionUI() : m_bSelected(false)
+COptionUI::COptionUI() : m_bSelected(false), m_dwSelectedTextColor(0)
 {
 }
 
@@ -2336,6 +2335,7 @@ void CScrollBarUI::DoEvent(TEventUI& event)
                 }
             }
         }
+        if( m_pManager != NULL && m_pOwner == NULL ) m_pManager->SendNotify(this, _T("scroll"));
         return;
     }
     if( event.Type == UIEVENT_BUTTONUP )
@@ -2455,6 +2455,7 @@ void CScrollBarUI::DoEvent(TEventUI& event)
                 }
             }
         }
+        if( m_pManager != NULL && m_pOwner == NULL ) m_pManager->SendNotify(this, _T("scroll"));
         return;
     }
     if( event.Type == UIEVENT_MOUSEENTER )
@@ -2554,6 +2555,8 @@ void CScrollBarUI::PaintBk(HDC hDC)
 
 void CScrollBarUI::PaintButton1(HDC hDC)
 {
+    if( !m_bShowButton1 ) return;
+    
     if( !IsEnabled() ) m_uButton1State |= UISTATE_DISABLED;
     else m_uButton1State &= ~ UISTATE_DISABLED;
 
@@ -2592,6 +2595,8 @@ void CScrollBarUI::PaintButton1(HDC hDC)
 
 void CScrollBarUI::PaintButton2(HDC hDC)
 {
+    if( !m_bShowButton2 ) return;
+    
     if( !IsEnabled() ) m_uButton2State |= UISTATE_DISABLED;
     else m_uButton2State &= ~ UISTATE_DISABLED;
 
