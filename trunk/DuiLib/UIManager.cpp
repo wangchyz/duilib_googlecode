@@ -520,7 +520,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
                     // to submit swipes/animations.
                     if( m_bFirstLayout ) {
                         m_bFirstLayout = false;
-                        SendNotify(m_pRoot, _T("windowinit"));
+                        SendNotify(m_pRoot, _T("windowinit"),  0, 0, false);
                     }
                 }
             }
@@ -1008,11 +1008,15 @@ void CPaintManagerUI::ReapObjects(CControlUI* pControl)
     if( pControl == m_pEventHover ) m_pEventHover = NULL;
     if( pControl == m_pEventClick ) m_pEventClick = NULL;
     if( pControl == m_pFocus ) m_pFocus = NULL;
-    
+    KillTimer(pControl);
     const CStdString& sName = pControl->GetName();
     if( !sName.IsEmpty() ) {
         if( pControl == FindControl(sName) ) m_mNameHash.Remove(sName);
     }
+    for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) {
+        TNotifyUI* pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
+        if( pMsg->pSender == pControl ) pMsg->pSender = NULL;
+    }    
 }
 
 bool CPaintManagerUI::AddOptionGroup(LPCTSTR pStrGroupName, CControlUI* pControl)
@@ -1215,6 +1219,20 @@ bool CPaintManagerUI::KillTimer(CControlUI* pControl, UINT nTimerID)
         }
     }
     return false;
+}
+
+void CPaintManagerUI::KillTimer(CControlUI* pControl)
+{
+    ASSERT(pControl!=NULL);
+    int count = m_aTimers.GetSize();
+    for( int i = 0, j = 0; i < count; i++ ) {
+        TIMERINFO* pTimer = static_cast<TIMERINFO*>(m_aTimers[i - j]);
+        if( pTimer->pSender == pControl && pTimer->hWnd == m_hWndPaint ) {
+            if( pTimer->bKilled == false ) ::KillTimer(pTimer->hWnd, pTimer->uWinTimer);
+            m_aTimers.Remove(i);
+            j++;
+        }
+    }
 }
 
 void CPaintManagerUI::RemoveAllTimers()

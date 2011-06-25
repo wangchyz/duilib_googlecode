@@ -261,6 +261,7 @@ public:
 
     bool SetTimer(CControlUI* pControl, UINT nTimerID, UINT uElapse);
     bool KillTimer(CControlUI* pControl, UINT nTimerID);
+    void KillTimer(CControlUI* pControl);
     void RemoveAllTimers();
 
     void SetCapture();
