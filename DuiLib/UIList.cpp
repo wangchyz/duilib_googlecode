@@ -2324,7 +2324,6 @@ m_pOwner(NULL),
 m_bSelected(false),
 m_uButtonState(0)
 {
-    SetMouseChildEnabled(false);
 }
 
 LPCTSTR CListContainerElementUI::GetClass() const
@@ -2448,7 +2447,6 @@ bool CListContainerElementUI::Select(bool bSelect)
     if( bSelect == m_bSelected ) return true;
     m_bSelected = bSelect;
     if( bSelect && m_pOwner != NULL ) m_pOwner->SelectItem(m_iIndex);
-    SetMouseChildEnabled(bSelect);
     Invalidate();
 
     return true;
