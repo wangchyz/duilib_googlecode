@@ -1630,7 +1630,7 @@ void CRichEditUI::DoInit()
         m_pTwh->SetTransparent(TRUE);
         LRESULT lResult;
         m_pTwh->GetTextServices()->TxSendMessage(EM_SETLANGOPTIONS, 0, 0, &lResult);
-        if( m_bReadOnly ) m_pTwh->OnTxInPlaceActivate(NULL);
+        m_pTwh->OnTxInPlaceActivate(NULL);
         m_pManager->AddMessageFilter(this);
     }
 }
