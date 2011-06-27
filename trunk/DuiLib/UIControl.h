@@ -142,6 +142,7 @@ public:
     CEventSource OnDestroy;
     CEventSource OnSize;
     CEventSource OnEvent;
+    CEventSource OnNotify;
 
 protected:
     CPaintManagerUI* m_pManager;

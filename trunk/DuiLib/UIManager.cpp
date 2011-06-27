@@ -439,6 +439,9 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         {
             for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) {
                 TNotifyUI* pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
+                if( pMsg->pSender != NULL ) {
+                    if( pMsg->pSender->OnNotify ) pMsg->pSender->OnNotify(&pMsg);
+                }
                 for( int j = 0; j < m_aNotifiers.GetSize(); j++ ) {
                     static_cast<INotifyUI*>(m_aNotifiers[j])->Notify(*pMsg);
                 }
@@ -1397,6 +1400,9 @@ void CPaintManagerUI::SendNotify(TNotifyUI& Msg, bool bAsync /*= false*/)
     Msg.dwTimestamp = ::GetTickCount();
     if( !bAsync ) {
         // Send to all listeners
+        if( Msg.pSender != NULL ) {
+            if( Msg.pSender->OnNotify ) Msg.pSender->OnNotify(&Msg);
+        }
         for( int i = 0; i < m_aNotifiers.GetSize(); i++ ) {
             static_cast<INotifyUI*>(m_aNotifiers[i])->Notify(Msg);
         }
