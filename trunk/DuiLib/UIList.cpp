@@ -71,27 +71,23 @@ bool CListUI::SetItemIndex(CControlUI* pControl, int iIndex)
     if( _tcsstr(pControl->GetClass(), _T("ListHeaderItemUI")) != NULL ) return m_pHeader->SetItemIndex(pControl, iIndex);
 
     int iOrginIndex = m_pList->GetItemIndex(pControl);
-    if (iOrginIndex == -1) return false;
+    if( iOrginIndex == -1 ) return false;
+    if( iOrginIndex == iIndex ) return true;
 
-    if (!m_pList->SetItemIndex(pControl, iIndex)) return false;
-
-    // The list items should know about us
-    IListItemUI* pListItem = static_cast<IListItemUI*>(pControl->GetInterface(_T("ListItem")));
-    if( pListItem != NULL ) {
-        pListItem->SetIndex(GetCount()); // 本来是GetCount() - 1的，不过后面有减一
-    }
-
-    for(int i = iOrginIndex; i < m_pList->GetCount(); ++i)
-    {
+    IListItemUI* pSelectedListItem = NULL;
+    if( m_iCurSel >= 0 ) pSelectedListItem = 
+        static_cast<IListItemUI*>(GetItemAt(m_iCurSel)->GetInterface(_T("ListItem")));
+    if( !m_pList->SetItemIndex(pControl, iIndex) ) return false;
+    int iMinIndex = min(iOrginIndex, iIndex);
+    int iMaxIndex = max(iOrginIndex, iIndex);
+    for(int i = iMinIndex; i < iMaxIndex + 1; ++i) {
         CControlUI* p = m_pList->GetItemAt(i);
-        pListItem = static_cast<IListItemUI*>(p->GetInterface(_T("ListItem")));
+        IListItemUI* pListItem = static_cast<IListItemUI*>(p->GetInterface(_T("ListItem")));
         if( pListItem != NULL ) {
-            pListItem->SetIndex(pListItem->GetIndex() - 1);
+            pListItem->SetIndex(i);
         }
     }
-
-    SelectItem(FindSelectable(m_iCurSel, false));
-
+    if( m_iCurSel >= 0 && pSelectedListItem != NULL ) m_iCurSel = pSelectedListItem->GetIndex();
     return true;
 }
 
@@ -156,14 +152,14 @@ bool CListUI::AddAt(CControlUI* pControl, int iIndex)
         pListItem->SetIndex(iIndex);
     }
 
-    for(int i = iIndex + 1; i < m_pList->GetCount(); ++i)
-    {
+    for(int i = iIndex + 1; i < m_pList->GetCount(); ++i) {
         CControlUI* p = m_pList->GetItemAt(i);
         pListItem = static_cast<IListItemUI*>(p->GetInterface(_T("ListItem")));
         if( pListItem != NULL ) {
-            pListItem->SetIndex(pListItem->GetIndex() + 1);
+            pListItem->SetIndex(i);
         }
     }
+    if( m_iCurSel >= iIndex ) m_iCurSel += 1;
     return true;
 }
 
@@ -178,16 +174,15 @@ bool CListUI::Remove(CControlUI* pControl)
 
     if (!m_pList->RemoveAt(iIndex)) return false;
 
-    for(int i = iIndex; i < m_pList->GetCount(); ++i)
-    {
+    for(int i = iIndex; i < m_pList->GetCount(); ++i) {
         CControlUI* p = m_pList->GetItemAt(i);
         IListItemUI* pListItem = static_cast<IListItemUI*>(p->GetInterface(_T("ListItem")));
         if( pListItem != NULL ) {
-            pListItem->SetIndex(pListItem->GetIndex() - 1);
+            pListItem->SetIndex(i);
         }
     }
 
-    if( iIndex == m_iCurSel ) {
+    if( iIndex == m_iCurSel && m_iCurSel >= 0 ) {
         int iSel = m_iCurSel;
         m_iCurSel = -1;
         SelectItem(FindSelectable(iSel, false));
@@ -200,16 +195,13 @@ bool CListUI::RemoveAt(int iIndex)
 {
     if (!m_pList->RemoveAt(iIndex)) return false;
 
-    for(int i = iIndex; i < m_pList->GetCount(); ++i)
-    {
+    for(int i = iIndex; i < m_pList->GetCount(); ++i) {
         CControlUI* p = m_pList->GetItemAt(i);
         IListItemUI* pListItem = static_cast<IListItemUI*>(p->GetInterface(_T("ListItem")));
-        if( pListItem != NULL ) {
-            pListItem->SetIndex(pListItem->GetIndex() - 1);
-        }
+        if( pListItem != NULL ) pListItem->SetIndex(i);
     }
 
-    if( iIndex == m_iCurSel ) {
+    if( iIndex == m_iCurSel && m_iCurSel >= 0 ) {
         int iSel = m_iCurSel;
         m_iCurSel = -1;
         SelectItem(FindSelectable(iSel, false));

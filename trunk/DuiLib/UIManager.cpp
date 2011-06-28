@@ -440,7 +440,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) {
                 TNotifyUI* pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
                 if( pMsg->pSender != NULL ) {
-                    if( pMsg->pSender->OnNotify ) pMsg->pSender->OnNotify(&pMsg);
+                    if( pMsg->pSender->OnNotify ) pMsg->pSender->OnNotify(pMsg);
                 }
                 for( int j = 0; j < m_aNotifiers.GetSize(); j++ ) {
                     static_cast<INotifyUI*>(m_aNotifiers[j])->Notify(*pMsg);
