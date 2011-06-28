@@ -59,7 +59,7 @@ bool CContainerUI::SetItemIndex(CControlUI* pControl, int iIndex)
 {
     for( int it = 0; it < m_items.GetSize(); it++ ) {
         if( static_cast<CControlUI*>(m_items[it]) == pControl ) {
-            Invalidate();            
+            NeedUpdate();            
             m_items.Remove(it);
             return m_items.InsertAt(iIndex, pControl);
         }
