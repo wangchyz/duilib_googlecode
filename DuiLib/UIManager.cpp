@@ -706,7 +706,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     case WM_MOUSEMOVE:
         {
-            if( ::GetActiveWindow() != m_hWndPaint && lParam != (LPARAM)-1 ) break;
             // Start tracking this entire window again...
             if( !m_bMouseTracking ) {
                 TRACKMOUSEEVENT tme = { 0 };
