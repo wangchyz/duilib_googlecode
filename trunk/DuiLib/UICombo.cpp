@@ -222,7 +222,7 @@ LPCTSTR CComboUI::GetClass() const
 LPVOID CComboUI::GetInterface(LPCTSTR pstrName)
 {
 	if( _tcscmp(pstrName, _T("Combo")) == 0 ) return static_cast<CComboUI*>(this);
-    if( _tcscmp(pstrName, _T("ListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
+    if( _tcscmp(pstrName, _T("IListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
 

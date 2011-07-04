@@ -76,11 +76,11 @@ m_bOffscreenPaint(true),
 m_bAlphaBackground(false),
 m_pParentResourcePM(NULL)
 {
-    m_dwDefalutDisabledColor = 0xFFA7A6AA;
-    m_dwDefalutFontColor = 0xFF000000;
-    m_dwDefalutLinkFontColor = 0xFF0000FF;
-    m_dwDefalutLinkHoverFontColor = 0xFFD3215F;
-    m_dwDefalutSelectedBkColor = 0xFFBAE4FF;
+    m_dwDefaultDisabledColor = 0xFFA7A6AA;
+    m_dwDefaultFontColor = 0xFF000000;
+    m_dwDefaultLinkFontColor = 0xFF0000FF;
+    m_dwDefaultLinkHoverFontColor = 0xFFD3215F;
+    m_dwDefaultSelectedBkColor = 0xFFBAE4FF;
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
     lf.lfCharSet = DEFAULT_CHARSET;
@@ -1444,56 +1444,56 @@ CPaintManagerUI* CPaintManagerUI::GetParentResource() const
 DWORD CPaintManagerUI::GetDefaultDisabledColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultDisabledColor();
-    return m_dwDefalutDisabledColor;
+    return m_dwDefaultDisabledColor;
 }
 
 void CPaintManagerUI::SetDefaultDisabledColor(DWORD dwColor)
 {
-    m_dwDefalutDisabledColor = dwColor;
+    m_dwDefaultDisabledColor = dwColor;
 }
 
 DWORD CPaintManagerUI::GetDefaultFontColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultFontColor();
-    return m_dwDefalutFontColor;
+    return m_dwDefaultFontColor;
 }
 
 void CPaintManagerUI::SetDefaultFontColor(DWORD dwColor)
 {
-    m_dwDefalutFontColor = dwColor;
+    m_dwDefaultFontColor = dwColor;
 }
 
 DWORD CPaintManagerUI::GetDefaultLinkFontColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkFontColor();
-    return m_dwDefalutLinkFontColor;
+    return m_dwDefaultLinkFontColor;
 }
 
 void CPaintManagerUI::SetDefaultLinkFontColor(DWORD dwColor)
 {
-    m_dwDefalutLinkFontColor = dwColor;
+    m_dwDefaultLinkFontColor = dwColor;
 }
 
 DWORD CPaintManagerUI::GetDefaultLinkHoverFontColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultLinkHoverFontColor();
-    return m_dwDefalutLinkHoverFontColor;
+    return m_dwDefaultLinkHoverFontColor;
 }
 
 void CPaintManagerUI::SetDefaultLinkHoverFontColor(DWORD dwColor)
 {
-    m_dwDefalutLinkHoverFontColor = dwColor;
+    m_dwDefaultLinkHoverFontColor = dwColor;
 }
 
 DWORD CPaintManagerUI::GetDefaultSelectedBkColor() const
 {
     if( m_pParentResourcePM ) return m_pParentResourcePM->GetDefaultSelectedBkColor();
-    return m_dwDefalutSelectedBkColor;
+    return m_dwDefaultSelectedBkColor;
 }
 
 void CPaintManagerUI::SetDefaultSelectedBkColor(DWORD dwColor)
 {
-    m_dwDefalutSelectedBkColor = dwColor;
+    m_dwDefaultSelectedBkColor = dwColor;
 }
 
 TFontInfo* CPaintManagerUI::GetDefaultFontInfo()
