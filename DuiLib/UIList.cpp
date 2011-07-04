@@ -44,9 +44,9 @@ UINT CListUI::GetControlFlags() const
 
 LPVOID CListUI::GetInterface(LPCTSTR pstrName)
 {
-	if( _tcscmp(pstrName, _T("CList")) == 0 ) return static_cast<CListUI*>(this);
-    if( _tcscmp(pstrName, _T("List")) == 0 ) return static_cast<IListUI*>(this);
-    if( _tcscmp(pstrName, _T("ListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
+	if( _tcscmp(pstrName, _T("List")) == 0 ) return static_cast<CListUI*>(this);
+    if( _tcscmp(pstrName, _T("IList")) == 0 ) return static_cast<IListUI*>(this);
+    if( _tcscmp(pstrName, _T("IListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
     return CVerticalLayoutUI::GetInterface(pstrName);
 }
 
@@ -1487,7 +1487,7 @@ IListOwnerUI* CListElementUI::GetOwner()
 
 void CListElementUI::SetOwner(CControlUI* pOwner)
 {
-    m_pOwner = static_cast<IListOwnerUI*>(pOwner->GetInterface(_T("ListOwner")));
+    m_pOwner = static_cast<IListOwnerUI*>(pOwner->GetInterface(_T("IListOwner")));
 }
 
 void CListElementUI::SetVisible(bool bVisible)
@@ -1879,7 +1879,7 @@ void CListTextElementUI::SetText(int iIndex, LPCTSTR pstrText)
 void CListTextElementUI::SetOwner(CControlUI* pOwner)
 {
     CListElementUI::SetOwner(pOwner);
-    m_pOwner = static_cast<IListUI*>(pOwner->GetInterface(_T("List")));
+    m_pOwner = static_cast<IListUI*>(pOwner->GetInterface(_T("IList")));
 }
 
 CStdString* CListTextElementUI::GetLinkContent(int iIndex)
@@ -2342,7 +2342,7 @@ IListOwnerUI* CListContainerElementUI::GetOwner()
 
 void CListContainerElementUI::SetOwner(CControlUI* pOwner)
 {
-    m_pOwner = static_cast<IListOwnerUI*>(pOwner->GetInterface(_T("ListOwner")));
+    m_pOwner = static_cast<IListOwnerUI*>(pOwner->GetInterface(_T("IListOwner")));
 }
 
 void CListContainerElementUI::SetVisible(bool bVisible)

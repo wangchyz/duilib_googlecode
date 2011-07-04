@@ -224,38 +224,45 @@ public:
     }
     static DWORD WINAPI Search(LPVOID lpParameter)
     {
-        struct Prama* prama = (struct Prama *)lpParameter;
-        CListUI* pList = prama->pList;
-        CButtonUI* pSearch = prama->pSearch;
-        CStdString tDomain = prama->tDomain;
-        //-------------------------------------
-        /*
-        * 添加数据循环
-        */
-        for(int i=0; i<100; i++)
+        try
         {
-            std::stringstream ss;
-            ss << "www." << i << ".com";
-            domain.push_back(ss.str());
-            ss.clear();
-            ss << "it's " << i;
-            desc.push_back(ss.str());
-            CListTextElementUI* pListElement = new CListTextElementUI;
-            pListElement->SetTag(i);
-            if (pListElement != NULL)
-            {
-                ::PostMessage(prama->hWnd, WM_ADDLISTITEM, 0L, (LPARAM)pListElement);
-            }
+            struct Prama* prama = (struct Prama *)lpParameter;
+            CListUI* pList = prama->pList;
+            CButtonUI* pSearch = prama->pSearch;
+            CStdString tDomain = prama->tDomain;
+            //-------------------------------------
             /*
-            *	Sleep 为了展示添加的动态效果，故放慢了添加速度，同时可以看到添加过程中界面仍然可以响应
+            * 添加数据循环
             */
-            ::Sleep(100);
-        }
-        //------------------------------------------
-        delete prama;
+            for(int i=0; i<100; i++)
+            {
+                std::stringstream ss;
+                ss << "www." << i << ".com";
+                domain.push_back(ss.str());
+                ss.clear();
+                ss << "it's " << i;
+                desc.push_back(ss.str());
+                CListTextElementUI* pListElement = new CListTextElementUI;
+                pListElement->SetTag(i);
+                if (pListElement != NULL)
+                {
+                    ::PostMessage(prama->hWnd, WM_ADDLISTITEM, 0L, (LPARAM)pListElement);
+                }
+                /*
+                *	Sleep 为了展示添加的动态效果，故放慢了添加速度，同时可以看到添加过程中界面仍然可以响应
+                */
+                ::Sleep(100);
+            }
+            //------------------------------------------
+            delete prama;
 
-        pSearch->SetEnabled(true);
-        return 0;
+            pSearch->SetEnabled(true);
+            return 0;
+        }
+        catch(...)
+        {
+            return 0;
+        }
     }
     void OnSearch()
     {

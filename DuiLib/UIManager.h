@@ -351,11 +351,11 @@ private:
     CStdStringPtrMap m_mOptionGroup;
     //
     CPaintManagerUI* m_pParentResourcePM;
-    DWORD m_dwDefalutDisabledColor;
-    DWORD m_dwDefalutFontColor;
-    DWORD m_dwDefalutLinkFontColor;
-    DWORD m_dwDefalutLinkHoverFontColor;
-    DWORD m_dwDefalutSelectedBkColor;
+    DWORD m_dwDefaultDisabledColor;
+    DWORD m_dwDefaultFontColor;
+    DWORD m_dwDefaultLinkFontColor;
+    DWORD m_dwDefaultLinkHoverFontColor;
+    DWORD m_dwDefaultSelectedBkColor;
     TFontInfo m_DefaultFontInfo;
     CStdPtrArray m_aCustomFonts;
 
