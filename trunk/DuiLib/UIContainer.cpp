@@ -185,21 +185,19 @@ void CContainerUI::SetMouseChildEnabled(bool bEnable)
 void CContainerUI::SetVisible(bool bVisible)
 {
     if( m_bVisible == bVisible ) return;
-
-    for( int it = 0; it < m_items.GetSize(); it++ ) {
-        static_cast<CControlUI*>(m_items[it])->SetInternVisible(bVisible);
-    }
-
     CControlUI::SetVisible(bVisible);
+    for( int it = 0; it < m_items.GetSize(); it++ ) {
+        static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
+    }
 }
 
 void CContainerUI::SetInternVisible(bool bVisible)
 {
-    for( int it = 0; it < m_items.GetSize(); it++ ) {
-        static_cast<CControlUI*>(m_items[it])->SetInternVisible(bVisible);
-    }
-
     CControlUI::SetInternVisible(bVisible);
+    if( m_items.IsEmpty() ) return;
+    for( int it = 0; it < m_items.GetSize(); it++ ) {
+        static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
+    }
 }
 
 void CContainerUI::SetMouseEnabled(bool bEnabled)

@@ -428,28 +428,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
     }
     // Custom handling of events
     switch( uMsg ) {
-    case WM_APP + 1:
-        {
-           // Delayed control-tree cleanup. See AttachDialog() for details.
-           for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) delete static_cast<CControlUI*>(m_aDelayedCleanup[i]);
-           m_aDelayedCleanup.Empty();
-        }
-        break;
-    case WM_APP + 2:
-        {
-            for( int i = 0; i < m_aAsyncNotify.GetSize(); i++ ) {
-                TNotifyUI* pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify[i]);
-                if( pMsg->pSender != NULL ) {
-                    if( pMsg->pSender->OnNotify ) pMsg->pSender->OnNotify(pMsg);
-                }
-                for( int j = 0; j < m_aNotifiers.GetSize(); j++ ) {
-                    static_cast<INotifyUI*>(m_aNotifiers[j])->Notify(*pMsg);
-                }
-                delete pMsg;
-            }
-            m_aAsyncNotify.Empty();
-        }
-        break;
     case WM_CLOSE:
         {
             // Make sure all matching "closing" events are sent
@@ -957,6 +935,23 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     }
 
+    TNotifyUI* pMsg = NULL;
+    while( pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify.GetAt(0)) ) {
+        m_aAsyncNotify.Remove(0);
+        if( pMsg->pSender != NULL ) {
+            if( pMsg->pSender->OnNotify ) pMsg->pSender->OnNotify(pMsg);
+        }
+        for( int j = 0; j < m_aNotifiers.GetSize(); j++ ) {
+            static_cast<INotifyUI*>(m_aNotifiers[j])->Notify(*pMsg);
+        }
+        delete pMsg;
+    }
+
+    if( !m_aDelayedCleanup.IsEmpty() ) {
+        for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) delete static_cast<CControlUI*>(m_aDelayedCleanup[i]);
+        m_aDelayedCleanup.Empty();
+    }
+
     return false;
 }
 
@@ -1380,7 +1375,6 @@ void CPaintManagerUI::AddDelayedCleanup(CControlUI* pControl)
 {
     pControl->SetManager(this, NULL, false);
     m_aDelayedCleanup.Add(pControl);
-    ::PostMessage(m_hWndPaint, WM_APP + 1, 0, 0L);
 }
 
 void CPaintManagerUI::SendNotify(CControlUI* pControl, LPCTSTR pstrMessage, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/, bool bAsync /*= false*/)
@@ -1415,7 +1409,6 @@ void CPaintManagerUI::SendNotify(TNotifyUI& Msg, bool bAsync /*= false*/)
         pMsg->ptMouse = Msg.ptMouse;
         pMsg->dwTimestamp = Msg.dwTimestamp;
         m_aAsyncNotify.Add(pMsg);
-        ::PostMessage(m_hWndPaint, WM_APP + 2, 0, 0L);
     }
 }
 
