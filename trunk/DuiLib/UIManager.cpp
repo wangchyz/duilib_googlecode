@@ -428,6 +428,13 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
     }
     // Custom handling of events
     switch( uMsg ) {
+    case WM_APP + 1:
+        {
+            for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) 
+                delete static_cast<CControlUI*>(m_aDelayedCleanup[i]);
+            m_aDelayedCleanup.Empty();
+        }
+        break;
     case WM_CLOSE:
         {
             // Make sure all matching "closing" events are sent
@@ -947,11 +954,6 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         delete pMsg;
     }
 
-    if( !m_aDelayedCleanup.IsEmpty() ) {
-        for( int i = 0; i < m_aDelayedCleanup.GetSize(); i++ ) delete static_cast<CControlUI*>(m_aDelayedCleanup[i]);
-        m_aDelayedCleanup.Empty();
-    }
-
     return false;
 }
 
@@ -1375,6 +1377,7 @@ void CPaintManagerUI::AddDelayedCleanup(CControlUI* pControl)
 {
     pControl->SetManager(this, NULL, false);
     m_aDelayedCleanup.Add(pControl);
+    ::PostMessage(m_hWndPaint, WM_APP + 1, 0, 0L);
 }
 
 void CPaintManagerUI::SendNotify(CControlUI* pControl, LPCTSTR pstrMessage, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/, bool bAsync /*= false*/)

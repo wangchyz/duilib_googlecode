@@ -384,51 +384,6 @@ protected:
     CStdPtrArray m_aTexts;
 };
 
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-
-class UILIB_API CListExpandElementUI : public CListTextElementUI
-{
-public:
-    CListExpandElementUI();
-    virtual ~CListExpandElementUI();
-
-    LPCTSTR GetClass() const;
-    LPVOID GetInterface(LPCTSTR pstrName);
-
-    void SetVisible(bool bVisible = true);
-    void SetInternVisible(bool bVisible = true);
-    void SetMouseEnabled(bool bEnable = true);
-
-    void SetPos(RECT rc);
-    void DoEvent(TEventUI& event);
-    SIZE EstimateSize(SIZE szAvailable);
-    void DoPaint(HDC hDC, const RECT& rcPaint);
-
-    void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-
-    void SetManager(CPaintManagerUI* pManager, CControlUI* pParent, bool bInit = true);
-    CControlUI* FindControl(FINDCONTROLPROC Proc, LPVOID pData, UINT uFlags);
-
-    bool IsExpanded() const;
-    bool Expand(bool bExpand = true);
-    bool GetExpandHideSelf() const;
-    void SetExpandHideSelf(bool bHideSelf);
-    RECT GetExpanderRect() const;
-    void SetExpanderRect(RECT rc);
-    void SetExpandItem(CControlUI* pControl);
-
-    void DrawItemText(HDC hDC, const RECT& rcItem);
-
-protected:
-    bool m_bExpanded;
-    bool m_bHideSelf;
-    RECT m_rcExpander;
-    CControlUI* m_pSubControl;
-};
-
-
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
