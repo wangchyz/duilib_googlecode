@@ -282,9 +282,6 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
             if( _tcscmp(pstrClass, _T("HorizontalLayout")) == 0 )       pControl = new CHorizontalLayoutUI;
             else if( _tcscmp(pstrClass, _T("ListLabelElement")) == 0 )  pControl = new CListLabelElementUI;
             break;
-        case 17:
-            if( _tcscmp(pstrClass, _T("ListExpandElement")) == 0 )      pControl = new CListExpandElementUI;
-            break;
         case 20:
             if( _tcscmp(pstrClass, _T("ListContainerElement")) == 0 )   pControl = new CListContainerElementUI;
             break;

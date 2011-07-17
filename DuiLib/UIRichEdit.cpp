@@ -484,8 +484,7 @@ void CTxtWinHost::TxInvalidateRect(LPCRECT prc, BOOL fMode)
 
 void CTxtWinHost::TxViewChange(BOOL fUpdate) 
 {
-    if( m_re->OnTxViewChanged() )
-        ::UpdateWindow(m_re->GetManager()->GetPaintWindow());
+    if( m_re->OnTxViewChanged() ) m_re->Invalidate();
 }
 
 BOOL CTxtWinHost::TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight)
