@@ -243,7 +243,9 @@ int CComboUI::GetCurSel() const
 
 bool CComboUI::SelectItem(int iIndex)
 {
+    if( m_pWindow != NULL ) m_pWindow->Close();
     if( iIndex == m_iCurSel ) return true;
+    int iOldSel = m_iCurSel;
     if( m_iCurSel >= 0 ) {
         CControlUI* pControl = static_cast<CControlUI*>(m_items[m_iCurSel]);
         if( !pControl ) return false;
@@ -259,9 +261,9 @@ bool CComboUI::SelectItem(int iIndex)
     IListItemUI* pListItem = static_cast<IListItemUI*>(pControl->GetInterface(_T("ListItem")));
     if( pListItem == NULL ) return false;
     m_iCurSel = iIndex;
-    //pControl->SetFocus();
+    if( m_pWindow != NULL ) pControl->SetFocus();
     pListItem->Select(true);
-    if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("itemselect"));
+    if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("itemselect"), m_iCurSel, iOldSel);
     Invalidate();
 
     return true;
