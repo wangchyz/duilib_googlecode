@@ -1779,6 +1779,7 @@ bool CTabLayoutUI::SelectItem(int iIndex)
     if( iIndex < 0 || iIndex >= m_items.GetSize() ) return false;
     if( iIndex == m_iCurSel ) return true;
 
+    int iOldSel = m_iCurSel;
     m_iCurSel = iIndex;
     for( int it = 0; it < m_items.GetSize(); it++ )
     {
@@ -1790,7 +1791,10 @@ bool CTabLayoutUI::SelectItem(int iIndex)
     }
     NeedParentUpdate();
 
-    if( m_pManager != NULL ) m_pManager->SetNextTabControl();
+    if( m_pManager != NULL ) {
+        m_pManager->SetNextTabControl();
+        m_pManager->SendNotify(this, _T("tabselect"), m_iCurSel, iOldSel);
+    }
     return true;
 }
 

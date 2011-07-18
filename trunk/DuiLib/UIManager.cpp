@@ -416,6 +416,19 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
 //#endif
     // Not ready yet?
     if( m_hWndPaint == NULL ) return false;
+    
+    TNotifyUI* pMsg = NULL;
+    while( pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify.GetAt(0)) ) {
+        m_aAsyncNotify.Remove(0);
+        if( pMsg->pSender != NULL ) {
+            if( pMsg->pSender->OnNotify ) pMsg->pSender->OnNotify(pMsg);
+        }
+        for( int j = 0; j < m_aNotifiers.GetSize(); j++ ) {
+            static_cast<INotifyUI*>(m_aNotifiers[j])->Notify(*pMsg);
+        }
+        delete pMsg;
+    }
+    
     // Cycle through listeners
     for( int i = 0; i < m_aMessageFilters.GetSize(); i++ ) 
     {
@@ -942,7 +955,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
         break;
     }
 
-    TNotifyUI* pMsg = NULL;
+    pMsg = NULL;
     while( pMsg = static_cast<TNotifyUI*>(m_aAsyncNotify.GetAt(0)) ) {
         m_aAsyncNotify.Remove(0);
         if( pMsg->pSender != NULL ) {

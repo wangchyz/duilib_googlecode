@@ -227,7 +227,9 @@ void CListUI::SetPos(RECT rc)
     // we should determine the correct dimensions...
 
     if( !m_pHeader->IsVisible() ) {
-        m_pHeader->SetInternVisible(true);
+        for( int it = 0; it < m_pHeader->GetCount(); it++ ) {
+            static_cast<CControlUI*>(m_pHeader->GetItemAt(it))->SetInternVisible(true);
+        }
         m_pHeader->SetPos(CRect(rc.left, 0, rc.right, 0));
     }
     int iOffset = m_pList->GetScrollPos().cx;
@@ -245,7 +247,9 @@ void CListUI::SetPos(RECT rc)
         m_ListInfo.rcColumn[i] = pControl->GetPos();
     }
     if( !m_pHeader->IsVisible() ) {
-        m_pHeader->SetInternVisible(false);
+        for( int it = 0; it < m_pHeader->GetCount(); it++ ) {
+            static_cast<CControlUI*>(m_pHeader->GetItemAt(it))->SetInternVisible(false);
+        }
     }
 }
 
@@ -341,6 +345,7 @@ bool CListUI::SelectItem(int iIndex)
 {
     if( iIndex == m_iCurSel ) return true;
 
+    int iOldSel = m_iCurSel;
     // We should first unselect the currently selected item
     if( m_iCurSel >= 0 ) {
         CControlUI* pControl = GetItemAt(m_iCurSel);
@@ -366,9 +371,9 @@ bool CListUI::SelectItem(int iIndex)
         return false;
     }
     EnsureVisible(m_iCurSel);
-    pControl->SetFocus();
+    //pControl->SetFocus();
     if( m_pManager != NULL ) {
-        m_pManager->SendNotify(this, _T("itemselect"));
+        m_pManager->SendNotify(this, _T("itemselect"), m_iCurSel, iOldSel);
     }
 
     return true;
@@ -880,7 +885,11 @@ void CListBodyUI::SetScrollPos(SIZE szPos)
         TListInfoUI* pInfo = m_pOwner->GetListInfo();
         pInfo->nColumns = MIN(pHeader->GetCount(), UILIST_MAX_COLUMNS);
 
-        if( !pHeader->IsVisible() ) pHeader->SetInternVisible(true);
+        if( !pHeader->IsVisible() ) {
+            for( int it = 0; it < pHeader->GetCount(); it++ ) {
+                static_cast<CControlUI*>(pHeader->GetItemAt(it))->SetInternVisible(true);
+            }
+        }
         for( int i = 0; i < pInfo->nColumns; i++ ) {
             CControlUI* pControl = static_cast<CControlUI*>(pHeader->GetItemAt(i));
             if( !pControl->IsVisible() ) continue;
@@ -892,7 +901,11 @@ void CListBodyUI::SetScrollPos(SIZE szPos)
             pControl->SetPos(rcPos);
             pInfo->rcColumn[i] = pControl->GetPos();
         }
-        if( !pHeader->IsVisible() ) pHeader->SetInternVisible(false);
+        if( !pHeader->IsVisible() ) {
+            for( int it = 0; it < pHeader->GetCount(); it++ ) {
+                static_cast<CControlUI*>(pHeader->GetItemAt(it))->SetInternVisible(false);
+            }
+        }
     }
 }
 
