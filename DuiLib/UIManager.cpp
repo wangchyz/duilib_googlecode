@@ -160,7 +160,7 @@ CStdString CPaintManagerUI::GetInstancePath()
     ::GetModuleFileName(m_hInstance, tszModule, MAX_PATH);
     CStdString sInstancePath = tszModule;
     int pos = sInstancePath.ReverseFind(_T('\\'));
-    sInstancePath = sInstancePath.Left(pos);
+    if( pos >= 0 ) sInstancePath = sInstancePath.Left(pos + 1);
     return sInstancePath;
 }
 
@@ -213,6 +213,14 @@ void CPaintManagerUI::SetResourcePath(LPCTSTR pStrPath)
 void CPaintManagerUI::SetResourceZip(LPCTSTR pStrPath)
 {
     m_pStrResourceZip = pStrPath;
+}
+
+void CPaintManagerUI::ReloadSkin()
+{
+    for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) {
+        CPaintManagerUI* pManager = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
+        pManager->ReloadAllImages();
+    }
 }
 
 HWND CPaintManagerUI::GetPaintWindow() const
@@ -1784,10 +1792,12 @@ const TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, LPCTSTR type, DWORD 
         }
     }
     else {
-        data = CRenderEngine::LoadImage(bitmap, type, mask);
+        data = CRenderEngine::LoadImage(bitmap, NULL, mask);
     }
 
     if( !data ) return NULL;
+    if( type != NULL ) data->sResType = type;
+    data->dwMask = mask;
     if( !m_mImageHash.Insert(bitmap, data) ) {
         ::DeleteObject(data->hBitmap);
         delete data;
@@ -1805,7 +1815,8 @@ const TImageInfo* CPaintManagerUI::AddImage(LPCTSTR bitmap, HBITMAP hBitmap, int
     data->nX = iWidth;
     data->nY = iHeight;
     data->alphaChannel = bAlpha;
-
+    //data->sResType = _T("");
+    data->dwMask = 0;
     if( !m_mImageHash.Insert(bitmap, data) ) {
         ::DeleteObject(data->hBitmap);
         delete data;
@@ -1835,6 +1846,41 @@ void CPaintManagerUI::RemoveAllImages()
             delete data;
         }
     }
+}
+
+void CPaintManagerUI::ReloadAllImages()
+{
+    bool bRedraw = false;
+    TImageInfo* data;
+    TImageInfo* pNewData;
+    for( int i = 0; i< m_mImageHash.GetSize(); i++ ) {
+        if(LPCTSTR bitmap = m_mImageHash.GetAt(i)) {
+            data = static_cast<TImageInfo*>(m_mImageHash.Find(bitmap));
+            if( data && data->hBitmap != NULL ) {
+                if( !data->sResType.IsEmpty() ) {
+                    if( isdigit(*bitmap) ) {
+                        LPTSTR pstr = NULL;
+                        int iIndex = _tcstol(bitmap, &pstr, 10);
+                        pNewData = CRenderEngine::LoadImage(iIndex, data->sResType.GetData(), data->dwMask);
+                    }
+                }
+                else {
+                    pNewData = CRenderEngine::LoadImage(bitmap, NULL, data->dwMask);
+                }
+                if( pNewData == NULL ) continue;
+
+                ::DeleteObject(data->hBitmap);
+                data->hBitmap = pNewData->hBitmap;
+                data->nX = pNewData->nX;
+                data->nY = pNewData->nY;
+                data->alphaChannel = pNewData->alphaChannel;
+
+                delete pNewData;
+                bRedraw = true;
+            }
+        }
+    }
+    if( bRedraw && m_pRoot ) m_pRoot->Invalidate();
 }
 
 void CPaintManagerUI::AddDefaultAttributeList(LPCTSTR pStrControlName, LPCTSTR pStrControlAttrList)
@@ -1889,27 +1935,62 @@ CControlUI* CPaintManagerUI::GetRoot() const
     return m_pRoot;
 }
 
-CControlUI* CPaintManagerUI::FindControl(LPCTSTR pstrName)
-{
-    ASSERT(m_pRoot);
-    return static_cast<CControlUI*>(m_mNameHash.Find(pstrName));
-}
-
-CControlUI* CPaintManagerUI::FindControl(CControlUI* pParent, LPCTSTR pstrName)
-{
-	ASSERT(pParent);
-	return pParent->FindControl(__FindControlFromName, (LPVOID)pstrName, UIFIND_ALL);
-}
-
 CControlUI* CPaintManagerUI::FindControl(POINT pt) const
 {
     ASSERT(m_pRoot);
     return m_pRoot->FindControl(__FindControlFromPoint, &pt, UIFIND_VISIBLE | UIFIND_HITTEST | UIFIND_TOP_FIRST);
 }
-CControlUI* CPaintManagerUI::FindControl(CControlUI* pParent, POINT pt) const
+
+CControlUI* CPaintManagerUI::FindControl(LPCTSTR pstrName) const
 {
-	ASSERT(pParent);
-	return pParent->FindControl(__FindControlFromPoint, &pt, UIFIND_VISIBLE | UIFIND_HITTEST | UIFIND_TOP_FIRST);
+    ASSERT(m_pRoot);
+    return static_cast<CControlUI*>(m_mNameHash.Find(pstrName));
+}
+
+CControlUI* CPaintManagerUI::FindSubControlByPoint(CControlUI* pParent, POINT pt) const
+{
+    if( pParent == NULL ) pParent = GetRoot();
+    ASSERT(pParent);
+    return pParent->FindControl(__FindControlFromPoint, &pt, UIFIND_VISIBLE | UIFIND_HITTEST | UIFIND_TOP_FIRST);
+}
+
+CControlUI* CPaintManagerUI::FindSubControlByName(CControlUI* pParent, LPCTSTR pstrName) const
+{
+    if( pParent == NULL ) pParent = GetRoot();
+    ASSERT(pParent);
+    return pParent->FindControl(__FindControlFromName, (LPVOID)pstrName, UIFIND_ALL);
+}
+
+CControlUI* CPaintManagerUI::FindSubControlByClass(CControlUI* pParent, LPCTSTR pstrClass, int iIndex)
+{
+    if( pParent == NULL ) pParent = GetRoot();
+    ASSERT(pParent);
+    m_aFoundControls.Resize(iIndex + 1);
+    return pParent->FindControl(__FindControlFromClass, (LPVOID)pstrClass, UIFIND_ALL);
+}
+
+CStdPtrArray* CPaintManagerUI::FindSubControlsByClass(CControlUI* pParent, LPCTSTR pstrClass)
+{
+    if( pParent == NULL ) pParent = GetRoot();
+    ASSERT(pParent);
+    m_aFoundControls.Empty();
+    pParent->FindControl(__FindControlsFromClass, (LPVOID)pstrClass, UIFIND_ALL);
+    return &m_aFoundControls;
+}
+
+CStdPtrArray* CPaintManagerUI::GetSubControlsByClass()
+{
+    return &m_aFoundControls;
+}
+
+CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameHash(CControlUI* pThis, LPVOID pData)
+{
+    CPaintManagerUI* pManager = static_cast<CPaintManagerUI*>(pData);
+    const CStdString& sName = pThis->GetName();
+    if( sName.IsEmpty() ) return NULL;
+    // Add this control to the hash list
+    pManager->m_mNameHash.Set(sName, pThis);
+    return NULL; // Attempt to add all controls
 }
 
 CControlUI* CALLBACK CPaintManagerUI::__FindControlFromCount(CControlUI* /*pThis*/, LPVOID pData)
@@ -1917,6 +1998,12 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlFromCount(CControlUI* /*pThis
     int* pnCount = static_cast<int*>(pData);
     (*pnCount)++;
     return NULL;  // Count all controls
+}
+
+CControlUI* CALLBACK CPaintManagerUI::__FindControlFromPoint(CControlUI* pThis, LPVOID pData)
+{
+    LPPOINT pPoint = static_cast<LPPOINT>(pData);
+    return ::PtInRect(&pThis->GetPos(), *pPoint) ? pThis : NULL;
 }
 
 CControlUI* CALLBACK CPaintManagerUI::__FindControlFromTab(CControlUI* pThis, LPVOID pData)
@@ -1933,24 +2020,6 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlFromTab(CControlUI* pThis, LP
     return NULL;  // Examine all controls
 }
 
-CControlUI* CALLBACK CPaintManagerUI::__FindControlFromNameHash(CControlUI* pThis, LPVOID pData)
-{
-    CPaintManagerUI* pManager = static_cast<CPaintManagerUI*>(pData);
-    const CStdString& sName = pThis->GetName();
-    if( sName.IsEmpty() ) return NULL;
-    // Add this control to the hash list
-    pManager->m_mNameHash.Set(sName, pThis);
-    return NULL; // Attempt to add all controls
-}
-
-CControlUI* CALLBACK CPaintManagerUI::__FindControlFromName(CControlUI* pThis, LPVOID pData)
-{
-    LPCTSTR pstrName = static_cast<LPCTSTR>(pData);
-	const CStdString& sName = pThis->GetName();
-	if( sName.IsEmpty() ) return NULL;
-	return (_tcsicmp(sName, pstrName) == 0) ? pThis : NULL;
-}
-
 CControlUI* CALLBACK CPaintManagerUI::__FindControlFromShortcut(CControlUI* pThis, LPVOID pData)
 {
     if( !pThis->IsVisible() ) return NULL; 
@@ -1960,15 +2029,40 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlFromShortcut(CControlUI* pThi
     return pFS->bPickNext ? pThis : NULL;
 }
 
-CControlUI* CALLBACK CPaintManagerUI::__FindControlFromPoint(CControlUI* pThis, LPVOID pData)
-{
-    LPPOINT pPoint = static_cast<LPPOINT>(pData);
-    return ::PtInRect(&pThis->GetPos(), *pPoint) ? pThis : NULL;
-}
-
 CControlUI* CALLBACK CPaintManagerUI::__FindControlFromUpdate(CControlUI* pThis, LPVOID pData)
 {
     return pThis->IsUpdateNeeded() ? pThis : NULL;
+}
+
+CControlUI* CALLBACK CPaintManagerUI::__FindControlFromName(CControlUI* pThis, LPVOID pData)
+{
+    LPCTSTR pstrName = static_cast<LPCTSTR>(pData);
+    const CStdString& sName = pThis->GetName();
+    if( sName.IsEmpty() ) return NULL;
+    return (_tcsicmp(sName, pstrName) == 0) ? pThis : NULL;
+}
+
+CControlUI* CALLBACK CPaintManagerUI::__FindControlFromClass(CControlUI* pThis, LPVOID pData)
+{
+    LPCTSTR pstrType = static_cast<LPCTSTR>(pData);
+    LPCTSTR pType = pThis->GetClass();
+    CStdPtrArray* pFoundControls = pThis->GetManager()->GetSubControlsByClass();
+    if( _tcscmp(pstrType, _T("*")) == 0 || _tcscmp(pstrType, pType) == 0 ) {
+        int iIndex = -1;
+        while( pFoundControls->GetAt(++iIndex) != NULL ) ;
+        if( iIndex < pFoundControls->GetSize() ) pFoundControls->SetAt(iIndex, pThis);
+    }
+    if( pFoundControls->GetAt(pFoundControls->GetSize() - 1) != NULL ) return pThis; 
+    return NULL;
+}
+
+CControlUI* CALLBACK CPaintManagerUI::__FindControlsFromClass(CControlUI* pThis, LPVOID pData)
+{
+    LPCTSTR pstrType = static_cast<LPCTSTR>(pData);
+    LPCTSTR pType = pThis->GetClass();
+    if( _tcscmp(pstrType, _T("*")) == 0 || _tcscmp(pstrType, pType) == 0 ) 
+        pThis->GetManager()->GetSubControlsByClass()->Add((LPVOID)pThis);
+    return NULL;
 }
 
 } // namespace DuiLib

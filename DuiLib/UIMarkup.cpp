@@ -586,7 +586,8 @@ bool CMarkup::_ParseAttributes(LPTSTR& pstrText)
         if( !_ParseData(pstrText, pstrDest, _T('\"')) ) return false;
         if( *pstrText == _T('\0') ) return _Failed(_T("Error while parsing attribute string"), pstrText);
         *pstrDest = _T('\0');
-        *pstrText++ = _T('\0');
+        if( pstrText != pstrDest ) *pstrText = _T(' ');
+        pstrText++;
         _SkipWhitespace(pstrText);
     }
     return true;

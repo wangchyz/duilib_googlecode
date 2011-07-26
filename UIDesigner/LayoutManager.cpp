@@ -826,9 +826,6 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 	case classListLabelElement:
 		pCopyControl = new CListLabelElementUI(*static_cast<CListLabelElementUI*>(pControl->GetInterface(_T("ListLabelElement"))));
 		break;
-	case classListExpandElement:
-		pCopyControl = new CListExpandElementUI(*static_cast<CListExpandElementUI*>(pControl->GetInterface(_T("ListExpandElement"))));
-		break;
 	case classListContainerElement:
 		pCopyControl = new CListContainerElementUI(*static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement"))));
 		break;
