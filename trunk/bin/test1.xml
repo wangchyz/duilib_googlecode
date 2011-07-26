@@ -7,9 +7,9 @@
 
 	<VerticalLayout inset="10,6,10,6" bkimage="file='voice_rect.png' xtiled='true' ytiled='true'" borderround="18,18">
 		<?如果richedit在窗口内是第一个获得焦点的，会出现一个光标刷新bug，暂无解决办法，所以这里先放一个Button避免这种情况?>
-		<Button name="changefontbtn" height="20" text="更改字体" maxwidth="120" />
+		<Button name="changeskinbtn" height="20" text="换肤" maxwidth="120" />
 		<RichEdit name="testrichedit" bordercolor="#FF0000" bordersize="0" borderround="18,18" inset="4,2,4,2" bkcolor="#A0F2F5FA" bkcolor2="#A0FF0000" bkcolor3="#A0F2F5FA" font="1" multiline="true" vscrollbar="true" autovscroll="true" enabled="true" rich="true" readonly="false" text="1爱3">
-			<Control bkcolor="#FFF22E2E" float="true" pos="480,100,660,320" />
+			<Control bkcolor="#FFF22E2E" float="true" pos="480,100,660,320" bkimage="winbk.bmp" />
 			<Button name="insertimagebtn" float="true" pos="280,100,360,120" text="插入图片" />
 		</RichEdit>
 		<Control height="26"/>

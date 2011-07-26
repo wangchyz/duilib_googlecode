@@ -23,6 +23,13 @@ public:
                     pRich->RemoveAll();
                 }
             }
+            else if( msg.pSender->GetName() == _T("changeskinbtn") ) {
+                if( CPaintManagerUI::GetResourcePath() == CPaintManagerUI::GetInstancePath() )
+                    CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath() + _T("skin\\FlashRes"));
+                else
+                    CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath());
+                CPaintManagerUI::ReloadSkin();
+            }
         }
     }
 

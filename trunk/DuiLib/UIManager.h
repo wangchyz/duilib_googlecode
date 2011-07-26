@@ -99,6 +99,8 @@ typedef struct tagTImageInfo
     int nX;
     int nY;
     bool alphaChannel;
+    CStdString sResType;
+    DWORD dwMask;
 } TImageInfo;
 
 // Structure for notifications from the system
@@ -200,6 +202,7 @@ public:
     static void SetResourceDll(HINSTANCE hInst);
     static void SetResourcePath(LPCTSTR pStrPath);
     static void SetResourceZip(LPCTSTR pStrZip);
+    static void ReloadSkin();
 
     bool UseParentResource(CPaintManagerUI* pm);
     CPaintManagerUI* GetParentResource() const;
@@ -237,6 +240,7 @@ public:
     const TImageInfo* AddImage(LPCTSTR bitmap, HBITMAP hBitmap, int iWidth, int iHeight, bool bAlpha);
     bool RemoveImage(LPCTSTR bitmap);
     void RemoveAllImages();
+    void ReloadAllImages();
 
     void AddDefaultAttributeList(LPCTSTR pStrControlName, LPCTSTR pStrControlAttrList);
     LPCTSTR GetDefaultAttributeList(LPCTSTR pStrControlName) const;
@@ -288,9 +292,12 @@ public:
 
     CControlUI* GetRoot() const;
     CControlUI* FindControl(POINT pt) const;
-    CControlUI* FindControl(CControlUI* pParent, POINT pt) const;
-    CControlUI* FindControl(LPCTSTR pstrName);
-    CControlUI* FindControl(CControlUI* pParent, LPCTSTR pstrName);
+    CControlUI* FindControl(LPCTSTR pstrName) const;
+    CControlUI* FindSubControlByPoint(CControlUI* pParent, POINT pt) const;
+    CControlUI* FindSubControlByName(CControlUI* pParent, LPCTSTR pstrName) const;
+    CControlUI* FindSubControlByClass(CControlUI* pParent, LPCTSTR pstrClass, int iIndex = 0);
+    CStdPtrArray* FindSubControlsByClass(CControlUI* pParent, LPCTSTR pstrClass);
+    CStdPtrArray* GetSubControlsByClass();
 
     static void MessageLoop();
     static bool TranslateMessage(const LPMSG pMsg);
@@ -306,6 +313,8 @@ private:
     static CControlUI* CALLBACK __FindControlFromShortcut(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromUpdate(CControlUI* pThis, LPVOID pData);
     static CControlUI* CALLBACK __FindControlFromName(CControlUI* pThis, LPVOID pData);
+    static CControlUI* CALLBACK __FindControlFromClass(CControlUI* pThis, LPVOID pData);
+    static CControlUI* CALLBACK __FindControlsFromClass(CControlUI* pThis, LPVOID pData);
 
 private:
     HWND m_hWndPaint;
@@ -347,6 +356,7 @@ private:
     CStdPtrArray m_aPostPaintControls;
     CStdPtrArray m_aDelayedCleanup;
     CStdPtrArray m_aAsyncNotify;
+    CStdPtrArray m_aFoundControls;
     CStdStringPtrMap m_mNameHash;
     CStdStringPtrMap m_mOptionGroup;
     //

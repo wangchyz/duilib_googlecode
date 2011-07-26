@@ -59,9 +59,6 @@ int gGetUIClass(LPCTSTR pstrClass)
 			if( _tcscmp(pstrClass, _T("HorizontalLayoutUI")) == 0 )       nClass=classHorizontalLayout;
 			else if( _tcscmp(pstrClass, _T("ListLabelElementUI")) == 0 )  nClass=classListLabelElement;
 			break;
-		case 19:
-			if( _tcscmp(pstrClass, _T("ListExpandElementUI")) == 0 )      nClass=classListExpandElement;
-			break;
 		case 22:
 			if( _tcscmp(pstrClass, _T("ListContainerElementUI")) == 0 )   nClass=classListContainerElement;
 			break;

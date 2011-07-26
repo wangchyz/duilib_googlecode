@@ -15,8 +15,13 @@ public:
 class UILIB_API CDialogBuilder
 {
 public:
-    CControlUI* Create(STRINGorID xml, STRINGorID type = (UINT) 0, IDialogBuilderCallback* pCallback = NULL, CPaintManagerUI* pManager = NULL);
-    CControlUI* Create(IDialogBuilderCallback* pCallback = NULL, CPaintManagerUI* pManager = NULL);
+    CDialogBuilder();
+    CControlUI* Create(STRINGorID xml, LPCTSTR type = NULL, IDialogBuilderCallback* pCallback = NULL,
+        CPaintManagerUI* pManager = NULL, CControlUI* pParent = NULL);
+    CControlUI* Create(IDialogBuilderCallback* pCallback = NULL, CPaintManagerUI* pManager = NULL,
+        CControlUI* pParent = NULL);
+
+    CMarkup* GetMarkup();
 
     void GetLastErrorMessage(LPTSTR pstrMessage, SIZE_T cchMax) const;
     void GetLastErrorLocation(LPTSTR pstrSource, SIZE_T cchMax) const;
@@ -25,6 +30,7 @@ private:
 
     CMarkup m_xml;
     IDialogBuilderCallback* m_pCallback;
+    LPCTSTR m_pstrtype;
 };
 
 } // namespace DuiLib

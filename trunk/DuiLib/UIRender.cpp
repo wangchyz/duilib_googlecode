@@ -224,12 +224,12 @@ static BOOL WINAPI AlphaBitBlt(HDC hDC, int nDestX, int nDestY, int dwWidth, int
 //
 //
 
-TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD mask)
+TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask)
 {
     LPBYTE pData = NULL;
     DWORD dwSize = 0;
 
-    if( HIWORD(bitmap.m_lpstr) != NULL ) {
+    if( type == NULL ) {
         CStdString sFile = CPaintManagerUI::GetResourcePath();
         if( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
             sFile += bitmap.m_lpstr;
@@ -268,7 +268,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, STRINGorID type, DWORD m
         }
     }
     else {
-        HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), bitmap.m_lpstr, type.m_lpstr);
+        HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), bitmap.m_lpstr, type);
         if( hResource == NULL ) return NULL;
         HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceDll(), hResource);
         if( hGlobal == NULL ) {

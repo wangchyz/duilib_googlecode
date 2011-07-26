@@ -189,7 +189,6 @@ using DuiLib::CListElementUI;
 using DuiLib::CListHeaderItemUI;
 using DuiLib::CListTextElementUI;
 using DuiLib::CListLabelElementUI;
-using DuiLib::CListExpandElementUI;
 using DuiLib::CListContainerElementUI;
 using DuiLib::CScrollBarUI;
 using DuiLib::IContainerUI;
