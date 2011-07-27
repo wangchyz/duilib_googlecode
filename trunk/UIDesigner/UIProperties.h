@@ -166,7 +166,7 @@ enum PropertyTag
 	tagComboPushedImage,
 	tagComboFocusedImage,
 	tagComboDisabledImage,
-	tagItemImage,
+	tagItemBkImage,
 	tagItemHotImage,
 	tagItemSelectedImage,
 	tagItemDisabledImage,

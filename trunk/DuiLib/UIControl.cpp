@@ -613,6 +613,7 @@ void CControlUI::NeedParentUpdate()
 
 DWORD CControlUI::GetAdjustColor(DWORD dwColor)
 {
+    if( !m_bColorHSL ) return dwColor;
     short H, S, L;
     CPaintManagerUI::GetHSL(&H, &S, &L);
     return CRenderEngine::AdjustColor(dwColor, H, S, L);
