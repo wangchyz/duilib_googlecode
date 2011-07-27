@@ -12,7 +12,57 @@ public:
     void OnFinalMessage(HWND /*hWnd*/) { delete this; };
 
     void Init() { }
-    void OnPrepare() { }
+
+    bool OnHChanged(void* param) {
+        TNotifyUI* pMsg = (TNotifyUI*)param;
+        if( pMsg->sType == _T("valuechanged") ) {
+            short H, S, L;
+            CPaintManagerUI::GetHSL(&H, &S, &L);
+            CPaintManagerUI::SetHSL(true, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue(), S, L);
+        }
+        return true;
+    }
+
+    bool OnSChanged(void* param) {
+        TNotifyUI* pMsg = (TNotifyUI*)param;
+        if( pMsg->sType == _T("valuechanged") ) {
+            short H, S, L;
+            CPaintManagerUI::GetHSL(&H, &S, &L);
+            CPaintManagerUI::SetHSL(true, H, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue(), L);
+        }
+        return true;
+    }
+
+    bool OnLChanged(void* param) {
+        TNotifyUI* pMsg = (TNotifyUI*)param;
+        if( pMsg->sType == _T("valuechanged") ) {
+            short H, S, L;
+            CPaintManagerUI::GetHSL(&H, &S, &L);
+            CPaintManagerUI::SetHSL(true, H, S, (static_cast<CSliderUI*>(pMsg->pSender))->GetValue());
+        }
+        return true;
+    }
+
+    bool OnAlphaChanged(void* param) {
+        TNotifyUI* pMsg = (TNotifyUI*)param;
+        if( pMsg->sType == _T("valuechanged") ) {
+            m_pm.SetTransparent((static_cast<CSliderUI*>(pMsg->pSender))->GetValue());
+        }
+        return true;
+    }
+
+    void OnPrepare() 
+    {
+        CSliderUI* pSilder = static_cast<CSliderUI*>(m_pm.FindControl(_T("alpha_controlor")));
+        if( pSilder ) pSilder->OnNotify += MakeDelegate(this, &CFrameWindowWnd::OnAlphaChanged);
+        pSilder = static_cast<CSliderUI*>(m_pm.FindControl(_T("h_controlor")));
+        if( pSilder ) pSilder->OnNotify += MakeDelegate(this, &CFrameWindowWnd::OnHChanged);
+        pSilder = static_cast<CSliderUI*>(m_pm.FindControl(_T("s_controlor")));
+        if( pSilder ) pSilder->OnNotify += MakeDelegate(this, &CFrameWindowWnd::OnSChanged);
+        pSilder = static_cast<CSliderUI*>(m_pm.FindControl(_T("l_controlor")));
+        if( pSilder ) pSilder->OnNotify += MakeDelegate(this, &CFrameWindowWnd::OnLChanged);
+    }
+
     void Notify(TNotifyUI& msg)
     {
         if( msg.sType == _T("windowinit") ) OnPrepare();

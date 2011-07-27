@@ -45,6 +45,8 @@ public:
     void SetBorderColor(DWORD dwBorderColor);
 	DWORD GetFocusBorderColor() const;
 	void SetFocusBorderColor(DWORD dwBorderColor);
+    bool IsColorHSL() const;
+    void SetColorHSL(bool bColorHSL);
     int GetBorderSize() const;
     void SetBorderSize(int nSize);
     SIZE GetBorderRound() const;
@@ -116,6 +118,7 @@ public:
     bool IsUpdateNeeded() const;
     void NeedUpdate();
     void NeedParentUpdate();
+    DWORD GetAdjustColor(DWORD dwColor);
 
     virtual void Init();
     virtual void DoInit();
@@ -177,6 +180,7 @@ protected:
     CStdString m_sBkImage;
     DWORD m_dwBorderColor;
 	DWORD m_dwFocusBorderColor;
+    bool m_bColorHSL;
     int m_nBorderSize;
     SIZE m_cxyBorderRound;
     RECT m_rcPaint;

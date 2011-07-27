@@ -49,6 +49,9 @@ HINSTANCE CPaintManagerUI::m_hInstance = NULL;
 HINSTANCE CPaintManagerUI::m_hResourceInstance = NULL;
 CStdString CPaintManagerUI::m_pStrResourcePath;
 CStdString CPaintManagerUI::m_pStrResourceZip;
+short CPaintManagerUI::m_H = 180;
+short CPaintManagerUI::m_S = 100;
+short CPaintManagerUI::m_L = 100;
 CStdPtrArray CPaintManagerUI::m_aPreMessages;
 
 
@@ -213,6 +216,26 @@ void CPaintManagerUI::SetResourcePath(LPCTSTR pStrPath)
 void CPaintManagerUI::SetResourceZip(LPCTSTR pStrPath)
 {
     m_pStrResourceZip = pStrPath;
+}
+
+void CPaintManagerUI::GetHSL(short* H, short* S, short* L)
+{
+    *H = m_H;
+    *S = m_S;
+    *L = m_L;
+}
+
+void CPaintManagerUI::SetHSL(bool bUseHSL, short H, short S, short L)
+{
+    if( H == m_H && S == m_S && L == m_L ) return;
+    m_H = CLAMP(H, 0, 360);
+    m_S = CLAMP(S, 0, 200);
+    m_L = CLAMP(L, 0, 200);
+    for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) {
+        CPaintManagerUI* pManager = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
+        if( pManager != NULL && pManager->GetRoot() != NULL )
+            pManager->GetRoot()->Invalidate();
+    }
 }
 
 void CPaintManagerUI::ReloadSkin()
@@ -1856,7 +1879,7 @@ void CPaintManagerUI::ReloadAllImages()
     for( int i = 0; i< m_mImageHash.GetSize(); i++ ) {
         if(LPCTSTR bitmap = m_mImageHash.GetAt(i)) {
             data = static_cast<TImageInfo*>(m_mImageHash.Find(bitmap));
-            if( data && data->hBitmap != NULL ) {
+            if( data != NULL ) {
                 if( !data->sResType.IsEmpty() ) {
                     if( isdigit(*bitmap) ) {
                         LPTSTR pstr = NULL;
@@ -1869,7 +1892,7 @@ void CPaintManagerUI::ReloadAllImages()
                 }
                 if( pNewData == NULL ) continue;
 
-                ::DeleteObject(data->hBitmap);
+                if( data->hBitmap != NULL ) ::DeleteObject(data->hBitmap);
                 data->hBitmap = pNewData->hBitmap;
                 data->nX = pNewData->nX;
                 data->nY = pNewData->nY;

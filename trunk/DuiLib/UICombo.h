@@ -63,8 +63,10 @@ public:
     void SetItemTextColor(DWORD dwTextColor);
 	DWORD GetItemBkColor() const;
     void SetItemBkColor(DWORD dwBkColor);
-	LPCTSTR GetItemImage() const;
-    void SetItemImage(LPCTSTR pStrImage);
+	LPCTSTR GetItemBkImage() const;
+    void SetItemBkImage(LPCTSTR pStrImage);
+    bool IsAlternateBk() const;
+    void SetAlternateBk(bool bAlternateBk);
 	DWORD GetSelectedItemTextColor() const;
     void SetSelectedItemTextColor(DWORD dwTextColor);
 	DWORD GetSelectedItemBkColor() const;

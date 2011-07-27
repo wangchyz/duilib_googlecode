@@ -19,6 +19,7 @@ CListUI::CListUI() : m_pCallback(NULL), m_bScrollSelect(false), m_iCurSel(-1), m
     m_ListInfo.uTextStyle = DT_VCENTER; // m_uTextStyle(DT_VCENTER | DT_END_ELLIPSIS)
     m_ListInfo.dwTextColor = 0xFF000000;
     m_ListInfo.dwBkColor = 0;
+    m_ListInfo.bAlternateBk = false;
     m_ListInfo.dwSelectedTextColor = 0xFF000000;
     m_ListInfo.dwSelectedBkColor = 0xFFC1E3FF;
     m_ListInfo.dwHotTextColor = 0xFF000000;
@@ -429,9 +430,15 @@ void CListUI::SetItemBkColor(DWORD dwBkColor)
     Invalidate();
 }
 
-void CListUI::SetItemImage(LPCTSTR pStrImage)
+void CListUI::SetItemBkImage(LPCTSTR pStrImage)
 {
-    m_ListInfo.sImage = pStrImage;
+    m_ListInfo.sBkImage = pStrImage;
+    Invalidate();
+}
+
+void CListUI::SetAlternateBk(bool bAlternateBk)
+{
+    m_ListInfo.bAlternateBk = bAlternateBk;
     Invalidate();
 }
 
@@ -445,9 +452,14 @@ DWORD CListUI::GetItemBkColor() const
 	return m_ListInfo.dwBkColor;
 }
 
-LPCTSTR CListUI::GetItemImage() const
+LPCTSTR CListUI::GetItemBkImage() const
 {
-	return m_ListInfo.sImage;
+	return m_ListInfo.sBkImage;
+}
+
+bool CListUI::IsAlternateBk() const
+{
+    return m_ListInfo.bAlternateBk;
 }
 
 void CListUI::SetSelectedItemTextColor(DWORD dwTextColor)
@@ -684,7 +696,8 @@ void CListUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
         SetItemBkColor(clrColor);
     }
-    else if( _tcscmp(pstrName, _T("itemimage")) == 0 ) SetItemImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("itembkimage")) == 0 ) SetItemBkImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("itemaltbk")) == 0 ) SetAlternateBk(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("itemselectedtextcolor")) == 0 ) {
         if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
         LPTSTR pstr = NULL;
@@ -1653,7 +1666,8 @@ void CListElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
     ASSERT(m_pOwner);
     if( m_pOwner == NULL ) return;
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
-    DWORD iBackColor = pInfo->dwBkColor;
+    DWORD iBackColor = 0;
+    if( m_iIndex % 2 == 0 ) iBackColor = pInfo->dwBkColor;
     if( (m_uButtonState & UISTATE_HOT) != 0 ) {
         iBackColor = pInfo->dwHotBkColor;
     }
@@ -1665,7 +1679,7 @@ void CListElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
     }
 
     if ( iBackColor != 0 ) {
-        CRenderEngine::DrawColor(hDC, m_rcItem, iBackColor);
+        CRenderEngine::DrawColor(hDC, m_rcItem, GetAdjustColor(iBackColor));
     }
 
     if( !IsEnabled() ) {
@@ -1688,19 +1702,21 @@ void CListElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
     }
 
     if( !m_sBkImage.IsEmpty() ) {
-        if( !DrawImage(hDC, (LPCTSTR)m_sBkImage) ) m_sBkImage.Empty();
+        if( m_iIndex % 2 == 0 ) {
+            if( !DrawImage(hDC, (LPCTSTR)m_sBkImage) ) m_sBkImage.Empty();
+        }
     }
 
     if( m_sBkImage.IsEmpty() ) {
-        if( !pInfo->sImage.IsEmpty() ) {
-            if( !DrawImage(hDC, (LPCTSTR)pInfo->sImage) ) pInfo->sImage.Empty();
+        if( !pInfo->sBkImage.IsEmpty() ) {
+            if( !DrawImage(hDC, (LPCTSTR)pInfo->sBkImage) ) pInfo->sBkImage.Empty();
             else return;
         }
     }
 
     if ( pInfo->dwLineColor != 0 ) {
         RECT rcLine = { m_rcItem.left, m_rcItem.bottom - 1, m_rcItem.right, m_rcItem.bottom - 1 };
-        CRenderEngine::DrawLine(hDC, rcLine, 1, pInfo->dwLineColor);
+        CRenderEngine::DrawLine(hDC, rcLine, 1, GetAdjustColor(pInfo->dwLineColor));
     }
 }
 
@@ -2246,7 +2262,8 @@ void CListContainerElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
     ASSERT(m_pOwner);
     if( m_pOwner == NULL ) return;
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
-    DWORD iBackColor = pInfo->dwBkColor;
+    DWORD iBackColor = 0;
+    if( m_iIndex % 2 == 0 ) iBackColor = pInfo->dwBkColor;
 
     if( (m_uButtonState & UISTATE_HOT) != 0 ) {
         iBackColor = pInfo->dwHotBkColor;
@@ -2258,7 +2275,7 @@ void CListContainerElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
         iBackColor = pInfo->dwDisabledBkColor;
     }
     if ( iBackColor != 0 ) {
-        CRenderEngine::DrawColor(hDC, m_rcItem, iBackColor);
+        CRenderEngine::DrawColor(hDC, m_rcItem, GetAdjustColor(iBackColor));
     }
 
     if( !IsEnabled() ) {
@@ -2280,19 +2297,21 @@ void CListContainerElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
         }
     }
     if( !m_sBkImage.IsEmpty() ) {
-        if( !DrawImage(hDC, (LPCTSTR)m_sBkImage) ) m_sBkImage.Empty();
+        if( m_iIndex % 2 == 0 ) {
+            if( !DrawImage(hDC, (LPCTSTR)m_sBkImage) ) m_sBkImage.Empty();
+        }
     }
 
     if( m_sBkImage.IsEmpty() ) {
-        if( !pInfo->sImage.IsEmpty() ) {
-            if( !DrawImage(hDC, (LPCTSTR)pInfo->sImage) ) pInfo->sImage.Empty();
+        if( !pInfo->sBkImage.IsEmpty() ) {
+            if( !DrawImage(hDC, (LPCTSTR)pInfo->sBkImage) ) pInfo->sBkImage.Empty();
             else return;
         }
     }
 
     if ( pInfo->dwLineColor != 0 ) {
         RECT rcLine = { m_rcItem.left, m_rcItem.bottom - 1, m_rcItem.right, m_rcItem.bottom - 1 };
-        CRenderEngine::DrawLine(hDC, rcLine, 1, pInfo->dwLineColor);
+        CRenderEngine::DrawLine(hDC, rcLine, 1, GetAdjustColor(pInfo->dwLineColor));
     }
 }
 

@@ -1124,9 +1124,19 @@ void CSliderUI::DoEvent(TEventUI& event)
     {
         if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
             m_uButtonState &= ~UISTATE_CAPTURED;
-            m_pManager->SendNotify(this, _T("valuechanged"));
-            Invalidate();
         }
+        if( m_bHorizontal ) {
+            if( event.ptMouse.x >= m_rcItem.right - m_szThumb.cx / 2 ) m_nValue = m_nMax;
+            else if( event.ptMouse.x <= m_rcItem.left + m_szThumb.cx / 2 ) m_nValue = m_nMin;
+            else m_nValue = m_nMin + (m_nMax - m_nMin) * (event.ptMouse.x - m_rcItem.left - m_szThumb.cx / 2 ) / (m_rcItem.right - m_rcItem.left - m_szThumb.cx);
+        }
+        else {
+            if( event.ptMouse.y >= m_rcItem.bottom - m_szThumb.cy / 2 ) m_nValue = m_nMin;
+            else if( event.ptMouse.y <= m_rcItem.top + m_szThumb.cy / 2  ) m_nValue = m_nMax;
+            else m_nValue = m_nMin + (m_nMax - m_nMin) * (m_rcItem.bottom - event.ptMouse.y - m_szThumb.cy / 2 ) / (m_rcItem.bottom - m_rcItem.top - m_szThumb.cy);
+        }
+        m_pManager->SendNotify(this, _T("valuechanged"));
+        Invalidate();
         return;
     }
     if( event.Type == UIEVENT_CONTEXTMENU )
@@ -1138,38 +1148,27 @@ void CSliderUI::DoEvent(TEventUI& event)
         switch( LOWORD(event.wParam) ) {
         case SB_LINEUP:
             SetValue(GetValue() + GetChangeStep());
+            m_pManager->SendNotify(this, _T("valuechanged"));
             return;
         case SB_LINEDOWN:
             SetValue(GetValue() - GetChangeStep());
+            m_pManager->SendNotify(this, _T("valuechanged"));
             return;
         }
     }
     if( event.Type == UIEVENT_MOUSEMOVE )
     {
         if( (m_uButtonState & UISTATE_CAPTURED) != 0 ) {
-            if( m_bHorizontal ){
-                if( event.ptMouse.x >= m_rcItem.right - m_szThumb.cx / 2 ) {
-                    m_nValue = m_nMax;
-                }
-                else if( event.ptMouse.x <= m_rcItem.left + m_szThumb.cx / 2 ) {
-                    m_nValue = m_nMin;
-                }
-                else {
-                    m_nValue = m_nMin + (m_nMax - m_nMin) * (event.ptMouse.x - m_rcItem.left - m_szThumb.cx / 2 ) / (m_rcItem.right - m_rcItem.left - m_szThumb.cx);
-                }
+            if( m_bHorizontal ) {
+                if( event.ptMouse.x >= m_rcItem.right - m_szThumb.cx / 2 ) m_nValue = m_nMax;
+                else if( event.ptMouse.x <= m_rcItem.left + m_szThumb.cx / 2 ) m_nValue = m_nMin;
+                else m_nValue = m_nMin + (m_nMax - m_nMin) * (event.ptMouse.x - m_rcItem.left - m_szThumb.cx / 2 ) / (m_rcItem.right - m_rcItem.left - m_szThumb.cx);
             }
             else {
-                if( event.ptMouse.y >= m_rcItem.bottom - m_szThumb.cy / 2 ) {
-                    m_nValue = m_nMin;
-                }
-                else if( event.ptMouse.y <= m_rcItem.top + m_szThumb.cy / 2  ) {
-                    m_nValue = m_nMax;
-                }
-                else {
-                    m_nValue = m_nMin + (m_nMax - m_nMin) * (m_rcItem.bottom - event.ptMouse.y - m_szThumb.cy / 2 ) / (m_rcItem.bottom - m_rcItem.top - m_szThumb.cy);
-                }
+                if( event.ptMouse.y >= m_rcItem.bottom - m_szThumb.cy / 2 ) m_nValue = m_nMin;
+                else if( event.ptMouse.y <= m_rcItem.top + m_szThumb.cy / 2  ) m_nValue = m_nMax;
+                else m_nValue = m_nMin + (m_nMax - m_nMin) * (m_rcItem.bottom - event.ptMouse.y - m_szThumb.cy / 2 ) / (m_rcItem.bottom - m_rcItem.top - m_szThumb.cy);
             }
-
             Invalidate();
         }
         return;

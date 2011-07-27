@@ -21,6 +21,7 @@ m_dwBackColor2(0),
 m_dwBackColor3(0),
 m_dwBorderColor(0),
 m_dwFocusBorderColor(0),
+m_bColorHSL(false),
 m_nBorderSize(1)
 {
     m_cXY.cx = m_cXY.cy = 0;
@@ -179,6 +180,19 @@ void CControlUI::SetFocusBorderColor(DWORD dwBorderColor)
     if( m_dwFocusBorderColor == dwBorderColor ) return;
 
     m_dwFocusBorderColor = dwBorderColor;
+    Invalidate();
+}
+
+bool CControlUI::IsColorHSL() const
+{
+    return m_bColorHSL;
+}
+
+void CControlUI::SetColorHSL(bool bColorHSL)
+{
+    if( m_bColorHSL == bColorHSL ) return;
+
+    m_bColorHSL = bColorHSL;
     Invalidate();
 }
 
@@ -597,6 +611,13 @@ void CControlUI::NeedParentUpdate()
     if( m_pManager != NULL ) m_pManager->NeedUpdate();
 }
 
+DWORD CControlUI::GetAdjustColor(DWORD dwColor)
+{
+    short H, S, L;
+    CPaintManagerUI::GetHSL(&H, &S, &L);
+    return CRenderEngine::AdjustColor(dwColor, H, S, L);
+}
+
 void CControlUI::Init()
 {
     DoInit();
@@ -712,6 +733,7 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
         SetFocusBorderColor(clrColor);
     }
+    else if( _tcscmp(pstrName, _T("colorhsl")) == 0 ) SetColorHSL(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("bordersize")) == 0 ) SetBorderSize(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("borderround")) == 0 ) {
         SIZE cxyRound = { 0 };
@@ -805,16 +827,16 @@ void CControlUI::PaintBkColor(HDC hDC)
             if( m_dwBackColor3 != 0 ) {
                 RECT rc = m_rcItem;
                 rc.bottom = (rc.bottom + rc.top) / 2;
-                CRenderEngine::DrawGradient(hDC, rc, m_dwBackColor, m_dwBackColor2, true, 8);
+                CRenderEngine::DrawGradient(hDC, rc, GetAdjustColor(m_dwBackColor), GetAdjustColor(m_dwBackColor2), true, 8);
                 rc.top = rc.bottom;
                 rc.bottom = m_rcItem.bottom;
-                CRenderEngine::DrawGradient(hDC, rc, m_dwBackColor2, m_dwBackColor3, true, 8);
+                CRenderEngine::DrawGradient(hDC, rc, GetAdjustColor(m_dwBackColor2), GetAdjustColor(m_dwBackColor3), true, 8);
             }
             else 
-                CRenderEngine::DrawGradient(hDC, m_rcItem, m_dwBackColor, m_dwBackColor2, true, 16);
+                CRenderEngine::DrawGradient(hDC, m_rcItem, GetAdjustColor(m_dwBackColor), GetAdjustColor(m_dwBackColor2), true, 16);
         }
-        else if( m_dwBackColor >= 0xFF000000 ) CRenderEngine::DrawColor(hDC, m_rcPaint, m_dwBackColor);
-        else CRenderEngine::DrawColor(hDC, m_rcItem, m_dwBackColor);
+        else if( m_dwBackColor >= 0xFF000000 ) CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwBackColor));
+        else CRenderEngine::DrawColor(hDC, m_rcItem, GetAdjustColor(m_dwBackColor));
     }
 }
 
@@ -841,16 +863,16 @@ void CControlUI::PaintBorder(HDC hDC)
         if( m_cxyBorderRound.cx > 0 || m_cxyBorderRound.cy > 0 )
 		{
 			if (IsFocused() && m_dwFocusBorderColor != 0)
-				CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, m_dwFocusBorderColor);
+				CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, GetAdjustColor(m_dwFocusBorderColor));
 			else
-				CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, m_dwBorderColor);
+				CRenderEngine::DrawRoundRect(hDC, m_rcItem, m_nBorderSize, m_cxyBorderRound.cx, m_cxyBorderRound.cy, GetAdjustColor(m_dwBorderColor));
 		}
 		else
 		{
 			if (IsFocused() && m_dwFocusBorderColor != 0)
-				CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, m_dwFocusBorderColor);
+				CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, GetAdjustColor(m_dwFocusBorderColor));
 			else if (m_dwBorderColor != 0)
-				CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, m_dwBorderColor);
+				CRenderEngine::DrawRect(hDC, m_rcItem, m_nBorderSize, GetAdjustColor(m_dwBorderColor));
 		}
 	}
 }

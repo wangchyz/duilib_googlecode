@@ -202,6 +202,8 @@ public:
     static void SetResourceDll(HINSTANCE hInst);
     static void SetResourcePath(LPCTSTR pStrPath);
     static void SetResourceZip(LPCTSTR pStrZip);
+    static void GetHSL(short* H, short* S, short* L);
+    static void SetHSL(bool bUseHSL, short H, short S, short L); // H:0~360, S:0~200, L:0~200 
     static void ReloadSkin();
 
     bool UseParentResource(CPaintManagerUI* pm);
@@ -376,6 +378,9 @@ private:
     static HINSTANCE m_hResourceInstance;
     static CStdString m_pStrResourcePath;
     static CStdString m_pStrResourceZip;
+    static short m_H;
+    static short m_S;
+    static short m_L;
     static CStdPtrArray m_aPreMessages;
 };
 
