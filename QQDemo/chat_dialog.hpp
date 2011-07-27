@@ -1,21 +1,3 @@
-//
-// chat_dialog.hpp
-// ~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2011 achellies (achellies at 163 dot com)
-//
-// This code may be used in compiled form in any way you desire. This
-// source file may be redistributed by any means PROVIDING it is 
-// not sold for profit without the authors written consent, and 
-// providing that this notice and the authors name is included. 
-//
-// This file is provided "as is" with no expressed or implied warranty.
-// The author accepts no liability if it causes any damage to you or your
-// computer whatsoever. It's free, so don't hassle me about it.
-//
-// Beware of bugs.
-//
-
 #ifndef CHATDIALOG_HPP
 #define CHATDIALOG_HPP
 
@@ -49,6 +31,8 @@ public:
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+
+    virtual LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	virtual LRESULT OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
@@ -84,6 +68,8 @@ private:
 	DWORD bkcolor_;
 	FriendListItemInfo myselft_;
 	FriendListItemInfo friend_;
+
+    static CDialogBuilder m_dlgBuilder;
 };
 
 #endif // CHARTDIALOG_HPP

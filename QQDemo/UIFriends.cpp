@@ -1,21 +1,3 @@
-//
-// UIFriends.cpp
-// ~~~~~~~~~~~~~
-//
-// Copyright (c) 2011 achellies (achellies at 163 dot com)
-//
-// This code may be used in compiled form in any way you desire. This
-// source file may be redistributed by any means PROVIDING it is 
-// not sold for profit without the authors written consent, and 
-// providing that this notice and the authors name is included. 
-//
-// This file is provided "as is" with no expressed or implied warranty.
-// The author accepts no liability if it causes any damage to you or your
-// computer whatsoever. It's free, so don't hassle me about it.
-//
-// Beware of bugs.
-//
-
 #include "stdafx.h"
 #include "UIFriends.hpp"
 
@@ -187,6 +169,17 @@ const TCHAR* const kNickNameControlName = _T("nickname");
 const TCHAR* const kDescriptionControlName = _T("description");
 const TCHAR* const kOperatorPannelControlName = _T("operation");
 
+static bool OnLogoButtonEvent(void* event) {
+    if( ((TEventUI*)event)->Type == UIEVENT_BUTTONDOWN ) {
+        CControlUI* pButton = ((TEventUI*)event)->pSender;
+        if( pButton != NULL ) {
+            CListContainerElementUI* pListElement = (CListContainerElementUI*)(pButton->GetTag());
+            if( pListElement != NULL ) pListElement->DoEvent(*(TEventUI*)event);
+        }
+    }
+    return true;
+}
+
 Node* CFriendsUI::AddNode(const FriendListItemInfo& item, Node* parent)
 {
 	if (!parent)
@@ -194,10 +187,15 @@ Node* CFriendsUI::AddNode(const FriendListItemInfo& item, Node* parent)
 
 	TCHAR szBuf[MAX_PATH] = {0};
 
-	CDialogBuilder builder;
-	CListContainerElementUI* pListElement = static_cast<CListContainerElementUI*>(builder.Create(_T("friend_list_item.xml"), (UINT)0, NULL, &paint_manager_));
-	if (pListElement == NULL)
-		return NULL;
+    CListContainerElementUI* pListElement = NULL;
+    if( !m_dlgBuilder.GetMarkup()->IsValid() ) {
+        pListElement = static_cast<CListContainerElementUI*>(m_dlgBuilder.Create(_T("friend_list_item.xml"), (UINT)0, NULL, &paint_manager_));
+    }
+    else {
+        pListElement = static_cast<CListContainerElementUI*>(m_dlgBuilder.Create((UINT)0, &paint_manager_));
+    }
+    if (pListElement == NULL)
+        return NULL;
 
 	Node* node = new Node;
 
@@ -247,6 +245,8 @@ Node* CFriendsUI::AddNode(const FriendListItemInfo& item, Node* parent)
 			if (logo_container != NULL)
 				logo_container->SetVisible(false);
 		}
+        log_button->SetTag((UINT_PTR)pListElement);
+        log_button->OnEvent += MakeDelegate(&OnLogoButtonEvent);
 	}
 
 	tString html_text;

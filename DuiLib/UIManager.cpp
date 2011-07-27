@@ -671,6 +671,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             if( m_pFocus != NULL ) {
                 TEventUI event = { 0 };
                 event.Type = UIEVENT_WINDOWSIZE;
+                event.pSender = m_pFocus;
                 event.dwTimestamp = ::GetTickCount();
                 m_pFocus->Event(event);
             }
@@ -684,6 +685,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
                 if( pTimer->hWnd == m_hWndPaint && pTimer->uWinTimer == LOWORD(wParam) && pTimer->bKilled == false) {
                     TEventUI event = { 0 };
                     event.Type = UIEVENT_TIMER;
+                    event.pSender = pTimer->pSender;
                     event.wParam = pTimer->nLocalID;
                     event.dwTimestamp = ::GetTickCount();
                     pTimer->pSender->Event(event);
@@ -703,7 +705,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
                 TEventUI event = { 0 };
                 event.ptMouse = pt;
                 event.Type = UIEVENT_MOUSEHOVER;
-                event.pSender = pHover;
+                event.pSender = m_pEventHover;
                 event.dwTimestamp = ::GetTickCount();
                 m_pEventHover->Event(event);
             }
@@ -755,25 +757,25 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             event.dwTimestamp = ::GetTickCount();
             if( pNewHover != m_pEventHover && m_pEventHover != NULL ) {
                 event.Type = UIEVENT_MOUSELEAVE;
-                event.pSender = pNewHover;
+                event.pSender = m_pEventHover;
                 m_pEventHover->Event(event);
                 m_pEventHover = NULL;
                 if( m_hwndTooltip != NULL ) ::SendMessage(m_hwndTooltip, TTM_TRACKACTIVATE, FALSE, (LPARAM) &m_ToolTip);
             }
             if( pNewHover != m_pEventHover && pNewHover != NULL ) {
                 event.Type = UIEVENT_MOUSEENTER;
-                event.pSender = m_pEventHover;
+                event.pSender = pNewHover;
                 pNewHover->Event(event);
                 m_pEventHover = pNewHover;
             }
             if( m_pEventClick != NULL ) {
                 event.Type = UIEVENT_MOUSEMOVE;
-                event.pSender = NULL;
+                event.pSender = m_pEventClick;
                 m_pEventClick->Event(event);
             }
             else if( pNewHover != NULL ) {
                 event.Type = UIEVENT_MOUSEMOVE;
-                event.pSender = NULL;
+                event.pSender = pNewHover;
                 pNewHover->Event(event);
             }
         }
@@ -794,6 +796,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             SetCapture();
             TEventUI event = { 0 };
             event.Type = UIEVENT_BUTTONDOWN;
+            event.pSender = pControl;
             event.wParam = wParam;
             event.lParam = lParam;
             event.ptMouse = pt;
@@ -813,6 +816,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             SetCapture();
             TEventUI event = { 0 };
             event.Type = UIEVENT_DBLCLICK;
+            event.pSender = pControl;
             event.ptMouse = pt;
             event.wKeyState = (WORD)wParam;
             event.dwTimestamp = ::GetTickCount();
@@ -828,6 +832,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             ReleaseCapture();
             TEventUI event = { 0 };
             event.Type = UIEVENT_BUTTONUP;
+            event.pSender = m_pEventClick;
             event.wParam = wParam;
             event.lParam = lParam;
             event.ptMouse = pt;
@@ -849,6 +854,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             SetCapture();
             TEventUI event = { 0 };
             event.Type = UIEVENT_RBUTTONDOWN;
+            event.pSender = pControl;
             event.wParam = wParam;
             event.lParam = lParam;
             event.ptMouse = pt;
@@ -867,6 +873,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
             ReleaseCapture();
             TEventUI event = { 0 };
             event.Type = UIEVENT_CONTEXTMENU;
+            event.pSender = m_pEventClick;
             event.ptMouse = pt;
             event.wKeyState = (WORD)wParam;
             event.lParam = (LPARAM)m_pEventClick;
