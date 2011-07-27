@@ -54,22 +54,17 @@ typedef std::basic_string<TCHAR> tString;
 #ifdef _DEBUG
 #   ifdef _UNICODE
 #       pragma comment(lib, "..\\bin\\DuiLib_ud.lib")
-#		pragma comment(lib, "..\\bin\\DuiLibEx_ud.lib")
 #   else
 #       pragma comment(lib, "..\\bin\\DuiLib_d.lib")
-#       pragma comment(lib, "..\\bin\\DuiLibEx_d.lib")
 #   endif
 #else
 #   ifdef _UNICODE
 #       pragma comment(lib, "..\\bin\\DuiLib_u.lib")
-#       pragma comment(lib, "..\\bin\\DuiLibEx_u.lib")
 #   else
 #       pragma comment(lib, "..\\bin\\DuiLib.lib")
-#       pragma comment(lib, "..\\bin\\DuiLibEx.lib")
 #   endif
 #endif
 
-#pragma comment(lib, "..\\bin\\GdiOle_d.lib")
 #pragma comment(lib, "gdiplus.lib")
 
 #define USE(FEATURE) (defined USE_##FEATURE  && USE_##FEATURE)
