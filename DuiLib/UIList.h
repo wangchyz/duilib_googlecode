@@ -20,7 +20,8 @@ typedef struct tagTListInfoUI
     RECT rcTextPadding;
     DWORD dwTextColor;
     DWORD dwBkColor;
-    CStdString sImage;
+    CStdString sBkImage;
+    bool bAlternateBk;
     DWORD dwSelectedTextColor;
     DWORD dwSelectedBkColor;
     CStdString sSelectedImage;
@@ -125,7 +126,8 @@ public:
     void SetItemTextPadding(RECT rc);
     void SetItemTextColor(DWORD dwTextColor);
     void SetItemBkColor(DWORD dwBkColor);
-    void SetItemImage(LPCTSTR pStrImage);
+    void SetItemBkImage(LPCTSTR pStrImage);
+    void SetAlternateBk(bool bAlternateBk);
     void SetSelectedItemTextColor(DWORD dwTextColor);
     void SetSelectedItemBkColor(DWORD dwBkColor);
     void SetSelectedItemImage(LPCTSTR pStrImage); 
@@ -141,7 +143,8 @@ public:
 	RECT GetItemTextPadding() const;
 	DWORD GetItemTextColor() const;
 	DWORD GetItemBkColor() const;
-	LPCTSTR GetItemImage() const;
+	LPCTSTR GetItemBkImage() const;
+    bool IsAlternateBk() const;
 	DWORD GetSelectedItemTextColor() const;
 	DWORD GetSelectedItemBkColor() const;
 	LPCTSTR GetSelectedItemImage() const;

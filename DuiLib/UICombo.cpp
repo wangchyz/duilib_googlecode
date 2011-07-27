@@ -201,6 +201,7 @@ CComboUI::CComboUI() : m_pWindow(NULL), m_iCurSel(-1), m_uButtonState(0)
     m_ListInfo.uTextStyle = DT_VCENTER;
     m_ListInfo.dwTextColor = 0xFF000000;
     m_ListInfo.dwBkColor = 0;
+    m_ListInfo.bAlternateBk = false;
     m_ListInfo.dwSelectedTextColor = 0xFF000000;
     m_ListInfo.dwSelectedBkColor = 0xFFC1E3FF;
     m_ListInfo.dwHotTextColor = 0xFF000000;
@@ -622,9 +623,9 @@ void CComboUI::SetItemBkColor(DWORD dwBkColor)
     m_ListInfo.dwBkColor = dwBkColor;
 }
 
-void CComboUI::SetItemImage(LPCTSTR pStrImage)
+void CComboUI::SetItemBkImage(LPCTSTR pStrImage)
 {
-    m_ListInfo.sImage = pStrImage;
+    m_ListInfo.sBkImage = pStrImage;
 }
 
 DWORD CComboUI::GetItemTextColor() const
@@ -637,9 +638,19 @@ DWORD CComboUI::GetItemBkColor() const
 	return m_ListInfo.dwBkColor;
 }
 
-LPCTSTR CComboUI::GetItemImage() const
+LPCTSTR CComboUI::GetItemBkImage() const
 {
-	return m_ListInfo.sImage;
+	return m_ListInfo.sBkImage;
+}
+
+bool CComboUI::IsAlternateBk() const
+{
+    return m_ListInfo.bAlternateBk;
+}
+
+void CComboUI::SetAlternateBk(bool bAlternateBk)
+{
+    m_ListInfo.bAlternateBk = bAlternateBk;
 }
 
 void CComboUI::SetSelectedItemTextColor(DWORD dwTextColor)
@@ -816,7 +827,8 @@ void CComboUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
         SetItemBkColor(clrColor);
     }
-    else if( _tcscmp(pstrName, _T("itemimage")) == 0 ) SetItemImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("itembkimage")) == 0 ) SetItemBkImage(pstrValue);
+    else if( _tcscmp(pstrName, _T("itemaltbk")) == 0 ) SetAlternateBk(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("itemselectedtextcolor")) == 0 ) {
         if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
         LPTSTR pstr = NULL;
