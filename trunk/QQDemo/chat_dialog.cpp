@@ -1,21 +1,3 @@
-//
-// chat_dialog.cpp
-// ~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2011 achellies (achellies at 163 dot com)
-//
-// This code may be used in compiled form in any way you desire. This
-// source file may be redistributed by any means PROVIDING it is 
-// not sold for profit without the authors written consent, and 
-// providing that this notice and the authors name is included. 
-//
-// This file is provided "as is" with no expressed or implied warranty.
-// The author accepts no liability if it causes any damage to you or your
-// computer whatsoever. It's free, so don't hassle me about it.
-//
-// Beware of bugs.
-//
-
 #include "stdafx.h"
 #include <windows.h>
 #include <shellapi.h>
@@ -23,6 +5,10 @@
 #include "win_impl_base.hpp"
 #include "chat_dialog.hpp"
 #include "ColorPicker.hpp"
+
+#if USE(ZIP_SKIN)
+static const TCHAR* const kResourceSkinZipFileName = _T("QQRes.zip");
+#endif
 
 const TCHAR* const kTitleControlName = _T("apptitle");
 const TCHAR* const kCloseButtonControlName = _T("closebtn");
@@ -54,6 +40,8 @@ const TCHAR* const kSendButtonControlName = _T("sendbtn");
 
 const int kEmotionRefreshTimerId = 1001;
 const int kEmotionRefreshInterval = 150;
+
+CDialogBuilder ChatDialog::m_dlgBuilder;
 
 ChatDialog::ChatDialog(const tString& bgimage, DWORD bkcolor, const FriendListItemInfo& myselft_info, const FriendListItemInfo& friend_info)
 : bgimage_(bgimage)
@@ -166,6 +154,60 @@ LRESULT ChatDialog::OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 #endif
 
 	return 0;
+}
+
+LRESULT ChatDialog::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
+    styleValue &= ~WS_CAPTION;
+    ::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
+    RECT rcClient;
+    ::GetClientRect(*this, &rcClient);
+    ::SetWindowPos(*this, NULL, rcClient.left, rcClient.top, rcClient.right - rcClient.left, \
+        rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
+
+    paint_manager_.Init(m_hWnd);
+    paint_manager_.AddPreMessageFilter(this);
+
+    CDialogBuilder builder;
+
+    paint_manager_.SetResourcePath(GetSkinFolder().c_str());
+
+#if USE(ZIP_SKIN)
+
+#if defined(UNDER_CE)
+    static bool resource_unzipped = false;
+    if (!resource_unzipped)
+    {
+        resource_unzipped = true;
+        paint_manager_.SetResourceZip(kResourceSkinZipFileName);
+        paint_manager_.UnzipResource();
+        paint_manager_.SetResourceZip(_T(""));
+    }
+    tString tstrSkin = paint_manager_.GetResourcePath();
+    tstrSkin += GetSkinFile();
+#else
+    paint_manager_.SetResourceZip(kResourceSkinZipFileName);
+    tString tstrSkin = GetSkinFile();
+#endif
+
+#else
+    tString tstrSkin = paint_manager_.GetResourcePath();
+    tstrSkin += GetSkinFile();
+#endif
+
+    CControlUI* pRoot = NULL;
+    if( !m_dlgBuilder.GetMarkup()->IsValid() ) {
+        pRoot = m_dlgBuilder.Create(tstrSkin.c_str(), (UINT)0, this, &paint_manager_);
+    }
+    else {
+        pRoot = m_dlgBuilder.Create((UINT)0, &paint_manager_);
+    }
+    paint_manager_.AttachDialog(pRoot);
+    paint_manager_.AddNotifier(this);
+
+    Init();
+    return 0;
 }
 
 LRESULT ChatDialog::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)

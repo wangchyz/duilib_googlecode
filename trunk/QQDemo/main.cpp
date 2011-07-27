@@ -1,8 +1,8 @@
 //
-// main.cpp
-// ~~~~~~~~
+// win_impl_base.hpp
+// ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2011 achellies (achellies at 163 dot com)
+// Copyright (c) 2011 achellies (achellies at 163 dot com), wangchyz (wangchyz at gmail dot com)
 //
 // This code may be used in compiled form in any way you desire. This
 // source file may be redistributed by any means PROVIDING it is 
@@ -30,7 +30,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPSTR /*l
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpCmdLine, int nCmdShow)
 #endif
 {
-	CPaintManagerUI::SetInstance(hInstance);
+    CPaintManagerUI::SetInstance(hInstance);
+    CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath());
 
 	HINSTANCE hInstRich = ::LoadLibrary(_T("Riched20.dll"));
 
