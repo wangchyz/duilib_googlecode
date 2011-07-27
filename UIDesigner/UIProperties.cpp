@@ -720,7 +720,7 @@ void CUIProperties::InitPropList()
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemImage"),_T(""),_T("指定组项正常显示时的图片"),tagItemImage);//itemimage
+	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemBkImage"),_T(""),_T("指定组项正常显示时的图片"),tagItemBkImage);//itembkimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
@@ -1325,10 +1325,10 @@ void CUIProperties::ShowComboProperty(CControlUI* pControl)
 	//disabledimage
 	pPropCombo->GetSubItem(tagComboDisabledImage-tagCombo)->SetValue((_variant_t)pCombo->GetDisabledImage());
 	pPropCombo->GetSubItem(tagComboDisabledImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetDisabledImage());
-	//itemimage
+	//itembkimage
 	TListInfoUI* pListInfo=pCombo->GetListInfo();
-	pPropCombo->GetSubItem(tagItemImage-tagCombo)->SetValue((_variant_t)pListInfo->sImage);
-	pPropCombo->GetSubItem(tagItemImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sImage);
+	pPropCombo->GetSubItem(tagItemBkImage-tagCombo)->SetValue((_variant_t)pListInfo->sBkImage);
+	pPropCombo->GetSubItem(tagItemBkImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sBkImage);
 	//itemhotimage
 	pPropCombo->GetSubItem(tagItemHotImage-tagCombo)->SetValue((_variant_t)pListInfo->sHotImage);
 	pPropCombo->GetSubItem(tagItemHotImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sHotImage);

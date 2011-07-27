@@ -1721,8 +1721,8 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 		pNode->SetAttribute("itemlinecolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
-	if(pListUI->GetItemImage() && _tcslen(pListUI->GetItemImage()) > 0)
-		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetItemImage())));
+	if(pListUI->GetItemBkImage() && _tcslen(pListUI->GetItemBkImage()) > 0)
+		pNode->SetAttribute("itembkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetItemBkImage())));
 
 	if(pListUI->GetSelectedItemImage() && _tcslen(pListUI->GetSelectedItemImage()) > 0)
 		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetSelectedItemImage())));
@@ -1861,8 +1861,8 @@ void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode
 		pNode->SetAttribute("itemlinecolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
-	if(pComboUI->GetItemImage() && _tcslen(pComboUI->GetItemImage()) > 0)
-		pNode->SetAttribute("itemimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetItemImage())));
+	if(pComboUI->GetItemBkImage() && _tcslen(pComboUI->GetItemBkImage()) > 0)
+		pNode->SetAttribute("itembkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetItemBkImage())));
 
 	if(pComboUI->GetSelectedItemImage() && _tcslen(pComboUI->GetSelectedItemImage()) > 0)
 		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetSelectedItemImage())));
