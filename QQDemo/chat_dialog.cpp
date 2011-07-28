@@ -293,6 +293,74 @@ tString GetCurrentTimeString()
 	return szTime;
 }
 
+void ChatDialog::SendMsg()
+{
+    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(paint_manager_.FindControl(kInputRichEditControlName));
+    if( pRichEdit == NULL ) return;
+    pRichEdit->SetFocus();
+    CStdString sText = pRichEdit->GetTextRange(0, pRichEdit->GetTextLength());
+    if( sText.IsEmpty() ) return;
+    pRichEdit->SetText(_T(""));
+
+    pRichEdit = static_cast<CRichEditUI*>(paint_manager_.FindControl(kViewRichEditControlName));
+    if( pRichEdit == NULL ) return;
+    long lSelBegin = 0, lSelEnd = 0;
+    CHARFORMAT2 cf;
+    ZeroMemory(&cf, sizeof(CHARFORMAT2));
+    cf.cbSize = sizeof(cf);
+    cf.dwReserved = 0;
+    cf.dwMask = CFM_COLOR | CFM_LINK | CFM_UNDERLINE | CFM_UNDERLINETYPE;
+    cf.dwEffects = CFE_LINK;
+    cf.bUnderlineType = CFU_UNDERLINE;
+    cf.crTextColor = RGB(220, 0, 0);
+
+    lSelEnd = lSelBegin = pRichEdit->GetTextLength();
+    pRichEdit->SetSel(lSelEnd, lSelEnd);
+    pRichEdit->ReplaceSel(_T("Ä³ÈË"), false);
+
+    lSelEnd = pRichEdit->GetTextLength();
+    pRichEdit->SetSel(lSelBegin, lSelEnd);
+    pRichEdit->SetSelectionCharFormat(cf);
+
+    lSelEnd = lSelBegin = pRichEdit->GetTextLength();
+    pRichEdit->SetSel(lSelEnd, lSelEnd);
+    pRichEdit->ReplaceSel(_T("Ëµ:\t2011-07-30 08:30:12\n"), false);
+    cf.dwMask = CFM_COLOR;
+    cf.crTextColor = RGB(0, 0, 0);
+    cf.dwEffects = 0;
+    lSelEnd = pRichEdit->GetTextLength();
+    pRichEdit->SetSel(lSelBegin, lSelEnd);
+    pRichEdit->SetSelectionCharFormat(cf);
+
+    PARAFORMAT2 pf;
+    ZeroMemory(&pf, sizeof(PARAFORMAT2));
+    pf.cbSize = sizeof(pf);
+    pf.dwMask = PFM_STARTINDENT;
+    pf.dxStartIndent = 0;
+    pRichEdit->SetParaFormat(pf);
+
+    lSelEnd = lSelBegin = pRichEdit->GetTextLength();
+
+    pRichEdit->SetSel(-1, -1);
+    pRichEdit->ReplaceSel(sText.GetData(), false);
+
+    pRichEdit->SetSel(-1, -1);
+    pRichEdit->ReplaceSel(_T("\n"), false);
+
+    cf.crTextColor = RGB(0, 0, 0);
+    lSelEnd = pRichEdit->GetTextLength();
+    pRichEdit->SetSel(lSelBegin, lSelEnd);
+    pRichEdit->SetSelectionCharFormat(cf);
+
+    ZeroMemory(&pf, sizeof(PARAFORMAT2));
+    pf.cbSize = sizeof(pf);
+    pf.dwMask = PFM_STARTINDENT;
+    pf.dxStartIndent = 220;
+    pRichEdit->SetParaFormat(pf);
+
+    pRichEdit->EndDown();
+}
+
 void ChatDialog::Notify(TNotifyUI& msg)
 {
 	if (_tcsicmp(msg.sType, _T("windowinit")) == 0)
@@ -358,9 +426,17 @@ void ChatDialog::Notify(TNotifyUI& msg)
 			//emotion_list_window_.SelectEmotion(pt);
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), kSendButtonControlName) == 0)
-		{
+        {
+            SendMsg();
 		}
 	}
+    else if( _tcsicmp(msg.sType, _T("return")) == 0 ) 
+    {
+        if (_tcsicmp(msg.pSender->GetName(), kInputRichEditControlName) == 0)
+        {
+            SendMsg();
+        }
+    }
 	else if (_tcsicmp(msg.sType, _T("timer")) == 0)
 	{
 		return OnTimer(msg);
