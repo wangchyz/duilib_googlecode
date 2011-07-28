@@ -44,6 +44,8 @@ public:
 
 	void SetTextColor(DWORD dwColor);
 
+    void SendMsg();
+
 protected:	
 
 	void Notify(TNotifyUI& msg);
