@@ -231,6 +231,17 @@ void MainFrame::UpdateFriendsList()
         pFriendsList->AddNode(item, root_parent);
         friends_.push_back(item);
 
+        for( int i = 0; i < 100; ++i )
+        {
+            item.id = _T("2");
+            item.folder = false;
+            item.logo = _T("default.png");
+            item.nick_name = _T("duilib");
+            item.description = _T("www.duilib.com");
+            pFriendsList->AddNode(item, root_parent);
+            friends_.push_back(item);
+        }
+
 		item.id = _T("3");
 		item.folder = true;
 		item.empty = false;
