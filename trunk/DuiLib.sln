@@ -93,10 +93,10 @@ Global
 		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.Debug|Win32.Build.0 = Debug|Win32
 		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.Release|Win32.ActiveCfg = Release|Win32
 		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.Release|Win32.Build.0 = Release|Win32
-		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeDebug|Win32.ActiveCfg = Debug|Win32
-		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeDebug|Win32.Build.0 = Debug|Win32
-		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeRelease|Win32.ActiveCfg = Release|Win32
-		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeRelease|Win32.Build.0 = Release|Win32
+		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeDebug|Win32.ActiveCfg = UnicodeDebug|Win32
+		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeDebug|Win32.Build.0 = UnicodeDebug|Win32
+		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeRelease|Win32.ActiveCfg = UnicodeRelease|Win32
+		{5EEA82DD-05C7-477F-8870-942E8758BFFF}.UnicodeRelease|Win32.Build.0 = UnicodeRelease|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
