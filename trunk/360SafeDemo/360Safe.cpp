@@ -36,7 +36,7 @@ public:
 			else if( msg.pSender == m_pRestoreBtn ) { 
 				SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0); return; }
 		}
-		else if(msg.sType==_T("setfocus"))
+		else if(msg.sType==_T("selectchanged"))
 		{
 			CStdString name = msg.pSender->GetName();
 			CTabLayoutUI* pControl = static_cast<CTabLayoutUI*>(m_pm.FindControl(_T("switch")));

@@ -403,7 +403,10 @@ bool CMarkup::LoadFromFile(LPCTSTR pstrFilename, int encoding)
     }
     else {
         sFile += CPaintManagerUI::GetResourceZip();
-        HZIP hz = OpenZip((void*)sFile.GetData(), 0, 2);
+        HZIP hz = NULL;
+        if( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
+        else hz = OpenZip((void*)sFile.GetData(), 0, 2);
+        if( hz == NULL ) return _Failed(_T("Error opening zip file"));
         ZIPENTRY ze; 
         int i; 
         if( FindZipItem(hz, pstrFilename, true, &i, &ze) != 0 ) return _Failed(_T("Could not find ziped file"));
@@ -414,10 +417,10 @@ bool CMarkup::LoadFromFile(LPCTSTR pstrFilename, int encoding)
         int res = UnzipItem(hz, i, pByte, dwSize, 3);
         if( res != 0x00000000 && res != 0x00000600) {
             delete[] pByte;
-            CloseZip(hz);
+            if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
             return _Failed(_T("Could not unzip file"));
         }
-        CloseZip(hz);
+        if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
         bool ret = LoadFromMem(pByte, dwSize, encoding);
         delete[] pByte;
 
