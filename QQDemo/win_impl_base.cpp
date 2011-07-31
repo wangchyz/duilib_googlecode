@@ -223,23 +223,8 @@ LRESULT WindowImplBase::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	paint_manager_.SetResourcePath(GetSkinFolder().c_str());
 
 #if USE(ZIP_SKIN)
-
-#if defined(UNDER_CE)
-	static bool resource_unzipped = false;
-	if (!resource_unzipped)
-	{
-		resource_unzipped = true;
-		paint_manager_.SetResourceZip(kResourceSkinZipFileName);
-		paint_manager_.UnzipResource();
-		paint_manager_.SetResourceZip(_T(""));
-	}
-	tString tstrSkin = paint_manager_.GetResourcePath();
-	tstrSkin += GetSkinFile();
-#else
-	paint_manager_.SetResourceZip(kResourceSkinZipFileName);
+	paint_manager_.SetResourceZip(kResourceSkinZipFileName, true);
 	tString tstrSkin = GetSkinFile();
-#endif
-
 #else
 	tString tstrSkin = paint_manager_.GetResourcePath();
 	tstrSkin += GetSkinFile();

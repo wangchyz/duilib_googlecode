@@ -1,6 +1,13 @@
 #include "StdAfx.h"
 #include <zmouse.h>
 
+DECLARE_HANDLE(HZIP);	// An HZIP identifies a zip file that has been opened
+typedef DWORD ZRESULT;
+#define OpenZip OpenZipU
+#define CloseZip(hz) CloseZipU(hz)
+extern HZIP OpenZipU(void *z,unsigned int len,DWORD flags);
+extern ZRESULT CloseZipU(HZIP hz);
+
 namespace DuiLib {
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +56,8 @@ HINSTANCE CPaintManagerUI::m_hInstance = NULL;
 HINSTANCE CPaintManagerUI::m_hResourceInstance = NULL;
 CStdString CPaintManagerUI::m_pStrResourcePath;
 CStdString CPaintManagerUI::m_pStrResourceZip;
+bool CPaintManagerUI::m_bCachedResourceZip = false;
+HANDLE CPaintManagerUI::m_hResourceZip = NULL;
 short CPaintManagerUI::m_H = 180;
 short CPaintManagerUI::m_S = 100;
 short CPaintManagerUI::m_L = 100;
@@ -190,6 +199,16 @@ const CStdString& CPaintManagerUI::GetResourceZip()
     return m_pStrResourceZip;
 }
 
+bool CPaintManagerUI::IsCachedResourceZip()
+{
+    return m_bCachedResourceZip;
+}
+
+HANDLE CPaintManagerUI::GetResourceZipHandle()
+{
+    return m_hResourceZip;
+}
+
 void CPaintManagerUI::SetInstance(HINSTANCE hInst)
 {
     m_hInstance = hInst;
@@ -213,9 +232,20 @@ void CPaintManagerUI::SetResourcePath(LPCTSTR pStrPath)
     if( cEnd != _T('\\') && cEnd != _T('/') ) m_pStrResourcePath += _T('\\');
 }
 
-void CPaintManagerUI::SetResourceZip(LPCTSTR pStrPath)
+void CPaintManagerUI::SetResourceZip(LPCTSTR pStrPath, bool bCachedResourceZip)
 {
+    if( m_pStrResourceZip == pStrPath && m_bCachedResourceZip == bCachedResourceZip ) return;
+    if( m_bCachedResourceZip && m_hResourceZip != NULL ) {
+        CloseZip((HZIP)m_hResourceZip);
+        m_hResourceZip = NULL;
+    }
     m_pStrResourceZip = pStrPath;
+    m_bCachedResourceZip = bCachedResourceZip;
+    if( m_bCachedResourceZip ) {
+        CStdString sFile = CPaintManagerUI::GetResourcePath();
+        sFile += CPaintManagerUI::GetResourceZip();
+        m_hResourceZip = (HANDLE)OpenZip((void*)sFile.GetData(), 0, 2);
+    }
 }
 
 void CPaintManagerUI::GetHSL(short* H, short* S, short* L)

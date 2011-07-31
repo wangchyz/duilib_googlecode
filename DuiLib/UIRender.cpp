@@ -310,7 +310,10 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
         }
         else {
             sFile += CPaintManagerUI::GetResourceZip();
-            HZIP hz = OpenZip((void*)sFile.GetData(), 0, 2);
+            HZIP hz = NULL;
+            if( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
+            else hz = OpenZip((void*)sFile.GetData(), 0, 2);
+            if( hz == NULL ) return NULL;
             ZIPENTRY ze; 
             int i; 
             if( FindZipItem(hz, bitmap.m_lpstr, true, &i, &ze) != 0 ) return NULL;
@@ -320,10 +323,10 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
             int res = UnzipItem(hz, i, pData, dwSize, 3);
             if( res != 0x00000000 && res != 0x00000600) {
                 delete[] pData;
-                CloseZip(hz);
+                if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
                 return NULL;
             }
-            CloseZip(hz);
+            if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
         }
     }
     else {
