@@ -282,8 +282,8 @@ public:
     HWND Subclass(HWND hWnd);
     void Unsubclass();
     void ShowWindow(bool bShow = true, bool bTakeFocus = true);
-    bool ShowModal();
-    void Close();
+    UINT ShowModal();
+    void Close(UINT nRet = IDOK);
     void CenterWindow();
     void SetIcon(UINT nRes);
 

@@ -955,15 +955,17 @@ void CWindowWnd::ShowWindow(bool bShow /*= true*/, bool bTakeFocus /*= false*/)
     ::ShowWindow(m_hWnd, bShow ? (bTakeFocus ? SW_SHOWNORMAL : SW_SHOWNOACTIVATE) : SW_HIDE);
 }
 
-bool CWindowWnd::ShowModal()
+UINT CWindowWnd::ShowModal()
 {
     ASSERT(::IsWindow(m_hWnd));
+    UINT nRet = 0;
     HWND hWndParent = GetWindowOwner(m_hWnd);
     ::ShowWindow(m_hWnd, SW_SHOWNORMAL);
     ::EnableWindow(hWndParent, FALSE);
     MSG msg = { 0 };
     while( ::IsWindow(m_hWnd) && ::GetMessage(&msg, NULL, 0, 0) ) {
         if( msg.message == WM_CLOSE && msg.hwnd == m_hWnd ) {
+            nRet = msg.wParam;
             ::EnableWindow(hWndParent, TRUE);
             ::SetFocus(hWndParent);
         }
@@ -976,14 +978,14 @@ bool CWindowWnd::ShowModal()
     ::EnableWindow(hWndParent, TRUE);
     ::SetFocus(hWndParent);
     if( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
-    return true;
+    return nRet;
 }
 
-void CWindowWnd::Close()
+void CWindowWnd::Close(UINT nRet)
 {
     ASSERT(::IsWindow(m_hWnd));
     if( !::IsWindow(m_hWnd) ) return;
-    PostMessage(WM_CLOSE);
+    PostMessage(WM_CLOSE, (WPARAM)nRet, 0L);
 }
 
 void CWindowWnd::CenterWindow()
