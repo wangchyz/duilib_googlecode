@@ -1276,10 +1276,11 @@ public:
 protected:
     CEditUI* m_pOwner;
     HBRUSH m_hBkBrush;
+    bool m_bInit;
 };
 
 
-CEditWnd::CEditWnd() : m_pOwner(NULL), m_hBkBrush(NULL)
+CEditWnd::CEditWnd() : m_pOwner(NULL), m_hBkBrush(NULL), m_bInit(false)
 {
 }
 
@@ -1300,6 +1301,7 @@ void CEditWnd::Init(CEditUI* pOwner)
     Edit_SetReadOnly(m_hWnd, m_pOwner->IsReadOnly() == true);
     ::ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
     ::SetFocus(m_hWnd);
+    m_bInit = true;    
 }
 
 RECT CEditWnd::CalPos()
@@ -1377,6 +1379,7 @@ LRESULT CEditWnd::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 
 LRESULT CEditWnd::OnEditChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
 {
+    if( !m_bInit ) return 0;
     if( m_pOwner == NULL ) return 0;
     // Copy text back
     int cchLen = ::GetWindowTextLength(m_hWnd) + 1;
