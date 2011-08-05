@@ -273,10 +273,17 @@ bool CStdPtrArray::IsEmpty() const
 bool CStdPtrArray::Add(LPVOID pData)
 {
     if( ++m_nCount >= m_nAllocated) {
-        m_nAllocated *= 2;
-        if( m_nAllocated == 0 ) m_nAllocated = 11;
-        m_ppVoid = static_cast<LPVOID*>(realloc(m_ppVoid, m_nAllocated * sizeof(LPVOID)));
-        if( m_ppVoid == NULL ) return false;
+        int nAllocated = m_nAllocated * 2;
+        if( nAllocated == 0 ) nAllocated = 11;
+        LPVOID* ppVoid = static_cast<LPVOID*>(realloc(m_ppVoid, nAllocated * sizeof(LPVOID)));
+        if( ppVoid != NULL ) {
+            m_nAllocated = nAllocated;
+            m_ppVoid = ppVoid;
+        }
+        else {
+            --m_nCount;
+            return false;
+        }
     }
     m_ppVoid[m_nCount - 1] = pData;
     return true;
@@ -287,10 +294,17 @@ bool CStdPtrArray::InsertAt(int iIndex, LPVOID pData)
     if( iIndex == m_nCount ) return Add(pData);
     if( iIndex < 0 || iIndex > m_nCount ) return false;
     if( ++m_nCount >= m_nAllocated) {
-        m_nAllocated *= 2;
-        if( m_nAllocated == 0 ) m_nAllocated = 11;
-        m_ppVoid = static_cast<LPVOID*>(realloc(m_ppVoid, m_nAllocated * sizeof(LPVOID)));
-        if( m_ppVoid == NULL ) return false;
+        int nAllocated = m_nAllocated * 2;
+        if( nAllocated == 0 ) nAllocated = 11;
+        LPVOID* ppVoid = static_cast<LPVOID*>(realloc(m_ppVoid, nAllocated * sizeof(LPVOID)));
+        if( ppVoid != NULL ) {
+            m_nAllocated = nAllocated;
+            m_ppVoid = ppVoid;
+        }
+        else {
+            --m_nCount;
+            return false;
+        }
     }
     memmove(&m_ppVoid[iIndex + 1], &m_ppVoid[iIndex], (m_nCount - iIndex - 1) * sizeof(LPVOID));
     m_ppVoid[iIndex] = pData;
@@ -373,10 +387,17 @@ bool CStdValArray::IsEmpty() const
 bool CStdValArray::Add(LPCVOID pData)
 {
     if( ++m_nCount >= m_nAllocated) {
-        m_nAllocated *= 2;
-        if( m_nAllocated == 0 ) m_nAllocated = 11;
-        m_pVoid = static_cast<LPBYTE>(realloc(m_pVoid, m_nAllocated * m_iElementSize));
-        if( m_pVoid == NULL ) return false;
+        int nAllocated = m_nAllocated * 2;
+        if( nAllocated == 0 ) nAllocated = 11;
+        LPBYTE pVoid = static_cast<LPBYTE>(realloc(m_pVoid, nAllocated * m_iElementSize));
+        if( pVoid != NULL ) {
+            m_nAllocated = nAllocated;
+            m_pVoid = pVoid;
+        }
+        else {
+            --m_nCount;
+            return false;
+        }
     }
     ::CopyMemory(m_pVoid + ((m_nCount - 1) * m_iElementSize), pData, m_iElementSize);
     return true;
