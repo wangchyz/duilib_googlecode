@@ -639,7 +639,7 @@ CControlUI* CContainerUI::FindControl(FINDCONTROLPROC Proc, LPVOID pData, UINT u
         }
     }
 
-    if( pResult == NULL ) pResult = CControlUI::FindControl(Proc, pData, uFlags);
+    if( pResult == NULL && (uFlags & UIFIND_ME_FIRST) == 0 ) pResult = CControlUI::FindControl(Proc, pData, uFlags);
     return pResult;
 }
 
