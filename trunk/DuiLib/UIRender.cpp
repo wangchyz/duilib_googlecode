@@ -941,7 +941,8 @@ bool CRenderEngine::DrawImageString(HDC hDC, CPaintManagerUI* pManager, const RE
 							rcItem, rcBmpPart, rcCorner, dwMask, bFade, bHole, bTiledX, bTiledY);
 
                     sImageName = sValue;
-					++image_count;
+					if( sItem == _T("file") )
+						++image_count;
                 }
                 else if( sItem == _T("restype") ) {
 					if( image_count > 0 )
