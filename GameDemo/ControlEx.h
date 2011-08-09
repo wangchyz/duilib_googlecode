@@ -326,21 +326,26 @@ public:
 
     DeskListUI() : m_uButtonState(0), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
     {
-        for(int i = 0; i < 500; ++i) 
-        {
-            CDialogBuilder builder;
-            CContainerUI* pDesk = static_cast<CContainerUI*>(builder.Create(_T("desk.xml"), (UINT)0));
-            if( pDesk ) {
-                this->Add(pDesk);
-                TCHAR indexBuffer[16];
-                CStdString strIndexString = _T("- ");
-                strIndexString += _itot(i+1, indexBuffer, 10);
-                strIndexString += _T(" -");
-                pDesk->GetItemAt(3)->SetText(strIndexString);
-            }
-            else {
-                this->RemoveAll();
-                return;
+        SetItemSize(CSize(182, 152));
+        CDialogBuilder builder;
+        CContainerUI* pDesk = static_cast<CContainerUI*>(builder.Create(_T("desk.xml"), (UINT)0));
+        if( pDesk != NULL ) {
+            for(int i = 0; i < 500; ++i) 
+            {
+                if( pDesk == NULL ) pDesk = static_cast<CContainerUI*>(builder.Create());
+                if( pDesk != NULL ) {
+                    this->Add(pDesk);
+                    TCHAR indexBuffer[16];
+                    CStdString strIndexString = _T("- ");
+                    strIndexString += _itot(i+1, indexBuffer, 10);
+                    strIndexString += _T(" -");
+                    pDesk->GetItemAt(3)->SetText(strIndexString);
+                    pDesk = NULL;
+                }
+                else {
+                    this->RemoveAll();
+                    return;
+                }
             }
         }
     }
@@ -430,18 +435,6 @@ public:
             return;
         }
         CTileLayoutUI::DoEvent(event);
-    }
-
-    void SetPos(RECT rc)
-    {
-        if( GetCount() > 0 ) {
-            int iDeskWidth = GetItemAt(0)->GetFixedWidth();
-            int column = (rc.right - rc.left) / iDeskWidth;
-            if( column < 1 ) column = 1;
-            SetColumns(column);
-        }
-
-        CTileLayoutUI::SetPos(rc);
     }
 
 private:
