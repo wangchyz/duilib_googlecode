@@ -70,7 +70,7 @@ static __declspec(deprecated) __inline LPTSTR StringAlloc(size_t  len)          
 static __declspec(deprecated) __inline LPTSTR WideToTchar(LPCWSTR str, int len = -1) { return WideToAnsi(str, len);  }
 static __declspec(deprecated) __inline LPTSTR AnsiToTchar(LPCSTR  str, int len = -1) { return AnsiStrDup(str, len);  }
 static __declspec(deprecated) __inline LPTSTR Utf8ToTchar(LPCSTR  str, int len = -1) { return Utf8ToAnsi(str, len);  }
-static __declspec(deprecated) __inline LPTSTR TcharToWide(LPCTSTR str, int len = -1) { return AnsiToWide(str, len);  }
+static __declspec(deprecated) __inline LPWSTR TcharToWide(LPCTSTR str, int len = -1) { return AnsiToWide(str, len);  }
 static __declspec(deprecated) __inline LPSTR  TcharToAnsi(LPCTSTR str, int len = -1) { return AnsiStrDup(str, len);  }
 static __declspec(deprecated) __inline LPSTR  TcharToUtf8(LPCTSTR str, int len = -1) { return AnsiToUtf8(str, len);  }
 static __declspec(deprecated) __inline LPTSTR TcharStrDup(LPCTSTR str, int len = -1) { return AnsiStrDup(str, len);  }
