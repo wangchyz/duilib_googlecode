@@ -372,7 +372,7 @@ bool CListUI::SelectItem(int iIndex)
         return false;
     }
     EnsureVisible(m_iCurSel);
-    //pControl->SetFocus();
+    pControl->SetFocus();
     if( m_pManager != NULL ) {
         m_pManager->SendNotify(this, _T("itemselect"), m_iCurSel, iOldSel);
     }

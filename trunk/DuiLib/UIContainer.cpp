@@ -1344,8 +1344,9 @@ RECT CHorizontalLayoutUI::GetThumbRect(bool bUseNew) const
 //
 //
 
-CTileLayoutUI::CTileLayoutUI() : m_nColumns(2)
+CTileLayoutUI::CTileLayoutUI() : m_nColumns(1)
 {
+    m_szItem.cx = m_szItem.cy = 0;
 }
 
 LPCTSTR CTileLayoutUI::GetClass() const
@@ -1357,6 +1358,19 @@ LPVOID CTileLayoutUI::GetInterface(LPCTSTR pstrName)
 {
     if( _tcscmp(pstrName, _T("TileLayout")) == 0 ) return static_cast<CTileLayoutUI*>(this);
     return CContainerUI::GetInterface(pstrName);
+}
+
+SIZE CTileLayoutUI::GetItemdSize() const
+{
+    return m_szItem;
+}
+
+void CTileLayoutUI::SetItemSize(SIZE szItem)
+{
+    if( m_szItem.cx != szItem.cx || m_szItem.cy != szItem.cy ) {
+        m_szItem = szItem;
+        NeedUpdate();
+    }
 }
 
 int CTileLayoutUI::GetColumns() const
@@ -1373,7 +1387,14 @@ void CTileLayoutUI::SetColumns(int nCols)
 
 void CTileLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
-    if( _tcscmp(pstrName, _T("columns")) == 0 ) SetColumns(_ttoi(pstrValue));
+    if( _tcscmp(pstrName, _T("itemsize")) == 0 ) {
+            SIZE szItem = { 0 };
+            LPTSTR pstr = NULL;
+            szItem.cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+            szItem.cy = _tcstol(pstr + 1, &pstr, 10);   ASSERT(pstr);     
+            SetItemSize(szItem);
+        }
+    else if( _tcscmp(pstrName, _T("columns")) == 0 ) SetColumns(_ttoi(pstrValue));
     else CContainerUI::SetAttribute(pstrName, pstrValue);
 }
 
@@ -1397,6 +1418,9 @@ void CTileLayoutUI::SetPos(RECT rc)
     if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) rc.bottom -= m_pHorizontalScrollBar->GetFixedHeight();
 
     // Position the elements
+    if( m_szItem.cx > 0 ) m_nColumns = (rc.right - rc.left) / m_szItem.cx;
+    if( m_nColumns == 0 ) m_nColumns = 1;
+
     int cyNeeded = 0;
     int cxWidth = (rc.right - rc.left) / m_nColumns;
     if( m_pHorizontalScrollBar && m_pHorizontalScrollBar->IsVisible() ) 
