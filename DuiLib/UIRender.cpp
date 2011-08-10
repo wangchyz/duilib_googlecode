@@ -1408,9 +1408,10 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                 }
                 break;
             case _T('i'):  // Italic or Image
-                {
+                {    
                     pstrNextStart = pstrText - 1;
                     pstrText++;
+					CStdString sImageString = pstrText;
                     int iWidth = 0;
                     int iHeight = 0;
                     while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
@@ -1439,16 +1440,58 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
                     else {
                         while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
                         int iImageListNum = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-                        if( iImageListNum <= 0 ) iImageListNum = 1;
-                        while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
-                        int iImageListIndex = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
-                        if( iImageListIndex < 0 || iImageListIndex >= iImageListNum ) iImageListIndex = 0;
+						if( iImageListNum <= 0 ) iImageListNum = 1;
+						while( *pstrText > _T('\0') && *pstrText <= _T(' ') ) pstrText = ::CharNext(pstrText);
+						int iImageListIndex = (int) _tcstol(pstrText, const_cast<LPTSTR*>(&pstrText), 10);
+						if( iImageListIndex < 0 || iImageListIndex >= iImageListNum ) iImageListIndex = 0;
 
-                        pImageInfo = pManager->GetImageEx((LPCTSTR)sName);
-                        if( pImageInfo ) {
-                            iWidth = pImageInfo->nX;
-                            iHeight = pImageInfo->nY;
-                            if( iImageListNum > 1 ) iWidth /= iImageListNum;
+						if( _tcsstr(sImageString.GetData(), _T("file=\'")) != NULL || _tcsstr(sImageString.GetData(), _T("res=\'")) != NULL ) {
+							CStdString sImageResType;
+							CStdString sImageName;
+							LPCTSTR pStrImage = sImageString.GetData();
+							CStdString sItem;
+							CStdString sValue;
+							while( *pStrImage != _T('\0') ) {
+								sItem.Empty();
+								sValue.Empty();
+								while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
+								while( *pStrImage != _T('\0') && *pStrImage != _T('=') && *pStrImage > _T(' ') ) {
+									LPTSTR pstrTemp = ::CharNext(pStrImage);
+									while( pStrImage < pstrTemp) {
+										sItem += *pStrImage++;
+									}
+								}
+								while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
+								if( *pStrImage++ != _T('=') ) break;
+								while( *pStrImage > _T('\0') && *pStrImage <= _T(' ') ) pStrImage = ::CharNext(pStrImage);
+								if( *pStrImage++ != _T('\'') ) break;
+								while( *pStrImage != _T('\0') && *pStrImage != _T('\'') ) {
+									LPTSTR pstrTemp = ::CharNext(pStrImage);
+									while( pStrImage < pstrTemp) {
+										sValue += *pStrImage++;
+									}
+								}
+								if( *pStrImage++ != _T('\'') ) break;
+								if( !sValue.IsEmpty() ) {
+									if( sItem == _T("file") || sItem == _T("res") ) {
+										sImageName = sValue;
+									}
+									else if( sItem == _T("restype") ) {
+										sImageResType = sValue;
+									}
+								}
+								if( *pStrImage++ != _T(' ') ) break;
+							}
+
+							pImageInfo = pManager->GetImageEx((LPCTSTR)sImageName, sImageResType);
+						}
+						else
+							pImageInfo = pManager->GetImageEx((LPCTSTR)sName);
+
+						if( pImageInfo ) {
+							iWidth = pImageInfo->nX;
+							iHeight = pImageInfo->nY;
+							if( iImageListNum > 1 ) iWidth /= iImageListNum;
 
                             if( pt.x + iWidth > rc.right && pt.x > rc.left && (uStyle & DT_SINGLELINE) == 0 ) {
                                 bLineEnd = true;
