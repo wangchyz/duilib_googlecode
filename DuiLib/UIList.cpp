@@ -277,10 +277,10 @@ void CListUI::DoEvent(TEventUI& event)
     case UIEVENT_KEYDOWN:
         switch( event.chKey ) {
         case VK_UP:
-            SelectItem(FindSelectable(m_iCurSel - 1, false));
+            SelectItem(FindSelectable(m_iCurSel - 1, false), true);
             return;
         case VK_DOWN:
-            SelectItem(FindSelectable(m_iCurSel + 1, true));
+            SelectItem(FindSelectable(m_iCurSel + 1, true), true);
             return;
         case VK_PRIOR:
             PageUp();
@@ -289,10 +289,10 @@ void CListUI::DoEvent(TEventUI& event)
             PageDown();
             return;
         case VK_HOME:
-            SelectItem(FindSelectable(0, false));
+            SelectItem(FindSelectable(0, false), true);
             return;
         case VK_END:
-            SelectItem(FindSelectable(GetCount() - 1, true));
+            SelectItem(FindSelectable(GetCount() - 1, true), true);
             return;
         case VK_RETURN:
             if( m_iCurSel != -1 ) GetItemAt(m_iCurSel)->Activate();
@@ -303,11 +303,11 @@ void CListUI::DoEvent(TEventUI& event)
         {
             switch( LOWORD(event.wParam) ) {
             case SB_LINEUP:
-                if( m_bScrollSelect ) SelectItem(FindSelectable(m_iCurSel - 1, false));
+                if( m_bScrollSelect ) SelectItem(FindSelectable(m_iCurSel - 1, false), true);
                 else LineUp();
                 return;
             case SB_LINEDOWN:
-                if( m_bScrollSelect ) SelectItem(FindSelectable(m_iCurSel + 1, true));
+                if( m_bScrollSelect ) SelectItem(FindSelectable(m_iCurSel + 1, true), true);
                 else LineDown();
                 return;
             }
@@ -342,7 +342,7 @@ int CListUI::GetCurSel() const
     return m_iCurSel;
 }
 
-bool CListUI::SelectItem(int iIndex)
+bool CListUI::SelectItem(int iIndex, bool bTakeFocus)
 {
     if( iIndex == m_iCurSel ) return true;
 
@@ -372,7 +372,7 @@ bool CListUI::SelectItem(int iIndex)
         return false;
     }
     EnsureVisible(m_iCurSel);
-    pControl->SetFocus();
+    if( bTakeFocus ) pControl->SetFocus();
     if( m_pManager != NULL ) {
         m_pManager->SendNotify(this, _T("itemselect"), m_iCurSel, iOldSel);
     }
