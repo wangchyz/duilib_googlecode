@@ -17,7 +17,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="UnicodeDebug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
@@ -98,7 +98,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="UnicodeRelease|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
@@ -279,7 +279,7 @@
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="UnicodeDebug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -287,7 +287,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="UnicodeRelease|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -735,7 +735,7 @@
 				RelativePath=".\third_party\tinyxml\tinystr.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="UnicodeDebug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -743,7 +743,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="UnicodeRelease|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -759,7 +759,7 @@
 				RelativePath=".\third_party\tinyxml\tinyxml.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="UnicodeDebug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -767,7 +767,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="UnicodeRelease|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -783,7 +783,7 @@
 				RelativePath=".\third_party\tinyxml\tinyxmlerror.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="UnicodeDebug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -791,7 +791,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="UnicodeRelease|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -803,7 +803,7 @@
 				RelativePath=".\third_party\tinyxml\tinyxmlparser.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="UnicodeDebug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -811,7 +811,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="UnicodeRelease|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
