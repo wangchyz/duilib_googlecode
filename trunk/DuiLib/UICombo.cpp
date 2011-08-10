@@ -130,7 +130,7 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else if( uMsg == WM_KEYDOWN ) {
         switch( wParam ) {
         case VK_ESCAPE:
-            m_pOwner->SelectItem(m_iOldSel);
+            m_pOwner->SelectItem(m_iOldSel, true);
             EnsureVisible(m_iOldSel);
             // FALL THROUGH...
         case VK_RETURN:
@@ -234,7 +234,6 @@ UINT CComboUI::GetControlFlags() const
 
 void CComboUI::DoInit()
 {
-    if( m_iCurSel < 0 ) SelectItem(0);
 }
 
 int CComboUI::GetCurSel() const
@@ -242,7 +241,7 @@ int CComboUI::GetCurSel() const
     return m_iCurSel;
 }
 
-bool CComboUI::SelectItem(int iIndex)
+bool CComboUI::SelectItem(int iIndex, bool bTakeFocus)
 {
     if( m_pWindow != NULL ) m_pWindow->Close();
     if( iIndex == m_iCurSel ) return true;
@@ -262,7 +261,7 @@ bool CComboUI::SelectItem(int iIndex)
     IListItemUI* pListItem = static_cast<IListItemUI*>(pControl->GetInterface(_T("ListItem")));
     if( pListItem == NULL ) return false;
     m_iCurSel = iIndex;
-    if( m_pWindow != NULL ) pControl->SetFocus();
+    if( m_pWindow != NULL || bTakeFocus ) pControl->SetFocus();
     pListItem->Select(true);
     if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("itemselect"), m_iCurSel, iOldSel);
     Invalidate();
