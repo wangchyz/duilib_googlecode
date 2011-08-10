@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 可能有错漏，欢迎补充。wangchyz(wangchyz@gmail.com) -->
 <Controls>
-	<Window>
+	<Window parent="">
 		<Attribute name="size" default="0,0" type="SIZE" comment="窗口的初始化大小,如(800,600)"/>
 		<Attribute name="sizebox" default="0,0,0,0" type="RECT" comment="窗口可拖动改变窗口大小的边距,如(4,4,6,6)"/>
 		<Attribute name="caption" default="0,0,0,0" type="RECT" comment="窗口可拖动的标题栏大小的边距,最后一个参数是指离上边框的距离,如(0,0,0,28)"/>
@@ -16,7 +16,7 @@
 		<Attribute name="linkhoverfontcolor" default="0xFFD3215F" type="DWORD" comment="默认的linkhoverfont字体颜色,如(0xFFD3215F)"/>
 		<Attribute name="selectedcolor" default="0xFFBAE4FF" type="DWORD" comment="默认的selected字体颜色,如(0xFFBAE4FF)"/>
 	</Window>
-	<Control notifies="setfocus killfocus timer menu windowinit(root)">
+	<Control parent="" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -46,7 +46,7 @@
 		<Attribute name="menu" default="false" type="BOOL" comment="是否需要右键菜单,如(true)"/>
 		<Attribute name="stretch" default="" type="STRING" comment="在DialogLayout中的拉伸方式,取值move_x、move_y、move_xy、size_x、size_y、size_xy、group、line和空,如(move_x)"/>
 	</Control>
-	<Container notifies="setfocus killfocus timer menu windowinit(root)">
+	<Container parent="Control" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -81,7 +81,7 @@
 		<Attribute name="hscrollbar" default="false" type="BOOL" comment="是否使用横向滚动条,如(true)"/>
 		<Attribute name="childpadding" default="0" type="INT" comment="子控件之间的额外距离,如(4)"/>
 	</Container>
-	<VerticalLayout notifies="setfocus killfocus timer menu windowinit(root)">
+	<VerticalLayout parent="Container" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -118,7 +118,7 @@
 		<Attribute name="sepheight" default="0" type="INT" comment="分隔符高度,正负表示分隔符在顶部还是底部,如(4)"/>
 		<Attribute name="sepimm" default="false" type="BOOL" comment="拖动分隔符是否立即改变大小,如(false)"/>
 	</VerticalLayout>
-	<HorizontalLayout notifies="setfocus killfocus timer menu windowinit(root)">
+	<HorizontalLayout parent="Container" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -155,7 +155,7 @@
 		<Attribute name="sepwidth" default="0" type="INT" comment="分隔符宽,正负表示分隔符在左边还是右边,如(-4)"/>
 		<Attribute name="sepimm" default="false" type="BOOL" comment="拖动分隔符是否立即改变大小,如(false)"/>
 	</HorizontalLayout>
-	<TileLayout notifies="setfocus killfocus timer menu windowinit(root)">
+	<TileLayout parent="Container" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -192,7 +192,7 @@
 		<Attribute name="columns" default="1" type="INT" comment="列数,如(4)"/>
 		<Attribute name="itemsize" default="0,0" type="SIZE" comment="子项固定大小，如(128,128)"/>
 	</TileLayout>
-	<DialogLayout notifies="setfocus killfocus timer menu windowinit(root)">
+	<DialogLayout parent="Container" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -227,7 +227,7 @@
 		<Attribute name="hscrollbar" default="false" type="BOOL" comment="是否使用横向滚动条,如(true)"/>
 		<Attribute name="childpadding" default="0" type="INT" comment="子控件之间的额外距离,如(4)"/>
 	</DialogLayout>
-	<TabLayout notifies="setfocus killfocus timer menu tabselect windowinit(root)">
+	<TabLayout parent="Container" notifies="setfocus killfocus timer menu tabselect windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -263,7 +263,7 @@
 		<Attribute name="childpadding" default="0" type="DWORD" comment="子控件之间的额外距离,如(4)"/>
 		<Attribute name="selectedid" default="0" type="INT" comment="默认选中的页面id,如(0)"/>
 	</TabLayout>
-	<ActiveX notifies="setfocus killfocus timer menu showactivex windowinit(root)">
+	<ActiveX parent="Control" notifies="setfocus killfocus timer menu showactivex windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -297,7 +297,7 @@
 		<Attribute name="modulename" default="" type="STRING" comment="activex从指定位置加载,如(flash/flash.ocx)"/>
 		<Attribute name="delaycreate" default="false" type="BOOL" comment="是否需要延迟创建activex,如(false)"/>
 	</ActiveX>
-	<Combo notifies="setfocus killfocus timer menu dropdown itemselect windowinit(root)">
+	<Combo parent="Container" notifies="setfocus killfocus timer menu dropdown itemselect windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -359,7 +359,7 @@
 		<Attribute name="itemshowhtml" default="false" type="BOOL" comment="item是否使用类html富文本绘制,如(false)"/>
 		<Attribute name="multiexpanding" default="false" type="BOOL" comment="是否支持多个item同时打开,如(false)"/>
 	</Combo>
-	<Label notifies="setfocus killfocus timer menu windowinit(root)">
+	<Label parent="Control" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -396,7 +396,7 @@
 		<Attribute name="textpadding" default="0,0,0,0" type="RECT" comment="文字显示的边距,如(2,2,2,2)"/>
 		<Attribute name="showhtml" default="false" type="BOOL" comment="是否使用类html富文本绘制,如(false)"/>
 	</Label>
-	<Button notifies="setfocus killfocus timer menu click windowinit(root)">
+	<Button parent="Label" notifies="setfocus killfocus timer menu click windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -441,7 +441,7 @@
 		<Attribute name="pushedtextcolor" default="0x00000000" type="DWORD" comment="鼠标按下字体颜色，0表示不使用此颜色,如(0xFFFF0000)"/>
 		<Attribute name="focusedtextcolor" default="0x00000000" type="DWORD" comment="获得焦点字体颜色，0表示不使用此颜色,如(0xFFFF0000)"/>
 	</Button>
-	<Option notifies="setfocus killfocus timer menu click selectchanged windowinit(root)">
+	<Option parent="Button" notifies="setfocus killfocus timer menu click selectchanged windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -491,7 +491,7 @@
 		<Attribute name="group" default="" type="STRING" comment="所属组的名称，可不设"/>
 		<Attribute name="selected" default="false" type="BOOL" comment="是否选中"/>
 	</Option>
-	<Text notifies="setfocus killfocus timer menu link windowinit(root)">
+	<Text parent="Label" notifies="setfocus killfocus timer menu link windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -528,7 +528,7 @@
 		<Attribute name="textpadding" default="2,0,2,0" type="RECT" comment="文字显示的边距,如(2,0,2,0)"/>
 		<Attribute name="showhtml" default="false" type="BOOL" comment="是否使用类html富文本绘制,如(false)"/>
 	</Text>
-	<Progress notifies="setfocus killfocus timer menu windowinit(root)">
+	<Progress parent="Label" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -570,7 +570,7 @@
 		<Attribute name="max" default="100" type="INT" comment="进度最大值，如(100)"/>
 		<Attribute name="value" default="0" type="INT" comment="进度值，如(50)"/>
 	</Progress>
-	<Slider notifies="setfocus killfocus timer menu valuechanged windowinit(root)">
+	<Slider parent="Progress" notifies="setfocus killfocus timer menu valuechanged windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -617,7 +617,7 @@
 		<Attribute name="thumbsize" default="10,10" type="SIZE" comment="拖动滑块大小,如(10,10)"/>
 		<Attribute name="step" default="1" type="INT" comment="进度步长，如(1)"/>
 	</Slider>
-	<Edit notifies="setfocus killfocus timer menu return textchanged windowinit(root)">
+	<Edit parent="Label" notifies="setfocus killfocus timer menu return textchanged windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -662,7 +662,7 @@
 		<Attribute name="disabledimage" default="" type="STRING" comment="禁用状态图片"/>
 		<Attribute name="nativebkcolor" default="0x00000000" type="DWORD" comment="windows原生edit控件的背景颜色,如(0xFFFFFFFF)"/>
 	</Edit>
-	<ScrollBar notifies="timer menu scrolled windowinit(root)">
+	<ScrollBar parent="Control" notifies="timer menu scrolled windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -718,7 +718,7 @@
 		<Attribute name="showbutton1" default="true" type="BOOL" comment="是否显示左或上按钮,如(true)"/>
 		<Attribute name="showbutton2" default="true" type="BOOL" comment="是否显示右或下按钮,如(true)"/>
 	</ScrollBar>
-	<List notifies="setfocus killfocus timer menu itemselect windowinit(root)">
+	<List parent="VerticalLayout" notifies="setfocus killfocus timer menu itemselect windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -778,7 +778,7 @@
 		<Attribute name="itemshowhtml" default="false" type="BOOL" comment="item是否使用类html富文本绘制,如(false)"/>
 		<Attribute name="multiexpanding" default="false" type="BOOL" comment="是否支持多个item同时打开,如(false)"/>
 	</List>
-	<ListHeader notifies="setfocus killfocus timer windowinit(root)">
+	<ListHeader parent="HorizontalLayout" notifies="setfocus killfocus timer windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -815,7 +815,7 @@
 		<Attribute name="sepwidth" default="0" type="INT" comment="分隔符宽,正负表示分隔符在左边还是右边,如(-4)"/>
 		<Attribute name="sepimm" default="false" type="BOOL" comment="拖动分隔符是否立即改变大小,如(false)"/>
 	</ListHeader>
-	<ListHeaderItem notifies="setfocus killfocus timer headerclick windowinit(root)">
+	<ListHeaderItem parent="Control" notifies="setfocus killfocus timer headerclick windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -858,7 +858,7 @@
 		<Attribute name="focusedimage" default="" type="STRING" comment="获得焦点时的状态图片"/>
 		<Attribute name="sepimage" default="" type="STRING" comment="拖动条图片"/>
 	</ListHeaderItem>
-	<ListLabelElement notifies="setfocus killfocus timer itemactivate itemclick windowinit(root)">
+	<ListLabelElement parent="Control" notifies="setfocus killfocus timer itemactivate itemclick windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -889,7 +889,7 @@
 		<Attribute name="stretch" default="" type="STRING" comment="在DialogLayout中的拉伸方式,取值move_x、move_y、move_xy、size_x、size_y、size_xy、group、line和空,如(move_x)"/>
 		<Attribute name="selected" default="false" type="BOOL" comment="是否选中,如(true)"/>
 	</ListLabelElement>
-	<ListTextElement notifies="setfocus killfocus timer itemactivate itemclick link windowinit(root)">
+	<ListTextElement parent="ListLabelElement" notifies="setfocus killfocus timer itemactivate itemclick link windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -920,7 +920,7 @@
 		<Attribute name="stretch" default="" type="STRING" comment="在DialogLayout中的拉伸方式,取值move_x、move_y、move_xy、size_x、size_y、size_xy、group、line和空,如(move_x)"/>
 		<Attribute name="selected" default="false" type="BOOL" comment="是否选中,如(true)"/>
 	</ListTextElement>
-	<ListContainerElement notifies="setfocus killfocus timer itemactivate itemclick itemexpanded itemcollapsed windowinit(root)">
+	<ListContainerElement parent="Container" notifies="setfocus killfocus timer itemactivate itemclick itemexpanded itemcollapsed windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
@@ -956,7 +956,7 @@
 		<Attribute name="childpadding" default="0" type="INT" comment="子控件之间的额外距离,如(4)"/>
 		<Attribute name="selected" default="false" type="BOOL" comment="是否选中,如(true)"/>
 	</ListContainerElement>
-	<RichEdit notifies="setfocus killfocus timer menu return windowinit(root)">
+	<RichEdit parent="Container" notifies="setfocus killfocus timer menu return windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
 		<Attribute name="padding" default="0,0,0,0" type="RECT" comment="外边距,如(2,2,2,2)"/>
