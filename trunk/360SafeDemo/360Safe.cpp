@@ -26,9 +26,7 @@ public:
 		if( msg.sType == _T("windowinit") ) OnPrepare();
 		else if( msg.sType == _T("click") ) {
 			if( msg.pSender == m_pCloseBtn ) {
-				PostQuitMessage(0);
-				return; 
-			}
+				PostMessage(WM_SYSCOMMAND, SC_CLOSE, 0); return; } 
 			else if( msg.pSender == m_pMinBtn ) { 
 				SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, 0); return; }
 			else if( msg.pSender == m_pMaxBtn ) { 
@@ -85,7 +83,7 @@ public:
 
 	LRESULT OnDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
-		::PostQuitMessage(0L);
+ 		::PostQuitMessage(0L);
 
 		bHandled = FALSE;
 		return 0;
@@ -181,12 +179,6 @@ public:
 
 	LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
-		// 有时会在收到WM_NCDESTROY后收到wParam为SC_CLOSE的WM_SYSCOMMAND
-		if( wParam == SC_CLOSE ) {
-			::PostQuitMessage(0L);
-			bHandled = TRUE;
-			return 0;
-		}
 		BOOL bZoomed = ::IsZoomed(*this);
 		LRESULT lRes = CWindowWnd::HandleMessage(uMsg, wParam, lParam);
 		if( ::IsZoomed(*this) != bZoomed ) {
