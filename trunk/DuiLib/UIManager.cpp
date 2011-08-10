@@ -62,6 +62,7 @@ short CPaintManagerUI::m_H = 180;
 short CPaintManagerUI::m_S = 100;
 short CPaintManagerUI::m_L = 100;
 CStdPtrArray CPaintManagerUI::m_aPreMessages;
+CStdPtrArray CPaintManagerUI::m_aPlugins;
 
 
 CPaintManagerUI::CPaintManagerUI() :
@@ -274,6 +275,27 @@ void CPaintManagerUI::ReloadSkin()
         CPaintManagerUI* pManager = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
         pManager->ReloadAllImages();
     }
+}
+
+bool CPaintManagerUI::LoadPlugin(LPCTSTR pstrModuleName)
+{
+    ASSERT( !::IsBadStringPtr(pstrModuleName,-1) || pstrModuleName == NULL );
+    if( pstrModuleName == NULL ) return false;
+    HMODULE hModule = ::LoadLibrary(pstrModuleName);
+    if( hModule != NULL ) {
+        LPCREATECONTROL lpCreateControl = (LPCREATECONTROL)::GetProcAddress(hModule, "CreateControl");
+        if( lpCreateControl != NULL ) {
+            if( m_aPlugins.Find(lpCreateControl) >= 0 ) return true;
+            m_aPlugins.Add(lpCreateControl);
+            return true;
+        }
+    }
+    return false;
+}
+
+CStdPtrArray* CPaintManagerUI::GetPlugins()
+{
+    return &m_aPlugins;
 }
 
 HWND CPaintManagerUI::GetPaintWindow() const

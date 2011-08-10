@@ -241,29 +241,26 @@ void CControlUI::SetPos(RECT rc)
     m_rcItem = rc;
     if( m_pManager == NULL ) return;
 
+    if( !m_bSetPos ) {
+        m_bSetPos = true;
+        if( OnSize ) OnSize(this);
+        m_bSetPos = false;
+    }
+    
     if( m_bFloat ) {
         CControlUI* pParent = GetParent();
         if( pParent != NULL ) {
             RECT rcParentPos = pParent->GetPos();
             if( m_cXY.cx >= 0 ) m_cXY.cx = m_rcItem.left - rcParentPos.left;
             else m_cXY.cx = m_rcItem.right - rcParentPos.right;
-
             if( m_cXY.cy >= 0 ) m_cXY.cy = m_rcItem.top - rcParentPos.top;
             else m_cXY.cy = m_rcItem.bottom - rcParentPos.bottom;
+            m_cxyFixed.cx = m_rcItem.right - m_rcItem.left;
+            m_cxyFixed.cy = m_rcItem.bottom - m_rcItem.top;
         }
     }
 
-    if( !m_bSetPos ) {
-        m_bSetPos = true;
-        if( OnSize ) OnSize(this);
-        m_bSetPos = false;
-    }
-
     m_bUpdateNeeded = false;
-
-    // NOTE: SetPos() is usually called during the WM_PAINT cycle where all controls are
-    //       being laid out. Calling UpdateLayout() again would be wrong. Refreshing the
-    //       window won't hurt (if we're already inside WM_PAINT we'll just validate it out).
     invalidateRc.Join(m_rcItem);
 
     CControlUI* pParent = this;

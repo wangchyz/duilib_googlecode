@@ -322,6 +322,17 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
                 break;
             }
             // User-supplied control factory
+            if( pControl == NULL ) {
+                CStdPtrArray* pPlugins = CPaintManagerUI::GetPlugins();
+                LPCREATECONTROL lpCreateControl = NULL;
+                for( int i = 0; i < pPlugins->GetSize(); ++i ) {
+                    lpCreateControl = (LPCREATECONTROL)pPlugins->GetAt(i);
+                    if( lpCreateControl != NULL ) {
+                        pControl = lpCreateControl(pstrClass);
+                        if( pControl != NULL ) break;
+                    }
+                }
+            }
             if( pControl == NULL && m_pCallback != NULL ) {
                 pControl = m_pCallback->CreateControl(pstrClass);
             }

@@ -156,6 +156,8 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
+typedef CControlUI* (*LPCREATECONTROL)(LPCTSTR pstrType);
+
 
 class UILIB_API CPaintManagerUI
 {
@@ -207,6 +209,8 @@ public:
     static void GetHSL(short* H, short* S, short* L);
     static void SetHSL(bool bUseHSL, short H, short S, short L); // H:0~360, S:0~200, L:0~200 
     static void ReloadSkin();
+    static bool LoadPlugin(LPCTSTR pstrModuleName);
+    static CStdPtrArray* GetPlugins();
 
     bool UseParentResource(CPaintManagerUI* pm);
     CPaintManagerUI* GetParentResource() const;
@@ -386,6 +390,7 @@ private:
     static short m_S;
     static short m_L;
     static CStdPtrArray m_aPreMessages;
+    static CStdPtrArray m_aPlugins;
 };
 
 } // namespace DuiLib
