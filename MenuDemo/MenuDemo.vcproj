@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="QQDemo"
-	ProjectGUID="{5EEA82DD-05C7-477F-8870-942E8758BFFF}"
+	Name="MenuDemo"
+	ProjectGUID="{11A20D10-E0D7-447F-A546-8E4662C115C5}"
 	TargetFrameworkVersion="0"
 	>
 	<Platforms>
@@ -42,7 +42,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/QQDemo.tlb"
+				TypeLibraryName=".\Release/MenuDemo.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -55,7 +55,7 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Release/QQDemo.pch"
+				PrecompiledHeaderFile=".\Release/MenuDemo.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -75,10 +75,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../bin/QQDemo.exe"
+				OutputFile="../bin/MenuDemo.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/QQDemo.pdb"
+				ProgramDatabaseFile=".\Release/MenuDemo.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -94,7 +94,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/QQDemo.bsc"
+				OutputFile=".\Release/MenuDemo.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -134,7 +134,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/QQDemo.tlb"
+				TypeLibraryName=".\Debug/MenuDemo.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -146,7 +146,7 @@
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Debug/QQDemo.pch"
+				PrecompiledHeaderFile=".\Debug/MenuDemo.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
@@ -168,13 +168,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../bin/QQDemo_d.exe"
+				OutputFile="../bin/MenuDemo_d.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/QQDemo.pdb"
+				ProgramDatabaseFile=".\Debug/MenuDemo.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Debug/QQDemo.map"
+				MapFileName=".\Debug/MenuDemo.map"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -190,7 +190,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Debug/QQDemo.bsc"
+				OutputFile=".\Debug/MenuDemo.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -230,7 +230,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/QQDemo.tlb"
+				TypeLibraryName=".\Debug/MenuDemo.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -242,7 +242,7 @@
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Debug_u/QQDemo.pch"
+				PrecompiledHeaderFile=".\Debug_u/MenuDemo.pch"
 				AssemblerListingLocation=".\Debug_u/"
 				ObjectFile=".\Debug_u/"
 				ProgramDataBaseFileName=".\Debug_u/"
@@ -264,13 +264,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../bin/QQDemo_ud.exe"
+				OutputFile="../bin/MenuDemo_ud.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug_u/QQDemo.pdb"
+				ProgramDatabaseFile=".\Debug_u/MenuDemo.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Debug_u/QQDemo.map"
+				MapFileName=".\Debug_u/MenuDemo.map"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -286,7 +286,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Debug/QQDemo.bsc"
+				OutputFile=".\Debug/MenuDemo.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -326,7 +326,7 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/QQDemo.tlb"
+				TypeLibraryName=".\Release/MenuDemo.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -339,7 +339,7 @@
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Release_u/QQDemo.pch"
+				PrecompiledHeaderFile=".\Release_u/MenuDemo.pch"
 				AssemblerListingLocation=".\Release_u/"
 				ObjectFile=".\Release_u/"
 				ProgramDataBaseFileName=".\Release_u/"
@@ -359,10 +359,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../bin/QQDemo_u.exe"
+				OutputFile="../bin/MenuDemo_u.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release_u/QQDemo.pdb"
+				ProgramDatabaseFile=".\Release_u/MenuDemo.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -378,7 +378,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/QQDemo.bsc"
+				OutputFile=".\Release/MenuDemo.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -399,19 +399,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath=".\chat_dialog.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ColorPicker.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\debug.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\main.cpp"
 				>
 			</File>
 			<File
@@ -423,19 +411,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UIFriends.cpp"
+				RelativePath=".\UICrack.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\UIGroups.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UIListCommonDefine.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UIMicroBlog.cpp"
+				RelativePath=".\UIMenu.cpp"
 				>
 			</File>
 			<File
@@ -447,23 +427,11 @@
 			Name="Header Files"
 			>
 			<File
-				RelativePath=".\chat_dialog.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\color_skin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\color_skin.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ColorPicker.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\debug.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\main.cpp"
 				>
 			</File>
 			<File
@@ -475,27 +443,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\skin_change_event.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\StdAfx.h"
 				>
 			</File>
 			<File
-				RelativePath=".\UIFriends.hpp"
+				RelativePath=".\UICrack.h"
 				>
 			</File>
 			<File
-				RelativePath=".\UIGroups.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UIListCommonDefine.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UIMicroBlog.hpp"
+				RelativePath=".\UIMenu.h"
 				>
 			</File>
 			<File
@@ -506,6 +462,22 @@
 		<Filter
 			Name="Resource Files"
 			>
+			<File
+				RelativePath=".\MenuDemo.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\res\menutest.xml"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\res\skin.xml"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
