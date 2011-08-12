@@ -447,33 +447,6 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			m_pOwner->SetFocus();
 		}
     }
-	else if( uMsg == WM_CONTEXTMENU ) {
-		ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
-		ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
-
-		ContextMenuParam param;
-		param.hWnd = GetHWND();
-		param.wParam = 1;
-		s_context_menu_observer.RBroadcast(param);
-		while (pReceiver != NULL)
-		{
-			CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
-			if ((pContextMenu != NULL) && pContextMenu->m_hParent)
-			{
-				ReleaseCapture();
-				::PostMessage(pContextMenu->m_hParent, uMsg, wParam, lParam);
-				break;
-			}
-			pReceiver = iterator.next();
-		}
-	}
-    else if( uMsg == WM_LBUTTONUP ) {
-        POINT pt = { 0 };
-        ::GetCursorPos(&pt);
-        ::ScreenToClient(m_pm.GetPaintWindow(), &pt);
-        CControlUI* pControl = m_pm.FindControl(pt);
-        if( pControl && _tcscmp(pControl->GetClass(), _T("ScrollBarUI")) != 0 ) PostMessage(WM_KILLFOCUS);
-    }
 	else if( uMsg == WM_MOUSEHOVER )
 	{
 		CPoint point(lParam);
@@ -526,7 +499,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}			
 		}
 	}
-	else if( uMsg == WM_LBUTTONDOWN)
+	else if( uMsg == WM_LBUTTONUP )
 	{
 		CPoint point(lParam);
 		ClientToScreen(m_hWnd, &point);
@@ -534,8 +507,8 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CRect rcPos;
 		GetWindowRect(m_hWnd, &rcPos);
 		if( !PtInRect(&rcPos, point) ) {
-			ReleaseCapture();
-
+			BOOL bExpandable = FALSE;
+			BOOL bSameMenuBranch = FALSE;
 			bool bPointInContextMenu = false;
 			ContextMenuParam param;
 			param.hWnd = GetHWND();
@@ -543,6 +516,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
 			ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
 
+			HWND hNextWnd = m_hWnd;
 			while( pReceiver != NULL ) {
 				CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
 				if( pContextMenu != NULL ) {
@@ -551,6 +525,15 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 					if( PtInRect(&rcWindow, point) )
 					{
+						pReceiver = iterator.next();
+						if( (pReceiver != NULL) && dynamic_cast<CMenuWnd*>(pReceiver) )
+							hNextWnd = dynamic_cast<CMenuWnd*>(pReceiver)->GetHWND();
+
+						CPoint point2(lParam);
+						ClientToScreen(m_hWnd, &point2);
+						ScreenToClient(pContextMenu->GetHWND(), &point2);
+						bExpandable = pContextMenu->IsMenuItemExpandable(point2, hNextWnd, bSameMenuBranch);
+
 						param.hWnd = pContextMenu->GetHWND();
 						bPointInContextMenu = true;
 						break;
@@ -560,22 +543,80 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				pReceiver = iterator.next();
 			}
 
-			param.wParam = bPointInContextMenu ? 2 : 1;
-			s_context_menu_observer.RBroadcast(param);
+			if( bSameMenuBranch ) return 0L;
+		}
+	}
+	else if( uMsg == WM_RBUTTONDOWN || uMsg == WM_CONTEXTMENU || uMsg == WM_RBUTTONUP || uMsg == WM_RBUTTONDBLCLK )
+	{
+		return 0L;
+	}
+	else if( uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK )
+	{
+		CPoint point(lParam);
+		ClientToScreen(m_hWnd, &point);
 
-			if( bPointInContextMenu ) {
-				ResetMenuCache();
+		CRect rcPos;
+		GetWindowRect(m_hWnd, &rcPos);
+		if( !PtInRect(&rcPos, point) ) {
+			BOOL bExpandable = FALSE;
+			BOOL bSameMenuBranch = FALSE;
+			bool bPointInContextMenu = false;
+			ContextMenuParam param;
+			param.hWnd = GetHWND();
 
-				SetCapture(param.hWnd);
+			ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
+			ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
 
-				CPoint point(lParam);
-				ClientToScreen(m_hWnd, &point);
-				ScreenToClient(param.hWnd, &point);
+			HWND hNextWnd = m_hWnd;
+			while( pReceiver != NULL ) {
+				CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
+				if( pContextMenu != NULL ) {
+					CRect rcWindow;
+					GetWindowRect(pContextMenu->GetHWND(), &rcWindow);
 
-				::PostMessage(param.hWnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
+					if( PtInRect(&rcWindow, point) )
+					{
+						pReceiver = iterator.next();
+						if( (pReceiver != NULL) && dynamic_cast<CMenuWnd*>(pReceiver) )
+							hNextWnd = dynamic_cast<CMenuWnd*>(pReceiver)->GetHWND();
+
+						CPoint point2(lParam);
+						ClientToScreen(m_hWnd, &point2);
+						ScreenToClient(pContextMenu->GetHWND(), &point2);
+						bExpandable = pContextMenu->IsMenuItemExpandable(point2, hNextWnd, bSameMenuBranch);
+
+						param.hWnd = pContextMenu->GetHWND();
+						bPointInContextMenu = true;
+						break;
+					}
+				}
+
+				pReceiver = iterator.next();
 			}
 
-			return 0;
+			if( !bSameMenuBranch ) {
+				ReleaseCapture();
+
+				param.wParam = bPointInContextMenu ? 2 : 1;
+				s_context_menu_observer.RBroadcast(param);
+
+				if( bPointInContextMenu ) {
+					ResetMenuCache();
+
+					CPoint point(lParam);
+					ClientToScreen(m_hWnd, &point);
+					ScreenToClient(param.hWnd, &point);
+
+					::SendMessage(param.hWnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
+					::SendMessage(param.hWnd, WM_LBUTTONUP, MK_LBUTTON, MAKELPARAM(point.x, point.y));
+					if( bExpandable ) SetCapture(param.hWnd);
+				}
+
+				return 0;
+			}
+
+			if( uMsg == WM_LBUTTONDBLCLK )
+				return 0L;
 		}
 	}
 	else if( uMsg == WM_KEYDOWN)
