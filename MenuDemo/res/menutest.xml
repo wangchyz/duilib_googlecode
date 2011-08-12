@@ -42,7 +42,14 @@
           <MenuElement text="     菜单测试6        " />
           <MenuElement text="     菜单测试7        " />
         </MenuElement>
-        <MenuElement text="     菜单测试8        " />
+        <MenuElement text="     菜单测试8        " >
+          <HorizontalLayout>
+            <Label />
+            <Label width="20"  bkimage="res='122' restype='png' source='0,0,16,16' dest='0,5,15,20'"/>
+          </HorizontalLayout>
+          <MenuElement text="     菜单测试a        " />
+          <MenuElement text="     菜单测试b       " />
+        </MenuElement>
       </MenuElement>
     </MenuElement>
     <MenuElement text="     菜单测试0        ">
@@ -67,7 +74,14 @@
         <MenuElement text="     菜单测试6        " />
         <MenuElement text="     菜单测试7        " />
       </MenuElement>
-      <MenuElement text="     菜单测试8        " />
+      <MenuElement text="     菜单测试8        " >
+        <HorizontalLayout>
+          <Label />
+          <Label width="20"  bkimage="res='122' restype='png' source='0,0,16,16' dest='0,5,15,20'"/>
+        </HorizontalLayout>
+        <MenuElement text="     菜单测试a        " />
+        <MenuElement text="     菜单测试b       " />
+      </MenuElement>
     </MenuElement>
     <MenuElement text="     菜单测试9        " />
     <MenuElement text="     菜单测试10        ">

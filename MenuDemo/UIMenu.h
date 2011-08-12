@@ -80,7 +80,7 @@ public:
 
 	BOOL Receive(ContextMenuParam param);
 
-	BOOL IsMenuItemExpandable(POINT point);
+	BOOL IsMenuItemExpandable(POINT point, HWND, BOOL&);
 
 public:
 	HWND m_hParent;
