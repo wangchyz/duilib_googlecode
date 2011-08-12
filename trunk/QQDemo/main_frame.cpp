@@ -44,7 +44,7 @@ const TCHAR* const kChangeColorSkinControlName = _T("colorskinbtn");
 
 const TCHAR* const kBackgroundControlName = _T("bg");
 
-const int kBackgroundSkinImageCount = 13;
+const int kBackgroundSkinImageCount = 3;
 
 MainFrame::MainFrame()
 : bk_image_index_(0)
