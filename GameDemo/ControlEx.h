@@ -249,7 +249,6 @@ public:
         }
 
         CListUI::Remove(node->data()._pListElement);
-        delete node->data()._pListElement;
         node->parent()->remove_child(node);
         delete node;
     }

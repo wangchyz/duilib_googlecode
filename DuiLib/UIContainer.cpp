@@ -1360,7 +1360,7 @@ LPVOID CTileLayoutUI::GetInterface(LPCTSTR pstrName)
     return CContainerUI::GetInterface(pstrName);
 }
 
-SIZE CTileLayoutUI::GetItemdSize() const
+SIZE CTileLayoutUI::GetItemSize() const
 {
     return m_szItem;
 }

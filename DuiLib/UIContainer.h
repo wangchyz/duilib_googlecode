@@ -187,7 +187,7 @@ public:
 
     void SetPos(RECT rc);
 
-    SIZE GetItemdSize() const;
+    SIZE GetItemSize() const;
     void SetItemSize(SIZE szItem);
     int GetColumns() const;
     void SetColumns(int nCols);
