@@ -41,7 +41,7 @@ bool CFriendsUI::Add(CControlUI* pControl)
 	if (!pControl)
 		return false;
 
-	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) == 0)
+	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) != 0)
 		return false;
 
 	return CListUI::Add(pControl);
@@ -52,7 +52,7 @@ bool CFriendsUI::AddAt(CControlUI* pControl, int iIndex)
 	if (!pControl)
 		return false;
 
-	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) == 0)
+	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) != 0)
 		return false;
 
 	return CListUI::AddAt(pControl, iIndex);
@@ -63,10 +63,13 @@ bool CFriendsUI::Remove(CControlUI* pControl)
 	if (!pControl)
 		return false;
 
-	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) == 0)
+	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) != 0)
 		return false;
 
-	return CListUI::Remove(pControl);
+	if (reinterpret_cast<Node*>(static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement")))->GetTag()) == NULL)
+		return CListUI::Remove(pControl);
+	else
+		return RemoveNode(reinterpret_cast<Node*>(static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement")))->GetTag()));
 }
 
 bool CFriendsUI::RemoveAt(int iIndex)
@@ -75,15 +78,23 @@ bool CFriendsUI::RemoveAt(int iIndex)
 	if (!pControl)
 		return false;
 
-	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) == 0)
+	if (_tcsicmp(pControl->GetClass(), _T("ListContainerElementUI")) != 0)
 		return false;
 
-	return CListUI::RemoveAt(iIndex);
+	if (reinterpret_cast<Node*>(static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement")))->GetTag()) == NULL)
+		return CListUI::RemoveAt(iIndex);
+	else
+		return RemoveNode(reinterpret_cast<Node*>(static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement")))->GetTag()));
 }
 
 void CFriendsUI::RemoveAll()
 {
 	CListUI::RemoveAll();
+	for (int i = 0; i < root_node_->num_children(); ++i)
+	{
+		Node* child = root_node_->child(i);
+		RemoveNode(child);
+	}
 	delete root_node_;
 
 	root_node_ = new Node;
@@ -330,9 +341,9 @@ Node* CFriendsUI::AddNode(const FriendListItemInfo& item, Node* parent)
 	return node;
 }
 
-void CFriendsUI::RemoveNode(Node* node)
+bool CFriendsUI::RemoveNode(Node* node)
 {
-	if (!node || node == root_node_) return;
+	if (!node || node == root_node_) return false;
 
 	for (int i = 0; i < node->num_children(); ++i)
 	{
@@ -341,9 +352,10 @@ void CFriendsUI::RemoveNode(Node* node)
 	}
 
 	CListUI::Remove(node->data().list_elment_);
-	delete node->data().list_elment_;
 	node->parent()->remove_child(node);
 	delete node;
+
+	return true;
 }
 
 void CFriendsUI::SetChildVisible(Node* node, bool visible)
