@@ -40,7 +40,7 @@ public:
 
 	Node* AddNode(const GroupsListItemInfo& item, Node* parent = NULL);
 
-	void RemoveNode(Node* node);
+	bool RemoveNode(Node* node);
 
 	void SetChildVisible(Node* node, bool visible);
 

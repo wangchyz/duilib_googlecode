@@ -41,7 +41,7 @@ public:
 
 	Node* AddNode(const FriendListItemInfo& item, Node* parent = NULL);
 
-	void RemoveNode(Node* node);
+	bool RemoveNode(Node* node);
 
 	void SetChildVisible(Node* node, bool visible);
 

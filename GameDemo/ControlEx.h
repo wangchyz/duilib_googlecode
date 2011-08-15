@@ -88,35 +88,48 @@ public:
     bool Add(CControlUI* pControl)
     {
         if( !pControl ) return false;
-        if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) == 0 ) return false;
+        if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) != 0 ) return false;
         return CListUI::Add(pControl);
     }
 
     bool AddAt(CControlUI* pControl, int iIndex)
     {
         if( !pControl ) return false;
-        if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) == 0 ) return false;
+        if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) != 0 ) return false;
         return CListUI::AddAt(pControl, iIndex);
     }
 
     bool Remove(CControlUI* pControl)
     {
         if( !pControl ) return false;
-        if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) == 0 ) return false;
-        return CListUI::Remove(pControl);
+        if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) != 0 ) return false;
+
+		if (reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(_T("ListLabelElement")))->GetTag()) == NULL)
+			return CListUI::Remove(pControl);
+		else
+			return RemoveNode(reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(_T("ListLabelElement")))->GetTag()));
     }
 
     bool RemoveAt(int iIndex)
     {
         CControlUI* pControl = GetItemAt(iIndex);
-        if( !pControl ) return false;
-        if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) == 0 ) return false;
-        return CListUI::RemoveAt(iIndex);
-    }
+		if( !pControl ) return false;
+		if( _tcscmp(pControl->GetClass(), _T("ListLabelElementUI")) != 0 ) return false;
+
+		if (reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(_T("ListLabelElement")))->GetTag()) == NULL)
+			return CListUI::RemoveAt(iIndex);
+		else
+			return RemoveNode(reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(_T("ListLabelElement")))->GetTag()));
+	}
 
     void RemoveAll()
     {
-        CListUI::RemoveAll();
+		CListUI::RemoveAll();
+		for (int i = 0; i < _root->num_children(); ++i)
+		{
+			Node* child = _root->child(i);
+			RemoveNode(child);
+		}
         delete _root;
         _root = new Node;
         _root->data()._level = -1;
@@ -238,9 +251,9 @@ public:
         return node;
     }
 
-    void RemoveNode(Node* node)
+    bool RemoveNode(Node* node)
     {
-        if( !node || node == _root ) return;
+        if( !node || node == _root ) return false;
 
         for( int i = 0; i < node->num_children(); ++i )
         {
@@ -251,6 +264,8 @@ public:
         CListUI::Remove(node->data()._pListElement);
         node->parent()->remove_child(node);
         delete node;
+
+		return true;
     }
 
     void SetChildVisible(Node* node, bool visible)
