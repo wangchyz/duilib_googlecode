@@ -233,6 +233,19 @@ void CPaintManagerUI::SetResourcePath(LPCTSTR pStrPath)
     if( cEnd != _T('\\') && cEnd != _T('/') ) m_pStrResourcePath += _T('\\');
 }
 
+void CPaintManagerUI::SetResourceZip(LPVOID pVoid, unsigned int len)
+{
+    if( m_pStrResourceZip == _T("membuffer") ) return;
+    if( m_bCachedResourceZip && m_hResourceZip != NULL ) {
+        CloseZip((HZIP)m_hResourceZip);
+        m_hResourceZip = NULL;
+    }
+    m_pStrResourceZip = _T("membuffer");
+    m_bCachedResourceZip = true;
+    if( m_bCachedResourceZip ) 
+        m_hResourceZip = (HANDLE)OpenZip(pVoid, len, 3);
+}
+
 void CPaintManagerUI::SetResourceZip(LPCTSTR pStrPath, bool bCachedResourceZip)
 {
     if( m_pStrResourceZip == pStrPath && m_bCachedResourceZip == bCachedResourceZip ) return;
@@ -1206,6 +1219,14 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
         }
     }
     return false;
+}
+
+void CPaintManagerUI::Term()
+{
+    if( m_bCachedResourceZip && m_hResourceZip != NULL ) {
+        CloseZip((HZIP)m_hResourceZip);
+        m_hResourceZip = NULL;
+    }
 }
 
 CControlUI* CPaintManagerUI::GetFocus() const

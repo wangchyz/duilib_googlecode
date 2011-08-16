@@ -205,6 +205,7 @@ public:
     static void SetCurrentPath(LPCTSTR pStrPath);
     static void SetResourceDll(HINSTANCE hInst);
     static void SetResourcePath(LPCTSTR pStrPath);
+	static void SetResourceZip(LPVOID pVoid, unsigned int len);
     static void SetResourceZip(LPCTSTR pstrZip, bool bCachedResourceZip = false);
     static void GetHSL(short* H, short* S, short* L);
     static void SetHSL(bool bUseHSL, short H, short S, short L); // H:0~360, S:0~200, L:0~200 
@@ -309,6 +310,7 @@ public:
 
     static void MessageLoop();
     static bool TranslateMessage(const LPMSG pMsg);
+	static void Term();
 
     bool MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRes);
     bool PreMessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRes);
