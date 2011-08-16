@@ -442,6 +442,10 @@
 				RelativePath=".\win_impl_base.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\DuiLib\XUnzip.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -506,6 +510,14 @@
 		<Filter
 			Name="Resource Files"
 			>
+			<File
+				RelativePath=".\QQDemo.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\resource.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

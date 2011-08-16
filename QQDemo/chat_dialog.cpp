@@ -41,8 +41,6 @@ const TCHAR* const kSendButtonControlName = _T("sendbtn");
 const int kEmotionRefreshTimerId = 1001;
 const int kEmotionRefreshInterval = 150;
 
-CDialogBuilder ChatDialog::m_dlgBuilder;
-
 ChatDialog::ChatDialog(const tString& bgimage, DWORD bkcolor, const FriendListItemInfo& myselft_info, const FriendListItemInfo& friend_info)
 : bgimage_(bgimage)
 , bkcolor_(bkcolor)
@@ -154,45 +152,6 @@ LRESULT ChatDialog::OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 #endif
 
 	return 0;
-}
-
-LRESULT ChatDialog::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-{
-    LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
-    styleValue &= ~WS_CAPTION;
-    ::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-    RECT rcClient;
-    ::GetClientRect(*this, &rcClient);
-    ::SetWindowPos(*this, NULL, rcClient.left, rcClient.top, rcClient.right - rcClient.left, \
-        rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
-
-    paint_manager_.Init(m_hWnd);
-    paint_manager_.AddPreMessageFilter(this);
-
-    CDialogBuilder builder;
-
-    paint_manager_.SetResourcePath(GetSkinFolder().c_str());
-
-#if USE(ZIP_SKIN)
-    paint_manager_.SetResourceZip(kResourceSkinZipFileName, true);
-    tString tstrSkin = GetSkinFile();
-#else
-    tString tstrSkin = paint_manager_.GetResourcePath();
-    tstrSkin += GetSkinFile();
-#endif
-
-    CControlUI* pRoot = NULL;
-    if( !m_dlgBuilder.GetMarkup()->IsValid() ) {
-        pRoot = m_dlgBuilder.Create(tstrSkin.c_str(), (UINT)0, this, &paint_manager_);
-    }
-    else {
-        pRoot = m_dlgBuilder.Create((UINT)0, &paint_manager_);
-    }
-    paint_manager_.AttachDialog(pRoot);
-    paint_manager_.AddNotifier(this);
-
-    Init();
-    return 0;
 }
 
 LRESULT ChatDialog::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)

@@ -65,12 +65,11 @@ typedef std::basic_string<TCHAR> tString;
 #   endif
 #endif
 
-#pragma comment(lib, "gdiplus.lib")
-
 #define USE(FEATURE) (defined USE_##FEATURE  && USE_##FEATURE)
 #define ENABLE(FEATURE) (defined ENABLE_##FEATURE  && ENABLE_##FEATURE)
 
 #define USE_ZIP_SKIN 1
+#define USE_EMBEDED_RESOURCE 1
 
 #define MESSAGE_RICHEDIT_MAX  1024
 
