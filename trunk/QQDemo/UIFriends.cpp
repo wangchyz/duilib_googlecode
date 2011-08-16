@@ -431,7 +431,7 @@ bool CFriendsUI::CanExpand(Node* node) const
 	return node->data().has_child_;
 }
 
-bool CFriendsUI::SelectItem(int iIndex)
+bool CFriendsUI::SelectItem(int iIndex, bool bTakeFocus)
 {
     if( iIndex == m_iCurSel ) return true;
 
@@ -463,7 +463,7 @@ bool CFriendsUI::SelectItem(int iIndex)
     if( iIndex < 0 )
 		return false;
 
-	if (!__super::SelectItem(iIndex))
+	if (!__super::SelectItem(iIndex, bTakeFocus))
 		return false;
 
 

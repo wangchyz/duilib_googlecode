@@ -32,8 +32,6 @@ public:
 
 	virtual LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
-    virtual LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-
 	virtual LRESULT OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 	virtual LRESULT OnSetFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -70,8 +68,6 @@ private:
 	DWORD bkcolor_;
 	FriendListItemInfo myselft_;
 	FriendListItemInfo friend_;
-
-    static CDialogBuilder m_dlgBuilder;
 };
 
 #endif // CHARTDIALOG_HPP

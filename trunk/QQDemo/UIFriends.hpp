@@ -47,7 +47,7 @@ public:
 
 	bool CanExpand(Node* node) const;
 
-	bool SelectItem(int iIndex);
+	bool SelectItem(int iIndex, bool bTakeFocus = false);
 
 private:
 	Node*	root_node_;

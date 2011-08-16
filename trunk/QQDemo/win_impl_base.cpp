@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "win_impl_base.hpp"
+#include "resource.h"
 
 #if !defined(UNDER_CE) && defined(_DEBUG)
 #define new   new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -8,6 +9,8 @@
 #if USE(ZIP_SKIN)
 static const TCHAR* const kResourceSkinZipFileName = _T("QQRes.zip");
 #endif
+
+LPBYTE WindowImplBase::resource_zip_buffer_ = NULL;
 
 WindowImplBase::WindowImplBase()
 {}
@@ -223,12 +226,43 @@ LRESULT WindowImplBase::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	paint_manager_.SetResourcePath(GetSkinFolder().c_str());
 
 #if USE(ZIP_SKIN)
-	paint_manager_.SetResourceZip(kResourceSkinZipFileName, true);
 	tString tstrSkin = GetSkinFile();
+	if (paint_manager_.GetResourceZip().IsEmpty())
+	{
+#if USE(EMBEDED_RESOURCE)
+		HRSRC hResource = ::FindResource(paint_manager_.GetResourceDll(), MAKEINTRESOURCE(IDR_ZIPRES), _T("ZIPRES"));
+		if( hResource == NULL )
+			return 0L;
+		DWORD dwSize = 0;
+		HGLOBAL hGlobal = ::LoadResource(paint_manager_.GetResourceDll(), hResource);
+		if( hGlobal == NULL ) {
+#if defined(WIN32) && !defined(UNDER_CE)
+			FreeResource(hResource);
+#endif
+			return 0L;
+		}
+		dwSize = ::SizeofResource(paint_manager_.GetResourceDll(), hResource);
+		if( dwSize == 0 )
+			return 0L;
+		resource_zip_buffer_ = new BYTE[ dwSize ];
+		if (resource_zip_buffer_ != NULL)
+		{
+			::CopyMemory(resource_zip_buffer_, (LPBYTE)::LockResource(hGlobal), dwSize);
+		}
+#if defined(WIN32) && !defined(UNDER_CE)
+		::FreeResource(hResource);
+#endif
+		paint_manager_.SetResourceZip(resource_zip_buffer_, dwSize);
+#else
+		paint_manager_.SetResourceZip(kResourceSkinZipFileName, true);
+#endif
+	}
+
 #else
 	tString tstrSkin = paint_manager_.GetResourcePath();
 	tstrSkin += GetSkinFile();
 #endif
+
 	CControlUI* pRoot = builder.Create(tstrSkin.c_str(), (UINT)0, this, &paint_manager_);
 	paint_manager_.AttachDialog(pRoot);
 	paint_manager_.AddNotifier(this);
@@ -308,4 +342,13 @@ LRESULT WindowImplBase::ResponseDefaultKeyEvent(WPARAM wParam)
 	}
 
 	return FALSE;
+}
+
+void WindowImplBase::Cleanup()
+{
+	if (resource_zip_buffer_ != NULL)
+	{
+		delete[] resource_zip_buffer_;
+		resource_zip_buffer_ = NULL;
+	}
 }

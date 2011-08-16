@@ -58,8 +58,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	::ShowWindow(*pFrame, SW_SHOW);
 
 	CPaintManagerUI::MessageLoop();
+	CPaintManagerUI::Term();
 
 	_Module.Term();
+
+	WindowImplBase::Cleanup();
 
 	::OleUninitialize();
 	::CoUninitialize();
