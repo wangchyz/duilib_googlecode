@@ -134,19 +134,6 @@ class CMenuBuilderCallback: public IDialogBuilderCallback
 	}
 };
 
-static bool bReachBottom = false;
-static bool bReachRight = false;
-static LONG chRightAlgin = 0;
-static LONG chBottomAlgin = 0;
-
-void ResetMenuCache()
-{
-	bReachBottom = false;
-	bReachRight = false;
-	chRightAlgin = 0;
-	chBottomAlgin = 0;
-}
-
 CMenuWnd::CMenuWnd(HWND hParent):
 m_hParent(hParent),
 m_pOwner(NULL),
@@ -193,6 +180,8 @@ void CMenuWnd::Init(CMenuElementUI* pOwner, STRINGorID xml, LPCTSTR pSkinType, P
 
 	m_xml = xml;
 
+	s_context_menu_observer.AddReceiver(this);
+
 	Create((m_pOwner == NULL) ? m_hParent : m_pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST, CRect());
     // HACK: Don't deselect the parent's caption
     HWND hWndParent = m_hWnd;
@@ -200,12 +189,7 @@ void CMenuWnd::Init(CMenuElementUI* pOwner, STRINGorID xml, LPCTSTR pSkinType, P
     ::ShowWindow(m_hWnd, SW_SHOW);
 #if defined(WIN32) && !defined(UNDER_CE)
     ::SendMessage(hWndParent, WM_NCACTIVATE, TRUE, 0L);
-#endif
-
-	s_context_menu_observer.AddReceiver(this);
-
-	m_pm.ReleaseCapture();
-	SetCapture(m_hWnd);
+#endif	
 }
 
 LPCTSTR CMenuWnd::GetWindowClassName() const
@@ -229,42 +213,6 @@ void CMenuWnd::OnFinalMessage(HWND hWnd)
 		m_pOwner->Invalidate();
 	}
     delete this;
-}
-
-BOOL CMenuWnd::IsMenuItemExpandable(POINT point, HWND hWnd, BOOL& bSameMenuBranch)
-{
-	bSameMenuBranch = FALSE;
-	CControlUI* pControl = m_pm.GetRoot();
-	if( pControl == NULL ) return FALSE;
-
-	if( pControl->GetInterface(kMenuUIInterfaceName) == NULL ) return FALSE;
-
-	CMenuUI* pMenuList = static_cast<CMenuUI*>(pControl->GetInterface(kMenuUIInterfaceName));
-
-	CMenuElementUI* pMenuItem = NULL;
-	if( pMenuList != NULL )
-	{
-		for( int i = 0; i < pMenuList->GetCount(); ++i )
-		{
-			if( PtInRect(&pMenuList->GetItemAt(i)->GetPos(), point) )
-			{
-				pMenuItem = static_cast<CMenuElementUI*>(pMenuList->GetItemAt(i)->GetInterface(kMenuElementUIInterfaceName));
-				break;
-			}
-		}
-	}
-
-	if( pMenuItem == NULL ) return FALSE;
-	for( int i = 0; i < pMenuItem->GetCount(); ++i ) {
-		if(pMenuItem->GetItemAt(i)->GetInterface(kMenuElementUIInterfaceName) != NULL) 
-		{
-			if (pMenuItem->GetMenuWnd() != NULL)
-				bSameMenuBranch = (hWnd == pMenuItem->GetMenuWnd()->GetHWND());
-			return (pMenuItem->GetMenuWnd() != NULL) ? FALSE : TRUE;
-		}
-	}
-
-	return FALSE;
 }
 
 LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -334,7 +282,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			cyFixed += 4;
 			cxFixed += 4;
 
-			CRect rcWindow;
+			RECT rcWindow;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWindow);
 
 			rc.top = rcOwner.top;
@@ -344,48 +292,70 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			rc.right = rc.left + cxFixed;
 			rc.right += 2;
 
+			bool bReachBottom = false;
+			bool bReachRight = false;
+			LONG chRightAlgin = 0;
+			LONG chBottomAlgin = 0;
+
+			RECT rcPreWindow = {0};
+			ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
+			ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
+			while( pReceiver != NULL ) {
+				CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
+				if( pContextMenu != NULL ) {
+					GetWindowRect(pContextMenu->GetHWND(), &rcPreWindow);
+
+					bReachRight = rcPreWindow.left >= rcWindow.right;
+					bReachBottom = rcPreWindow.top >= rcWindow.bottom;
+					if( pContextMenu->GetHWND() == m_pOwner->GetManager()->GetPaintWindow() 
+						||  bReachBottom || bReachRight )
+						break;
+				}
+				pReceiver = iterator.next();
+			}
+
 			if (bReachBottom)
 			{
-				rc.bottom = chBottomAlgin;
+				rc.bottom = rcWindow.top;
 				rc.top = rc.bottom - cyFixed;
-
-				chBottomAlgin = rc.top;
-			}
-			else if( rc.bottom > rcWork.bottom )
-			{
-				bReachBottom = true;
-				rc.bottom = rc.top;
-				rc.top = rc.bottom - cyFixed;
-
-				chBottomAlgin = rc.top;
 			}
 
 			if (bReachRight)
 			{
-				rc.right = chRightAlgin;
+				rc.right = rcWindow.left;
 				rc.left = rc.right - cxFixed;
-
-				chRightAlgin = rc.left;
 			}
-			else if (rc.right > rcWork.right)
-			{
-				bReachRight = true;
 
+			if( rc.bottom > rcWork.bottom )
+			{
+				rc.bottom = rc.top;
+				rc.top = rc.bottom - cyFixed;
+			}
+
+			if (rc.right > rcWork.right)
+			{
 				rc.right = rcWindow.left;
 				rc.left = rc.right - cxFixed;
 
 				rc.top = rcWindow.bottom;
 				rc.bottom = rc.top + cyFixed;
-
-				chRightAlgin = rc.left;
 			}
 
+			if( rc.top < rcWork.top )
+			{
+				rc.top = rcOwner.top;
+				rc.bottom = rc.top + cyFixed;
+			}
+
+			if (rc.left < rcWork.left)
+			{
+				rc.left = rcWindow.right;
+				rc.right = rc.left + cxFixed;
+			}
 
 			MoveWindow(m_hWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, FALSE);
 		}
 		else {
-			ResetMenuCache();
-
 			m_pm.Init(m_hWnd);
 
 			CDialogBuilder builder;
@@ -446,177 +416,35 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			m_pOwner->SetPos(m_pOwner->GetPos());
 			m_pOwner->SetFocus();
 		}
-    }
-	else if( uMsg == WM_MOUSEHOVER )
-	{
-		CPoint point(lParam);
-		ClientToScreen(m_hWnd, &point);
-
-		CRect rcPos;
-		GetWindowRect(m_hWnd, &rcPos);
-		if( !PtInRect(&rcPos, point) ) {
-			ContextMenuParam param;
-			param.hWnd = GetHWND();
-
-			ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
-			ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
-
-			HWND hNextWnd = m_hWnd;
-			while (pReceiver != NULL) {
-				CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
-				if (pContextMenu != NULL) {
-					CRect rcWindow;
-					GetWindowRect(pContextMenu->GetHWND(), &rcWindow);
-
-					CPoint point2(lParam);
-					ClientToScreen(m_hWnd, &point2);
-					ScreenToClient(pContextMenu->GetHWND(), &point2);
-					if( PtInRect(&rcWindow, point) ) {
-						BOOL bSameMenuBranch = FALSE;
-						pReceiver = iterator.next();
-						if( (pReceiver != NULL) && dynamic_cast<CMenuWnd*>(pReceiver) )
-							hNextWnd = dynamic_cast<CMenuWnd*>(pReceiver)->GetHWND();
-						
-						BOOL bExpandable = pContextMenu->IsMenuItemExpandable(point2, hNextWnd, bSameMenuBranch);
-
-						if( bSameMenuBranch )
-							break;
-						ReleaseCapture();
-						ResetMenuCache();
-						param.hWnd = pContextMenu->GetHWND();
-						param.wParam = 2;
-						s_context_menu_observer.RBroadcast(param);
-						SetCapture(param.hWnd);
-
-						if( bExpandable )
-							::PostMessage(param.hWnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point2.x, point2.y));
-
-						return 0;
-					}					
-				}
-
-				pReceiver = iterator.next();
-			}			
-		}
-	}
-	else if( uMsg == WM_LBUTTONUP )
-	{
-		CPoint point(lParam);
-		ClientToScreen(m_hWnd, &point);
-
-		CRect rcPos;
-		GetWindowRect(m_hWnd, &rcPos);
-		if( !PtInRect(&rcPos, point) ) {
-			BOOL bExpandable = FALSE;
-			BOOL bSameMenuBranch = FALSE;
-			bool bPointInContextMenu = false;
-			ContextMenuParam param;
-			param.hWnd = GetHWND();
-
-			ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
-			ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
-
-			HWND hNextWnd = m_hWnd;
-			while( pReceiver != NULL ) {
-				CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
-				if( pContextMenu != NULL ) {
-					CRect rcWindow;
-					GetWindowRect(pContextMenu->GetHWND(), &rcWindow);
-
-					if( PtInRect(&rcWindow, point) )
-					{
-						pReceiver = iterator.next();
-						if( (pReceiver != NULL) && dynamic_cast<CMenuWnd*>(pReceiver) )
-							hNextWnd = dynamic_cast<CMenuWnd*>(pReceiver)->GetHWND();
-
-						CPoint point2(lParam);
-						ClientToScreen(m_hWnd, &point2);
-						ScreenToClient(pContextMenu->GetHWND(), &point2);
-						bExpandable = pContextMenu->IsMenuItemExpandable(point2, hNextWnd, bSameMenuBranch);
-
-						param.hWnd = pContextMenu->GetHWND();
-						bPointInContextMenu = true;
-						break;
-					}
-				}
-
-				pReceiver = iterator.next();
-			}
-
-			if( bSameMenuBranch ) return 0L;
-		}
 	}
 	else if( uMsg == WM_RBUTTONDOWN || uMsg == WM_CONTEXTMENU || uMsg == WM_RBUTTONUP || uMsg == WM_RBUTTONDBLCLK )
 	{
 		return 0L;
 	}
-	else if( uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK )
+	else if( uMsg == WM_KILLFOCUS )
 	{
-		CPoint point(lParam);
-		ClientToScreen(m_hWnd, &point);
+		HWND hFocusWnd = (HWND)wParam;
 
-		CRect rcPos;
-		GetWindowRect(m_hWnd, &rcPos);
-		if( !PtInRect(&rcPos, point) ) {
-			BOOL bExpandable = FALSE;
-			BOOL bSameMenuBranch = FALSE;
-			bool bPointInContextMenu = false;
-			ContextMenuParam param;
-			param.hWnd = GetHWND();
+		BOOL bInMenuWindowList = FALSE;
+		ContextMenuParam param;
+		param.hWnd = GetHWND();
 
-			ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
-			ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
-
-			HWND hNextWnd = m_hWnd;
-			while( pReceiver != NULL ) {
-				CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
-				if( pContextMenu != NULL ) {
-					CRect rcWindow;
-					GetWindowRect(pContextMenu->GetHWND(), &rcWindow);
-
-					if( PtInRect(&rcWindow, point) )
-					{
-						pReceiver = iterator.next();
-						if( (pReceiver != NULL) && dynamic_cast<CMenuWnd*>(pReceiver) )
-							hNextWnd = dynamic_cast<CMenuWnd*>(pReceiver)->GetHWND();
-
-						CPoint point2(lParam);
-						ClientToScreen(m_hWnd, &point2);
-						ScreenToClient(pContextMenu->GetHWND(), &point2);
-						bExpandable = pContextMenu->IsMenuItemExpandable(point2, hNextWnd, bSameMenuBranch);
-
-						param.hWnd = pContextMenu->GetHWND();
-						bPointInContextMenu = true;
-						break;
-					}
-				}
-
-				pReceiver = iterator.next();
+		ContextMenuObserver::Iterator<BOOL, ContextMenuParam> iterator(s_context_menu_observer);
+		ReceiverImplBase<BOOL, ContextMenuParam>* pReceiver = iterator.next();
+		while( pReceiver != NULL ) {
+			CMenuWnd* pContextMenu = dynamic_cast<CMenuWnd*>(pReceiver);
+			if( pContextMenu != NULL && pContextMenu->GetHWND() ==  hFocusWnd ) {
+				bInMenuWindowList = TRUE;
+				break;
 			}
+			pReceiver = iterator.next();
+		}
 
-			if( !bSameMenuBranch ) {
-				ReleaseCapture();
+		if( !bInMenuWindowList ) {
+			param.wParam = 1;
+			s_context_menu_observer.RBroadcast(param);
 
-				param.wParam = bPointInContextMenu ? 2 : 1;
-				s_context_menu_observer.RBroadcast(param);
-
-				if( bPointInContextMenu ) {
-					ResetMenuCache();
-
-					CPoint point(lParam);
-					ClientToScreen(m_hWnd, &point);
-					ScreenToClient(param.hWnd, &point);
-
-					::SendMessage(param.hWnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
-					::SendMessage(param.hWnd, WM_LBUTTONUP, MK_LBUTTON, MAKELPARAM(point.x, point.y));
-					if( bExpandable ) SetCapture(param.hWnd);
-				}
-
-				return 0;
-			}
-
-			if( uMsg == WM_LBUTTONDBLCLK )
-				return 0L;
+			return 0;
 		}
 	}
 	else if( uMsg == WM_KEYDOWN)
@@ -624,7 +452,6 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if( wParam == VK_ESCAPE)
 		{
 			Close();
-			SetCapture(GetParent(m_hWnd));
 		}
 	}
 
@@ -669,9 +496,7 @@ void CMenuElementUI::DoPaint(HDC hDC, const RECT& rcPaint)
 	for (int i = 0; i < GetCount(); ++i)
 	{
 		if (GetItemAt(i)->GetInterface(kMenuElementUIInterfaceName) == NULL)
-		{
 			GetItemAt(i)->DoPaint(hDC, rcPaint);
-		}
 	}
 }
 
@@ -768,20 +593,13 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 		}
 		if( hasSubMenu )
 		{
-			m_pWindow = new CMenuWnd(m_pManager->GetPaintWindow());
-			ASSERT(m_pWindow);
-
-			ContextMenuParam param;
-			param.hWnd = m_pManager->GetPaintWindow();
-			param.wParam = 2;
-			s_context_menu_observer.RBroadcast(param);
-
-			m_pWindow->Init(static_cast<CMenuElementUI*>(this), _T(""), _T(""), CPoint());
+			m_pOwner->SelectItem(GetIndex(), true);
+			CreateMenuWnd();
 		}
 		return;
 	}
 
-	if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_RBUTTONDOWN )
+	if( event.Type == UIEVENT_BUTTONDOWN )
 	{
 		if( IsEnabled() ){
 			CListContainerElementUI::DoEvent(event);
@@ -799,15 +617,7 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 			}
 			if( hasSubMenu )
 			{
-				m_pWindow = new CMenuWnd(m_pManager->GetPaintWindow());
-				ASSERT(m_pWindow);
-
-				ContextMenuParam param;
-				param.hWnd = m_pManager->GetPaintWindow();
-				param.wParam = 2;
-				s_context_menu_observer.RBroadcast(param);
-
-				m_pWindow->Init(static_cast<CMenuElementUI*>(this), _T(""), _T(""), CPoint());
+				CreateMenuWnd();
 			}
 			else
 			{
@@ -841,15 +651,7 @@ bool CMenuElementUI::Activate()
 		}
 		if (hasSubMenu)
 		{
-			m_pWindow = new CMenuWnd(m_pManager->GetPaintWindow());
-			ASSERT(m_pWindow);
-
-			ContextMenuParam param;
-			param.hWnd = m_pManager->GetPaintWindow();
-			param.wParam = 2;
-			s_context_menu_observer.RBroadcast(param);
-
-			m_pWindow->Init(static_cast<CMenuElementUI*>(this), _T(""), _T(""), CPoint());
+			CreateMenuWnd();
 		}
 		else
 		{
@@ -867,6 +669,21 @@ bool CMenuElementUI::Activate()
 CMenuWnd* CMenuElementUI::GetMenuWnd()
 {
 	return m_pWindow;
+}
+
+void CMenuElementUI::CreateMenuWnd()
+{
+	if( m_pWindow ) return;
+
+	m_pWindow = new CMenuWnd(m_pManager->GetPaintWindow());
+	ASSERT(m_pWindow);
+
+	ContextMenuParam param;
+	param.hWnd = m_pManager->GetPaintWindow();
+	param.wParam = 2;
+	s_context_menu_observer.RBroadcast(param);
+
+	m_pWindow->Init(static_cast<CMenuElementUI*>(this), _T(""), _T(""), CPoint());
 }
 
 } // namespace DuiLib

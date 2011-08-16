@@ -80,8 +80,6 @@ public:
 
 	BOOL Receive(ContextMenuParam param);
 
-	BOOL IsMenuItemExpandable(POINT point, HWND, BOOL&);
-
 public:
 	HWND m_hParent;
 	POINT m_BasedPoint;
@@ -114,6 +112,8 @@ public:
 	void DoEvent(TEventUI& event);
 
 	CMenuWnd* GetMenuWnd();
+
+	void CreateMenuWnd();
 
 protected:
 	CMenuWnd* m_pWindow;
