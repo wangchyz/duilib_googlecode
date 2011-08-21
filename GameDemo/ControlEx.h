@@ -17,7 +17,7 @@ public:
     struct NodeData
     {
         int _level;
-        bool _child_visible;
+        bool _expand;
         CStdString _text;
         CListLabelElementUI* _pListElement;
     };
@@ -79,7 +79,7 @@ public:
 
         _root = new Node;
         _root->data()._level = -1;
-        _root->data()._child_visible = true;
+        _root->data()._expand = true;
         _root->data()._pListElement = NULL;
     }
 
@@ -133,8 +133,18 @@ public:
         delete _root;
         _root = new Node;
         _root->data()._level = -1;
-        _root->data()._child_visible = true;
+        _root->data()._expand = true;
         _root->data()._pListElement = NULL;
+    }
+    void SetVisible(bool bVisible = true)
+    {
+        if( m_bVisible == bVisible ) return;
+        CControlUI::SetVisible(bVisible);
+    }
+
+    void SetInternVisible(bool bVisible = true)
+    {
+        CControlUI::SetInternVisible(bVisible);
     }
 
     void DoEvent(TEventUI& event) 
@@ -145,8 +155,7 @@ public:
             return;
         }
 
-        if( event.Type == UIEVENT_TIMER && event.wParam == SCROLL_TIMERID )
-        {
+        if( event.Type == UIEVENT_TIMER && event.wParam == SCROLL_TIMERID ) {
             if( m_dwDelayLeft > 0 ) {
                 --m_dwDelayLeft;
                 SIZE sz = GetScrollPos();
@@ -163,8 +172,7 @@ public:
             m_pManager->KillTimer(this, SCROLL_TIMERID);
             return;
         }
-        if( event.Type == UIEVENT_SCROLLWHEEL )
-        {
+        if( event.Type == UIEVENT_SCROLLWHEEL ) {
             LONG lDeltaY = 0;
             if( m_dwDelayNum > 0 ) lDeltaY =  (LONG)(CalculateDelay((double)m_dwDelayLeft / m_dwDelayNum) * m_dwDelayDeltaY);
             switch( LOWORD(event.wParam) ) {
@@ -197,28 +205,23 @@ public:
         CListLabelElementUI* pListElement = new CListLabelElementUI;
         Node* node = new Node;
         node->data()._level = parent->data()._level + 1;
-        if( node->data()._level == 0 ) node->data()._child_visible = true;
-        else node->data()._child_visible = false;
+        if( node->data()._level == 0 ) node->data()._expand = true;
+        else node->data()._expand = false;
         node->data()._text = text;
         node->data()._pListElement = pListElement;
 
-        if( !parent->data()._child_visible )
-        {
-            pListElement->SetVisible(false);
-        }
-        if( parent != _root && !parent->data()._pListElement->IsVisible() )
-        {
-            pListElement->SetVisible(false);
+        if( parent != _root ) {
+            if( !(parent->data()._expand && parent->data()._pListElement->IsVisible()) )
+                pListElement->SetInternVisible(false);
         }
 
         CStdString html_text;
         html_text += _T("<x 6>");
-        for( int i = 0; i < node->data()._level; ++i )
-        {
+        for( int i = 0; i < node->data()._level; ++i ) {
             html_text += _T("<x 24>");
         }
         if( node->data()._level < 3 ) {
-            if( node->data()._child_visible ) html_text += _T("<a><i tree_expand.png 2 1></a>");
+            if( node->data()._expand ) html_text += _T("<a><i tree_expand.png 2 1></a>");
             else html_text += _T("<a><i tree_expand.png 2 0></a>");
         }
         html_text += node->data()._text;
@@ -231,13 +234,11 @@ public:
         }
 
         int index = 0;
-        if( parent->has_children() )
-        {
+        if( parent->has_children() ) {
             Node* prev = parent->get_last_child();
             index = prev->data()._pListElement->GetIndex() + 1;
         }
-        else 
-        {
+        else {
             if( parent == _root ) index = 0;
             else index = parent->data()._pListElement->GetIndex() + 1;
         }
@@ -246,7 +247,6 @@ public:
             delete node;
             node = NULL;
         }
-
         parent->add_child(node);
         return node;
     }
@@ -254,35 +254,30 @@ public:
     bool RemoveNode(Node* node)
     {
         if( !node || node == _root ) return false;
-
-        for( int i = 0; i < node->num_children(); ++i )
-        {
+        for( int i = 0; i < node->num_children(); ++i ) {
             Node* child = node->child(i);
             RemoveNode(child);
         }
-
         CListUI::Remove(node->data()._pListElement);
         node->parent()->remove_child(node);
         delete node;
-
 		return true;
     }
 
-    void SetChildVisible(Node* node, bool visible)
+    void ExpandNode(Node* node, bool expand)
     {
         if( !node || node == _root ) return;
 
-        if( node->data()._child_visible == visible ) return;
-        node->data()._child_visible = visible;
+        if( node->data()._expand == expand ) return;
+        node->data()._expand = expand;
 
         CStdString html_text;
         html_text += _T("<x 6>");
-        for( int i = 0; i < node->data()._level; ++i )
-        {
+        for( int i = 0; i < node->data()._level; ++i ) {
             html_text += _T("<x 24>");
         }
         if( node->data()._level < 3 ) {
-            if( node->data()._child_visible ) html_text += _T("<a><i tree_expand.png 2 1></a>");
+            if( node->data()._expand ) html_text += _T("<a><i tree_expand.png 2 1></a>");
             else html_text += _T("<a><i tree_expand.png 2 0></a>");
         }
         html_text += node->data()._text;
@@ -293,25 +288,14 @@ public:
 
         Node* begin = node->child(0);
         Node* end = node->get_last_child();
-        for( int i = begin->data()._pListElement->GetIndex(); i <= end->data()._pListElement->GetIndex(); ++i )
-        {
+        for( int i = begin->data()._pListElement->GetIndex(); i <= end->data()._pListElement->GetIndex(); ++i ) {
             CControlUI* control = GetItemAt(i);
-            if( _tcscmp(control->GetClass(), _T("ListLabelElementUI")) == 0 )
-            {
-                if( !visible ) 
-                {
-                    control->SetVisible(false);
-                }
-                else
-                {
-                    Node* local_parent = ((GameListUI::Node*)control->GetTag())->parent();
-                    if( local_parent->data()._child_visible && local_parent->data()._pListElement->IsVisible() )
-                    {
-                        control->SetVisible(true);
-                    }
-                }
+            if( _tcscmp(control->GetClass(), _T("ListLabelElementUI")) == 0 ) {
+                Node* local_parent = ((GameListUI::Node*)control->GetTag())->parent();
+                control->SetInternVisible(local_parent->data()._expand && local_parent->data()._pListElement->IsVisible());
             }
         }
+        NeedUpdate();
     }
 
     SIZE GetExpanderSizeX(Node* node) const

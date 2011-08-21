@@ -375,7 +375,7 @@ public:
                     pt.x -= msg.pSender->GetX();
                     SIZE sz = pGameList->GetExpanderSizeX(node);
                     if( pt.x >= sz.cx && pt.x < sz.cy )                     
-                        pGameList->SetChildVisible(node, !node->data()._child_visible);
+                        pGameList->ExpandNode(node, !node->data()._expand);
                 }
             }
         }
@@ -385,7 +385,7 @@ public:
             {
                 if( _tcscmp(msg.pSender->GetClass(), _T("ListLabelElementUI")) == 0 ) {
                     GameListUI::Node* node = (GameListUI::Node*)msg.pSender->GetTag();
-                    pGameList->SetChildVisible(node, !node->data()._child_visible);
+                    pGameList->ExpandNode(node, !node->data()._expand);
                     if( node->data()._level == 3 ) {
                         COptionUI* pControl = static_cast<COptionUI*>(m_pm.FindControl(_T("roomswitch")));
                         if( pControl ) {
