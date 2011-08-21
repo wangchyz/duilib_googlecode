@@ -1787,6 +1787,15 @@ void CScrollBarUI::SetOwner(CContainerUI* pOwner)
     m_pOwner = pOwner;
 }
 
+void CScrollBarUI::SetVisible(bool bVisible)
+{
+    if( m_bVisible == bVisible ) return;
+
+    bool v = IsVisible();
+    m_bVisible = bVisible;
+    if( m_bFocused ) m_bFocused = false;
+}
+
 void CScrollBarUI::SetEnabled(bool bEnable)
 {
     CControlUI::SetEnabled(bEnable);
