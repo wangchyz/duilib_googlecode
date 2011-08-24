@@ -955,22 +955,22 @@ void CProgressUI::SetValue(int nValue)
     Invalidate();
 }
 
-LPCTSTR CProgressUI::GetFgImage() const
+LPCTSTR CProgressUI::GetForeImage() const
 {
-    return m_sFgImage;
+    return m_sForeImage;
 }
 
-void CProgressUI::SetFgImage(LPCTSTR pStrImage)
+void CProgressUI::SetForeImage(LPCTSTR pStrImage)
 {
-    if( m_sFgImage == pStrImage ) return;
+    if( m_sForeImage == pStrImage ) return;
 
-    m_sFgImage = pStrImage;
+    m_sForeImage = pStrImage;
     Invalidate();
 }
 
 void CProgressUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
-    if( _tcscmp(pstrName, _T("fgimage")) == 0 ) SetFgImage(pstrValue);
+    if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
     else if( _tcscmp(pstrName, _T("hor")) == 0 ) SetHorizontal(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("min")) == 0 ) SetMinValue(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("max")) == 0 ) SetMaxValue(_ttoi(pstrValue));
@@ -995,11 +995,11 @@ void CProgressUI::PaintStatusImage(HDC hDC)
         rc.bottom = m_rcItem.bottom - m_rcItem.top;
     }
 
-    if( !m_sFgImage.IsEmpty() ) {
-        m_sFgImageModify.Empty();
-        m_sFgImageModify.SmallFormat(_T("dest='%d,%d,%d,%d'"), rc.left, rc.top, rc.right, rc.bottom);
+    if( !m_sForeImage.IsEmpty() ) {
+        m_sForeImageModify.Empty();
+        m_sForeImageModify.SmallFormat(_T("dest='%d,%d,%d,%d'"), rc.left, rc.top, rc.right, rc.bottom);
 
-        if( !DrawImage(hDC, (LPCTSTR)m_sFgImage, (LPCTSTR)m_sFgImageModify) ) m_sFgImage.Empty();
+        if( !DrawImage(hDC, (LPCTSTR)m_sForeImage, (LPCTSTR)m_sForeImageModify) ) m_sForeImage.Empty();
         else return;
     }
 }
