@@ -193,8 +193,8 @@ public:
     void SetMaxValue(int nMax);
     int GetValue() const;
     void SetValue(int nValue);
-    LPCTSTR GetFgImage() const;
-    void SetFgImage(LPCTSTR pStrImage);
+    LPCTSTR GetForeImage() const;
+    void SetForeImage(LPCTSTR pStrImage);
 
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
     void PaintStatusImage(HDC hDC);
@@ -205,8 +205,8 @@ protected:
     int m_nMin;
     int m_nValue;
 
-    CStdString m_sFgImage;
-    CStdString m_sFgImageModify;
+    CStdString m_sForeImage;
+    CStdString m_sForeImageModify;
 };
 
 
