@@ -472,6 +472,8 @@ m_pWindow(NULL)
 {
 	m_cxyFixed.cy = 25;
 	m_bMouseChildEnabled = true;
+
+	SetMouseChildEnabled(false);
 }
 
 CMenuElementUI::~CMenuElementUI()
