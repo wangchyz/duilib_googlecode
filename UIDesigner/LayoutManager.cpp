@@ -1507,8 +1507,8 @@ void CLayoutManager::SaveProgressProperty(CControlUI* pControl, TiXmlElement* pN
 
 	TCHAR szBuf[MAX_PATH] = {0};
 
-	if(pProgressUI->GetFgImage() && _tcslen(pProgressUI->GetFgImage()) > 0)
-		pNode->SetAttribute("fgimage", StringConvertor::WideToUtf8(ConvertImageFileName(pProgressUI->GetFgImage())));
+	if(pProgressUI->GetForeImage() && _tcslen(pProgressUI->GetForeImage()) > 0)
+		pNode->SetAttribute("fgimage", StringConvertor::WideToUtf8(ConvertImageFileName(pProgressUI->GetForeImage())));
 
 	_stprintf_s(szBuf, _T("%d"), pProgressUI->GetMinValue());
 	pNode->SetAttribute("min", StringConvertor::WideToUtf8(szBuf));
