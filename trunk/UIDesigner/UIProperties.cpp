@@ -1250,8 +1250,8 @@ void CUIProperties::ShowProgressProperty(CControlUI* pControl)
 	ASSERT(pPropProgress);
 
 	//fgimage
-	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetValue((_variant_t)pProgress->GetFgImage());
-	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetOriginalValue((_variant_t)pProgress->GetFgImage());
+	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetValue((_variant_t)pProgress->GetForeImage());
+	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetOriginalValue((_variant_t)pProgress->GetForeImage());
 	//minmax
 	CMFCPropertyGridProperty* pValueList=pPropProgress->GetSubItem(tagMinMax-tagProgress);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pProgress->GetMinValue());
