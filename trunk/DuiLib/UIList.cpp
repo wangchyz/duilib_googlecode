@@ -1667,7 +1667,7 @@ void CListElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
     if( m_pOwner == NULL ) return;
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
     DWORD iBackColor = 0;
-    if( m_iIndex % 2 == 0 ) iBackColor = pInfo->dwBkColor;
+    if( !pInfo->bAlternateBk || m_iIndex % 2 == 0 ) iBackColor = pInfo->dwBkColor;
     if( (m_uButtonState & UISTATE_HOT) != 0 ) {
         iBackColor = pInfo->dwHotBkColor;
     }
@@ -1702,7 +1702,7 @@ void CListElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
     }
 
     if( !m_sBkImage.IsEmpty() ) {
-        if( m_iIndex % 2 == 0 ) {
+        if( !pInfo->bAlternateBk || m_iIndex % 2 == 0 ) {
             if( !DrawImage(hDC, (LPCTSTR)m_sBkImage) ) m_sBkImage.Empty();
         }
     }
@@ -2263,7 +2263,7 @@ void CListContainerElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
     if( m_pOwner == NULL ) return;
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
     DWORD iBackColor = 0;
-    if( m_iIndex % 2 == 0 ) iBackColor = pInfo->dwBkColor;
+    if( !pInfo->bAlternateBk || m_iIndex % 2 == 0 ) iBackColor = pInfo->dwBkColor;
 
     if( (m_uButtonState & UISTATE_HOT) != 0 ) {
         iBackColor = pInfo->dwHotBkColor;
@@ -2297,7 +2297,7 @@ void CListContainerElementUI::DrawItemBk(HDC hDC, const RECT& rcItem)
         }
     }
     if( !m_sBkImage.IsEmpty() ) {
-        if( m_iIndex % 2 == 0 ) {
+        if( !pInfo->bAlternateBk || m_iIndex % 2 == 0 ) {
             if( !DrawImage(hDC, (LPCTSTR)m_sBkImage) ) m_sBkImage.Empty();
         }
     }
