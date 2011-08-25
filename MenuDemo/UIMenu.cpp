@@ -577,8 +577,9 @@ SIZE CMenuElementUI::EstimateSize(SIZE szAvailable)
 
 void CMenuElementUI::DoEvent(TEventUI& event)
 {
-	if( event.Type == UIEVENT_MOUSEHOVER )
+	if( event.Type == UIEVENT_MOUSEENTER )
 	{
+		CListContainerElementUI::DoEvent(event);
 		if( m_pWindow ) return;
 		bool hasSubMenu = false;
 		for( int i = 0; i < GetCount(); ++i )
@@ -595,6 +596,14 @@ void CMenuElementUI::DoEvent(TEventUI& event)
 		{
 			m_pOwner->SelectItem(GetIndex(), true);
 			CreateMenuWnd();
+		}
+		else
+		{
+			ContextMenuParam param;
+			param.hWnd = m_pManager->GetPaintWindow();
+			param.wParam = 2;
+			s_context_menu_observer.RBroadcast(param);
+			m_pOwner->SelectItem(GetIndex(), true);
 		}
 		return;
 	}
