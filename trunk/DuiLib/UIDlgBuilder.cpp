@@ -33,7 +33,7 @@ CControlUI* CDialogBuilder::Create(STRINGorID xml, LPCTSTR type, IDialogBuilderC
         m_pstrtype = type;
     }
 
-    return Create(pCallback, pManager);
+    return Create(pCallback, pManager, pParent);
 }
 
 CControlUI* CDialogBuilder::Create(IDialogBuilderCallback* pCallback, CPaintManagerUI* pManager, CControlUI* pParent)
@@ -218,7 +218,7 @@ CControlUI* CDialogBuilder::Create(IDialogBuilderCallback* pCallback, CPaintMana
             }
         }
     }
-    return _Parse(&root, NULL, pManager);
+    return _Parse(&root, pParent, pManager);
 }
 
 CMarkup* CDialogBuilder::GetMarkup()
