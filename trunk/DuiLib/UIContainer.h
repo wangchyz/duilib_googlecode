@@ -203,34 +203,6 @@ protected:
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
-class UILIB_API CDialogLayoutUI : public CContainerUI
-{
-public:
-    CDialogLayoutUI();
-
-    LPCTSTR GetClass() const;
-    LPVOID GetInterface(LPCTSTR pstrName);
-
-    void SetStretchMode(CControlUI* pControl, UINT uMode);
-
-    void SetPos(RECT rc);
-    SIZE EstimateSize(SIZE szAvailable);
-    RECT RecalcArea();   
-
-protected:  
-    typedef struct 
-    {
-        CControlUI* pControl;
-        UINT uMode;
-        RECT rcItem;
-    } STRETCHMODE;
-
-    CStdValArray m_aModes;
-};
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-
 class UILIB_API CTabLayoutUI : public CContainerUI
 {
 public:
