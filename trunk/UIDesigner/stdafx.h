@@ -181,7 +181,6 @@ using DuiLib::CActiveXUI;
 using DuiLib::CContainerUI;
 using DuiLib::CVerticalLayoutUI;
 using DuiLib::CHorizontalLayoutUI;
-using DuiLib::CDialogLayoutUI;
 using DuiLib::CTabLayoutUI;
 using DuiLib::CTileLayoutUI;
 using DuiLib::CListHeaderUI;
