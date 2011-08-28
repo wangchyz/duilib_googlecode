@@ -618,7 +618,7 @@ void CUIProperties::InitPropList()
 	//Progress
 	pPropUI=new CMFCPropertyGridProperty(_T("Progress"),classProgress);
 
-	pPropImage=new CMFCPropertyGridImageProperty(_T("FgImage"),_T(""),_T("指定进度条的前景图片"),tagFgImage);//fgimage
+	pPropImage=new CMFCPropertyGridImageProperty(_T("ForeImage"),_T(""),_T("指定进度条的前景图片"),tagForeImage);//foreimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
 
@@ -1249,9 +1249,9 @@ void CUIProperties::ShowProgressProperty(CControlUI* pControl)
 	CMFCPropertyGridProperty* pPropProgress=m_wndPropList.FindItemByData(classProgress,FALSE);
 	ASSERT(pPropProgress);
 
-	//fgimage
-	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetValue((_variant_t)pProgress->GetForeImage());
-	pPropProgress->GetSubItem(tagFgImage-tagProgress)->SetOriginalValue((_variant_t)pProgress->GetForeImage());
+	//foreimage
+	pPropProgress->GetSubItem(tagForeImage-tagProgress)->SetValue((_variant_t)pProgress->GetForeImage());
+	pPropProgress->GetSubItem(tagForeImage-tagProgress)->SetOriginalValue((_variant_t)pProgress->GetForeImage());
 	//minmax
 	CMFCPropertyGridProperty* pValueList=pPropProgress->GetSubItem(tagMinMax-tagProgress);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pProgress->GetMinValue());

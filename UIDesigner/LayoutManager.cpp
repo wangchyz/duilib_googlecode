@@ -525,10 +525,6 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CL
 		pControl=new CHorizontalLayoutUI;
 		pExtended->nClass=classHorizontalLayout;
 		break;
-	case classDialogLayout:
-		pControl=new CDialogLayoutUI;
-		pExtended->nClass=classDialogLayout;
-		break;
 	case classTileLayout:
 		pControl=new CTileLayoutUI;
 		pExtended->nClass=classTileLayout;
@@ -807,9 +803,6 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 		break;
 	case classHorizontalLayout:
 		pCopyControl = new CHorizontalLayoutUI(*static_cast<CHorizontalLayoutUI*>(pControl->GetInterface(_T("HorizontalLayout"))));
-		break;
-	case classDialogLayout:
-		pCopyControl = new CDialogLayoutUI(*static_cast<CDialogLayoutUI*>(pControl->GetInterface(_T("DialogLayout"))));
 		break;
 	case classTileLayout:
 		pCopyControl = new CTileLayoutUI(*static_cast<CTileLayoutUI*>(pControl->GetInterface(_T("TileLayout"))));
@@ -1508,7 +1501,7 @@ void CLayoutManager::SaveProgressProperty(CControlUI* pControl, TiXmlElement* pN
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if(pProgressUI->GetForeImage() && _tcslen(pProgressUI->GetForeImage()) > 0)
-		pNode->SetAttribute("fgimage", StringConvertor::WideToUtf8(ConvertImageFileName(pProgressUI->GetForeImage())));
+		pNode->SetAttribute("foreimage", StringConvertor::WideToUtf8(ConvertImageFileName(pProgressUI->GetForeImage())));
 
 	_stprintf_s(szBuf, _T("%d"), pProgressUI->GetMinValue());
 	pNode->SetAttribute("min", StringConvertor::WideToUtf8(szBuf));

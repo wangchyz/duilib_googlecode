@@ -147,7 +147,7 @@ enum PropertyTag
 
 	//Progress
 	tagProgress,
-	tagFgImage=tagProgress,
+	tagForeImage=tagProgress,
 	tagMinMax,
 	tagValue,
 	tagHor,
