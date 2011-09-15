@@ -8,6 +8,7 @@
 #include "DialogDefaultAttribList.h"
 
 using DuiLib::TRelativePosUI;
+using DuiLib::IListOwnerUI;
 
 //////////////////////////////////////////////////////////////////////////
 //CMFCPropertyGridColor32Property
@@ -346,6 +347,7 @@ void CUIProperties::InitPropList()
 	CMFCPropertyGridImageProperty* pPropImage=NULL;
 
 	//Form
+#pragma region Form
 	pPropUI=new CMFCPropertyGridProperty(_T("Form"),classForm);
 
 	pValueList=new CMFCPropertyGridProperty(_T("Size"),tagFormSize,TRUE);//size
@@ -410,8 +412,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Form
 
 	//Control
+#pragma region Control
 	pPropUI=new CMFCPropertyGridProperty(_T("Control"),classControl);
 
 	pProp=new CMFCPropertyGridProperty(_T("Name"),(_variant_t)_T(""),_T("控件的名称"),tagName);//name
@@ -509,8 +513,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Control
 
 	//Label
+#pragma region Label
 	pPropUI=new CMFCPropertyGridProperty(_T("Label"),classLabel);
 
 	pProp=new CMFCPropertyGridProperty(_T("Align"),_T("Center"),_T("指示文本的对齐方式"),tagAlign);//align
@@ -550,8 +556,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Label
 
 	//Button
+#pragma region Button
 	pPropUI=new CMFCPropertyGridProperty(_T("Button"),classButton);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定按钮正常显示时的图片"),tagNormalImage);//normalimage
@@ -575,8 +583,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pPropImage);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Button
 
 	//Edit
+#pragma region Edit
 	pPropUI=new CMFCPropertyGridProperty(_T("Edit"),classEdit);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定编辑框正常显示时的图片"),tagEditNormalImage);//normalimage
@@ -602,8 +612,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Edit
 
 	//Option
+#pragma region Option
 	pPropUI=new CMFCPropertyGridProperty(_T("Option"),classOption);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ForeImage"),_T(""),_T("指定复选框的前景图片"),tagOptForeImage);//foreimage
@@ -621,8 +633,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Option
 
 	//Progress
+#pragma region Progress
 	pPropUI=new CMFCPropertyGridProperty(_T("Progress"),classProgress);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ForeImage"),_T(""),_T("指定进度条的前景图片"),tagForeImage);//foreimage
@@ -643,8 +657,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Progress
 
 	//Slider
+#pragma region Slider
 	pPropUI=new CMFCPropertyGridProperty(_T("Slider"),classSlider);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbImage"),_T(""),_T("指定滑块的滑条图片"),tagThumbImage);//thumbimage
@@ -667,8 +683,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pValueList);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Slider
 
 	//ActiveX
+#pragma region ActiveX
 	pPropUI=new CMFCPropertyGridProperty(_T("ActiveX"),classActiveX);
 
 	pProp=new CMFCPropertyGridProperty(_T("Clsid"),(_variant_t)_T(""),_T("指定ActiveX控件的Clsid值"),tagClsid);//clsid
@@ -678,8 +696,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);//added by 邓景仁 2011-09-08
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion ActiveX
 
 	//Container
+#pragma region Container
 	pPropUI=new CMFCPropertyGridProperty(_T("Container"),classContainer);
 
 	pValueList=new CMFCPropertyGridProperty(_T("Inset"),tagInset,TRUE);//inset
@@ -706,29 +726,10 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Container
 
-	//Combo
-	pPropUI=new CMFCPropertyGridProperty(_T("Combo"),classCombo);
-
-	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定组合框正常显示时的图片"),tagComboNormalImage);//normalimage
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-
-	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定组合框获得热点时的图片"),tagComboHotImage);//hotimage
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-
-	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("指定组合框被按压下时的图片"),tagComboPushedImage);//pushedimage
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-
-	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定组合框获得焦点后的图片"),tagComboFocusedImage);//focusedimage
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
-
-	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定组合框被禁用后的图片"),tagComboDisabledImage);//disabledimage
-	pPropImage->AllowEdit(FALSE);
-	pPropUI->AddSubItem(pPropImage);
+	//Item
+	pPropUI=new CMFCPropertyGridProperty(_T("Item"),classItem);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemBkImage"),_T(""),_T("指定组项正常显示时的图片"),tagItemBkImage);//itembkimage
 	pPropImage->AllowEdit(FALSE);
@@ -745,17 +746,6 @@ void CUIProperties::InitPropList()
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemDisabledImage"),_T(""),_T("指定组项被禁用后的图片"),tagItemDisabledImage);//itemdisabledimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
-
-	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagComboTextPadding,TRUE);//textpadding
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定文本区域的左边距"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(_variant_t)(LONG)0,_T("指定文本区域的上边距"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(_variant_t)(LONG)0,_T("指定文本区域的右边距"));
-	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(_variant_t)(LONG)0,_T("指定文本区域的下边距"));
-	pValueList->AddSubItem(pProp);
-	pPropUI->AddSubItem(pValueList);
 
 	pValueList=new CMFCPropertyGridProperty(_T("ItemTextPadding"),tagItemTextPadding,TRUE);//itemtextpadding
 	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定组项文本区域的左边距"));
@@ -827,8 +817,46 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+	//Combo
+#pragma region Combo
+	pPropUI=new CMFCPropertyGridProperty(_T("Combo"),classCombo);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("指定组合框正常显示时的图片"),tagComboNormalImage);//normalimage
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("指定组合框获得热点时的图片"),tagComboHotImage);//hotimage
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("指定组合框被按压下时的图片"),tagComboPushedImage);//pushedimage
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("指定组合框获得焦点后的图片"),tagComboFocusedImage);//focusedimage
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("DisabledImage"),_T(""),_T("指定组合框被禁用后的图片"),tagComboDisabledImage);//disabledimage
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagComboTextPadding,TRUE);//textpadding
+	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定文本区域的左边距"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("Top"),(_variant_t)(LONG)0,_T("指定文本区域的上边距"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("Right"),(_variant_t)(LONG)0,_T("指定文本区域的右边距"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(_variant_t)(LONG)0,_T("指定文本区域的下边距"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
+	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Combo
 
 	//HorizontalLayout
+#pragma region HorizontalLayout
 	pPropUI=new CMFCPropertyGridProperty(_T("HorizontalLayout"),classHorizontalLayout);
 
 	pProp=new CMFCPropertyGridProperty(_T("SepWidth"),(_variant_t)(LONG)0,_T("------"),tagSepWidth);//sepwidth
@@ -838,14 +866,27 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion HorizontalLayout
 
 	//TileLayout
+#pragma region TileLayout
 	pPropUI=new CMFCPropertyGridProperty(_T("TileLayout"),classTileLayout);
 
 	pProp=new CMFCPropertyGridProperty(_T("Columns"),(_variant_t)(LONG)0,_T("指定并列布局的列数"),tagColumns);//columns
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion TileLayout
+
+	//List
+#pragma region List
+	pPropUI=new CMFCPropertyGridProperty(_T("List"),classList);
+
+	pProp=new CMFCPropertyGridProperty(_T("Header"),(_variant_t)false,_T("指定是否显示列表表头"),tagListHeader);
+	pPropUI->AddSubItem(pProp);
+
+	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion List
 
 	HideAllProperties();
 }
@@ -938,9 +979,11 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 	case classVerticalLayout:
 	case classDialogLayout:
 	case classTabLayout:
-	case classList:/*!*/
 	case classListContainerElement:/*!*/
 		ShowContainerProperty(pControl);
+		break;
+	case classList:
+		ShowListProperty(pControl);
 		break;
 	case classHorizontalLayout:
 		ShowHorizontalLayoutProperty(pControl);
@@ -1328,6 +1371,7 @@ void CUIProperties::ShowSliderProperty(CControlUI* pControl)
 void CUIProperties::ShowComboProperty(CControlUI* pControl)
 {
 	ShowContainerProperty(pControl);
+	ShowItemProperty(pControl);
 
 	ASSERT(pControl);
 	CComboUI* pCombo=static_cast<CComboUI*>(pControl->GetInterface(_T("Combo")));
@@ -1351,19 +1395,6 @@ void CUIProperties::ShowComboProperty(CControlUI* pControl)
 	//disabledimage
 	pPropCombo->GetSubItem(tagComboDisabledImage-tagCombo)->SetValue((_variant_t)pCombo->GetDisabledImage());
 	pPropCombo->GetSubItem(tagComboDisabledImage-tagCombo)->SetOriginalValue((_variant_t)pCombo->GetDisabledImage());
-	//itembkimage
-	TListInfoUI* pListInfo=pCombo->GetListInfo();
-	pPropCombo->GetSubItem(tagItemBkImage-tagCombo)->SetValue((_variant_t)pListInfo->sBkImage);
-	pPropCombo->GetSubItem(tagItemBkImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sBkImage);
-	//itemhotimage
-	pPropCombo->GetSubItem(tagItemHotImage-tagCombo)->SetValue((_variant_t)pListInfo->sHotImage);
-	pPropCombo->GetSubItem(tagItemHotImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sHotImage);
-	//itemselectedimage
-	pPropCombo->GetSubItem(tagItemSelectedImage-tagCombo)->SetValue((_variant_t)pListInfo->sSelectedImage);
-	pPropCombo->GetSubItem(tagItemSelectedImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sSelectedImage);
-	//itemdisabledimage
-	pPropCombo->GetSubItem(tagItemDisabledImage-tagCombo)->SetValue((_variant_t)pListInfo->sDisabledImage);
-	pPropCombo->GetSubItem(tagItemDisabledImage-tagCombo)->SetOriginalValue((_variant_t)pListInfo->sDisabledImage);
 	//textpadding
 	RECT rect=pCombo->GetTextPadding();
 	CMFCPropertyGridProperty* pValueList=pPropCombo->GetSubItem(tagComboTextPadding-tagCombo);
@@ -1375,60 +1406,6 @@ void CUIProperties::ShowComboProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
-	//itemtextpadding
-	pValueList=pPropCombo->GetSubItem(tagItemTextPadding-tagCombo);
-	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.left);
-	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.top);
-	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.right);
-	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.bottom);
-	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.left);
-	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.top);
-	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.right);
-	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.bottom);
-	//itemalign
-	CString strStyle;
-	if(pListInfo->uTextStyle&DT_CENTER)
-		strStyle=_T("Center");
-	else if(pListInfo->uTextStyle&DT_LEFT)
-		strStyle=_T("Left");
-	else if(pListInfo->uTextStyle&DT_RIGHT)
-		strStyle=_T("Right");
-	pPropCombo->GetSubItem(tagItemAlign-tagCombo)->SetValue((_variant_t)strStyle);
-	pPropCombo->GetSubItem(tagItemAlign-tagCombo)->SetOriginalValue((_variant_t)strStyle);
-	//itemtextcolor
-	pPropCombo->GetSubItem(tagItemTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwTextColor);
-	pPropCombo->GetSubItem(tagItemTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwTextColor);
-	//itembkcolor
-	pPropCombo->GetSubItem(tagItemBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwBkColor);
-	pPropCombo->GetSubItem(tagItemBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwBkColor);
-	//itemselectedtextcolor
-	pPropCombo->GetSubItem(tagItemSelectedTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwSelectedTextColor);
-	pPropCombo->GetSubItem(tagItemSelectedTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwSelectedTextColor);
-	//itemselectedbkcolor
-	pPropCombo->GetSubItem(tagItemSelectedBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwSelectedBkColor);
-	pPropCombo->GetSubItem(tagItemSelectedBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwSelectedBkColor);
-	//itemhottextcolor
-	pPropCombo->GetSubItem(tagItemHotTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwHotTextColor);
-	pPropCombo->GetSubItem(tagItemHotTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwHotTextColor);
-	//itemhotbkcolor
-	pPropCombo->GetSubItem(tagItemHotBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwHotBkColor);
-	pPropCombo->GetSubItem(tagItemHotBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwHotBkColor);
-	//itemdisabledtextcolor
-	pPropCombo->GetSubItem(tagItemDisabledTextColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwDisabledTextColor);
-	pPropCombo->GetSubItem(tagItemDisabledTextColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwDisabledTextColor);
-	//itemdisabledbkcolor
-	pPropCombo->GetSubItem(tagItemDisabledBkColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwDisabledBkColor);
-	pPropCombo->GetSubItem(tagItemDisabledBkColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwDisabledBkColor);
-	//itemlinecolor
-	pPropCombo->GetSubItem(tagItemLineColor-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->dwLineColor);
-	pPropCombo->GetSubItem(tagItemLineColor-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwLineColor);
-	//itemfont
-	pPropCombo->GetSubItem(tagItemFont-tagCombo)->SetValue((_variant_t)(LONG)pListInfo->nFont);
-	pPropCombo->GetSubItem(tagItemFont-tagCombo)->SetOriginalValue((_variant_t)(LONG)pListInfo->nFont);
-	//itemshowhtml
-	pPropCombo->GetSubItem(tagItemShowHtml-tagCombo)->SetValue((_variant_t)pCombo->IsItemShowHtml());
-	pPropCombo->GetSubItem(tagItemShowHtml-tagCombo)->SetOriginalValue((_variant_t)pCombo->IsItemShowHtml());
-
 	pPropCombo->Show(TRUE,FALSE);
 }
 
@@ -1615,4 +1592,102 @@ CString CUIProperties::FormatOrigProperty(CMFCPropertyGridProperty* pProp)
 	}
 
 	return strOrigVal;
+}
+
+void CUIProperties::ShowListProperty( CControlUI* pControl )
+{
+	ShowContainerProperty(pControl);
+	ShowItemProperty(pControl);
+
+	ASSERT(pControl);
+	CListUI* pList=static_cast<CListUI*>(pControl->GetInterface(_T("List")));
+	ASSERT(pList);
+
+	CMFCPropertyGridProperty* pPropList=m_wndPropList.FindItemByData(classList,FALSE);
+	ASSERT(pPropList);
+
+	//Header
+	pPropList->GetSubItem(tagListHeader-tagList)->SetValue((_variant_t)pList->GetHeader()->IsVisible());
+	pPropList->GetSubItem(tagListHeader-tagList)->SetOriginalValue((_variant_t)pList->GetHeader()->IsVisible());
+
+	pPropList->Show(TRUE,FALSE);
+}
+
+void CUIProperties::ShowItemProperty( CControlUI* pControl )
+{
+	ASSERT(pControl);
+	IListOwnerUI* pList=static_cast<IListOwnerUI*>(pControl->GetInterface(_T("IListOwner")));
+	ASSERT(pList);
+
+	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classItem,FALSE);
+	ASSERT(pPropItem);
+
+	//itembkimage
+	TListInfoUI* pListInfo=pList->GetListInfo();
+	pPropItem->GetSubItem(tagItemBkImage-tagItem)->SetValue((_variant_t)pListInfo->sBkImage);
+	pPropItem->GetSubItem(tagItemBkImage-tagItem)->SetOriginalValue((_variant_t)pListInfo->sBkImage);
+	//itemhotimage
+	pPropItem->GetSubItem(tagItemHotImage-tagItem)->SetValue((_variant_t)pListInfo->sHotImage);
+	pPropItem->GetSubItem(tagItemHotImage-tagItem)->SetOriginalValue((_variant_t)pListInfo->sHotImage);
+	//itemselectedimage
+	pPropItem->GetSubItem(tagItemSelectedImage-tagItem)->SetValue((_variant_t)pListInfo->sSelectedImage);
+	pPropItem->GetSubItem(tagItemSelectedImage-tagItem)->SetOriginalValue((_variant_t)pListInfo->sSelectedImage);
+	//itemdisabledimage
+	pPropItem->GetSubItem(tagItemDisabledImage-tagItem)->SetValue((_variant_t)pListInfo->sDisabledImage);
+	pPropItem->GetSubItem(tagItemDisabledImage-tagItem)->SetOriginalValue((_variant_t)pListInfo->sDisabledImage);
+	//itemtextpadding
+	CMFCPropertyGridProperty*  pValueList=pPropItem->GetSubItem(tagItemTextPadding-tagItem);
+	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.left);
+	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.top);
+	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.right);
+	pValueList->GetSubItem(3)->SetValue((_variant_t)(LONG)pListInfo->rcTextPadding.bottom);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.left);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.top);
+	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.right);
+	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)pListInfo->rcTextPadding.bottom);
+	//itemalign
+	CString strStyle;
+	if(pListInfo->uTextStyle&DT_CENTER)
+		strStyle=_T("Center");
+	else if(pListInfo->uTextStyle&DT_LEFT)
+		strStyle=_T("Left");
+	else if(pListInfo->uTextStyle&DT_RIGHT)
+		strStyle=_T("Right");
+	pPropItem->GetSubItem(tagItemAlign-tagItem)->SetValue((_variant_t)strStyle);
+	pPropItem->GetSubItem(tagItemAlign-tagItem)->SetOriginalValue((_variant_t)strStyle);
+	//itemtextcolor
+	pPropItem->GetSubItem(tagItemTextColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwTextColor);
+	pPropItem->GetSubItem(tagItemTextColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwTextColor);
+	//itembkcolor
+	pPropItem->GetSubItem(tagItemBkColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwBkColor);
+	pPropItem->GetSubItem(tagItemBkColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwBkColor);
+	//itemselectedtextcolor
+	pPropItem->GetSubItem(tagItemSelectedTextColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwSelectedTextColor);
+	pPropItem->GetSubItem(tagItemSelectedTextColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwSelectedTextColor);
+	//itemselectedbkcolor
+	pPropItem->GetSubItem(tagItemSelectedBkColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwSelectedBkColor);
+	pPropItem->GetSubItem(tagItemSelectedBkColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwSelectedBkColor);
+	//itemhottextcolor
+	pPropItem->GetSubItem(tagItemHotTextColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwHotTextColor);
+	pPropItem->GetSubItem(tagItemHotTextColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwHotTextColor);
+	//itemhotbkcolor
+	pPropItem->GetSubItem(tagItemHotBkColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwHotBkColor);
+	pPropItem->GetSubItem(tagItemHotBkColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwHotBkColor);
+	//itemdisabledtextcolor
+	pPropItem->GetSubItem(tagItemDisabledTextColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwDisabledTextColor);
+	pPropItem->GetSubItem(tagItemDisabledTextColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwDisabledTextColor);
+	//itemdisabledbkcolor
+	pPropItem->GetSubItem(tagItemDisabledBkColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwDisabledBkColor);
+	pPropItem->GetSubItem(tagItemDisabledBkColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwDisabledBkColor);
+	//itemlinecolor
+	pPropItem->GetSubItem(tagItemLineColor-tagItem)->SetValue((_variant_t)(LONG)pListInfo->dwLineColor);
+	pPropItem->GetSubItem(tagItemLineColor-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->dwLineColor);
+	//itemfont
+	pPropItem->GetSubItem(tagItemFont-tagItem)->SetValue((_variant_t)(LONG)pListInfo->nFont);
+	pPropItem->GetSubItem(tagItemFont-tagItem)->SetOriginalValue((_variant_t)(LONG)pListInfo->nFont);
+	//itemshowhtml
+	//pPropItem->GetSubItem(tagItemShowHtml-tagItem)->SetValue((_variant_t)pList->IsItemShowHtml());
+	//pPropItem->GetSubItem(tagItemShowHtml-tagItem)->SetOriginalValue((_variant_t)pList->IsItemShowHtml());
+
+	pPropItem->Show(TRUE,FALSE);
 }

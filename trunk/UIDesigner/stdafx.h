@@ -127,6 +127,7 @@ enum UIClass
 	classListLabelElement,
 	classListExpandElement,
 	classListContainerElement,
+	classItem,
 };
 
 typedef struct tagExtendedAttributes

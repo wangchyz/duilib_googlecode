@@ -161,18 +161,12 @@ enum PropertyTag
 	tagThumbPushedImage,
 	tagThumbSize,
 
-	//Combo
-	tagCombo,
-	tagComboNormalImage=tagCombo,
-	tagComboHotImage,
-	tagComboPushedImage,
-	tagComboFocusedImage,
-	tagComboDisabledImage,
-	tagItemBkImage,
+	//Item
+	tagItem,
+	tagItemBkImage=tagItem,
 	tagItemHotImage,
 	tagItemSelectedImage,
 	tagItemDisabledImage,
-	tagComboTextPadding,
 	tagItemTextPadding,
 	tagItemAlign,
 	tagItemTextColor,
@@ -186,6 +180,15 @@ enum PropertyTag
 	tagItemLineColor,
 	tagItemFont,
 	tagItemShowHtml,
+
+	//Combo
+	tagCombo,
+	tagComboNormalImage=tagCombo,
+	tagComboHotImage,
+	tagComboPushedImage,
+	tagComboFocusedImage,
+	tagComboDisabledImage,
+	tagComboTextPadding,
 
 	//ActiveX
 	tagActiveX,
@@ -208,6 +211,11 @@ enum PropertyTag
 	//TileLayout
 	tagTileLayout,
 	tagColumns=tagTileLayout,
+
+	//List
+	tagList,
+	tagListHeader=tagList,
+	tagListHeaderBKImage,
 };
 
 extern UINT WM_UI_PROPERTY_CHANGED;
@@ -250,6 +258,8 @@ protected:
 	void ShowSliderProperty(CControlUI* pControl);
 	void ShowComboProperty(CControlUI* pControl);
 	void ShowActiveXProperty(CControlUI* pControl);
+	void ShowListProperty(CControlUI* pControl);
+	void ShowItemProperty(CControlUI* pControl);
 
 	//Container Property
 	void ShowContainerProperty(CControlUI* pControl);

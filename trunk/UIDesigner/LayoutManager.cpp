@@ -364,6 +364,29 @@ CLayoutManager::~CLayoutManager(void)
 {
 }
 
+class CUserDefineUI : public CControlUI
+{
+public:
+	virtual void SetClass(LPCTSTR className)
+	{
+		mClassName = className;
+		mClassName+=_T("UI");
+	}
+	virtual LPCTSTR GetClass() const{return mClassName;}
+protected:
+	CStdString mClassName;
+};
+
+CControlUI* CLayoutManager::CreateControl(LPCTSTR pstrClass)
+{
+	CUserDefineUI* pResult = new CUserDefineUI;
+	if (pResult)
+	{
+		pResult->SetClass(pstrClass);
+	}
+	return pResult;
+}
+
 void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 {
 	m_pFormUI=static_cast<CFormUI*>(NewUI(classForm,
@@ -384,7 +407,7 @@ void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 		g_HookAPI.EnableCreateFile(true);
 
 		CDialogBuilder builder;
-		CControlUI* pRoot=builder.Create(pstrLoad,(UINT)0,NULL,&m_Manager);
+		CControlUI* pRoot=builder.Create(pstrLoad,(UINT)0,this,&m_Manager);
 		if(pRoot)
 			m_pFormUI->Add(pRoot);
 
@@ -1643,7 +1666,9 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if(pListUI->GetHeader() && !pListUI->GetHeader()->IsVisible())
-		pNode->SetAttribute("header", "hidden");
+		pNode->SetAttribute("header", "false");
+	else
+		pNode->RemoveAttribute("header");
 
 	if(pListUI->GetHeader() && pListUI->GetHeader()->GetBkImage() && _tcslen(pListUI->GetHeader()->GetBkImage()) > 0)
 		pNode->SetAttribute("headerbkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetHeader()->GetBkImage())));	
@@ -2016,12 +2041,16 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		pExtended = &mDummy;
 		ZeroMemory(pExtended, sizeof(ExtendedAttributes));
 		LPCTSTR pstrClass = pControl->GetClass();
-		//SIZE_T cchLen = _tcslen(pstrClass);
-		//switch( cchLen ) {
-		//case 16:
+		SIZE_T cchLen = _tcslen(pstrClass);
+		switch( cchLen )
+		{
+		case 16:
 			if (_tcscmp(_T("ListHeaderItemUI"), pstrClass)==0) pExtended->nClass = classListHeaderItem;
-		//	break;
-		//}
+			break;
+		case 12:
+			if (_tcscmp(_T("ListHeaderUI"), pstrClass)==0) pExtended->nClass = classListHeader;
+			break;
+		}
 	}
 
 	switch(pExtended->nClass)
@@ -2076,7 +2105,8 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		SaveTileLayoutProperty(pControl, pNode);
 		break;
 	default:
-		delete pNode;
+		break;
+		//delete pNode;
 		return;
 	}
 	TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
