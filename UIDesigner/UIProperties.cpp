@@ -505,6 +505,9 @@ void CUIProperties::InitPropList()
 	pProp=new CMFCPropertyGridProperty(_T("Visible"),(_variant_t)true,_T("确定该控件是可见的，还是隐藏的"),tagVisible);//visible
 	pPropUI->AddSubItem(pProp);
 
+	pProp=new CMFCPropertyGridProperty(_T("Mouse"),(_variant_t)true,_T("指示该控件是否响应鼠标操作"),tagMouse);//mouse
+	pPropUI->AddSubItem(pProp);
+
 	m_wndPropList.AddProperty(pPropUI);
 
 	//Label
@@ -603,6 +606,10 @@ void CUIProperties::InitPropList()
 	//Option
 	pPropUI=new CMFCPropertyGridProperty(_T("Option"),classOption);
 
+	pPropImage=new CMFCPropertyGridImageProperty(_T("ForeImage"),_T(""),_T("指定复选框的前景图片"),tagOptForeImage);//foreimage
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
 	pPropImage=new CMFCPropertyGridImageProperty(_T("SelectedImage"),_T(""),_T("指定复选框被选择后的图片"),tagSelectedImage);//selectedimage
 	pPropImage->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pPropImage);
@@ -666,6 +673,9 @@ void CUIProperties::InitPropList()
 
 	pProp=new CMFCPropertyGridProperty(_T("Clsid"),(_variant_t)_T(""),_T("指定ActiveX控件的Clsid值"),tagClsid);//clsid
 	pPropUI->AddSubItem(pProp);
+
+	pProp=new CMFCPropertyGridProperty(_T("DelayCreate"),(_variant_t)true,_T("指示是否延迟加载ActiveX控件"),tagDelayCreate);//delaycreate
+	pPropUI->AddSubItem(pProp);//added by 邓景仁 2011-09-08
 
 	m_wndPropList.AddProperty(pPropUI);
 
@@ -884,7 +894,13 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 
 	m_wndPropList.SetCurSel(NULL, FALSE);
 
+	ExtendedAttributes mDummy;
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
+	if (pExtended==NULL)
+	{
+		pExtended = &mDummy;
+		ZeroMemory(pExtended, sizeof(ExtendedAttributes));
+	}
 	switch(pExtended->nClass)
 	{
 	case classForm:
@@ -922,6 +938,8 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 	case classVerticalLayout:
 	case classDialogLayout:
 	case classTabLayout:
+	case classList:/*!*/
+	case classListContainerElement:/*!*/
 		ShowContainerProperty(pControl);
 		break;
 	case classHorizontalLayout:
@@ -931,7 +949,8 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 		ShowTileLayoutProperty(pControl);
 		break;
 	default:
-		return;
+		ShowControlProperty(pControl);
+		break;
 	}
 
 	m_pControl=pControl;
@@ -1094,6 +1113,9 @@ void CUIProperties::ShowControlProperty(CControlUI* pControl)
 	//visible
 	pPropControl->GetSubItem(tagVisible-tagControl)->SetValue((_variant_t)pControl->IsVisible());
 	pPropControl->GetSubItem(tagVisible-tagControl)->SetOriginalValue((_variant_t)pControl->IsVisible());
+	//mouse
+	pPropControl->GetSubItem(tagMouse-tagControl)->SetValue((_variant_t)pControl->IsMouseEnabled());
+	pPropControl->GetSubItem(tagMouse-tagControl)->SetOriginalValue((_variant_t)pControl->IsMouseEnabled());
 
 	pPropControl->Show(TRUE,FALSE);
 }
@@ -1224,6 +1246,10 @@ void CUIProperties::ShowOptionProperty(CControlUI* pControl)
 
 	CMFCPropertyGridProperty* pPropOption=m_wndPropList.FindItemByData(classOption,FALSE);
 	ASSERT(pPropOption);
+
+	//foreimage
+	pPropOption->GetSubItem(tagOptForeImage-tagOption)->SetValue((_variant_t)pOption->GetForeImage());
+	pPropOption->GetSubItem(tagOptForeImage-tagOption)->SetOriginalValue((_variant_t)pOption->GetForeImage());
 
 	//selectedimage
 	pPropOption->GetSubItem(tagSelectedImage-tagOption)->SetValue((_variant_t)pOption->GetSelectedImage());
@@ -1423,6 +1449,10 @@ void CUIProperties::ShowActiveXProperty(CControlUI* pControl)
 	//clsid
 	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetValue((_variant_t)strCLSID);
 	pPropActiveX->GetSubItem(tagClsid-tagActiveX)->SetOriginalValue((_variant_t)strCLSID);
+
+	//delaycreate
+	pPropActiveX->GetSubItem(tagDelayCreate-tagActiveX)->SetValue((_variant_t)pActiveX->IsDelayCreate());
+	pPropActiveX->GetSubItem(tagDelayCreate-tagActiveX)->SetOriginalValue((_variant_t)pActiveX->IsDelayCreate());
 
 	pPropActiveX->Show(TRUE,FALSE);
 }
