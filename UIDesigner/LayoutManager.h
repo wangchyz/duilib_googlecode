@@ -4,6 +4,7 @@ using DuiLib::CContainerUI;
 using DuiLib::CPaintManagerUI;
 using DuiLib::CWindowWnd;
 using DuiLib::TNotifyUI;
+using DuiLib::IDialogBuilderCallback;
 
 #define EXPORT_UI_SCRIPT
 
@@ -79,7 +80,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 //CLayoutManager
 
-class CLayoutManager
+class CLayoutManager : public IDialogBuilderCallback
 {
 public:
 	CLayoutManager(void);
@@ -132,6 +133,7 @@ public:
 	static CControlUI* CloneControls(CControlUI* pControl);
 	static CControlUI* CloneControl(CControlUI* pControl);
 
+	CControlUI* CreateControl(LPCTSTR pstrClass);
 protected:
 	static void SaveControlProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode);

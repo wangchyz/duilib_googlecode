@@ -72,16 +72,16 @@ void CToolBoxWnd::InitToolList()
 {
 	CToolElement* pControlTab=new CToolElement(_T("控件"));
 	pControlTab->AddSubTool(new CToolElement(_T("指针"),classPointer,IDI_TOOLBOX_POINTER));
-	pControlTab->AddSubTool(new CToolElement(_T("按钮"),classButton,IDI_TOOLBOX_BUTTON));
-	pControlTab->AddSubTool(new CToolElement(_T("基础控件"),classControl,IDI_TOOLBOX_CONTROL));
-	pControlTab->AddSubTool(new CToolElement(_T("标签"),classLabel,IDI_TOOLBOX_LABEL));
-	pControlTab->AddSubTool(new CToolElement(_T("文本框"),classText,IDI_TOOLBOX_TEXT));
-	pControlTab->AddSubTool(new CToolElement(_T("编辑框"),classEdit,IDI_TOOLBOX_EDIT));
-	pControlTab->AddSubTool(new CToolElement(_T("复选框"),classOption,IDI_TOOLBOX_OPTION));
-	pControlTab->AddSubTool(new CToolElement(_T("组合框"),classCombo,IDI_TOOLBOX_COMBO));
-	pControlTab->AddSubTool(new CToolElement(_T("进度条"),classProgress,IDI_TOOLBOX_PROGRESS));
-	pControlTab->AddSubTool(new CToolElement(_T("滑块"),classSlider,IDI_TOOLBOX_SLIDER));
-	pControlTab->AddSubTool(new CToolElement(_T("ActiveX控件"),classActiveX,IDI_TOOLBOX_ACTIVE));
+	pControlTab->AddSubTool(new CToolElement(_T("Control"),classControl,IDI_TOOLBOX_CONTROL));
+	pControlTab->AddSubTool(new CToolElement(_T("Label"),classLabel,IDI_TOOLBOX_LABEL));
+	pControlTab->AddSubTool(new CToolElement(_T("Text"),classText,IDI_TOOLBOX_TEXT));
+	pControlTab->AddSubTool(new CToolElement(_T("Edit"),classEdit,IDI_TOOLBOX_EDIT));
+	pControlTab->AddSubTool(new CToolElement(_T("Option"),classOption,IDI_TOOLBOX_OPTION));
+	pControlTab->AddSubTool(new CToolElement(_T("Combo"),classCombo,IDI_TOOLBOX_COMBO));
+	pControlTab->AddSubTool(new CToolElement(_T("Button"),classButton,IDI_TOOLBOX_BUTTON));
+	pControlTab->AddSubTool(new CToolElement(_T("Progress"),classProgress,IDI_TOOLBOX_PROGRESS));
+	pControlTab->AddSubTool(new CToolElement(_T("Slider"),classSlider,IDI_TOOLBOX_SLIDER));
+	pControlTab->AddSubTool(new CToolElement(_T("ActiveX"),classActiveX,IDI_TOOLBOX_ACTIVE));
 	m_ctlToolList.AddToolTab(pControlTab);
 
 	CToolElement* pLayoutTab=new CToolElement(_T("布局"));
