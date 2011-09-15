@@ -112,6 +112,7 @@ enum PropertyTag
 	tagEnabled,
 	tagFloat,
 	tagVisible,
+	tagMouse,
 
 	//Label
 	tagLabel,
@@ -141,7 +142,8 @@ enum PropertyTag
 
 	//Option
 	tagOption,
-	tagSelectedImage=tagOption,
+	tagOptForeImage=tagOption,
+	tagSelectedImage,
 	tagSelected,
 	tagGroup,
 
@@ -188,6 +190,7 @@ enum PropertyTag
 	//ActiveX
 	tagActiveX,
 	tagClsid=tagActiveX,
+	tagDelayCreate,
 
 	//Container
 	tagContainer,

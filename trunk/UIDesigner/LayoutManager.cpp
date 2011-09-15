@@ -1367,6 +1367,11 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), relativePos.nMoveXPercent, relativePos.nMoveYPercent, relativePos.nZoomXPercent, relativePos.nZoomYPercent);
 		pNode->SetAttribute("relativepos", StringConvertor::WideToUtf8(szBuf));
 	}
+
+	if (pControl->IsMouseEnabled()==false)
+	{
+		pNode->SetAttribute("mouse", "false");
+	}
 }
 
 void CLayoutManager::SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode)
@@ -1633,7 +1638,7 @@ void CLayoutManager::SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* p
 void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
 	SaveControlProperty(pControl, pNode);
-	CListUI* pListUI = static_cast<CListUI*>(pControl->GetInterface(_T("CList")));
+	CListUI* pListUI = static_cast<CListUI*>(pControl->GetInterface(_T("List")));
 
 	TCHAR szBuf[MAX_PATH] = {0};
 
@@ -1972,6 +1977,28 @@ void CLayoutManager::SaveTileLayoutProperty(CControlUI* pControl, TiXmlElement* 
 	SaveContainerProperty(pControl, pNode);
 }
 
+//added by µË¾°ÈÊ 2011-09-08
+void CLayoutManager::SaveActiveXProperty(CControlUI* pControl, TiXmlElement* pNode)
+{
+	SaveControlProperty(pControl, pNode);
+	CActiveXUI* pActiveUI = static_cast<CActiveXUI*>(pControl->GetInterface(_T("ActiveX")));
+
+	TCHAR szBuf[128] = {0};	
+
+	CLSID clsid = pActiveUI->GetClisd();
+	if (clsid != IID_NULL)
+	{
+		StringFromGUID2(clsid,szBuf,128);
+		pNode->SetAttribute("clsid", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	pNode->SetAttribute("delaycreate", pActiveUI->IsDelayCreate()?"true":"false");
+}
+void CLayoutManager::SaveListContainerElementProperty(CControlUI* pControl, TiXmlElement* pNode)
+{
+	SaveContainerProperty(pControl, pNode);
+}
+
 void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode
 									, BOOL bSaveChildren/* = TRUE*/)
 {
@@ -1982,6 +2009,21 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	strClass = strClass.Mid(0, strClass.GetLength() - 2);
 	TiXmlElement* pNode = new TiXmlElement(StringConvertor::WideToUtf8(strClass.GetBuffer()));
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
+
+	ExtendedAttributes mDummy;
+	if (pExtended==NULL)
+	{
+		pExtended = &mDummy;
+		ZeroMemory(pExtended, sizeof(ExtendedAttributes));
+		LPCTSTR pstrClass = pControl->GetClass();
+		//SIZE_T cchLen = _tcslen(pstrClass);
+		//switch( cchLen ) {
+		//case 16:
+			if (_tcscmp(_T("ListHeaderItemUI"), pstrClass)==0) pExtended->nClass = classListHeaderItem;
+		//	break;
+		//}
+	}
+
 	switch(pExtended->nClass)
 	{
 	case classControl:
@@ -2009,8 +2051,17 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	case classCombo: 
 		SaveComboProperty(pControl, pNode);
 		break;
+	case classList:
+		SaveListProperty(pControl, pNode);
+		break;
+	case classListContainerElement:
+		SaveListContainerElementProperty(pControl, pNode);
+		break;
+	case classListHeaderItem:
+		SaveListHeaderItemProperty(pControl, pNode);
+		break;
 	case classActiveX:
-// 		SaveActiveXProperty(pControl, pNode);
+ 		SaveActiveXProperty(pControl, pNode);
 		break;
 	case classContainer:
 	case classVerticalLayout:

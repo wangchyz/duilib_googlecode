@@ -76,6 +76,7 @@ BOOL CUIDesignerApp::InitInstance()
 	SetRegistryKey(_T(""));
 	LoadStdProfileSettings();  // 加载标准 INI 文件选项(包括 MRU)
 	SetRegistryBase(_T("Settings"));
+	CPaintManagerUI::LoadPlugin(_T("mgyUI_Plugin.dll"));
 
 	InitContextMenuManager();
 
