@@ -206,7 +206,7 @@ void CUIDesignerView::OnInitialUpdate()
 	CUIDesignerDoc* pDoc=GetDocument();
 
 	m_LayoutManager.Init(this->GetSafeHwnd(),pDoc->GetPathName());
-	CFormUI* pForm=m_LayoutManager.GetForm();
+	CWindowUI* pForm=m_LayoutManager.GetForm();
 
 	g_pClassView->InsertUITreeItem(pForm,pDoc->GetTitle());
 	g_pResourceView->InsertImageTree(pDoc->GetTitle(), pDoc->GetPathName());
@@ -391,13 +391,13 @@ void CUIDesignerView::Notify(TNotifyUI& msg)
 	{
 		if(GetControlType(pControl)==typeForm)
 		{
-			CFormUI* pForm=m_LayoutManager.GetForm();
+			CWindowUI* pForm=m_LayoutManager.GetForm();
 			SIZE size;
 			size.cx=pForm->GetFixedWidth();
 			size.cy=pForm->GetFixedHeight();
 			pForm->SetInitSize(size.cx,size.cy);
 
-			g_pPropertiesWnd->SetPropValue(pControl,tagFormSize);
+			g_pPropertiesWnd->SetPropValue(pControl,tagWindowSize);
 			SetScrollSizes(MM_TEXT,CSize(size.cx+FORM_OFFSET_X+80,
 				size.cy+FORM_OFFSET_Y+80));
 			m_MultiTracker.SetFormSize(size);
@@ -416,7 +416,7 @@ void CUIDesignerView::Notify(TNotifyUI& msg)
 	{
 		if(GetControlType(pControl)!=typeForm)
 			return;
-		CFormUI* pForm=m_LayoutManager.GetForm();
+		CWindowUI* pForm=m_LayoutManager.GetForm();
 		SIZE size=pForm->GetInitSize();
 
 		pForm->SetFixedWidth(size.cx);
@@ -1165,7 +1165,7 @@ void CUIDesignerView::OnStyleSaveAs()
 BOOL CUIDesignerView::SaveSkinImage(LPCTSTR pstrPathName)
 {
 	CImage image;
-	CFormUI* pForm = m_LayoutManager.GetForm();
+	CWindowUI* pForm = m_LayoutManager.GetForm();
 	ASSERT(pForm);
 
 	CSize szForm = pForm->GetInitSize();

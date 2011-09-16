@@ -346,11 +346,11 @@ void CUIProperties::InitPropList()
 	CMFCPropertyGridColorProperty* pPropColor=NULL;
 	CMFCPropertyGridImageProperty* pPropImage=NULL;
 
-	//Form
-#pragma region Form
-	pPropUI=new CMFCPropertyGridProperty(_T("Form"),classForm);
+	//Window
+#pragma region Window
+	pPropUI=new CMFCPropertyGridProperty(_T("Window"),classForm);
 
-	pValueList=new CMFCPropertyGridProperty(_T("Size"),tagFormSize,TRUE);//size
+	pValueList=new CMFCPropertyGridProperty(_T("Size"),tagWindowSize,TRUE);//size
 	pProp=new CMFCPropertyGridProperty(_T("Width"),(_variant_t)(LONG)0,_T("窗体的宽度"));
 	pValueList->AddSubItem(pProp);
 	pProp=new CMFCPropertyGridProperty(_T("Height"),(_variant_t)(LONG)0,_T("窗体的高度"));
@@ -411,8 +411,46 @@ void CUIProperties::InitPropList()
 	pProp->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pProp);
 
+	// tagAlpha
+	pProp=new CMFCPropertyGridProperty(_T("Alpha"),(_variant_t)(LONG)0,_T("窗口的alpha值(0-255)\n255"),tagAlpha);
+	pPropUI->AddSubItem(pProp);
+
+	// tagBkTrans
+	pProp=new CMFCPropertyGridProperty(_T("BkTrans"),(_variant_t)false,_T("窗口是否使用静态透明背景\nfalse"),tagBkTrans);
+	pPropUI->AddSubItem(pProp);
+
+	// tagDefaultFontColor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("DefaultFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的字体颜色"),tagDefaultFontColor);
+	pPropColor->EnableOtherButton(_T("其他..."));
+	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
+	pPropUI->AddSubItem(pPropColor);
+
+	// tagSelectedFontColor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("SelectedColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的selected字体颜色"),tagSelectedFontColor);
+	pPropColor->EnableOtherButton(_T("其他..."));
+	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
+	pPropUI->AddSubItem(pPropColor);
+
+	//	DisabledFontColor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("DisabledFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的Disabled字体颜色"),tagDisabledFontColor);
+	pPropColor->EnableOtherButton(_T("其他..."));
+	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
+	pPropUI->AddSubItem(pPropColor);
+
+	// tagLinkFontColor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("LinkFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的link字体颜色"),tagLinkFontColor);
+	pPropColor->EnableOtherButton(_T("其他..."));
+	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
+	pPropUI->AddSubItem(pPropColor);
+
+	// tagLinkHoverFontColor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("LinkHoverFontColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定默认的linkhoverfont字体颜色"),tagLinkHoverFontColor);
+	pPropColor->EnableOtherButton(_T("其他..."));
+	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
+	pPropUI->AddSubItem(pPropColor);
+
 	m_wndPropList.AddProperty(pPropUI);
-#pragma endregion Form
+#pragma endregion Window
 
 	//Control
 #pragma region Control
@@ -891,6 +929,7 @@ void CUIProperties::InitPropList()
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion List
 
+	//ScrollBar
 #pragma region ScrollBar
 
 	pPropUI=new CMFCPropertyGridProperty(_T("ScrollBar"),classScrollBar);
@@ -1033,7 +1072,7 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 	switch(pExtended->nClass)
 	{
 	case classForm:
-		ShowFormProperty(pControl);
+		ShowWindowProperty(pControl);
 		break;
 	case classControl:
 		ShowControlProperty(pControl);
@@ -1090,10 +1129,10 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 	m_wndPropList.AdjustLayout();
 }
 
-void CUIProperties::ShowFormProperty(CControlUI* pControl)
+void CUIProperties::ShowWindowProperty(CControlUI* pControl)
 {
 	ASSERT(pControl);
-	CFormUI* pForm=static_cast<CFormUI*>(pControl->GetInterface(_T("Form")));
+	CWindowUI* pForm=static_cast<CWindowUI*>(pControl->GetInterface(_T("Form")));
 	ASSERT(pForm);
 
 	CMFCPropertyGridProperty* pPropForm=m_wndPropList.FindItemByData(classForm,FALSE);
@@ -1101,14 +1140,14 @@ void CUIProperties::ShowFormProperty(CControlUI* pControl)
 
 	//size
 	SIZE size=pForm->GetInitSize();
-	CMFCPropertyGridProperty* pValueList=pPropForm->GetSubItem(tagFormSize-tagForm);
+	CMFCPropertyGridProperty* pValueList=pPropForm->GetSubItem(tagWindowSize-tagWindow);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
 	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//caption
 	RECT rect=pForm->GetCaptionRect();
-	pValueList=pPropForm->GetSubItem(tagCaption-tagForm);
+	pValueList=pPropForm->GetSubItem(tagCaption-tagWindow);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)rect.left);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
@@ -1119,7 +1158,7 @@ void CUIProperties::ShowFormProperty(CControlUI* pControl)
 	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//sizebox
 	rect=pForm->GetSizeBox();
-	pValueList=pPropForm->GetSubItem(tagSizeBox-tagForm);
+	pValueList=pPropForm->GetSubItem(tagSizeBox-tagWindow);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)rect.left);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetValue((_variant_t)(LONG)rect.right);
@@ -1130,28 +1169,56 @@ void CUIProperties::ShowFormProperty(CControlUI* pControl)
 	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
 	//roundcorner
 	size=pForm->GetRoundCorner();
-	pValueList=pPropForm->GetSubItem(tagRoundCorner-tagForm);
+	pValueList=pPropForm->GetSubItem(tagRoundCorner-tagWindow);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
 	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//mininfo
 	size=pForm->GetMinInfo();
-	pValueList=pPropForm->GetSubItem(tagMinInfo-tagForm);
+	pValueList=pPropForm->GetSubItem(tagMinInfo-tagWindow);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
 	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//maxinfo
 	size=pForm->GetMaxInfo();
-	pValueList=pPropForm->GetSubItem(tagMaxInfo-tagForm);
+	pValueList=pPropForm->GetSubItem(tagMaxInfo-tagWindow);
 	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
 	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	//showdirty
-	pPropForm->GetSubItem(tagShowDirty-tagForm)->SetValue((_variant_t)pForm->IsShowUpdateRect());
-	pPropForm->GetSubItem(tagShowDirty-tagForm)->SetOriginalValue((_variant_t)pForm->IsShowUpdateRect());
+	pPropForm->GetSubItem(tagShowDirty-tagWindow)->SetValue((_variant_t)pForm->IsShowUpdateRect());
+	pPropForm->GetSubItem(tagShowDirty-tagWindow)->SetOriginalValue((_variant_t)pForm->IsShowUpdateRect());
+
+	// tagAlpha
+	pPropForm->GetSubItem(tagAlpha-tagWindow)->SetValue((_variant_t)(LONG)pForm->GetAlpha());
+	pPropForm->GetSubItem(tagAlpha-tagWindow)->SetOriginalValue((_variant_t)(LONG)pForm->GetAlpha());
+
+	// tagBkTrans
+	pPropForm->GetSubItem(tagBkTrans-tagWindow)->SetValue((_variant_t)pForm->GetBackgroundTransparent());
+	pPropForm->GetSubItem(tagBkTrans-tagWindow)->SetOriginalValue((_variant_t)pForm->GetBackgroundTransparent());
+
+	// tagDefaultFontColor
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDefaultFontColor-tagWindow))->SetColor((_variant_t)(LONG)(pForm->GetDefaultFontColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDefaultFontColor-tagWindow))->SetOriginalValue((_variant_t)(LONG)(pForm->GetDefaultFontColor()));
+
+	// tagSelectedFontColor
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagSelectedFontColor-tagWindow))->SetColor((_variant_t)(LONG)(pForm->GetDefaultSelectedFontColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagSelectedFontColor-tagWindow))->SetOriginalValue((_variant_t)(LONG)(pForm->GetDefaultSelectedFontColor()));
+
+	// tagDisabledFontColor
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDisabledFontColor-tagWindow))->SetColor((_variant_t)(LONG)(pForm->GetDefaultDisabledFontColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagDisabledFontColor-tagWindow))->SetOriginalValue((_variant_t)(LONG)(pForm->GetDefaultDisabledFontColor()));
+
+	// tagLinkFontColor
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkFontColor-tagWindow))->SetColor((_variant_t)(LONG)(pForm->GetDefaultLinkFontColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkFontColor-tagWindow))->SetOriginalValue((_variant_t)(LONG)(pForm->GetDefaultLinkFontColor()));
+
+	// tagLinkHoverFontColor
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkHoverFontColor-tagWindow))->SetColor((_variant_t)(LONG)(pForm->GetDefaultLinkHoverFontColor()));
+	static_cast<CMFCPropertyGridColor32Property*>(pPropForm->GetSubItem(tagLinkHoverFontColor-tagWindow))->SetOriginalValue((_variant_t)(LONG)(pForm->GetDefaultLinkHoverFontColor()));
 
 	pPropForm->Show(TRUE,FALSE);
 }
@@ -1802,23 +1869,23 @@ void CUIProperties::ShowScrollBarProperty( CControlUI* pControl )
 	//tagScrollBarLineSize
 	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
 	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetOriginalValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
- 	// tagScrollBarShowButton1
+	// tagScrollBarShowButton1
 	pPropItem->GetSubItem(tagScrollBarShowButton1-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetShowButton1());
 	pPropItem->GetSubItem(tagScrollBarShowButton1-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetShowButton1());
- 	//	tagScrollBarShowButton2
+	//	tagScrollBarShowButton2
 	pPropItem->GetSubItem(tagScrollBarShowButton2-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetShowButton2());
 	pPropItem->GetSubItem(tagScrollBarShowButton2-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetShowButton2());
 
- 	//	tagScrollBarButton1NormalImage
+	//	tagScrollBarButton1NormalImage
 	pPropItem->GetSubItem(tagScrollBarButton1NormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1NormalImage());
 	pPropItem->GetSubItem(tagScrollBarButton1NormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1NormalImage());
- 	//	tagScrollBarButton1HotImage
+	//	tagScrollBarButton1HotImage
 	pPropItem->GetSubItem(tagScrollBarButton1HotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1HotImage());
 	pPropItem->GetSubItem(tagScrollBarButton1HotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1HotImage());
- 	//	tagScrollBarButton1PushedImage
+	//	tagScrollBarButton1PushedImage
 	pPropItem->GetSubItem(tagScrollBarButton1PushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1PushedImage());
 	pPropItem->GetSubItem(tagScrollBarButton1PushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1PushedImage());
- 	//	tagScrollBarButton1DisabledImage
+	//	tagScrollBarButton1DisabledImage
 	pPropItem->GetSubItem(tagScrollBarButton1DisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1DisabledImage());
 	pPropItem->GetSubItem(tagScrollBarButton1DisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1DisabledImage());
 
@@ -1835,42 +1902,42 @@ void CUIProperties::ShowScrollBarProperty( CControlUI* pControl )
 	pPropItem->GetSubItem(tagScrollBarButton2DisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton2DisabledImage());
 	pPropItem->GetSubItem(tagScrollBarButton2DisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton2DisabledImage());
 
- 	//	tagScrollBarThumbNormalImage
+	//	tagScrollBarThumbNormalImage
 	pPropItem->GetSubItem(tagScrollBarThumbNormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbNormalImage());
 	pPropItem->GetSubItem(tagScrollBarThumbNormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbNormalImage());
- 	//	tagScrollBarThumbHotImage
+	//	tagScrollBarThumbHotImage
 	pPropItem->GetSubItem(tagScrollBarThumbHotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbHotImage());
 	pPropItem->GetSubItem(tagScrollBarThumbHotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbHotImage());
- 	//	tagScrollBarThumbPushedImage
+	//	tagScrollBarThumbPushedImage
 	pPropItem->GetSubItem(tagScrollBarThumbPushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbPushedImage());
 	pPropItem->GetSubItem(tagScrollBarThumbPushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbPushedImage());
- 	//	tagScrollBarThumbDisabledImage
+	//	tagScrollBarThumbDisabledImage
 	pPropItem->GetSubItem(tagScrollBarThumbDisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbDisabledImage());
 	pPropItem->GetSubItem(tagScrollBarThumbDisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbDisabledImage());
 
- 	//	tagScrollBarRailNormalImage
+	//	tagScrollBarRailNormalImage
 	pPropItem->GetSubItem(tagScrollBarRailNormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailNormalImage());
 	pPropItem->GetSubItem(tagScrollBarRailNormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetRailNormalImage());
- 	//	tagScrollBarRailHotImage
+	//	tagScrollBarRailHotImage
 	pPropItem->GetSubItem(tagScrollBarRailHotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailHotImage());
 	pPropItem->GetSubItem(tagScrollBarRailHotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1HotImage());
- 	//	tagScrollBarRailPushedImage
+	//	tagScrollBarRailPushedImage
 	pPropItem->GetSubItem(tagScrollBarRailPushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailPushedImage());
 	pPropItem->GetSubItem(tagScrollBarRailPushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetRailPushedImage());
- 	//	tagScrollBarRailDisabledImage
+	//	tagScrollBarRailDisabledImage
 	pPropItem->GetSubItem(tagScrollBarRailDisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailDisabledImage());
 	pPropItem->GetSubItem(tagScrollBarRailDisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetRailDisabledImage());
 
- 	//	tagScrollBarBKNormalImage
+	//	tagScrollBarBKNormalImage
 	pPropItem->GetSubItem(tagScrollBarBKNormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkNormalImage());
 	pPropItem->GetSubItem(tagScrollBarBKNormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkNormalImage());
- 	//	tagScrollBarBKHotImage
+	//	tagScrollBarBKHotImage
 	pPropItem->GetSubItem(tagScrollBarBKHotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkHotImage());
 	pPropItem->GetSubItem(tagScrollBarBKHotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkHotImage());
- 	//	tagScrollBarBKPushedImage
+	//	tagScrollBarBKPushedImage
 	pPropItem->GetSubItem(tagScrollBarBKPushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkPushedImage());
 	pPropItem->GetSubItem(tagScrollBarBKPushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkPushedImage());
- 	//	tagScrollBarBKDisabledImage
+	//	tagScrollBarBKDisabledImage
 	pPropItem->GetSubItem(tagScrollBarBKDisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkDisabledImage());
 	pPropItem->GetSubItem(tagScrollBarBKDisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkDisabledImage());
 

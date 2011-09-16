@@ -15,11 +15,11 @@ using DuiLib::IDialogBuilderCallback;
 //////////////////////////////////////////////////////////////////////////
 //CFormUI
 
-class CFormUI : public CContainerUI
+class CWindowUI : public CContainerUI
 {
 public:
-	CFormUI();
-	virtual ~CFormUI();
+	CWindowUI();
+	virtual ~CWindowUI();
 
 public:
 	LPCTSTR GetClass() const;
@@ -42,6 +42,37 @@ public:
 	void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
 	void SetPos(RECT rc);
+
+public:
+	void			SetAlpha(int nOpacity);
+	int			GetAlpha() const;
+
+	void			SetBackgroundTransparent(bool bTrans);
+	bool			GetBackgroundTransparent() const;
+
+	void			SetDefaultFontColor(DWORD dwColor);
+	DWORD	GetDefaultFontColor() const;
+
+	void			SetDefaultSelectedFontColor(DWORD dwColor);
+	DWORD	GetDefaultSelectedFontColor() const;
+
+	void			SetDefaultDisabledFontColor(DWORD dwColor);
+	DWORD	GetDefaultDisabledFontColor() const;
+
+	void			SetDefaultLinkFontColor(DWORD dwColor);
+	DWORD	GetDefaultLinkFontColor() const;
+
+	void			SetDefaultLinkHoverFontColor(DWORD dwColor);
+	DWORD	GetDefaultLinkHoverFontColor() const;
+
+private:
+	int			m_nOpacity;
+	bool			m_bAlphaBackground;
+	DWORD	m_dwDefaultFontColor;
+	DWORD	m_dwDefaultDisabledFontColor;
+	DWORD	m_dwDefaultLinkFontColor;
+	DWORD	m_dwDefaultLinkHoverFontColor;
+	DWORD	m_dwDefaultSelectedFontColor;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -97,7 +128,7 @@ public:
 	static BOOL DeleteUI(CControlUI* pControl);
 	static void ReleaseExtendedAttrib(CControlUI* pControl, CPaintManagerUI* pManager);
 	CPaintManagerUI* GetManager();
-	inline CFormUI* GetForm() const;
+	inline CWindowUI* GetForm() const;
 	CControlUI* FindControl(CPoint point) const;
 
 	void TestForm();
@@ -172,7 +203,7 @@ protected:
 
 private:
 	CPaintManagerUI m_Manager;
-	CFormUI* m_pFormUI;
+	CWindowUI* m_pFormUI;
 	CString m_strSkinDir;
 
 	bool m_bShowGrid;

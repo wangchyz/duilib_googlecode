@@ -90,12 +90,12 @@ void CPropertiesWnd::SetPropValue(CControlUI* pControl,int nTag)
 	CMFCPropertyGridProperty* pValueList=NULL;
 	switch(nTag)
 	{
-	case tagFormSize:
+	case tagWindowSize:
 		{
 			pPropUI = m_wndUIProperties.FindPropByData(classForm,FALSE);
 
 			RECT rect=pControl->GetPos();
-			pValueList=pPropUI->GetSubItem(tagFormSize-tagForm);
+			pValueList=pPropUI->GetSubItem(tagWindowSize-tagWindow);
 			pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)(rect.right-rect.left));
 			pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)(rect.bottom-rect.top));
 			pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)(rect.right-rect.left));
@@ -217,7 +217,7 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	Msg.lParam = (LPARAM)&newAttrib;
 	pUIView->Notify(Msg);
 
-	if(nTag==tagFormSize)
+	if(nTag==tagWindowSize)
 	{
 		Msg.sType=_T("formsize");
 		Msg.lParam = NULL;
