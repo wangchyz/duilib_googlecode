@@ -2094,7 +2094,6 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		break;
 	case classContainer:
 	case classVerticalLayout:
-	case classDialogLayout:
 	case classTabLayout:
 		SaveContainerProperty(pControl, pNode);
 		break;
@@ -2106,8 +2105,6 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		break;
 	default:
 		break;
-		//delete pNode;
-		return;
 	}
 	TiXmlNode* pNodeElement = pParentNode->InsertEndChild(*pNode);
 	delete pNode;

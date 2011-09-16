@@ -977,7 +977,6 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 		break;
 	case classContainer:
 	case classVerticalLayout:
-	case classDialogLayout:
 	case classTabLayout:
 	case classListContainerElement:/*!*/
 		ShowContainerProperty(pControl);

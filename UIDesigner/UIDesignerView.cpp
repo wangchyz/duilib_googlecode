@@ -1080,8 +1080,6 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 		break;
 	case classVerticalLayout:
 		break;
-	case classDialogLayout:
-		break;
 	case classTabLayout:
 		pPropDlg = new CPropertyTabLayoutUI(pControl);
 		break;

@@ -118,7 +118,6 @@ enum UIClass
 	classContainer,
 	classVerticalLayout,
 	classHorizontalLayout,
-	classDialogLayout,
 	classTabLayout,
 	classTileLayout,
 	classListHeader,

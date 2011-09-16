@@ -45,9 +45,6 @@ int gGetUIClass(LPCTSTR pstrClass)
 			if( _tcscmp(pstrClass, _T("ListHeaderUI")) == 0 )             nClass=classListHeader;
 			else if( _tcscmp(pstrClass, _T("TileLayoutUI")) == 0 )        nClass=classTileLayout;
 			break;
-		case 14:
-			if( _tcscmp(pstrClass, _T("DialogLayoutUI")) == 0 )           nClass=classDialogLayout;
-			break;
 		case 16:
 			if( _tcscmp(pstrClass, _T("VerticalLayoutUI")) == 0 )         nClass=classVerticalLayout;
 			else if( _tcscmp(pstrClass, _T("ListHeaderItemUI")) == 0 )    nClass=classListHeaderItem;
