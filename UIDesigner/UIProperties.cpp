@@ -348,7 +348,7 @@ void CUIProperties::InitPropList()
 
 	//Window
 #pragma region Window
-	pPropUI=new CMFCPropertyGridProperty(_T("Window"),classForm);
+	pPropUI=new CMFCPropertyGridProperty(_T("Window"),classWindow);
 
 	pValueList=new CMFCPropertyGridProperty(_T("Size"),tagWindowSize,TRUE);//size
 	pProp=new CMFCPropertyGridProperty(_T("Width"),(_variant_t)(LONG)0,_T("窗体的宽度"));
@@ -804,7 +804,7 @@ void CUIProperties::InitPropList()
 	pProp->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pProp);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("ItemTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定组项文本的颜色"),tagItemTextColor);//itemtextcolor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项文本的颜色"),tagItemTextColor);//itemtextcolor
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
@@ -814,7 +814,7 @@ void CUIProperties::InitPropList()
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("ItemSelectedTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定组项被选中后文本的颜色"),tagItemSelectedTextColor);//itemselectedtextcolor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemSelectedTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项被选中后文本的颜色"),tagItemSelectedTextColor);//itemselectedtextcolor
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
@@ -824,7 +824,7 @@ void CUIProperties::InitPropList()
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("ItemHotTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定组项获得热点时文本的颜色"),tagItemHotTextColor);//itemhottextcolor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemHotTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项获得热点时文本的颜色"),tagItemHotTextColor);//itemhottextcolor
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
@@ -834,7 +834,7 @@ void CUIProperties::InitPropList()
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("ItemDisabledTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定组项被禁用后文本的颜色"),tagItemDisabledTextColor);//itemdisabledtextcolor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemDisabledTextColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项被禁用后文本的颜色"),tagItemDisabledTextColor);//itemdisabledtextcolor
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
@@ -844,7 +844,7 @@ void CUIProperties::InitPropList()
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("ItemLineColor"),(LONG)RGB(0,0,0),NULL,_T("指定组项分割线的颜色"),tagItemLineColor);//itemlinecolor
+	pPropColor=new CMFCPropertyGridColor32Property(_T("ItemLineColor"),(LONG)ARGB(0,0,0,0),NULL,_T("指定组项分割线的颜色"),tagItemLineColor);//itemlinecolor
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
@@ -1071,7 +1071,7 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 	}
 	switch(pExtended->nClass)
 	{
-	case classForm:
+	case classWindow:
 		ShowWindowProperty(pControl);
 		break;
 	case classControl:
@@ -1135,7 +1135,7 @@ void CUIProperties::ShowWindowProperty(CControlUI* pControl)
 	CWindowUI* pForm=static_cast<CWindowUI*>(pControl->GetInterface(_T("Form")));
 	ASSERT(pForm);
 
-	CMFCPropertyGridProperty* pPropForm=m_wndPropList.FindItemByData(classForm,FALSE);
+	CMFCPropertyGridProperty* pPropForm=m_wndPropList.FindItemByData(classWindow,FALSE);
 	ASSERT(pPropForm);
 
 	//size

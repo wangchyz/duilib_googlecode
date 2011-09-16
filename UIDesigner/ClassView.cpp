@@ -246,7 +246,7 @@ void CClassView::InsertUITreeItem(CControlUI* pControl,LPCTSTR pstrName/*=NULL*/
 	if(strName.IsEmpty())
 		strName=pControl->GetName();
 
-	int nImage = ((ExtendedAttributes*)pControl->GetTag())->nClass - classForm;
+	int nImage = ((ExtendedAttributes*)pControl->GetTag())->nClass - classWindow;
 	HTREEITEM hItem=m_wndClassView.InsertItem(strName, nImage, nImage,hParent);
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
 	pExtended->hItem=hItem;
