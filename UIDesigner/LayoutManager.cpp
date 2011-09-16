@@ -1829,7 +1829,7 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if(pListUI->GetHeader() && !pListUI->GetHeader()->IsVisible())
-		pNode->SetAttribute("header", "false");
+		pNode->SetAttribute("header", "hidden");
 	else
 		pNode->RemoveAttribute("header");
 
