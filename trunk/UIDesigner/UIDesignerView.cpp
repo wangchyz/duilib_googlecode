@@ -1055,7 +1055,7 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
 	switch(pExtended->nClass)
 	{
-	case classForm:
+	case classWindow:
 		break;
 	case classControl:
 		break;

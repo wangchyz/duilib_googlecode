@@ -92,7 +92,7 @@ void CPropertiesWnd::SetPropValue(CControlUI* pControl,int nTag)
 	{
 	case tagWindowSize:
 		{
-			pPropUI = m_wndUIProperties.FindPropByData(classForm,FALSE);
+			pPropUI = m_wndUIProperties.FindPropByData(classWindow,FALSE);
 
 			RECT rect=pControl->GetPos();
 			pValueList=pPropUI->GetSubItem(tagWindowSize-tagWindow);

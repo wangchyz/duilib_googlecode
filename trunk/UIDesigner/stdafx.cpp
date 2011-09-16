@@ -18,7 +18,7 @@ int gGetUIClass(LPCTSTR pstrClass)
 	SIZE_T cchLen = _tcslen(pstrClass);
 	switch( cchLen ) {
 		case 6:
-			if( _tcscmp(pstrClass, _T("FormUI")) == 0 )                   nClass=classForm;
+			if( _tcscmp(pstrClass, _T("FormUI")) == 0 )                   nClass=classWindow;
 			else if( _tcscmp(pstrClass, _T("EditUI")) == 0 )              nClass=classEdit;
 			else if( _tcscmp(pstrClass, _T("ListUI")) == 0 )              nClass=classList;
 			else if( _tcscmp(pstrClass, _T("TextUI")) == 0 )              nClass=classText;

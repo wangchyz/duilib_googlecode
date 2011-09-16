@@ -103,7 +103,7 @@ enum UIType
 enum UIClass
 {
 	classPointer=100,
-	classForm,
+	classWindow,
 	classControl,
 	classButton,
 	classEdit,

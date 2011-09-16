@@ -3,6 +3,8 @@
 #include "UIUtil.h"
 #include <vector>
 
+using DuiLib::IListOwnerUI;
+
 //////////////////////////////////////////////////////////////////////////
 //CWindowUI
 
@@ -543,7 +545,7 @@ CControlUI* CLayoutManager::CreateControl(LPCTSTR pstrClass)
 
 void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 {
-	m_pFormUI=static_cast<CWindowUI*>(NewUI(classForm,
+	m_pFormUI=static_cast<CWindowUI*>(NewUI(classWindow,
 		CRect(0,0,FORM_INIT_WIDTH,FORM_INIT_HEIGHT),NULL, NULL)->GetInterface(_T("Form")));
 	ASSERT(m_pFormUI);
 	m_pFormUI->SetManager(&m_Manager, NULL);
@@ -635,9 +637,9 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CL
 	ZeroMemory(pExtended,sizeof(ExtendedAttributes));
 	switch(nClass)
 	{
-	case classForm:
+	case classWindow:
 		pControl=new CWindowUI;
-		pExtended->nClass=classForm;
+		pExtended->nClass=classWindow;
 		pExtended->nDepth = 0;
 		pControl->SetName(pControl->GetClass());
 		break;
@@ -1008,7 +1010,9 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 	case classListContainerElement:
 		pCopyControl = new CListContainerElementUI(*static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement"))));
 		break;
-	default:		pCopyControl = new CUserDefineUI(*static_cast<CUserDefineUI*>(pControl));		break;
+	default:
+		pCopyControl = new CUserDefineUI(*static_cast<CUserDefineUI*>(pControl));
+		break;
 	}
 
 	return pCopyControl;
@@ -1825,6 +1829,8 @@ void CLayoutManager::SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* p
 void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
 	SaveControlProperty(pControl, pNode);
+	SaveItemProperty(pControl,pNode);
+
 	CListUI* pListUI = static_cast<CListUI*>(pControl->GetInterface(_T("List")));
 
 	TCHAR szBuf[MAX_PATH] = {0};
@@ -1836,89 +1842,6 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 
 	if(pListUI->GetHeader() && pListUI->GetHeader()->GetBkImage() && _tcslen(pListUI->GetHeader()->GetBkImage()) > 0)
 		pNode->SetAttribute("headerbkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetHeader()->GetBkImage())));	
-
-	RECT rcTextPadding = pListUI->GetItemTextPadding();
-	if((rcTextPadding.left != 0) || (rcTextPadding.right != 0) || (rcTextPadding.bottom != 0) || (rcTextPadding.top != 0))
-	{
-		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), rcTextPadding.left, rcTextPadding.top, rcTextPadding.right, rcTextPadding.bottom);
-		pNode->SetAttribute("itemtextpadding", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetItemTextColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemtextcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetItemBkColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itembkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetSelectedItemTextColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetSelectedItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedtextcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetSelectedItemBkColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetSelectedItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedbkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetHotItemTextColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetHotItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhottextcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetHotItemBkColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetHotItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhotbkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetDisabledItemTextColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetDisabledItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledtextcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetDisabledItemBkColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetDisabledItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledbkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetItemLineColor() != 0)
-	{
-		DWORD dwColor = pListUI->GetItemLineColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-
-		pNode->SetAttribute("itemlinecolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pListUI->GetItemBkImage() && _tcslen(pListUI->GetItemBkImage()) > 0)
-		pNode->SetAttribute("itembkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetItemBkImage())));
-
-	if(pListUI->GetSelectedItemImage() && _tcslen(pListUI->GetSelectedItemImage()) > 0)
-		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetSelectedItemImage())));
-
-	if(pListUI->GetHotItemImage() && _tcslen(pListUI->GetHotItemImage()) > 0)
-		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetHotItemImage())));
-
-	if(pListUI->GetDisabledItemImage() && _tcslen(pListUI->GetDisabledItemImage()) > 0)
-		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetDisabledItemImage())));
 
 	if(pListUI->IsItemShowHtml())
 		pNode->SetAttribute("itemshowhtml",pListUI->IsItemShowHtml()?"true":"false");
@@ -1939,18 +1862,13 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 
 	if(pListUI->GetHeader())
 	{
-		CContainerUI* pContainerUI = static_cast<CContainerUI*>(pListUI->GetHeader()->GetInterface(_T("Container")));
-		for( int it = 0; it < pContainerUI->GetCount(); it++ )
-		{
-			CControlUI* pControl = static_cast<CControlUI*>(pContainerUI->GetItemAt(it));
-			SaveProperties(pControl, pNode);
-		}
+		CContainerUI* pContainerUI = static_cast<CContainerUI*>(pListUI->GetHeader());
+		SaveProperties(pContainerUI,pNode);
 	}
 }
 
 void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
-	SaveContainerProperty(pControl, pNode);
 	CComboUI* pComboUI = static_cast<CComboUI*>(pControl->GetInterface(_T("Combo")));
 
 	TCHAR szBuf[MAX_PATH] = {0};
@@ -1976,90 +1894,6 @@ void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode
 		pNode->SetAttribute("dropboxsize", StringConvertor::WideToUtf8(szBuf));
 	}
 
-	RECT rcItemPadding = pComboUI->GetItemTextPadding();
-	if((rcItemPadding.left != 0) || (rcItemPadding.right != 0) || (rcItemPadding.bottom != 0) || (rcItemPadding.top != 0))
-	{
-		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), rcItemPadding.left, rcItemPadding.top, rcItemPadding.right, rcItemPadding.bottom);
-		pNode->SetAttribute("itemtextpadding", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetItemTextColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemtextcolor", StringConvertor::WideToUtf8(szBuf));
-
-	}
-
-	if(pComboUI->GetItemBkColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itembkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetSelectedItemTextColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetSelectedItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedtextcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetSelectedItemBkColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetSelectedItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemselectedbkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetHotItemTextColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetHotItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhottextcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetHotItemBkColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetHotItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemhotbkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetDisabledItemTextColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetDisabledItemTextColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledtextcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetDisabledItemBkColor() != 0)
-	{
-
-		DWORD dwColor = pComboUI->GetDisabledItemBkColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemdisabledbkcolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetItemLineColor() != 0)
-	{
-		DWORD dwColor = pComboUI->GetItemLineColor();					
-		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
-		pNode->SetAttribute("itemlinecolor", StringConvertor::WideToUtf8(szBuf));
-	}
-
-	if(pComboUI->GetItemBkImage() && _tcslen(pComboUI->GetItemBkImage()) > 0)
-		pNode->SetAttribute("itembkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetItemBkImage())));
-
-	if(pComboUI->GetSelectedItemImage() && _tcslen(pComboUI->GetSelectedItemImage()) > 0)
-		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetSelectedItemImage())));
-
-	if(pComboUI->GetHotItemImage() && _tcslen(pComboUI->GetHotItemImage()) > 0)
-		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetHotItemImage())));
-
-	if(pComboUI->GetDisabledItemImage() && _tcslen(pComboUI->GetDisabledItemImage()) > 0)
-		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pComboUI->GetDisabledItemImage())));
-
 	if(pComboUI->IsItemShowHtml())
 		pNode->SetAttribute("itemshowhtml",pComboUI->IsItemShowHtml()?"true":"false");
 
@@ -2070,6 +1904,9 @@ void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode
 		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), rcInset.left, rcInset.top, rcInset.right, rcInset.bottom);
 		pNode->SetAttribute("inset", StringConvertor::WideToUtf8(szBuf));
 	}
+
+	SaveItemProperty(pControl,pNode);
+	SaveContainerProperty(pControl, pNode);
 }
 
 void CLayoutManager::SaveListHeaderItemProperty(CControlUI* pControl, TiXmlElement* pNode)
@@ -2598,4 +2435,94 @@ CString CLayoutManager::ConvertImageFileName(LPCTSTR pstrImageAttrib)
 	}
 
 	return strImageAttrib;
+}
+
+void CLayoutManager::SaveItemProperty( CControlUI* pControl, TiXmlElement* pNode )
+{
+	IListOwnerUI* pList=static_cast<IListOwnerUI*>(pControl->GetInterface(_T("IListOwner")));
+	TListInfoUI* pListInfo=pList->GetListInfo();
+	TCHAR szBuf[MAX_PATH] = {0};
+
+	RECT rcItemPadding = pListInfo->rcTextPadding;
+	if((rcItemPadding.left != 0) || (rcItemPadding.right != 0) || (rcItemPadding.bottom != 0) || (rcItemPadding.top != 0))
+	{
+		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), rcItemPadding.left, rcItemPadding.top, rcItemPadding.right, rcItemPadding.bottom);
+		pNode->SetAttribute("itemtextpadding", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwTextColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwTextColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemtextcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwBkColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwBkColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itembkcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwSelectedTextColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwSelectedTextColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemselectedtextcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwSelectedBkColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwSelectedBkColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemselectedbkcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwHotTextColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwHotTextColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemhottextcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwHotBkColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwHotBkColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemhotbkcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwDisabledTextColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwDisabledTextColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemdisabledtextcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwDisabledBkColor != 0)
+	{
+
+		DWORD dwColor = pListInfo->dwDisabledBkColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemdisabledbkcolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->dwLineColor != 0)
+	{
+		DWORD dwColor = pListInfo->dwLineColor;					
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("itemlinecolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListInfo->sBkImage && _tcslen(pListInfo->sBkImage) > 0)
+		pNode->SetAttribute("itembkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListInfo->sBkImage)));
+
+	if(pListInfo->sSelectedImage && _tcslen(pListInfo->sSelectedImage) > 0)
+		pNode->SetAttribute("itemselectedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListInfo->sSelectedImage)));
+
+	if(pListInfo->sHotImage && _tcslen(pListInfo->sHotImage) > 0)
+		pNode->SetAttribute("itemhotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListInfo->sHotImage)));
+
+	if(pListInfo->sDisabledImage && _tcslen(pListInfo->sDisabledImage) > 0)
+		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListInfo->sDisabledImage)));
 }
