@@ -85,11 +85,11 @@ void CToolBoxWnd::InitToolList()
 	m_ctlToolList.AddToolTab(pControlTab);
 
 	CToolElement* pLayoutTab=new CToolElement(_T("布局"));
-	pLayoutTab->AddSubTool(new CToolElement(_T("Container容器"),classContainer,IDI_TOOLBOX_CONTAINER));
-	pLayoutTab->AddSubTool(new CToolElement(_T("VerticalLayout垂直布局"),classVerticalLayout,IDI_TOOLBOX_VERTICAL_LAYOUT));
-	pLayoutTab->AddSubTool(new CToolElement(_T("HorizontalLayout水平布局"),classHorizontalLayout,IDI_TOOLBOX_HORIZONTAL_LAYOUT));
-	pLayoutTab->AddSubTool(new CToolElement(_T("TileLayout并列布局"),classTileLayout,IDI_TOOLBOX_TILE_LAYOUT));
-	pLayoutTab->AddSubTool(new CToolElement(_T("TabLayout选项页布局"),classTabLayout,IDI_TOOLBOX_TAB_LAYOUT));
+	pLayoutTab->AddSubTool(new CToolElement(_T("Container"),classContainer,IDI_TOOLBOX_CONTAINER));
+	pLayoutTab->AddSubTool(new CToolElement(_T("VerticalLayout"),classVerticalLayout,IDI_TOOLBOX_VERTICAL_LAYOUT));
+	pLayoutTab->AddSubTool(new CToolElement(_T("HorizontalLayout"),classHorizontalLayout,IDI_TOOLBOX_HORIZONTAL_LAYOUT));
+	pLayoutTab->AddSubTool(new CToolElement(_T("TileLayout"),classTileLayout,IDI_TOOLBOX_TILE_LAYOUT));
+	pLayoutTab->AddSubTool(new CToolElement(_T("TabLayout"),classTabLayout,IDI_TOOLBOX_TAB_LAYOUT));
 	m_ctlToolList.AddToolTab(pLayoutTab);
 
 	m_ctlToolList.SetCurSel(classPointer);
