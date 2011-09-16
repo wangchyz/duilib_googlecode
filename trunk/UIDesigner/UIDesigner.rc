@@ -474,23 +474,22 @@ IDR_UI MENU
 BEGIN
     POPUP "UI"
     BEGIN
-        MENUITEM "按钮",                          ID_UI_CONTROL_BUTTON
-        MENUITEM "标准控件",                        ID_UI_CONTROL_CONTROL
-        MENUITEM "标签",                          ID_UI_CONTROL_LABEL
-        MENUITEM "文本框",                         ID_UI_CONTROL_TEXT
-        MENUITEM "编辑框",                         ID_UI_CONTROL_EDIT
-        MENUITEM "复选框",                         ID_UI_CONTROL_OPTION
-        MENUITEM "组合框",                         ID_UI_CONTROL_COMBO
-        MENUITEM "进度条",                         ID_UI_CONTROL_PROGRESS
-        MENUITEM "滑块",                          ID_UI_CONTROL_SLIDER
-        MENUITEM "ActiveX控件",                   ID_UI_CONTROL_ACTIVEX
+        MENUITEM "Control",                     ID_UI_CONTROL_CONTROL
+        MENUITEM "Label",                       ID_UI_CONTROL_LABEL
+        MENUITEM "Text",                        ID_UI_CONTROL_TEXT
+        MENUITEM "Edit",                        ID_UI_CONTROL_EDIT
+        MENUITEM "Button",                      ID_UI_CONTROL_BUTTON
+        MENUITEM "Option",                      ID_UI_CONTROL_OPTION
+        MENUITEM "Combo",                       ID_UI_CONTROL_COMBO
+        MENUITEM "Progress",                    ID_UI_CONTROL_PROGRESS
+        MENUITEM "Slider",                      ID_UI_CONTROL_SLIDER
+        MENUITEM "ActiveX",                     ID_UI_CONTROL_ACTIVEX
         MENUITEM SEPARATOR
-        MENUITEM "垂直布局",                        ID_UI_LAYOUT_VERTICAL
-        MENUITEM "水平布局",                        ID_UI_LAYOUT_HORIZONTAL
-        MENUITEM "容器",                          ID_UI_LAYOUT_CONTAINER
-        MENUITEM "对话框布局",                       ID_UI_LAYOUT_DIALOG
-        MENUITEM "并列布局",                        ID_UI_LAYOUT_TILE
-        MENUITEM "选项页布局",                       ID_UI_LAYOUT_TAB
+        MENUITEM "Container",                   ID_UI_LAYOUT_CONTAINER
+        MENUITEM "VerticalLayout",              ID_UI_LAYOUT_VERTICAL
+        MENUITEM "HorizontalLayout",            ID_UI_LAYOUT_HORIZONTAL
+        MENUITEM "TileLayout",                  ID_UI_LAYOUT_TILE
+        MENUITEM "TabLayout",                   ID_UI_LAYOUT_TAB
     END
 END
 
