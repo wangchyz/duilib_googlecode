@@ -1008,6 +1008,7 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 	case classListContainerElement:
 		pCopyControl = new CListContainerElementUI(*static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement"))));
 		break;
+	default:		pCopyControl = new CUserDefineUI(*static_cast<CUserDefineUI*>(pControl));		break;
 	}
 
 	return pCopyControl;
