@@ -216,6 +216,34 @@ enum PropertyTag
 	tagList,
 	tagListHeader=tagList,
 	tagListHeaderBKImage,
+
+	//ScrollBar
+	tagScrollBar,
+	tagScrollBarRange=tagScrollBar,
+	tagScrollBarValue,
+	tagScrollBarLineSize,
+	tagScrollBarShowButton1,
+	tagScrollBarShowButton2,
+	tagScrollBarButton1NormalImage,
+	tagScrollBarButton1HotImage,
+	tagScrollBarButton1PushedImage,
+	tagScrollBarButton1DisabledImage,
+	tagScrollBarButton2NormalImage,
+	tagScrollBarButton2HotImage,
+	tagScrollBarButton2PushedImage,
+	tagScrollBarButton2DisabledImage,
+	tagScrollBarThumbNormalImage,
+	tagScrollBarThumbHotImage,
+	tagScrollBarThumbPushedImage,
+	tagScrollBarThumbDisabledImage,
+	tagScrollBarRailNormalImage,
+	tagScrollBarRailHotImage,
+	tagScrollBarRailPushedImage,
+	tagScrollBarRailDisabledImage,
+	tagScrollBarBKNormalImage,
+	tagScrollBarBKHotImage,
+	tagScrollBarBKPushedImage,
+	tagScrollBarBKDisabledImage,
 };
 
 extern UINT WM_UI_PROPERTY_CHANGED;
@@ -260,6 +288,7 @@ protected:
 	void ShowActiveXProperty(CControlUI* pControl);
 	void ShowListProperty(CControlUI* pControl);
 	void ShowItemProperty(CControlUI* pControl);
+	void ShowScrollBarProperty(CControlUI* pControl);
 
 	//Container Property
 	void ShowContainerProperty(CControlUI* pControl);
