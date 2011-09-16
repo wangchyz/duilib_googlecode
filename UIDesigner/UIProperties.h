@@ -82,9 +82,9 @@ enum PropertyTag
 {
 	tagNULL=0,
 
-	//Form
-	tagForm,
-	tagFormSize=tagForm,
+	//Window
+	tagWindow,
+	tagWindowSize=tagWindow,
 	tagCaption,
 	tagSizeBox,
 	tagRoundCorner,
@@ -93,6 +93,13 @@ enum PropertyTag
 	tagShowDirty,
 	tagCustomFonts,
 	tagDefaultAttribList,
+	tagAlpha,
+	tagBkTrans,
+	tagDefaultFontColor,
+	tagSelectedFontColor,
+	tagDisabledFontColor,
+	tagLinkFontColor,
+	tagLinkHoverFontColor,
 
 	//Control
 	tagControl,
@@ -273,8 +280,8 @@ protected:
 
 	void HideAllProperties(BOOL bAdjustLayout=FALSE);
 
-	//FormProperty
-	void ShowFormProperty(CControlUI* pControl);
+	//WindowProperty
+	void ShowWindowProperty(CControlUI* pControl);
 
 	//Control Property
 	void ShowControlProperty(CControlUI* pControl);
