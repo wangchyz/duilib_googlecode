@@ -532,6 +532,11 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CL
 		pExtended->nClass=classCombo;
 		pControl->SetFloat(true);
 		break;
+	case classList:
+		pControl=new CListUI;
+		pExtended->nClass=classList;
+		pControl->SetFloat(false);
+		break;
 	case classActiveX:
 		pControl=new CActiveXUI;
 		pExtended->nClass=classActiveX;
@@ -555,6 +560,10 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CL
 	case classTabLayout:
 		pControl=new CTabLayoutUI;
 		pExtended->nClass=classTabLayout;
+		break;
+	case classScrollBar:
+		pControl=new CScrollBarUI;
+		pExtended->nClass=classScrollBar;
 		break;
 	default:
 		delete pExtended;

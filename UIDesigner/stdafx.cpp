@@ -44,6 +44,8 @@ int gGetUIClass(LPCTSTR pstrClass)
 		case 12:
 			if( _tcscmp(pstrClass, _T("ListHeaderUI")) == 0 )             nClass=classListHeader;
 			else if( _tcscmp(pstrClass, _T("TileLayoutUI")) == 0 )        nClass=classTileLayout;
+			else if (_tcscmp(pstrClass, _T("VScrollBarUI")) == 0 )			nClass=classScrollBar;
+			else if (_tcscmp(pstrClass, _T("HScrollBarUI")) == 0 )			nClass=classScrollBar;
 			break;
 		case 16:
 			if( _tcscmp(pstrClass, _T("VerticalLayoutUI")) == 0 )         nClass=classVerticalLayout;

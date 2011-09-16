@@ -703,32 +703,33 @@ void CUIProperties::InitPropList()
 	pPropUI=new CMFCPropertyGridProperty(_T("Container"),classContainer);
 
 	pValueList=new CMFCPropertyGridProperty(_T("Inset"),tagInset,TRUE);//inset
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定容器客户区域的左边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定容器客户区域的左边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(_variant_t)(LONG)0,_T("指定容器客户区域的上边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Top"),(_variant_t)(LONG)0,_T("指定容器客户区域的上边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(_variant_t)(LONG)0,_T("指定容器客户区域的右边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Right"),(_variant_t)(LONG)0,_T("指定容器客户区域的右边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(_variant_t)(LONG)0,_T("指定容器客户区域的下边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(_variant_t)(LONG)0,_T("指定容器客户区域的下边距\n0"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pProp=new CMFCPropertyGridProperty(_T("ChildPadding"),(_variant_t)(LONG)0,_T("指定子控件之间的间距"),tagChildPadding);//childpadding
+	pProp=new CMFCPropertyGridProperty(_T("ChildPadding"),(_variant_t)(LONG)0,_T("指定子控件之间的间距\n0"),tagChildPadding);//childpadding
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("MouseChild"),(_variant_t)false,_T("-----"),tagMouseChild);//mousechild
+	pProp=new CMFCPropertyGridProperty(_T("MouseChild"),(_variant_t)false,_T("指定本控件的子控件是否可以响应用户操作\nTrue"),tagMouseChild);//mousechild
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("HScrollBar"),(_variant_t)false,_T("指示是否启用水平滚动条"),tagHScrollBar);//hscrollbar
+	pProp=new CMFCPropertyGridProperty(_T("HScrollBar"),(_variant_t)false,_T("指示是否启用水平滚动条\nFalse"),tagHScrollBar);//hscrollbar
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("VScrollBar"),(_variant_t)false,_T("指示是否启用垂直滚动条"),tagVScrollBar);//vscrollbar
+	pProp=new CMFCPropertyGridProperty(_T("VScrollBar"),(_variant_t)false,_T("指示是否启用垂直滚动条\nFalse"),tagVScrollBar);//vscrollbar
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion Container
 
 	//Item
+#pragma region Item
 	pPropUI=new CMFCPropertyGridProperty(_T("Item"),classItem);
 
 	pPropImage=new CMFCPropertyGridImageProperty(_T("ItemBkImage"),_T(""),_T("指定组项正常显示时的图片"),tagItemBkImage);//itembkimage
@@ -748,17 +749,17 @@ void CUIProperties::InitPropList()
 	pPropUI->AddSubItem(pPropImage);
 
 	pValueList=new CMFCPropertyGridProperty(_T("ItemTextPadding"),tagItemTextPadding,TRUE);//itemtextpadding
-	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定组项文本区域的左边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定组项文本区域的左边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Top"),(_variant_t)(LONG)0,_T("指定组项文本区域的上边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Top"),(_variant_t)(LONG)0,_T("指定组项文本区域的上边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Right"),(_variant_t)(LONG)0,_T("指定组项文本区域的右边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Right"),(_variant_t)(LONG)0,_T("指定组项文本区域的右边距\n0"));
 	pValueList->AddSubItem(pProp);
-	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(_variant_t)(LONG)0,_T("指定组项文本区域的下边距"));
+	pProp=new CMFCPropertyGridProperty(_T("Bottom"),(_variant_t)(LONG)0,_T("指定组项文本区域的下边距\n0"));
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pProp=new CMFCPropertyGridProperty(_T("ItemAlign"),_T("Center"),_T("指示组项文本的对齐方式"),tagItemAlign);//itemalign
+	pProp=new CMFCPropertyGridProperty(_T("ItemAlign"),_T("Center"),_T("指示组项文本的对齐方式\nCenter"),tagItemAlign);//itemalign
 	pProp->AddOption(_T("Center"));
 	pProp->AddOption(_T("Left"));
 	pProp->AddOption(_T("Right"));
@@ -810,13 +811,15 @@ void CUIProperties::InitPropList()
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pProp=new CMFCPropertyGridProperty(_T("ItemFont"),(_variant_t)(LONG)-1,_T("指定组项文本的字体"),tagItemFont);//itemfont
+	pProp=new CMFCPropertyGridProperty(_T("ItemFont"),(_variant_t)(LONG)-1,_T("指定组项文本的字体\n-1"),tagItemFont);//itemfont
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("ItemShowHtml"),(_variant_t)false,_T("指示是否使用Html格式文本"),tagItemShowHtml);//itemshowhtml
+	pProp=new CMFCPropertyGridProperty(_T("ItemShowHtml"),(_variant_t)false,_T("指示是否使用Html格式文本\nFalse"),tagItemShowHtml);//itemshowhtml
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion Item
+
 	//Combo
 #pragma region Combo
 	pPropUI=new CMFCPropertyGridProperty(_T("Combo"),classCombo);
@@ -882,11 +885,96 @@ void CUIProperties::InitPropList()
 #pragma region List
 	pPropUI=new CMFCPropertyGridProperty(_T("List"),classList);
 
-	pProp=new CMFCPropertyGridProperty(_T("Header"),(_variant_t)false,_T("指定是否显示列表表头"),tagListHeader);
+	pProp=new CMFCPropertyGridProperty(_T("Header"),(_variant_t)false,_T("指定是否显示列表表头\nTrue"),tagListHeader);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion List
+
+#pragma region ScrollBar
+
+	pPropUI=new CMFCPropertyGridProperty(_T("ScrollBar"),classScrollBar);
+
+	pProp=new CMFCPropertyGridProperty(_T("Range"),(_variant_t)(LONG)0,_T("指定滚动范围\n100"),tagScrollBarRange);
+	pPropUI->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("Value"),(_variant_t)(LONG)0,_T("指定滚动位置\n0"),tagScrollBarValue);
+	pPropUI->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("LineSize"),(_variant_t)(LONG)0,_T("指定滚动一行的大小\n8"),tagScrollBarLineSize);
+	pPropUI->AddSubItem(pProp);
+
+	pProp=new CMFCPropertyGridProperty(_T("ShowButton1"),(_variant_t)false,_T("是否显示左或上按钮\nTrue"),tagScrollBarShowButton1);
+	pPropUI->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("ShowButton2"),(_variant_t)false,_T("是否显示左或上按钮\nTrue"),tagScrollBarShowButton2);
+	pPropUI->AddSubItem(pProp);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1NormalImage"),_T(""),_T("指定左或上按钮普通状态图片"),tagScrollBarButton1NormalImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1HotImage"),_T(""),_T("指定左或上按钮鼠标悬浮状态图片"),tagScrollBarButton1HotImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1PushedImage"),_T(""),_T("指定左或上按钮鼠标按下状态图片"),tagScrollBarButton1PushedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button1DisabledImage"),_T(""),_T("指定左或上按钮鼠标禁用状态图片"),tagScrollBarButton1DisabledImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2NormalImage"),_T(""),_T("指定左或上按钮普通状态图片"),tagScrollBarButton2NormalImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2HotImage"),_T(""),_T("指定左或上按钮鼠标悬浮状态图片"),tagScrollBarButton2HotImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2PushedImage"),_T(""),_T("指定左或上按钮鼠标按下状态图片"),tagScrollBarButton2PushedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("Button2DisabledImage"),_T(""),_T("指定左或上按钮鼠标悬禁用态图片"),tagScrollBarButton2DisabledImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbNormalImage"),_T(""),_T("指定滑块普通状态图片"),tagScrollBarThumbNormalImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbHotImage"),_T(""),_T("指定滑块鼠标悬浮状态图片"),tagScrollBarThumbHotImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbPushedImage"),_T(""),_T("指定滑块鼠标按下状态图片"),tagScrollBarThumbPushedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("ThumbDisabledImage"),_T(""),_T("指定滑块禁用状态图片"),tagScrollBarThumbDisabledImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("RailNormalImage"),_T(""),_T("指定滑块中间标识普通状态图片"),tagScrollBarRailNormalImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("RailHotImage"),_T(""),_T("指定滑块中间标识鼠标悬浮状态图片"),tagScrollBarRailHotImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("RailPushedImage"),_T(""),_T("指定滑块中间标识鼠标按下状态图片"),tagScrollBarRailPushedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("RailDisabledImage"),_T(""),_T("指定滑块中间标识禁用状态图片"),tagScrollBarRailDisabledImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	pPropImage=new CMFCPropertyGridImageProperty(_T("BKNormalImage"),_T(""),_T("指定背景普通状态图片"),tagScrollBarBKNormalImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("BKHotImage"),_T(""),_T("指定背景鼠标悬浮状态图片"),tagScrollBarBKHotImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("BKPushedImage"),_T(""),_T("指定背景鼠标按下状态图片"),tagScrollBarBKPushedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+	pPropImage=new CMFCPropertyGridImageProperty(_T("BKDisabledImage"),_T(""),_T("指定背景禁用状态图片"),tagScrollBarBKDisabledImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	m_wndPropList.AddProperty(pPropUI);
+
+#pragma endregion ScrollBar
 
 	HideAllProperties();
 }
@@ -989,6 +1077,9 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 		break;
 	case classTileLayout:
 		ShowTileLayoutProperty(pControl);
+		break;
+	case classScrollBar:
+		ShowScrollBarProperty(pControl);
 		break;
 	default:
 		ShowControlProperty(pControl);
@@ -1687,6 +1778,101 @@ void CUIProperties::ShowItemProperty( CControlUI* pControl )
 	//itemshowhtml
 	//pPropItem->GetSubItem(tagItemShowHtml-tagItem)->SetValue((_variant_t)pList->IsItemShowHtml());
 	//pPropItem->GetSubItem(tagItemShowHtml-tagItem)->SetOriginalValue((_variant_t)pList->IsItemShowHtml());
+
+	pPropItem->Show(TRUE,FALSE);
+}
+
+void CUIProperties::ShowScrollBarProperty( CControlUI* pControl )
+{
+	//ShowControlProperty(pControl);
+
+	ASSERT(pControl);
+	CScrollBarUI* pScrollBar=static_cast<CScrollBarUI*>(pControl->GetInterface(_T("ScrollBar")));
+	ASSERT(pScrollBar);
+
+	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classScrollBar,FALSE);
+	ASSERT(pPropItem);
+
+	//tagScrollBarRange
+	pPropItem->GetSubItem(tagScrollBarRange-tagScrollBar)->SetValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarRange-tagScrollBar)->SetOriginalValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
+	//tagScrollBarValue
+	pPropItem->GetSubItem(tagScrollBarValue-tagScrollBar)->SetValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarValue-tagScrollBar)->SetOriginalValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
+	//tagScrollBarLineSize
+	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
+	pPropItem->GetSubItem(tagScrollBarLineSize-tagScrollBar)->SetOriginalValue((_variant_t)(LONG)pScrollBar->GetScrollRange());
+ 	// tagScrollBarShowButton1
+	pPropItem->GetSubItem(tagScrollBarShowButton1-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetShowButton1());
+	pPropItem->GetSubItem(tagScrollBarShowButton1-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetShowButton1());
+ 	//	tagScrollBarShowButton2
+	pPropItem->GetSubItem(tagScrollBarShowButton2-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetShowButton2());
+	pPropItem->GetSubItem(tagScrollBarShowButton2-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetShowButton2());
+
+ 	//	tagScrollBarButton1NormalImage
+	pPropItem->GetSubItem(tagScrollBarButton1NormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1NormalImage());
+	pPropItem->GetSubItem(tagScrollBarButton1NormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1NormalImage());
+ 	//	tagScrollBarButton1HotImage
+	pPropItem->GetSubItem(tagScrollBarButton1HotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1HotImage());
+	pPropItem->GetSubItem(tagScrollBarButton1HotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1HotImage());
+ 	//	tagScrollBarButton1PushedImage
+	pPropItem->GetSubItem(tagScrollBarButton1PushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1PushedImage());
+	pPropItem->GetSubItem(tagScrollBarButton1PushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1PushedImage());
+ 	//	tagScrollBarButton1DisabledImage
+	pPropItem->GetSubItem(tagScrollBarButton1DisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1DisabledImage());
+	pPropItem->GetSubItem(tagScrollBarButton1DisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1DisabledImage());
+
+	//	tagScrollBarButton2NormalImage
+	pPropItem->GetSubItem(tagScrollBarButton2NormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton2NormalImage());
+	pPropItem->GetSubItem(tagScrollBarButton2NormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton2NormalImage());
+	//	tagScrollBarButton2HotImage
+	pPropItem->GetSubItem(tagScrollBarButton2HotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton1HotImage());
+	pPropItem->GetSubItem(tagScrollBarButton2HotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1HotImage());
+	//	tagScrollBarButton2PushedImage
+	pPropItem->GetSubItem(tagScrollBarButton2PushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton2PushedImage());
+	pPropItem->GetSubItem(tagScrollBarButton2PushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton2PushedImage());
+	//	tagScrollBarButton2DisabledImage
+	pPropItem->GetSubItem(tagScrollBarButton2DisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetButton2DisabledImage());
+	pPropItem->GetSubItem(tagScrollBarButton2DisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton2DisabledImage());
+
+ 	//	tagScrollBarThumbNormalImage
+	pPropItem->GetSubItem(tagScrollBarThumbNormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbNormalImage());
+	pPropItem->GetSubItem(tagScrollBarThumbNormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbNormalImage());
+ 	//	tagScrollBarThumbHotImage
+	pPropItem->GetSubItem(tagScrollBarThumbHotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbHotImage());
+	pPropItem->GetSubItem(tagScrollBarThumbHotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbHotImage());
+ 	//	tagScrollBarThumbPushedImage
+	pPropItem->GetSubItem(tagScrollBarThumbPushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbPushedImage());
+	pPropItem->GetSubItem(tagScrollBarThumbPushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbPushedImage());
+ 	//	tagScrollBarThumbDisabledImage
+	pPropItem->GetSubItem(tagScrollBarThumbDisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetThumbDisabledImage());
+	pPropItem->GetSubItem(tagScrollBarThumbDisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetThumbDisabledImage());
+
+ 	//	tagScrollBarRailNormalImage
+	pPropItem->GetSubItem(tagScrollBarRailNormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailNormalImage());
+	pPropItem->GetSubItem(tagScrollBarRailNormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetRailNormalImage());
+ 	//	tagScrollBarRailHotImage
+	pPropItem->GetSubItem(tagScrollBarRailHotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailHotImage());
+	pPropItem->GetSubItem(tagScrollBarRailHotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetButton1HotImage());
+ 	//	tagScrollBarRailPushedImage
+	pPropItem->GetSubItem(tagScrollBarRailPushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailPushedImage());
+	pPropItem->GetSubItem(tagScrollBarRailPushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetRailPushedImage());
+ 	//	tagScrollBarRailDisabledImage
+	pPropItem->GetSubItem(tagScrollBarRailDisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetRailDisabledImage());
+	pPropItem->GetSubItem(tagScrollBarRailDisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetRailDisabledImage());
+
+ 	//	tagScrollBarBKNormalImage
+	pPropItem->GetSubItem(tagScrollBarBKNormalImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkNormalImage());
+	pPropItem->GetSubItem(tagScrollBarBKNormalImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkNormalImage());
+ 	//	tagScrollBarBKHotImage
+	pPropItem->GetSubItem(tagScrollBarBKHotImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkHotImage());
+	pPropItem->GetSubItem(tagScrollBarBKHotImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkHotImage());
+ 	//	tagScrollBarBKPushedImage
+	pPropItem->GetSubItem(tagScrollBarBKPushedImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkPushedImage());
+	pPropItem->GetSubItem(tagScrollBarBKPushedImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkPushedImage());
+ 	//	tagScrollBarBKDisabledImage
+	pPropItem->GetSubItem(tagScrollBarBKDisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkDisabledImage());
+	pPropItem->GetSubItem(tagScrollBarBKDisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkDisabledImage());
 
 	pPropItem->Show(TRUE,FALSE);
 }
