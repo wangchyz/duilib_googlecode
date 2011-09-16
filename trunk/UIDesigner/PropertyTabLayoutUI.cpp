@@ -186,9 +186,6 @@ void CPropertyTabLayoutUI::OnBnClickedButtonTabLayoutUIAdd()
 	case ID_UI_LAYOUT_CONTAINER:
 		nClass=classContainer;
 		break;
-	case ID_UI_LAYOUT_DIALOG:
-		nClass=classDialogLayout;
-		break;
 	case ID_UI_LAYOUT_TILE:
 		nClass=classTileLayout;
 		break;
