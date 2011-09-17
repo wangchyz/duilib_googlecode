@@ -345,7 +345,7 @@ LPCTSTR CFormTestWnd::GetWindowClassName() const
 
 UINT CFormTestWnd::GetClassStyle() const
 {
-	return CS_DBLCLKS;
+	return UI_CLASSSTYLE_CHILD;
 }
 
 void CFormTestWnd::OnFinalMessage(HWND /*hWnd*/)
@@ -378,6 +378,10 @@ LRESULT CFormTestWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 {
 	LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
 	styleValue &= ~WS_CAPTION;
+	styleValue &= ~WS_MAXIMIZEBOX; 
+	styleValue &= ~WS_MINIMIZEBOX; 
+	styleValue &= ~WS_THICKFRAME; 
+	styleValue &= ~WS_BORDER; 
 	::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
 	RECT rcClient;
 	::GetClientRect(*this, &rcClient);
