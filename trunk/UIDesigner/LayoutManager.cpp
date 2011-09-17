@@ -316,11 +316,6 @@ DWORD CWindowUI::GetDefaultSelectedFontColor() const
 
 void CWindowUI::SetAlpha( int nOpacity )
 {
-	if (nOpacity<0)
-		m_nOpacity=0;
-	else if (nOpacity>255)
-		m_nOpacity=255;
-	else
 		m_nOpacity=nOpacity;
 }
 
@@ -1472,7 +1467,13 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 	{
 		pNode->SetAttribute("float", "true");
 
-		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), pControl->GetFixedXY().cx, pControl->GetFixedXY().cy, pControl->GetFixedXY().cx + pControl->GetFixedWidth(), pControl->GetFixedXY().cy + pControl->GetFixedHeight());
+		_stprintf_s(szBuf,
+			_T("%d,%d,%d,%d"),
+			pControl->GetFixedXY().cx,
+			pControl->GetFixedXY().cy,
+			pControl->GetFixedXY().cx + pControl->GetFixedWidth(),
+			pControl->GetFixedXY().cy + pControl->GetFixedHeight()
+			);
 		pNode->SetAttribute("pos", StringConvertor::WideToUtf8(szBuf));
 	}
 	else
@@ -1574,6 +1575,11 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 	if (pControl->IsMouseEnabled()==false)
 	{
 		pNode->SetAttribute("mouse", "false");
+	}
+
+	if (pControl->IsContextMenuUsed())
+	{
+		pNode->SetAttribute("menu","true");
 	}
 }
 
@@ -2103,6 +2109,7 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	case classActiveX:
  		SaveActiveXProperty(pControl, pNode);
 		break;
+	case classListHeader:
 	case classContainer:
 	case classVerticalLayout:
 	case classTabLayout:
