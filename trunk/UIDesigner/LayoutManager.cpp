@@ -1849,8 +1849,6 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 
 	if(pListUI->GetHeader() && !pListUI->GetHeader()->IsVisible())
 		pNode->SetAttribute("header", "hidden");
-	else
-		pNode->RemoveAttribute("header");
 
 	if(pListUI->GetHeader() && pListUI->GetHeader()->GetBkImage() && _tcslen(pListUI->GetHeader()->GetBkImage()) > 0)
 		pNode->SetAttribute("headerbkimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListUI->GetHeader()->GetBkImage())));	
@@ -2162,13 +2160,11 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 	ASSERT(pForm);
 	SIZE szSize = pForm->GetInitSize();
 	ZeroMemory(szBuf,sizeof(szBuf));
-	if((szSize.cx != 0) || (szSize.cy != 0))
+	if((szSize.cx != 400) || (szSize.cy != 400))
 	{
 		_stprintf_s(szBuf, _T("%d,%d"), szSize.cx, szSize.cy);
 		pFormElm->SetAttribute("size", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("size");
 
 	RECT rcSizeBox = pForm->GetSizeBox();
 	ZeroMemory(szBuf,sizeof(szBuf));
@@ -2177,8 +2173,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), rcSizeBox.left, rcSizeBox.top, rcSizeBox.right, rcSizeBox.bottom);
 		pFormElm->SetAttribute("sizebox", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->SetAttribute("sizebox", "4,4,6,6");
 
 	RECT rcCaption = pForm->GetCaptionRect();
 	ZeroMemory(szBuf,sizeof(szBuf));
@@ -2187,8 +2181,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), rcCaption.left, rcCaption.top, rcCaption.right, rcCaption.bottom);
 		pFormElm->SetAttribute("caption", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->SetAttribute("caption", "0,0,0,30");
 
 	SIZE szMinWindow = pForm->GetMinInfo();
 	if((szMinWindow.cx != 0) || (szMinWindow.cy != 0))
@@ -2197,8 +2189,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("%d,%d"), szMinWindow.cx, szMinWindow.cy);
 		pFormElm->SetAttribute("mininfo", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("mininfo");
 
 	SIZE szMaxWindow = pForm->GetMaxInfo();
 	if((szMaxWindow.cx != 0) || (szMaxWindow.cy != 0))
@@ -2207,8 +2197,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("%d,%d"), szMinWindow.cx, szMinWindow.cy);
 		pFormElm->SetAttribute("maxinfo", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("maxinfo");
 
 	SIZE szRoundCorner = pForm->GetRoundCorner();
 	if((szRoundCorner.cx != 0) || (szRoundCorner.cy != 0))
@@ -2217,18 +2205,13 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("%d,%d"), szRoundCorner.cx, szRoundCorner.cy);
 		pFormElm->SetAttribute("roundcorner", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("roundcorner");
 
-	bool bShow = pForm->IsShowUpdateRect();
-	if(bShow)
+	if( pForm->IsShowUpdateRect())
 	{
 		ZeroMemory(szBuf,sizeof(szBuf));
 		_tcscpy(szBuf,_T("true"));
 		pFormElm->SetAttribute("showdirty", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("showdirty");
 
 	if (pForm->GetAlpha()!=255)
 	{
@@ -2236,8 +2219,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("%d"), pForm->GetAlpha());
 		pFormElm->SetAttribute("alpha", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("alpha");
 
 	if (pForm->GetBackgroundTransparent())
 	{
@@ -2245,8 +2226,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_tcscpy(szBuf,_T("true"));
 		pFormElm->SetAttribute("bktrans", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("bktrans");
 
 	if (pForm->GetDefaultFontColor()!=0xFF000000)
 	{
@@ -2255,8 +2234,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pFormElm->SetAttribute("defaultfontcolor", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("defaultfontcolor");
 
 	if (pForm->GetDefaultSelectedFontColor()!=0xFFBAE4FF)
 	{
@@ -2265,8 +2242,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pFormElm->SetAttribute("selectedcolor", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("selectedcolor");
 
 	if (pForm->GetDefaultDisabledFontColor()!=0xFFA7A6AA)
 	{
@@ -2275,8 +2250,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pFormElm->SetAttribute("disabledfontcolor", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("disabledfontcolor");
 
 	if (pForm->GetDefaultLinkFontColor()!=0xFF0000FF)
 	{
@@ -2285,8 +2258,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pFormElm->SetAttribute("linkfontcolor", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("linkfontcolor");
 
 	if (pForm->GetDefaultLinkHoverFontColor()!=0xFFD3215F)
 	{
@@ -2295,8 +2266,6 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pFormElm->SetAttribute("linkhoverfontcolor", StringConvertor::WideToUtf8(szBuf));
 	}
-	else
-		pFormElm->RemoveAttribute("linkhoverfontcolor");
 
 	TiXmlNode* pNode = xmlDoc.InsertEndChild(*pFormElm);
 	if(m_Manager.GetCustomFontCount() > 0)
@@ -2537,4 +2506,17 @@ void CLayoutManager::SaveItemProperty( CControlUI* pControl, TiXmlElement* pNode
 
 	if(pListInfo->sDisabledImage && _tcslen(pListInfo->sDisabledImage) > 0)
 		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListInfo->sDisabledImage)));
+
+	CStdString tstrAlgin;
+	UINT uTextStyle = pListInfo->uTextStyle;
+
+	if(uTextStyle == DT_LEFT)
+		tstrAlgin = _T("left");
+	else if(uTextStyle & DT_RIGHT)
+		tstrAlgin = _T("right");
+	else
+		tstrAlgin = _T("center");
+
+	if(tstrAlgin.CompareNoCase(_T("center"))!=0)
+		pNode->SetAttribute("itemalign", StringConvertor::WideToUtf8(tstrAlgin));
 }
