@@ -197,6 +197,27 @@ void CPropertiesWnd::SetUIValue(CMFCPropertyGridProperty* pProp,int nTag)
 	case tagVisible:
 		nUpdate=UPDATE_REDRAW_PARENT;
 		break;
+	case tagListHeader:
+		if (strNewVal.Compare(_T("false"))==0)
+		{
+			strNewVal = _T("hidden");
+		}
+		break;
+	case tagAlpha:
+		{
+			int alpha=_ttoi(strNewVal);
+			if (alpha<0)
+			{
+				strNewVal=_T("0");
+				pProp->SetValue((_variant_t)(LONG)0);
+			}
+			else
+			{
+				strNewVal=_T("255");
+				pProp->SetValue((_variant_t)(LONG)255);
+			}
+			break;
+		}
 	}
 
 	CUIDesignerView* pUIView=g_pMainFrame->GetActiveUIView();
