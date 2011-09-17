@@ -1306,7 +1306,7 @@ void CMultiUITracker::ExcludeChildren(CArray<CControlUI*,CControlUI*>& arrSelect
 				if(pDepth[i] < pDepth[j])
 				{
 					int depth = pDepth[j] - pDepth[i];
-					while(depth--)
+					while(depth-- && pControl2)
 						pControl2 = pControl2->GetParent();
 					if(pControl1 == pControl2)
 						arrSelected.RemoveAt(j--);
@@ -1314,7 +1314,7 @@ void CMultiUITracker::ExcludeChildren(CArray<CControlUI*,CControlUI*>& arrSelect
 				else
 				{
 					int depth = pDepth[i] - pDepth[j];
-					while(depth--)
+					while(depth-- && pControl1)
 						pControl1 = pControl1->GetParent();
 					if(pControl1 == pControl2)
 						arrSelected.RemoveAt(i--);

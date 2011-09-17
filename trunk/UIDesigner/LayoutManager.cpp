@@ -1010,6 +1010,18 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 	case classListContainerElement:
 		pCopyControl = new CListContainerElementUI(*static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement"))));
 		break;
+	case classList:
+		{//0917 by 邓景仁(cddjr) , 在不改动duilib的前提下，只能采用如下代码 
+			CListUI &copyList = *static_cast<CListUI*>(pControl->GetInterface(_T("List")));
+			if (copyList.GetHorizontalScrollBar() || copyList.GetVerticalScrollBar())
+			{//测试窗体中，暂不支持滚动条
+				copyList.EnableScrollBar(false, false);
+			}
+			pCopyControl = new CListUI();
+			*(((CListUI*)pCopyControl)->GetHeader()) = *(copyList.GetHeader());
+			*((CVerticalLayoutUI*)((CListUI*)pCopyControl)->GetList()) = *static_cast<CVerticalLayoutUI*>(copyList.GetList());
+		}
+		break;
 	default:
 		pCopyControl = new CUserDefineUI(*static_cast<CUserDefineUI*>(pControl));
 		break;

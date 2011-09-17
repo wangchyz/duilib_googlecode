@@ -115,11 +115,17 @@ enum PropertyTag
 	tagBkColor,
 	tagBkColor2,
 	tagBorderColor,
+	tagFocusBorderColor,
 	tagBorderSize,
+	tagBorderRound,
 	tagEnabled,
 	tagFloat,
 	tagVisible,
 	tagMouse,
+	tagMenu,
+	tagColorHSL,
+	tagTooltip,
+	tagUserData,
 
 	//Label
 	tagLabel,
@@ -187,6 +193,7 @@ enum PropertyTag
 	tagItemLineColor,
 	tagItemFont,
 	tagItemShowHtml,
+	tagMultiExpanding,
 
 	//Combo
 	tagCombo,
