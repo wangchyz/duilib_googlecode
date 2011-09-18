@@ -107,6 +107,8 @@ public:
     virtual void SetEnabled(bool bEnable = true);
     virtual bool IsMouseEnabled() const;
     virtual void SetMouseEnabled(bool bEnable = true);
+    virtual bool IsKeyboardEnabled() const;
+    virtual void SetKeyboardEnabled(bool bEnable = true);
     virtual bool IsFocused() const;
     virtual void SetFocus();
     virtual bool IsFloat() const;
@@ -163,6 +165,7 @@ protected:
     bool m_bInternVisible;
     bool m_bEnabled;
     bool m_bMouseEnabled;
+	bool m_bKeyboardEnabled ;
     bool m_bFocused;
     bool m_bFloat;
     bool m_bSetPos; // ∑¿÷πSetPos—≠ª∑µ˜”√

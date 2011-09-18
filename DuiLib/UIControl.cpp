@@ -12,6 +12,7 @@ m_bInternVisible(true),
 m_bFocused(false),
 m_bEnabled(true),
 m_bMouseEnabled(true),
+m_bKeyboardEnabled(true),
 m_bFloat(false),
 m_bSetPos(false),
 m_chShortcut('\0'),
@@ -495,6 +496,9 @@ void CControlUI::SetVisible(bool bVisible)
     bool v = IsVisible();
     m_bVisible = bVisible;
     if( m_bFocused ) m_bFocused = false;
+	if (!bVisible && m_pManager && m_pManager->GetFocus() == this) {
+		m_pManager->SetFocus(NULL) ;
+	}
     if( IsVisible() != v ) {
         NeedParentUpdate();
     }
@@ -503,6 +507,9 @@ void CControlUI::SetVisible(bool bVisible)
 void CControlUI::SetInternVisible(bool bVisible)
 {
     m_bInternVisible = bVisible;
+	if (!bVisible && m_pManager && m_pManager->GetFocus() == this) {
+		m_pManager->SetFocus(NULL) ;
+	}
 }
 
 bool CControlUI::IsEnabled() const
@@ -526,6 +533,15 @@ bool CControlUI::IsMouseEnabled() const
 void CControlUI::SetMouseEnabled(bool bEnabled)
 {
     m_bMouseEnabled = bEnabled;
+}
+
+bool CControlUI::IsKeyboardEnabled() const
+{
+	return m_bKeyboardEnabled ;
+}
+void CControlUI::SetKeyboardEnabled(bool bEnabled)
+{
+	m_bKeyboardEnabled = bEnabled ; 
 }
 
 bool CControlUI::IsFocused() const
@@ -753,6 +769,7 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("userdata")) == 0 ) SetUserData(pstrValue);
     else if( _tcscmp(pstrName, _T("enabled")) == 0 ) SetEnabled(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("mouse")) == 0 ) SetMouseEnabled(_tcscmp(pstrValue, _T("true")) == 0);
+	else if( _tcscmp(pstrName, _T("keyboard")) == 0 ) SetKeyboardEnabled(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("visible")) == 0 ) SetVisible(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("float")) == 0 ) SetFloat(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("shortcut")) == 0 ) SetShortcut(pstrValue[0]);
