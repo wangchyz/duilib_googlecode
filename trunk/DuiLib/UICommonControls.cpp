@@ -224,7 +224,7 @@ LPVOID CButtonUI::GetInterface(LPCTSTR pstrName)
 
 UINT CButtonUI::GetControlFlags() const
 {
-    return UIFLAG_TABSTOP | (IsEnabled() ? UIFLAG_SETCURSOR : 0);
+    return (IsKeyboardEnabled() ? UIFLAG_TABSTOP : 0) | (IsEnabled() ? UIFLAG_SETCURSOR : 0);
 }
 
 void CButtonUI::DoEvent(TEventUI& event)
@@ -245,10 +245,12 @@ void CButtonUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_KEYDOWN )
     {
-        if( event.chKey == VK_SPACE || event.chKey == VK_RETURN ) {
-            Activate();
-            return;
-        }
+		if (IsKeyboardEnabled()) {
+			if( event.chKey == VK_SPACE || event.chKey == VK_RETURN ) {
+				Activate();
+				return;
+			}
+		}
     }
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK )
     {
