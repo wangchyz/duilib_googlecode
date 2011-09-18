@@ -16,7 +16,7 @@ CListUI::CListUI() : m_pCallback(NULL), m_bScrollSelect(false), m_iCurSel(-1), m
 
     m_ListInfo.nColumns = 0;
     m_ListInfo.nFont = -1;
-    m_ListInfo.uTextStyle = DT_CENTER; // m_uTextStyle(DT_VCENTER | DT_END_ELLIPSIS)
+    m_ListInfo.uTextStyle = DT_VCENTER; // m_uTextStyle(DT_VCENTER | DT_END_ELLIPSIS)
     m_ListInfo.dwTextColor = 0xFF000000;
     m_ListInfo.dwBkColor = 0;
     m_ListInfo.bAlternateBk = false;
