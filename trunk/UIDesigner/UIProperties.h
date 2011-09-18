@@ -208,6 +208,7 @@ enum PropertyTag
 	tagActiveX,
 	tagClsid=tagActiveX,
 	tagDelayCreate,
+	tagModuleName,
 
 	//Container
 	tagContainer,
@@ -258,6 +259,9 @@ enum PropertyTag
 	tagScrollBarBKHotImage,
 	tagScrollBarBKPushedImage,
 	tagScrollBarBKDisabledImage,
+	// TabLayout
+	tagTabLayout,
+	tagSelectedID=tagTabLayout,
 };
 
 extern UINT WM_UI_PROPERTY_CHANGED;
@@ -303,6 +307,7 @@ protected:
 	void ShowListProperty(CControlUI* pControl);
 	void ShowItemProperty(CControlUI* pControl);
 	void ShowScrollBarProperty(CControlUI* pControl);
+	void ShowTabLayoutPropery(CControlUI* pControl);
 
 	//Container Property
 	void ShowContainerProperty(CControlUI* pControl);
