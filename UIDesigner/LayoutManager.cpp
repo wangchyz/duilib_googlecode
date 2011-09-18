@@ -257,6 +257,7 @@ void CWindowUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 void CWindowUI::SetBackgroundTransparent( bool bTrans )
 {
 	m_bAlphaBackground=bTrans;
+	m_pManager->SetBackgroundTransparent(bTrans);
 }
 
 bool CWindowUI::GetBackgroundTransparent() const
@@ -267,6 +268,7 @@ bool CWindowUI::GetBackgroundTransparent() const
 void CWindowUI::SetDefaultDisabledFontColor( DWORD dwColor )
 {
 	m_dwDefaultDisabledFontColor=dwColor;
+	m_pManager->SetDefaultDisabledColor(dwColor);
 }
 
 DWORD CWindowUI::GetDefaultDisabledFontColor() const
@@ -277,6 +279,7 @@ DWORD CWindowUI::GetDefaultDisabledFontColor() const
 void CWindowUI::SetDefaultFontColor( DWORD dwColor )
 {
 	m_dwDefaultFontColor=dwColor;
+	m_pManager->SetDefaultFontColor(dwColor);
 }
 
 DWORD CWindowUI::GetDefaultFontColor() const
@@ -287,6 +290,7 @@ DWORD CWindowUI::GetDefaultFontColor() const
 void CWindowUI::SetDefaultLinkFontColor( DWORD dwColor )
 {
 	m_dwDefaultLinkFontColor=dwColor;
+	m_pManager->SetDefaultLinkFontColor(dwColor);
 }
 
 DWORD CWindowUI::GetDefaultLinkFontColor() const
@@ -297,6 +301,7 @@ DWORD CWindowUI::GetDefaultLinkFontColor() const
 void CWindowUI::SetDefaultLinkHoverFontColor( DWORD dwColor )
 {
 	m_dwDefaultLinkHoverFontColor=dwColor;
+	m_pManager->SetDefaultLinkHoverFontColor(dwColor);
 }
 
 DWORD CWindowUI::GetDefaultLinkHoverFontColor() const
@@ -307,6 +312,7 @@ DWORD CWindowUI::GetDefaultLinkHoverFontColor() const
 void CWindowUI::SetDefaultSelectedFontColor( DWORD dwColor )
 {
 	m_dwDefaultSelectedFontColor=dwColor;
+	m_pManager->SetDefaultSelectedBkColor(dwColor);
 }
 
 DWORD CWindowUI::GetDefaultSelectedFontColor() const
@@ -317,6 +323,7 @@ DWORD CWindowUI::GetDefaultSelectedFontColor() const
 void CWindowUI::SetAlpha( int nOpacity )
 {
 		m_nOpacity=nOpacity;
+		m_pManager->SetTransparent(nOpacity);
 }
 
 int CWindowUI::GetAlpha() const
@@ -2038,7 +2045,15 @@ void CLayoutManager::SaveActiveXProperty(CControlUI* pControl, TiXmlElement* pNo
 		pNode->SetAttribute("clsid", StringConvertor::WideToUtf8(szBuf));
 	}
 
-	pNode->SetAttribute("delaycreate", pActiveUI->IsDelayCreate()?"true":"false");
+	if (!pActiveUI->IsDelayCreate())
+	{
+		pNode->SetAttribute("delaycreate","false");
+	}
+	
+	if (pActiveUI->GetModuleName()&&_tcslen(pActiveUI->GetModuleName())>0)
+	{
+		pNode->SetAttribute("modulename",StringConvertor::WideToUtf8(pActiveUI->GetModuleName()));
+	}
 }
 void CLayoutManager::SaveListContainerElementProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
@@ -2116,8 +2131,10 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	case classListHeader:
 	case classContainer:
 	case classVerticalLayout:
+		SaveContainerProperty(pControl,pNode);
+		break;
 	case classTabLayout:
-		SaveContainerProperty(pControl, pNode);
+		SaveTabLayoutProperty(pControl, pNode);
 		break;
 	case classHorizontalLayout:
 		SaveHorizontalLayoutProperty(pControl, pNode);
@@ -2530,4 +2547,22 @@ void CLayoutManager::SaveItemProperty( CControlUI* pControl, TiXmlElement* pNode
 
 	if(tstrAlgin.CompareNoCase(_T("center"))!=0)
 		pNode->SetAttribute("itemalign", StringConvertor::WideToUtf8(tstrAlgin));
+}
+
+void CLayoutManager::SaveTabLayoutProperty( CControlUI* pControl, TiXmlElement* pNode )
+{
+	TCHAR szBuf[MAX_PATH]={0};
+
+	SaveContainerProperty(pControl, pNode);
+
+	ASSERT(pControl);
+	CTabLayoutUI* pTabLayout=static_cast<CTabLayoutUI*>(pControl->GetInterface(_T("TabLayout")));
+	ASSERT(pTabLayout);
+
+	if (pTabLayout->GetCurSel()!=0)
+	{
+		ZeroMemory(szBuf,sizeof(szBuf));
+		_stprintf_s(szBuf, _T("%d"), pTabLayout->GetCurSel());
+		pNode->SetAttribute("selectedid", StringConvertor::WideToUtf8(szBuf));
+	}
 }

@@ -756,11 +756,17 @@ void CUIProperties::InitPropList()
 #pragma region ActiveX
 	pPropUI=new CMFCPropertyGridProperty(_T("ActiveX"),classActiveX);
 
-	pProp=new CMFCPropertyGridProperty(_T("Clsid"),(_variant_t)_T(""),_T("指定ActiveX控件的Clsid值"),tagClsid);//clsid
+	//clsid
+	pProp=new CMFCPropertyGridProperty(_T("Clsid"),(_variant_t)_T(""),_T("指定ActiveX控件的Clsid值"),tagClsid);
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("DelayCreate"),(_variant_t)true,_T("指示是否延迟加载ActiveX控件"),tagDelayCreate);//delaycreate
+	//delaycreate
+	pProp=new CMFCPropertyGridProperty(_T("DelayCreate"),(_variant_t)true,_T("指示是否延迟加载ActiveX控件"),tagDelayCreate);
 	pPropUI->AddSubItem(pProp);//added by 邓景仁 2011-09-08
+
+	// modulename
+	pProp=new CMFCPropertyGridProperty(_T("ModuleName"),(_variant_t)_T(""),_T("指示从指定位置加载ActiveX控件\n如(flash/flash.ocx)"),tagModuleName);
+	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion ActiveX
@@ -946,10 +952,10 @@ void CUIProperties::InitPropList()
 #pragma region HorizontalLayout
 	pPropUI=new CMFCPropertyGridProperty(_T("HorizontalLayout"),classHorizontalLayout);
 
-	pProp=new CMFCPropertyGridProperty(_T("SepWidth"),(_variant_t)(LONG)0,_T("------"),tagSepWidth);//sepwidth
+	pProp=new CMFCPropertyGridProperty(_T("SepWidth"),(_variant_t)(LONG)0,_T("分隔符宽,正负表示分隔符在左边还是右边\n0"),tagSepWidth);//sepwidth
 	pPropUI->AddSubItem(pProp);
 
-	pProp=new CMFCPropertyGridProperty(_T("SepImm"),(_variant_t)false,_T("------"),tagSepImm);//sepimm
+	pProp=new CMFCPropertyGridProperty(_T("SepImm"),(_variant_t)false,_T("拖动分隔符是否立即改变大小\nfalse"),tagSepImm);//sepimm
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
@@ -1065,6 +1071,17 @@ void CUIProperties::InitPropList()
 
 #pragma endregion ScrollBar
 
+#pragma region TabLayout
+	pPropUI=new CMFCPropertyGridProperty(_T("TabLayout"),classTabLayout);
+
+	// selectedid
+	pProp=new CMFCPropertyGridProperty(_T("selectedid"),(_variant_t)(LONG)0,_T("默认选中的页面ID\n从0开始计数"),tagSelectedID);
+	pPropUI->AddSubItem(pProp);
+
+	m_wndPropList.AddProperty(pPropUI);
+
+#pragma endregion TabLayout
+
 	HideAllProperties();
 }
 
@@ -1154,9 +1171,11 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 		break;
 	case classContainer:
 	case classVerticalLayout:
-	case classTabLayout:
 	case classListContainerElement:/*!*/
 		ShowContainerProperty(pControl);
+		break;
+	case classTabLayout:
+		ShowTabLayoutPropery(pControl);
 		break;
 	case classList:
 		ShowListProperty(pControl);
@@ -1659,6 +1678,10 @@ void CUIProperties::ShowActiveXProperty(CControlUI* pControl)
 	pPropActiveX->GetSubItem(tagDelayCreate-tagActiveX)->SetValue((_variant_t)pActiveX->IsDelayCreate());
 	pPropActiveX->GetSubItem(tagDelayCreate-tagActiveX)->SetOriginalValue((_variant_t)pActiveX->IsDelayCreate());
 
+	//modulename
+	pPropActiveX->GetSubItem(tagModuleName-tagActiveX)->SetValue((_variant_t)pActiveX->GetModuleName());
+	pPropActiveX->GetSubItem(tagModuleName-tagActiveX)->SetOriginalValue((_variant_t)pActiveX->GetModuleName());
+
 	pPropActiveX->Show(TRUE,FALSE);
 }
 
@@ -1925,6 +1948,8 @@ void CUIProperties::ShowItemProperty( CControlUI* pControl )
 
 void CUIProperties::ShowScrollBarProperty( CControlUI* pControl )
 {
+	//大部分时候只在默认属性中设置全局滚动条属性
+	//默认不显示基础控件属性
 	//ShowControlProperty(pControl);
 
 	ASSERT(pControl);
@@ -2014,6 +2039,23 @@ void CUIProperties::ShowScrollBarProperty( CControlUI* pControl )
 	//	tagScrollBarBKDisabledImage
 	pPropItem->GetSubItem(tagScrollBarBKDisabledImage-tagScrollBar)->SetValue((_variant_t)pScrollBar->GetBkDisabledImage());
 	pPropItem->GetSubItem(tagScrollBarBKDisabledImage-tagScrollBar)->SetOriginalValue((_variant_t)pScrollBar->GetBkDisabledImage());
+
+	pPropItem->Show(TRUE,FALSE);
+}
+void CUIProperties::ShowTabLayoutPropery( CControlUI* pControl )
+{
+	ShowContainerProperty(pControl);
+
+	ASSERT(pControl);
+	CTabLayoutUI* pTabLayout=static_cast<CTabLayoutUI*>(pControl->GetInterface(_T("TabLayout")));
+	ASSERT(pTabLayout);
+
+	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classTabLayout,FALSE);
+	ASSERT(pPropItem);
+
+	//	SelectedID
+	pPropItem->GetSubItem(tagSelectedID-tagTabLayout)->SetValue((_variant_t)(LONG)pTabLayout->GetCurSel());
+	pPropItem->GetSubItem(tagSelectedID-tagTabLayout)->SetOriginalValue((_variant_t)(LONG)pTabLayout->GetCurSel());
 
 	pPropItem->Show(TRUE,FALSE);
 }
