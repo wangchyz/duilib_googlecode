@@ -253,7 +253,7 @@
 		<Attribute name="menu" default="false" type="BOOL" comment="是否需要右键菜单,如(true)"/>
 		<Attribute name="clsid" default="" type="STRING" comment="activex的clsid,如({8856F961-340A-11D0-A96B-00C04FD705A2})"/>
 		<Attribute name="modulename" default="" type="STRING" comment="activex从指定位置加载,如(flash/flash.ocx)"/>
-		<Attribute name="delaycreate" default="false" type="BOOL" comment="是否需要延迟创建activex,如(false)"/>
+		<Attribute name="delaycreate" default="true" type="BOOL" comment="是否需要延迟创建activex,如(false)"/>
 	</ActiveX>
 	<Combo parent="Container" notifies="setfocus killfocus timer menu dropdown itemselect windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>

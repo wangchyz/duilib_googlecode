@@ -1812,7 +1812,7 @@ void CLayoutManager::SaveEditProperty(CControlUI* pControl, TiXmlElement* pNode)
 		pNode->SetAttribute("maxchar",StringConvertor::WideToUtf8(szBuf));
 	}
 
-	if (pEditUI->GetNativeEditBkColor()!=0)
+	if (pEditUI->GetNativeEditBkColor()!=0xFFFFFFFF)
 	{
 		ZeroMemory(szBuf,sizeof(szBuf));
 		DWORD dwColor = pEditUI->GetNativeEditBkColor();			
