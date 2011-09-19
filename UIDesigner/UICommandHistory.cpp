@@ -194,12 +194,18 @@ BOOL CUICommandNode::RemoveSameProperties(TiXmlNode* pBeforeElem, TiXmlNode* pAf
 void CUICommandNode::RemoveSameProperty(TiXmlNode* pBeforeElem, TiXmlNode* pAfterElem)
 {
 	TiXmlAttribute* pBeforeAttrib = pBeforeElem->ToElement()->FirstAttribute();
+	ASSERT(pBeforeAttrib);
 	TiXmlAttribute* pAfterAttrib = pAfterElem->ToElement()->FirstAttribute();
+	ASSERT(pAfterAttrib);
 
 	while(pBeforeAttrib)
 	{
 		TiXmlAttribute* pBeforeAttribNext = pBeforeAttrib->Next();
+		ASSERT(pBeforeAttribNext);
+		if (pBeforeAttribNext)
+			return;
 		TiXmlAttribute* pAfterAttribNext = pAfterAttrib->Next();
+		ASSERT(pAfterAttribNext);
 		if(strcmp(pBeforeAttrib->Name(), "myname") == 0)
 		{
 			CStringA strBeforeName = pBeforeAttrib->Value();
