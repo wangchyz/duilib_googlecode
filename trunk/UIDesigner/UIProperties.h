@@ -152,6 +152,8 @@ enum PropertyTag
 	tagEditDisabledImage,
 	tagReadOnly,
 	tagPassword,
+	tagMaxChar,
+	tagNativeBKColor,
 
 	//Option
 	tagOption,

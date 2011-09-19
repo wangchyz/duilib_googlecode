@@ -322,8 +322,8 @@ DWORD CWindowUI::GetDefaultSelectedFontColor() const
 
 void CWindowUI::SetAlpha( int nOpacity )
 {
-		m_nOpacity=nOpacity;
-		m_pManager->SetTransparent(nOpacity);
+	m_nOpacity=nOpacity;
+	m_pManager->SetTransparent(nOpacity);
 }
 
 int CWindowUI::GetAlpha() const
@@ -347,7 +347,7 @@ CFormTestWnd::~CFormTestWnd()
 
 LPCTSTR CFormTestWnd::GetWindowClassName() const
 {
-	 return _T("UIFormTest");
+	return _T("UIFormTest");
 }
 
 UINT CFormTestWnd::GetClassStyle() const
@@ -518,7 +518,7 @@ LRESULT CFormTestWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 //CLayoutManager
 
 CLayoutManager::CLayoutManager(void)
-	: m_pFormUI(NULL), m_bShowGrid(false), m_bShowAuxBorder(true)
+: m_pFormUI(NULL), m_bShowGrid(false), m_bShowAuxBorder(true)
 {
 }
 
@@ -564,7 +564,7 @@ void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 		int nPos = m_strSkinDir.ReverseFind(_T('\\'));
 		if(nPos != -1)
 			m_strSkinDir = m_strSkinDir.Left(nPos + 1);
-		
+
 		g_HookAPI.SetSkinDir(m_strSkinDir);
 		g_HookAPI.EnableCreateFile(true);
 
@@ -638,7 +638,7 @@ void CLayoutManager::DrawGrid(CDC* pDC, CRect& rect)
 CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CLayoutManager* pLayout)
 {
 	CControlUI* pControl=NULL;
-	
+
 	ExtendedAttributes* pExtended=new ExtendedAttributes;
 	ZeroMemory(pExtended,sizeof(ExtendedAttributes));
 	switch(nClass)
@@ -1306,7 +1306,7 @@ void CLayoutManager::AlignSameWidth(CControlUI* pFocused,CArray<CControlUI*,CCon
 		CControlUI* pControl=arrSelected.GetAt(i);
 		if(pControl==pFocused)
 			continue;
-		
+
 		pControl->SetFixedWidth(nWidth);
 		DelayPos.AddParent(pControl->GetParent());
 	}
@@ -1474,6 +1474,7 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 		pNode->SetAttribute("bordersize", StringConvertor::WideToUtf8(szBuf));
 	}
 
+#if 0
 	if(pControl->IsFloat())
 	{
 		pNode->SetAttribute("float", "true");
@@ -1509,6 +1510,35 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 			_stprintf_s(szBuf, _T("%d"), pControl->GetFixedHeight());
 			pNode->SetAttribute("height", StringConvertor::WideToUtf8(szBuf));
 		}
+	}
+#endif // 0
+
+	// 在绝对坐标下输出pos坐标，使用前两个值表示坐标
+	// 始终输出width和height来表示控件大小
+	if(pControl->IsFloat())
+	{
+		pNode->SetAttribute("float", "true");
+
+		_stprintf_s(szBuf,
+			_T("%d,%d,%d,%d"),
+			pControl->GetFixedXY().cx,
+			pControl->GetFixedXY().cy,
+			0,//pControl->GetFixedXY().cx + pControl->GetFixedWidth(),
+			0//pControl->GetFixedXY().cy + pControl->GetFixedHeight()
+			);
+		pNode->SetAttribute("pos", StringConvertor::WideToUtf8(szBuf));
+	}
+	
+	if(pControl->GetFixedWidth() > 0)
+	{
+		_stprintf_s(szBuf, _T("%d"), pControl->GetFixedWidth());
+		pNode->SetAttribute("width", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pControl->GetFixedHeight() > 0)
+	{
+		_stprintf_s(szBuf, _T("%d"), pControl->GetFixedHeight());
+		pNode->SetAttribute("height", StringConvertor::WideToUtf8(szBuf));
 	}
 
 	RECT rcPadding = pControl->GetPadding();
@@ -1764,16 +1794,31 @@ void CLayoutManager::SaveSliderProperty(CControlUI* pControl, TiXmlElement* pNod
 
 void CLayoutManager::SaveEditProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
+	TCHAR szBuf[MAX_PATH]={0};
+
 	SaveLabelProperty(pControl, pNode);
 	CEditUI* pEditUI = static_cast<CEditUI*>(pControl->GetInterface(_T("Edit")));
 
-	TCHAR szBuf[MAX_PATH] = {0};	
-
 	if(pEditUI->IsPasswordMode())
-		pNode->SetAttribute("password", pEditUI->IsPasswordMode()?"true":"false");
+		pNode->SetAttribute("password", "true");
 
 	if(pEditUI->IsReadOnly())
-		pNode->SetAttribute("readonly", pEditUI->IsReadOnly()?"true":"false");
+		pNode->SetAttribute("readonly", "true");
+
+	if (pEditUI->GetMaxChar()!=255)
+	{
+		ZeroMemory(szBuf,sizeof(szBuf));
+		_stprintf_s(szBuf,_T("%d"),pEditUI->GetMaxChar());
+		pNode->SetAttribute("maxchar",StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if (pEditUI->GetNativeEditBkColor()!=0)
+	{
+		ZeroMemory(szBuf,sizeof(szBuf));
+		DWORD dwColor = pEditUI->GetNativeEditBkColor();			
+		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
+		pNode->SetAttribute("nativebkcolor",StringConvertor::WideToUtf8(szBuf));
+	}
 }
 
 void CLayoutManager::SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* pNode)
@@ -2049,7 +2094,7 @@ void CLayoutManager::SaveActiveXProperty(CControlUI* pControl, TiXmlElement* pNo
 	{
 		pNode->SetAttribute("delaycreate","false");
 	}
-	
+
 	if (pActiveUI->GetModuleName()&&_tcslen(pActiveUI->GetModuleName())>0)
 	{
 		pNode->SetAttribute("modulename",StringConvertor::WideToUtf8(pActiveUI->GetModuleName()));
@@ -2126,7 +2171,7 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		SaveListHeaderItemProperty(pControl, pNode);
 		break;
 	case classActiveX:
- 		SaveActiveXProperty(pControl, pNode);
+		SaveActiveXProperty(pControl, pNode);
 		break;
 	case classListHeader:
 	case classContainer:
@@ -2161,18 +2206,18 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	}
 }
 
-void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
+bool CLayoutManager::SaveSkinFile( LPCTSTR pstrPathName )
 {
 	CString strPathName(pstrPathName);
 	int nPos = strPathName.ReverseFind(_T('\\'));
 	if(nPos == -1)
-		return;
+		return false;
 	m_strSkinDir = strPathName.Left(nPos + 1);
 
 	HANDLE hFile = ::CreateFile(pstrPathName, GENERIC_ALL, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if(hFile == INVALID_HANDLE_VALUE)
 	{
-		return;
+		return false;
 	}
 	if(hFile != INVALID_HANDLE_VALUE)
 		CloseHandle(hFile);
@@ -2370,7 +2415,7 @@ void CLayoutManager::SaveSkinFile(LPCTSTR pstrPathName)
 	SaveProperties(pForm->GetItemAt(0), pNode->ToElement());
 
 	delete pFormElm;
-	xmlDoc.SaveFile();
+	return xmlDoc.SaveFile();
 }
 
 void CLayoutManager::SetDefaultUIName(CControlUI* pControl)

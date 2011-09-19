@@ -1100,7 +1100,10 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 
 void CUIDesignerView::SaveSkinFile(LPCTSTR pstrPathName)
 {
-	m_LayoutManager.SaveSkinFile(pstrPathName);
+	if(!m_LayoutManager.SaveSkinFile(pstrPathName))
+	{
+		MessageBox(_T("±£´æXMLÎÄ¼þÊ§°Ü!"),_T("´íÎó"),MB_OK);
+	}
 	g_pResourceView->CopyImageToSkinDir(m_LayoutManager.GetSkinDir(), this->GetDocument()->GetTitle());
 }
 
