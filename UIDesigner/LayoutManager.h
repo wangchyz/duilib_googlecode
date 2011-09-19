@@ -153,7 +153,7 @@ public:
 	void MicoMoveLeft(CArray<CControlUI*,CControlUI*>& arrSelected,int nMoved);
 	void MicoMoveRight(CArray<CControlUI*,CControlUI*>& arrSelected,int nMoved);
 
-	void SaveSkinFile(LPCTSTR pstrPathName);
+	bool SaveSkinFile(LPCTSTR pstrPathName);
 	static void SaveProperties(CControlUI* pControl, TiXmlElement* pParentNode
 		, BOOL bSaveChildren = TRUE);
 
