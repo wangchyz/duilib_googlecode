@@ -1683,6 +1683,11 @@ void CLayoutManager::SaveLabelProperty(CControlUI* pControl, TiXmlElement* pNode
 
 	if(!tstrAlgin.empty())
 		pNode->SetAttribute("align", StringConvertor::WideToUtf8(tstrAlgin.c_str()));
+
+	if (pLabelUI->GetTextStyle()&DT_END_ELLIPSIS)
+	{
+		pNode->SetAttribute("endellipsis","true");
+	}
 }
 
 void CLayoutManager::SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNode)
