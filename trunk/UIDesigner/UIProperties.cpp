@@ -586,7 +586,8 @@ void CUIProperties::InitPropList()
 #pragma region Label
 	pPropUI=new CMFCPropertyGridProperty(_T("Label"),classLabel);
 
-	pProp=new CMFCPropertyGridProperty(_T("Align"),_T("Center"),_T("指示文本的对齐方式"),tagAlign);//align
+	//align
+	pProp=new CMFCPropertyGridProperty(_T("Align"),_T("Center"),_T("指示文本的对齐方式"),tagAlign);
 	pProp->AddOption(_T("Center"));
 	pProp->AddOption(_T("Left"));
 	pProp->AddOption(_T("Right"));
@@ -595,20 +596,24 @@ void CUIProperties::InitPropList()
 	pProp->AllowEdit(FALSE);
 	pPropUI->AddSubItem(pProp);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("TextColor"),(LONG)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagTextColor);//textcolor
+	//textcolor
+	pPropColor=new CMFCPropertyGridColorProperty(_T("TextColor"),(LONG)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pPropColor=new CMFCPropertyGridColorProperty(_T("DisabledTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagDisabledTextColor);//disabledtextcolor
+	//disabledtextcolor
+	pPropColor=new CMFCPropertyGridColorProperty(_T("DisabledTextColor"),(LONG)RGB(0,0,0),NULL,_T("指定文本的颜色"),tagDisabledTextColor);
 	pPropColor->EnableOtherButton(_T("其他..."));
 	pPropColor->EnableAutomaticButton(_T("默认"),::GetSysColor(COLOR_3DFACE));
 	pPropUI->AddSubItem(pPropColor);
 
-	pProp=new CMFCPropertyGridProperty(_T("Font"),(_variant_t)(LONG)-1,_T("指定文本的字体"),tagFont);//font
+	//font
+	pProp=new CMFCPropertyGridProperty(_T("Font"),(_variant_t)(LONG)-1,_T("指定文本的字体"),tagFont);
 	pPropUI->AddSubItem(pProp);
 
-	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagTextPadding,TRUE);//textpadding
+	//textpadding
+	pValueList=new CMFCPropertyGridProperty(_T("TextPadding"),tagTextPadding,TRUE);
 	pProp=new CMFCPropertyGridProperty(_T("Left"),(_variant_t)(LONG)0,_T("指定文本区域的左边距"));
 	pValueList->AddSubItem(pProp);
 	pProp=new CMFCPropertyGridProperty(_T("Top"),(_variant_t)(LONG)0,_T("指定文本区域的上边距"));
@@ -619,7 +624,12 @@ void CUIProperties::InitPropList()
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	pProp=new CMFCPropertyGridProperty(_T("ShowHtml"),(_variant_t)false,_T("指示是否使用HTML格式的文本"),tagShowHtml);//showhtml
+	//showhtml
+	pProp=new CMFCPropertyGridProperty(_T("ShowHtml"),(_variant_t)false,_T("指示是否使用HTML格式的文本"),tagShowHtml);
+	pPropUI->AddSubItem(pProp);
+
+	//endellipsis
+	pProp=new CMFCPropertyGridProperty(_T("EndEllipsis"),(_variant_t)false,_T("指示句末显示不全是否使用...代替"),tagEndEllipsis);
 	pPropUI->AddSubItem(pProp);
 
 	m_wndPropList.AddProperty(pPropUI);
@@ -1098,6 +1108,45 @@ void CUIProperties::InitPropList()
 
 #pragma endregion TabLayout
 
+#pragma region ListHeaderItem
+	pPropUI=new CMFCPropertyGridProperty(_T("ListHeaderItem"),classListHeaderItem);
+
+	// dragable
+	pProp=new CMFCPropertyGridProperty(_T("Dragable"),(_variant_t)true,_T("是否可拖动改变大小\ntrue"),tagDragable);
+	pPropUI->AddSubItem(pProp);
+
+	// sepwidth
+	pProp=new CMFCPropertyGridProperty(_T("SepWidth"),(_variant_t)(LONG)0,_T("分隔符宽\n4"),tagListHeaderItemSepWidth);
+	pPropUI->AddSubItem(pProp);
+
+	// normalimage
+	pPropImage=new CMFCPropertyGridImageProperty(_T("NormalImage"),_T(""),_T("普通状态图片"),tagListHeaderItemNormalImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	// hotimage
+	pPropImage=new CMFCPropertyGridImageProperty(_T("HotImage"),_T(""),_T("鼠标悬浮的状态图片"),tagListHeaderItemHotImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	// PushedImage
+	pPropImage=new CMFCPropertyGridImageProperty(_T("PushedImage"),_T(""),_T("鼠标按下的状态图片"),tagListHeaderItemPushedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	// focusedimage
+	pPropImage=new CMFCPropertyGridImageProperty(_T("FocusedImage"),_T(""),_T("获得焦点时的状态图片"),tagListHeaderItemFocusedImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	// sepimage
+	pPropImage=new CMFCPropertyGridImageProperty(_T("SepImage"),_T(""),_T("拖动条图片"),tagSepImage);
+	pPropImage->AllowEdit(FALSE);
+	pPropUI->AddSubItem(pPropImage);
+
+	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion ListHeaderItem
+
 	HideAllProperties();
 }
 
@@ -1204,6 +1253,9 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 		break;
 	case classScrollBar:
 		ShowScrollBarProperty(pControl);
+		break;
+	case classListHeaderItem:
+		ShowListHeaderItemPropery(pControl);
 		break;
 	default:
 		ShowControlProperty(pControl);
@@ -1475,6 +1527,11 @@ void CUIProperties::ShowLabelProperty(CControlUI* pControl)
 	//showhtml
 	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetValue((_variant_t)pLabel->IsShowHtml());
 	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetOriginalValue((_variant_t)pLabel->IsShowHtml());
+	//endellipsis
+	DWORD dwStyle=pLabel->GetTextStyle();
+	bool bEndEllipsis=(dwStyle&DT_END_ELLIPSIS);
+	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetValue((_variant_t)bEndEllipsis);
+	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetOriginalValue((_variant_t)bEndEllipsis);
 
 	pPropLabel->Show(TRUE,FALSE);
 }
@@ -2080,4 +2137,38 @@ void CUIProperties::ShowTabLayoutPropery( CControlUI* pControl )
 	pPropItem->GetSubItem(tagSelectedID-tagTabLayout)->SetOriginalValue((_variant_t)(LONG)pTabLayout->GetCurSel());
 
 	pPropItem->Show(TRUE,FALSE);
+}
+
+void CUIProperties::ShowListHeaderItemPropery( CControlUI* pControl )
+{
+	ShowControlProperty(pControl);
+
+	ASSERT(pControl);
+	CListHeaderItemUI* pListHeaderItem=static_cast<CListHeaderItemUI*>(pControl->GetInterface(_T("ListHeaderItem")));
+	ASSERT(pListHeaderItem);
+
+	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classListHeaderItem,FALSE);
+	ASSERT(pPropItem);
+
+	//	dragable
+	pPropItem->GetSubItem(tagDragable-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->IsDragable());
+	pPropItem->GetSubItem(tagDragable-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->IsDragable());
+	//	sepwidth
+	pPropItem->GetSubItem(tagListHeaderItemSepWidth-classListHeaderItem)->SetValue((_variant_t)(LONG)pListHeaderItem->GetSepWidth());
+	pPropItem->GetSubItem(tagListHeaderItemSepWidth-classListHeaderItem)->SetOriginalValue((_variant_t)(LONG)pListHeaderItem->GetSepWidth());
+	//	normalimage
+	pPropItem->GetSubItem(tagListHeaderItemNormalImage-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->GetNormalImage());
+	pPropItem->GetSubItem(tagScrollBarBKPushedImage-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->GetNormalImage());
+	//	hotimage
+	pPropItem->GetSubItem(tagListHeaderItemHotImage-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->GetHotImage());
+	pPropItem->GetSubItem(tagListHeaderItemHotImage-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->GetHotImage());
+	//	pushedimage
+	pPropItem->GetSubItem(tagListHeaderItemPushedImage-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->GetPushedImage());
+	pPropItem->GetSubItem(tagListHeaderItemPushedImage-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->GetPushedImage());
+	//	focusedimage
+	pPropItem->GetSubItem(tagListHeaderItemFocusedImage-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->GetFocusedImage());
+	pPropItem->GetSubItem(tagListHeaderItemFocusedImage-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->GetFocusedImage());
+	//	sepimage
+	pPropItem->GetSubItem(tagSepImage-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->GetSepImage());
+	pPropItem->GetSubItem(tagSepImage-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->GetSepImage());
 }

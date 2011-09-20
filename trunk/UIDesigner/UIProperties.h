@@ -135,6 +135,7 @@ enum PropertyTag
 	tagFont,
 	tagTextPadding,
 	tagShowHtml,
+	tagEndEllipsis,
 
 	//Button
 	tagButton,
@@ -261,9 +262,20 @@ enum PropertyTag
 	tagScrollBarBKHotImage,
 	tagScrollBarBKPushedImage,
 	tagScrollBarBKDisabledImage,
+
 	// TabLayout
 	tagTabLayout,
 	tagSelectedID=tagTabLayout,
+
+	// ListHeaderItem
+	tagListHeaderItem,
+	tagDragable=tagListHeaderItem,
+	tagListHeaderItemSepWidth,
+	tagListHeaderItemNormalImage,
+	tagListHeaderItemHotImage,
+	tagListHeaderItemPushedImage,
+	tagListHeaderItemFocusedImage,
+	tagSepImage,
 };
 
 extern UINT WM_UI_PROPERTY_CHANGED;
@@ -310,6 +322,7 @@ protected:
 	void ShowItemProperty(CControlUI* pControl);
 	void ShowScrollBarProperty(CControlUI* pControl);
 	void ShowTabLayoutPropery(CControlUI* pControl);
+	void ShowListHeaderItemPropery(CControlUI* pControl);
 
 	//Container Property
 	void ShowContainerProperty(CControlUI* pControl);
