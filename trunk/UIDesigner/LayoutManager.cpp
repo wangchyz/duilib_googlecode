@@ -1731,6 +1731,11 @@ void CLayoutManager::SaveButtonProperty(CControlUI* pControl, TiXmlElement* pNod
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pNode->SetAttribute("hottextcolor", StringConvertor::WideToUtf8(szBuf));
 	}
+
+	if (!pButtonUI->IsKeyboardEnabled())
+	{
+		pNode->SetAttribute("keyboard","false");
+	}
 }
 
 void CLayoutManager::SaveOptionProperty(CControlUI* pControl, TiXmlElement* pNode)

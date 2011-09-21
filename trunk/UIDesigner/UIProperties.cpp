@@ -579,6 +579,10 @@ void CUIProperties::InitPropList()
 	pProp=new CMFCPropertyGridProperty(_T("UserData"),(_variant_t)_T(""),_T("指示该控件自定义标识\nFalse"),tagUserData);
 	pPropUI->AddSubItem(pProp);
 
+	//keyboard
+	pProp=new CMFCPropertyGridProperty(_T("KeyBoard"),(_variant_t)false,_T("指示CButton类控件是否接受TabStop和按键事件\nFalse"),tagKeyBoard);
+	pPropUI->AddSubItem(pProp);
+
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion Control
 
@@ -1474,6 +1478,9 @@ void CUIProperties::ShowControlProperty(CControlUI* pControl)
 	//userdata
 	pPropControl->GetSubItem(tagUserData-tagControl)->SetValue((_variant_t)pControl->GetUserData());
 	pPropControl->GetSubItem(tagUserData-tagControl)->SetOriginalValue((_variant_t)pControl->GetUserData());
+	//keyboard
+	pPropControl->GetSubItem(tagKeyBoard-tagControl)->SetValue((_variant_t)pControl->IsKeyboardEnabled());
+	pPropControl->GetSubItem(tagKeyBoard-tagControl)->SetOriginalValue((_variant_t)pControl->IsKeyboardEnabled());
 
 	pPropControl->Show(TRUE,FALSE);
 }
