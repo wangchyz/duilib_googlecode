@@ -126,6 +126,7 @@ enum PropertyTag
 	tagColorHSL,
 	tagTooltip,
 	tagUserData,
+	tagKeyBoard,
 
 	//Label
 	tagLabel,

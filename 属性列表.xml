@@ -44,6 +44,7 @@
 		<Attribute name="float" default="false" type="BOOL" comment="是否使用绝对定位,如(true)"/>
 		<Attribute name="shortcut" default="" type="CHAR" comment="对应的快捷键,如(P)"/>
 		<Attribute name="menu" default="false" type="BOOL" comment="是否需要右键菜单,如(true)"/>
+		<Attribute name="keyboard" default="true" type="BOOL" comment="非CButtonUI类忽略该值，为false时不支持TAB_STOP,且该对象不处理键盘信息"/>
 	</Control>
 	<Container parent="Control" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
