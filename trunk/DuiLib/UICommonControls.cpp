@@ -1293,7 +1293,7 @@ void CEditWnd::Init(CEditUI* pOwner)
     UINT uStyle = WS_CHILD | ES_AUTOHSCROLL;
     if( m_pOwner->IsPasswordMode() ) uStyle |= ES_PASSWORD;
     Create(m_pOwner->GetManager()->GetPaintWindow(), NULL, uStyle, 0, rcPos);
-    SetWindowFont(m_hWnd, m_pOwner->GetManager()->GetDefaultFontInfo()->hFont, TRUE);
+    SetWindowFont(m_hWnd, m_pOwner->GetManager()->GetFontInfo(m_pOwner->GetFont())->hFont, TRUE);
     Edit_LimitText(m_hWnd, m_pOwner->GetMaxChar());
     if( m_pOwner->IsPasswordMode() ) Edit_SetPasswordChar(m_hWnd, m_pOwner->GetPasswordChar());
     Edit_SetText(m_hWnd, m_pOwner->GetText());
@@ -1314,7 +1314,7 @@ RECT CEditWnd::CalPos()
     rcPos.top += rcInset.top;
     rcPos.right -= rcInset.right;
     rcPos.bottom -= rcInset.bottom;
-    LONG lEditHeight = m_pOwner->GetManager()->GetDefaultFontInfo()->tm.tmHeight;
+    LONG lEditHeight = m_pOwner->GetManager()->GetFontInfo(m_pOwner->GetFont())->tm.tmHeight;
     if( lEditHeight < rcPos.GetHeight() ) {
         rcPos.top += (rcPos.GetHeight() - lEditHeight) / 2;
         rcPos.bottom = rcPos.top + lEditHeight;
@@ -1667,7 +1667,7 @@ void CEditUI::SetInternVisible(bool bVisible)
 
 SIZE CEditUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 6);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 6);
     return CControlUI::EstimateSize(szAvailable);
 }
 
