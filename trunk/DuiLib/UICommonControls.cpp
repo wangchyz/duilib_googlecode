@@ -90,7 +90,7 @@ void CLabelUI::SetShowHtml(bool bShowHtml)
 
 SIZE CLabelUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 4);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 4);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -410,7 +410,7 @@ void CButtonUI::SetDisabledImage(LPCTSTR pStrImage)
 
 SIZE CButtonUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -661,7 +661,7 @@ void COptionUI::SetForeImage(LPCTSTR pStrImage)
 
 SIZE COptionUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8);
+    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
     return CControlUI::EstimateSize(szAvailable);
 }
 
