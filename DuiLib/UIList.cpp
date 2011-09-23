@@ -1790,7 +1790,7 @@ SIZE CListLabelElementUI::EstimateSize(SIZE szAvailable)
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
     SIZE cXY = m_cxyFixed;
     if( cXY.cy == 0 && m_pManager != NULL ) {
-        cXY.cy = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8;
+        cXY.cy = m_pManager->GetFontInfo(pInfo->nFont)->tm.tmHeight + 8;
         cXY.cy += pInfo->rcTextPadding.top + pInfo->rcTextPadding.bottom;
     }
 
@@ -1972,7 +1972,7 @@ SIZE CListTextElementUI::EstimateSize(SIZE szAvailable)
 
     SIZE cXY = m_cxyFixed;
     if( cXY.cy == 0 && m_pManager != NULL ) {
-        cXY.cy = m_pManager->GetDefaultFontInfo()->tm.tmHeight + 8;
+        cXY.cy = m_pManager->GetFontInfo(pInfo->nFont)->tm.tmHeight + 8;
         if( pInfo ) cXY.cy += pInfo->rcTextPadding.top + pInfo->rcTextPadding.bottom;
     }
 
