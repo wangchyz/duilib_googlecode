@@ -1933,8 +1933,7 @@ bool CPaintManagerUI::RemoveImage(LPCTSTR bitmap)
     const TImageInfo* data = GetImage(bitmap);
     if( !data ) return false;
 
-    ::DeleteObject(data->hBitmap);
-    delete data;
+    CRenderEngine::FreeImage(data) ;
 
     return m_mImageHash.Remove(bitmap);
 }
