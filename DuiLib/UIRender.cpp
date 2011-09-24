@@ -402,6 +402,14 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
     return data;
 }
 
+void CRenderEngine::FreeImage(const TImageInfo* bitmap)
+{
+	if (bitmap->hBitmap) {
+		::DeleteObject(bitmap->hBitmap) ; 
+	}
+	delete bitmap ;
+}
+
 void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RECT& rcPaint,
                                     const RECT& rcBmpPart, const RECT& rcCorners, bool alphaChannel, 
                                     BYTE uFade, bool hole, bool xtiled, bool ytiled)
