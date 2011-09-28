@@ -888,13 +888,15 @@ static void PixelToHiMetric(const SIZEL* lpSizeInPix, LPSIZEL lpSizeInHiMetric)
 void CActiveXUI::SetVisible(bool bVisible)
 {
     CControlUI::SetVisible(bVisible);
-    if( m_hwndHost != NULL ) ::ShowWindow(m_hwndHost, IsVisible() ? SW_SHOW : SW_HIDE);
+    if( m_hwndHost != NULL && !m_pControl->m_bWindowless ) 
+        ::ShowWindow(m_hwndHost, IsVisible() ? SW_SHOW : SW_HIDE);
 }
 
 void CActiveXUI::SetInternVisible(bool bVisible)
 {
     CControlUI::SetInternVisible(bVisible);
-    if( m_hwndHost != NULL ) ::ShowWindow(m_hwndHost, IsVisible() ? SW_SHOW : SW_HIDE);
+    if( m_hwndHost != NULL && !m_pControl->m_bWindowless ) 
+        ::ShowWindow(m_hwndHost, IsVisible() ? SW_SHOW : SW_HIDE);
 }
 
 void CActiveXUI::SetPos(RECT rc)
