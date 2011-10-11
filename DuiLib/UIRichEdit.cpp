@@ -2072,21 +2072,23 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
 
     bool bWasHandled = true;
     if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR ) {
-        switch (uMsg) {
-        case WM_LBUTTONDOWN:
-        case WM_LBUTTONUP:
-        case WM_LBUTTONDBLCLK:
-        case WM_RBUTTONDOWN:
-        case WM_RBUTTONUP:
-            {
-                POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
-                CControlUI* pHover = GetManager()->FindControl(pt);
-                if(pHover != this) {
-                    bWasHandled = false;
-                    return 0;
+        if( !m_pTwh->IsCaptured() ) {
+            switch (uMsg) {
+            case WM_LBUTTONDOWN:
+            case WM_LBUTTONUP:
+            case WM_LBUTTONDBLCLK:
+            case WM_RBUTTONDOWN:
+            case WM_RBUTTONUP:
+                {
+                    POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
+                    CControlUI* pHover = GetManager()->FindControl(pt);
+                    if(pHover != this) {
+                        bWasHandled = false;
+                        return 0;
+                    }
                 }
+                break;
             }
-            break;
         }
         // Mouse message only go when captured or inside rect
         DWORD dwHitResult = m_pTwh->IsCaptured() ? HITRESULT_HIT : HITRESULT_OUTSIDE;
@@ -2132,6 +2134,11 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
     LRESULT lResult = 0;
     HRESULT Hr = TxSendMessage(uMsg, wParam, lParam, &lResult);
     if( Hr == S_OK ) bHandled = bWasHandled;
+    else if( (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST) || uMsg == WM_CHAR || uMsg == WM_IME_CHAR )
+        bHandled = bWasHandled;
+    else if( uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST ) {
+        if( m_pTwh->IsCaptured() ) bHandled = bWasHandled;
+    }
     return lResult;
 }
 
