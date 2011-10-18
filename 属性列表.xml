@@ -942,7 +942,6 @@
 		<Attribute name="rich" default="true" type="BOOL" comment="是否使用富格式,如(true)"/>
 		<Attribute name="multiline" default="true" type="BOOL" comment="是否使用多行,如(true)"/>
 		<Attribute name="readonly" default="false" type="BOOL" comment="是否只读,如(false)"/>
-		<Attribute name="numberonly" default="false" type="BOOL" comment="是否只接受数字输入,如(true)"/>
 		<Attribute name="password" default="false" type="BOOL" comment="是否显示密码符,如(true)"/>
 		<Attribute name="align" default="left" type="STRING" comment="文字对齐方式,取值left、right、cente，如(center)"/>
 		<Attribute name="font" default="-1" type="INT" comment="字体id,如(0)"/>
