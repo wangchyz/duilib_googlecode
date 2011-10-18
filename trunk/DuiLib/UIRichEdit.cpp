@@ -2033,9 +2033,6 @@ void CRichEditUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("readonly")) == 0 ) {
         if( _tcscmp(pstrValue, _T("true")) == 0 ) { m_lTwhStyle |= ES_READONLY; m_bReadOnly = true; }
     }
-    else if( _tcscmp(pstrName, _T("numberonly")) == 0 ) {
-        if( _tcscmp(pstrValue, _T("true")) == 0 ) m_lTwhStyle |= ES_NUMBER;
-    }
     else if( _tcscmp(pstrName, _T("password")) == 0 ) {
         if( _tcscmp(pstrValue, _T("true")) == 0 ) m_lTwhStyle |= ES_PASSWORD;
     }
