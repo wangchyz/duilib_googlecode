@@ -1298,17 +1298,14 @@ bool CPaintManagerUI::SetTimer(CControlUI* pControl, UINT nTimerID, UINT uElapse
         TIMERINFO* pTimer = static_cast<TIMERINFO*>(m_aTimers[i]);
         if( pTimer->pSender == pControl
             && pTimer->hWnd == m_hWndPaint
-            && pTimer->nLocalID == nTimerID )
-        {
+            && pTimer->nLocalID == nTimerID ) {
             if( pTimer->bKilled == true ) {
                 if( ::SetTimer(m_hWndPaint, pTimer->uWinTimer, uElapse, NULL) ) {
                     pTimer->bKilled = false;
                     return true;
                 }
-
                 return false;
             }
-
             return false;
         }
     }
@@ -1352,6 +1349,7 @@ void CPaintManagerUI::KillTimer(CControlUI* pControl)
         TIMERINFO* pTimer = static_cast<TIMERINFO*>(m_aTimers[i - j]);
         if( pTimer->pSender == pControl && pTimer->hWnd == m_hWndPaint ) {
             if( pTimer->bKilled == false ) ::KillTimer(pTimer->hWnd, pTimer->uWinTimer);
+            delete pTimer;
             m_aTimers.Remove(i);
             j++;
         }
@@ -1362,8 +1360,7 @@ void CPaintManagerUI::RemoveAllTimers()
 {
     for( int i = 0; i < m_aTimers.GetSize(); i++ ) {
         TIMERINFO* pTimer = static_cast<TIMERINFO*>(m_aTimers[i]);
-        if( pTimer->hWnd == m_hWndPaint )
-        {
+        if( pTimer->hWnd == m_hWndPaint ) {
             if( pTimer->bKilled == false ) {
                 if( ::IsWindow(m_hWndPaint) ) ::KillTimer(m_hWndPaint, pTimer->uWinTimer);
             }
