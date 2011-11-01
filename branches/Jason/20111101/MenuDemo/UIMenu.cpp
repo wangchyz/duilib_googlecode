@@ -470,7 +470,7 @@ const TCHAR* const kMenuElementUIInterfaceName = _T("MenuElement");
 CMenuElementUI::CMenuElementUI():
 m_pWindow(NULL)
 {
-	m_cxyFixed.cy = 25;
+	m_stLayoutParams.GetHeight() = 25;
 	m_bMouseChildEnabled = true;
 
 	SetMouseChildEnabled(false);
@@ -559,7 +559,7 @@ SIZE CMenuElementUI::EstimateSize(SIZE szAvailable)
 			iTextColor = pInfo->dwDisabledTextColor;
 		}
 
-		RECT rcText = { 0, 0, MAX(szAvailable.cx, m_cxyFixed.cx), 9999 };
+		RECT rcText = { 0, 0, MAX(szAvailable.cx, m_stLayoutParams.GetWidth()), 9999 };
 		rcText.left += pInfo->rcTextPadding.left;
 		rcText.right -= pInfo->rcTextPadding.right;
 		if( pInfo->bShowHtml ) {   
@@ -573,7 +573,7 @@ SIZE CMenuElementUI::EstimateSize(SIZE szAvailable)
 		cXY.cy = rcText.bottom - rcText.top + pInfo->rcTextPadding.top + pInfo->rcTextPadding.bottom;
 	}
 
-	if( m_cxyFixed.cy != 0 ) cXY.cy = m_cxyFixed.cy;
+	if( m_stLayoutParams.GetHeight() != 0 ) cXY.cy = m_stLayoutParams.GetHeight();
 	return cXY;
 }
 

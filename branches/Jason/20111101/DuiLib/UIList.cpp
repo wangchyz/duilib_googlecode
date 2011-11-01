@@ -956,9 +956,9 @@ void CListBodyUI::SetPos(RECT rc)
             if( sz.cy < pControl->GetMinHeight() ) sz.cy = pControl->GetMinHeight();
             if( sz.cy > pControl->GetMaxHeight() ) sz.cy = pControl->GetMaxHeight();
         }
-        cyFixed += sz.cy + pControl->GetPadding().top + pControl->GetPadding().bottom;
+        cyFixed += sz.cy + pControl->GetMargins().top + pControl->GetMargins().bottom;
 
-        RECT rcPadding = pControl->GetPadding();
+        RECT rcPadding = pControl->GetMargins();
         sz.cx = MAX(sz.cx, 0);
         if( sz.cx < pControl->GetMinWidth() ) sz.cx = pControl->GetMinWidth();
         if( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
@@ -998,7 +998,7 @@ void CListBodyUI::SetPos(RECT rc)
             continue;
         }
 
-        RECT rcPadding = pControl->GetPadding();
+        RECT rcPadding = pControl->GetMargins();
         szRemaining.cy -= rcPadding.top;
         SIZE sz = pControl->EstimateSize(szRemaining);
         if( sz.cy == 0 ) {
@@ -1089,7 +1089,7 @@ LPVOID CListHeaderUI::GetInterface(LPCTSTR pstrName)
 
 SIZE CListHeaderUI::EstimateSize(SIZE szAvailable)
 {
-    SIZE cXY = {0, m_cxyFixed.cy};
+    SIZE cXY = {0, m_stLayoutParams.GetHeight()};
 	if( cXY.cy == 0 && m_pManager != NULL ) {
 		for( int it = 0; it < m_items.GetSize(); it++ ) {
 			cXY.cy = MAX(cXY.cy,static_cast<CControlUI*>(m_items[it])->EstimateSize(szAvailable).cy);
@@ -1374,7 +1374,7 @@ void CListHeaderItemUI::DoEvent(TEventUI& event)
             }
             
             if( rc.right - rc.left > GetMinWidth() ) {
-                m_cxyFixed.cx = rc.right - rc.left;
+                m_stLayoutParams.SetWidth(rc.right - rc.left);
                 ptLastMouse = event.ptMouse;
                 if( GetParent() ) 
                     GetParent()->NeedParentUpdate();
@@ -1411,7 +1411,7 @@ void CListHeaderItemUI::DoEvent(TEventUI& event)
 
 SIZE CListHeaderItemUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetDefaultFontInfo()->tm.tmHeight + 14);
+    if( m_stLayoutParams.GetHeight() == 0 ) return CSize(m_stLayoutParams.GetWidth(), m_pManager->GetDefaultFontInfo()->tm.tmHeight + 14);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -1788,7 +1788,7 @@ SIZE CListLabelElementUI::EstimateSize(SIZE szAvailable)
     if( m_pOwner == NULL ) return CSize(0, 0);
 
     TListInfoUI* pInfo = m_pOwner->GetListInfo();
-    SIZE cXY = m_cxyFixed;
+	SIZE cXY = {m_stLayoutParams.GetWidth(), m_stLayoutParams.GetHeight()};
     if( cXY.cy == 0 && m_pManager != NULL ) {
         cXY.cy = m_pManager->GetFontInfo(pInfo->nFont)->tm.tmHeight + 8;
         cXY.cy += pInfo->rcTextPadding.top + pInfo->rcTextPadding.bottom;
@@ -1970,7 +1970,7 @@ SIZE CListTextElementUI::EstimateSize(SIZE szAvailable)
     TListInfoUI* pInfo = NULL;
     if( m_pOwner ) pInfo = m_pOwner->GetListInfo();
 
-    SIZE cXY = m_cxyFixed;
+    SIZE cXY = {m_stLayoutParams.GetWidth(), m_stLayoutParams.GetHeight()};
     if( cXY.cy == 0 && m_pManager != NULL ) {
         cXY.cy = m_pManager->GetFontInfo(pInfo->nFont)->tm.tmHeight + 8;
         if( pInfo ) cXY.cy += pInfo->rcTextPadding.top + pInfo->rcTextPadding.bottom;

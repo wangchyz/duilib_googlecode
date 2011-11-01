@@ -22,6 +22,19 @@
 		<Control height="26"/>
 		<Edit name="testedit" text="{a www.baidu.com}ddd{/a}" showhtml="true" maxwidth="280" bkcolor="#FF00E000" nativebkcolor="#FF00E000"/>
 		<RichEdit name="testrichedit1" bordercolor="#FF0000" bordersize="2" borderround="8,8" inset="4,2,4,2" bkcolor="#FFE2E5EA" bkcolor2="#FF00F5DA" bkcolor3="#FFF2F5FA" font="1" multiline="false" rich="false" hscrollbar="true" autohscroll="true"/>
+		<LinearLayout height="40" gravity="left|center_vertical" margins="0 10 0 0">
+			<Button text="左对齐" width="55" height="match_parent" bordersize="1" bordercolor="#ff000000" margins="20 0 20 0"/>
+			<Button text="左对齐" width="55" height="match_parent" bordersize="1" bordercolor="#ff000000" margins="20 0 20 0"/>
+		</LinearLayout>
+		<LinearLayout height="40" gravity="right|center_vertical" margins="0 10 0 0">
+			<Button text="右对齐" width="55" height="match_parent" bordersize="1" bordercolor="#ff000000" margins="20 0 20 0"/>
+			<Button text="右对齐" width="55" height="match_parent" bordersize="1" bordercolor="#ff000000" margins="20 0 20 0"/>
+		</LinearLayout>
+		<LinearLayout height="200" bordersize="1" bordercolor="#ff000000" gravity="bottom|right" vertical="true" margins="0 10 0 0">
+			<Button text="纵向布局" width="match_parent" height="30"/>
+			<Button text="自动拉升1" width="180" layoutweight="1" margins="0 10 0 0"/>
+			<Button text="自动拉升2" width="200" layoutweight="2" margins="0 10 0 0"/>
+		</LinearLayout>
 		<Control />
 	</VerticalLayout>
 </Window>

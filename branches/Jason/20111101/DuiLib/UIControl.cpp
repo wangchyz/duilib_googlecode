@@ -26,15 +26,16 @@ m_bColorHSL(false),
 m_nBorderSize(1)
 {
     m_cXY.cx = m_cXY.cy = 0;
-    m_cxyFixed.cx = m_cxyFixed.cy = 0;
     m_cxyMin.cx = m_cxyMin.cy = 0;
     m_cxyMax.cx = m_cxyMax.cy = 9999;
     m_cxyBorderRound.cx = m_cxyBorderRound.cy = 0;
 
-    ::ZeroMemory(&m_rcPadding, sizeof(m_rcPadding));
     ::ZeroMemory(&m_rcItem, sizeof(RECT));
     ::ZeroMemory(&m_rcPaint, sizeof(RECT));
     ::ZeroMemory(&m_tRelativePos, sizeof(TRelativePosUI));
+
+	::ZeroMemory(&m_stLayoutParams, sizeof(CLayoutParams));
+	::ZeroMemory(&m_rcPaddings, sizeof(m_rcPaddings));
 }
 
 CControlUI::~CControlUI()
@@ -256,8 +257,8 @@ void CControlUI::SetPos(RECT rc)
             else m_cXY.cx = m_rcItem.right - rcParentPos.right;
             if( m_cXY.cy >= 0 ) m_cXY.cy = m_rcItem.top - rcParentPos.top;
             else m_cXY.cy = m_rcItem.bottom - rcParentPos.bottom;
-            m_cxyFixed.cx = m_rcItem.right - m_rcItem.left;
-            m_cxyFixed.cy = m_rcItem.bottom - m_rcItem.top;
+            m_stLayoutParams.SetWidth(m_rcItem.right - m_rcItem.left);
+            m_stLayoutParams.SetHeight(m_rcItem.bottom - m_rcItem.top);
         }
     }
 
@@ -298,18 +299,32 @@ int CControlUI::GetY() const
 {
     return m_rcItem.top;
 }
-
+RECT CControlUI::GetMargins() const
+{
+	return m_stLayoutParams.GetMargins();
+}
+void CControlUI::SetMargins(const RECT &rcMargins)
+{
+	m_stLayoutParams.SetMargins(rcMargins);
+	NeedParentUpdate();
+}
 RECT CControlUI::GetPadding() const
 {
-    return m_rcPadding;
+	return GetMargins();
 }
-
-void CControlUI::SetPadding(RECT rcPadding)
+void CControlUI::SetPadding(const RECT &rcMargins)
 {
-    m_rcPadding = rcPadding;
-    NeedParentUpdate();
+	SetMargins(rcMargins);
 }
-
+RECT CControlUI::GetPaddings() const
+{
+	return m_rcPaddings;
+}
+void CControlUI::SetPaddings(const RECT &rcPaddings)
+{
+	m_rcPaddings = rcPaddings;
+	NeedParentUpdate();
+}
 SIZE CControlUI::GetFixedXY() const
 {
     return m_cXY;
@@ -325,28 +340,28 @@ void CControlUI::SetFixedXY(SIZE szXY)
 
 int CControlUI::GetFixedWidth() const
 {
-    return m_cxyFixed.cx;
+	return m_stLayoutParams.GetWidth();
 }
 
 void CControlUI::SetFixedWidth(int cx)
 {
-    if( cx < 0 ) return; 
-    m_cxyFixed.cx = cx;
-    if( !m_bFloat ) NeedParentUpdate();
-    else NeedUpdate();
+	if( cx < 0 ) return; 
+	m_stLayoutParams.SetWidth(cx);
+	if( !m_bFloat ) NeedParentUpdate();
+	else NeedUpdate();
 }
 
 int CControlUI::GetFixedHeight() const
 {
-    return m_cxyFixed.cy;
+	return m_stLayoutParams.GetHeight();
 }
 
 void CControlUI::SetFixedHeight(int cy)
 {
-    if( cy < 0 ) return; 
-    m_cxyFixed.cy = cy;
-    if( !m_bFloat ) NeedParentUpdate();
-    else NeedUpdate();
+	if( cy < 0 ) return; 
+	m_stLayoutParams.SetHeight(cy);
+	if( !m_bFloat ) NeedParentUpdate();
+	else NeedUpdate();
 }
 
 int CControlUI::GetMinWidth() const
@@ -705,21 +720,27 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         szZoom.cy = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr); 
         SetRelativePos(szMove,szZoom);
     }
-    else if( _tcscmp(pstrName, _T("padding")) == 0 ) {
-        RECT rcPadding = { 0 };
-        LPTSTR pstr = NULL;
-        rcPadding.left = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
-        rcPadding.top = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
-        rcPadding.right = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
-        rcPadding.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);    
-        SetPadding(rcPadding);
-    }
+	else if( _tcscmp(pstrName, _T("padding")) == 0 ) {
+		RECT rcPadding = { 0 };
+		LPTSTR pstr = NULL;
+		CommonUtils::toRECT(pstrValue, rcPadding);
+		SetMargins(rcPadding);
+	}
+	else if( _tcscmp(pstrName, _T("paddings")) == 0 ) {
+		RECT rcPaddings = { 0 };
+		LPTSTR pstr = NULL;
+		CommonUtils::toRECT(pstrValue, rcPaddings);
+		SetPaddings(rcPaddings);
+	}
+	else if( _tcscmp(pstrName, _T("margins")) == 0 ) {
+		RECT rcMargins = { 0 };
+		LPTSTR pstr = NULL;
+		CommonUtils::toRECT(pstrValue, rcMargins);
+		SetMargins(rcMargins);
+	}
     else if( _tcscmp(pstrName, _T("bkcolor")) == 0 || _tcscmp(pstrName, _T("bkcolor1")) == 0 ) {
-        while( *pstrValue > _T('\0') && *pstrValue <= _T(' ') ) pstrValue = ::CharNext(pstrValue);
-        if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
-        LPTSTR pstr = NULL;
-        DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
-        SetBkColor(clrColor);
+		while( *pstrValue > _T('\0') && *pstrValue <= _T(' ') ) pstrValue = ::CharNext(pstrValue);
+		SetBkColor(CommonUtils::toColor(pstrValue));
     }
     else if( _tcscmp(pstrName, _T("bkcolor2")) == 0 ) {
         while( *pstrValue > _T('\0') && *pstrValue <= _T(' ') ) pstrValue = ::CharNext(pstrValue);
@@ -757,8 +778,9 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
         SetBorderRound(cxyRound);
     }
     else if( _tcscmp(pstrName, _T("bkimage")) == 0 ) SetBkImage(pstrValue);
-    else if( _tcscmp(pstrName, _T("width")) == 0 ) SetFixedWidth(_ttoi(pstrValue));
-    else if( _tcscmp(pstrName, _T("height")) == 0 ) SetFixedHeight(_ttoi(pstrValue));
+	else if( _tcscmp(pstrName, _T("width")) == 0 ) m_stLayoutParams.SetWidth(pstrValue);
+	else if( _tcscmp(pstrName, _T("height")) == 0 )  m_stLayoutParams.SetHeight(pstrValue);
+	else if( _tcscmp(pstrName, _T("layoutweight")) == 0 ) m_stLayoutParams.SetWeight(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("minwidth")) == 0 ) SetMinWidth(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("minheight")) == 0 ) SetMinHeight(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("maxwidth")) == 0 ) SetMaxWidth(_ttoi(pstrValue));
@@ -809,7 +831,8 @@ CControlUI* CControlUI::ApplyAttributeList(LPCTSTR pstrList)
 
 SIZE CControlUI::EstimateSize(SIZE szAvailable)
 {
-    return m_cxyFixed;
+	SIZE stSize = {m_stLayoutParams.GetWidth(), m_stLayoutParams.GetHeight()};
+	return stSize;
 }
 
 void CControlUI::DoPaint(HDC hDC, const RECT& rcPaint)
@@ -895,6 +918,11 @@ void CControlUI::PaintBorder(HDC hDC)
 void CControlUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
 {
     return;
+}
+
+const CLayoutParams* CControlUI::GetLayoutParams() const
+{
+	return &m_stLayoutParams;
 }
 
 } // namespace DuiLib

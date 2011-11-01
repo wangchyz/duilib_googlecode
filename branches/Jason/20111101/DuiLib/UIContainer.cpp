@@ -866,7 +866,7 @@ void CVerticalLayoutUI::SetPos(RECT rc)
             if( sz.cy < pControl->GetMinHeight() ) sz.cy = pControl->GetMinHeight();
             if( sz.cy > pControl->GetMaxHeight() ) sz.cy = pControl->GetMaxHeight();
         }
-        cyFixed += sz.cy + pControl->GetPadding().top + pControl->GetPadding().bottom;
+        cyFixed += sz.cy + pControl->GetMargins().top + pControl->GetMargins().bottom;
         nEstimateNum++;
     }
     cyFixed += (nEstimateNum - 1) * m_iChildPadding;
@@ -895,7 +895,7 @@ void CVerticalLayoutUI::SetPos(RECT rc)
             continue;
         }
 
-        RECT rcPadding = pControl->GetPadding();
+        RECT rcPadding = pControl->GetMargins();
         szRemaining.cy -= rcPadding.top;
         SIZE sz = pControl->EstimateSize(szRemaining);
         if( sz.cy == 0 ) {
@@ -1032,7 +1032,7 @@ void CVerticalLayoutUI::DoEvent(TEventUI& event)
 
                 CRect rcInvalidate = GetThumbRect(true);
                 m_rcNewPos = rc;
-                m_cxyFixed.cy = m_rcNewPos.bottom - m_rcNewPos.top;
+                m_stLayoutParams.SetHeight(m_rcNewPos.bottom - m_rcNewPos.top);
 
                 if( m_bImmMode ) {
                     m_rcItem = m_rcNewPos;
@@ -1145,7 +1145,7 @@ void CHorizontalLayoutUI::SetPos(RECT rc)
             if( sz.cx < pControl->GetMinWidth() ) sz.cx = pControl->GetMinWidth();
             if( sz.cx > pControl->GetMaxWidth() ) sz.cx = pControl->GetMaxWidth();
         }
-        cxFixed += sz.cx +  pControl->GetPadding().left + pControl->GetPadding().right;
+        cxFixed += sz.cx +  pControl->GetMargins().left + pControl->GetMargins().right;
         nEstimateNum++;
     }
     cxFixed += (nEstimateNum - 1) * m_iChildPadding;
@@ -1167,7 +1167,7 @@ void CHorizontalLayoutUI::SetPos(RECT rc)
             SetFloatPos(it2);
             continue;
         }
-        RECT rcPadding = pControl->GetPadding();
+        RECT rcPadding = pControl->GetMargins();
         szRemaining.cx -= rcPadding.left;
         SIZE sz = pControl->EstimateSize(szRemaining);
         if( sz.cx == 0 ) {
@@ -1302,7 +1302,7 @@ void CHorizontalLayoutUI::DoEvent(TEventUI& event)
 
                 CRect rcInvalidate = GetThumbRect(true);
                 m_rcNewPos = rc;
-                m_cxyFixed.cx = m_rcNewPos.right - m_rcNewPos.left;
+                m_stLayoutParams.SetWidth(m_rcNewPos.right - m_rcNewPos.left);
 
                 if( m_bImmMode ) {
                     m_rcItem = m_rcNewPos;
@@ -1455,7 +1455,7 @@ void CTileLayoutUI::SetPos(RECT rc)
                 if( !pLineControl->IsVisible() ) continue;
                 if( pLineControl->IsFloat() ) continue;
 
-                RECT rcPadding = pLineControl->GetPadding();
+                RECT rcPadding = pLineControl->GetMargins();
                 SIZE szAvailable = { rcTile.right - rcTile.left - rcPadding.left - rcPadding.right, 9999 };
                 if( iIndex == iCount || (iIndex + 1) % m_nColumns == 0 ) {
                     szAvailable.cx -= m_iChildPadding / 2;
@@ -1478,7 +1478,7 @@ void CTileLayoutUI::SetPos(RECT rc)
             }
         }
 
-        RECT rcPadding = pControl->GetPadding();
+        RECT rcPadding = pControl->GetMargins();
 
         rcTile.left += rcPadding.left + m_iChildPadding / 2;
         rcTile.right -= rcPadding.right + m_iChildPadding / 2;
@@ -1664,7 +1664,7 @@ void CTabLayoutUI::SetPos(RECT rc)
 
         if( it != m_iCurSel ) continue;
 
-        RECT rcPadding = pControl->GetPadding();
+        RECT rcPadding = pControl->GetMargins();
         rc.left += rcPadding.left;
         rc.top += rcPadding.top;
         rc.right -= rcPadding.right;

@@ -183,7 +183,7 @@ public:
     TCHAR GetAt(int nIndex) const;
     void Append(LPCTSTR pstr);
     void Assign(LPCTSTR pstr, int nLength = -1);
-    LPCTSTR GetData();
+    LPCTSTR GetData() const;
 
     void SetAt(int nIndex, TCHAR ch);
     operator LPCTSTR() const;
@@ -320,6 +320,119 @@ public:
 
 protected:
     HCURSOR m_hOrigCursor;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+class UILIB_API CommonUtils
+{
+public:
+
+	static void toRECT(LPCTSTR pstrValue, RECT &stRect);
+	static void toSIZE(LPCTSTR pstrValue, SIZE &stSize);
+	static DWORD toColor(LPCTSTR lpszValue, DWORD dwDefColor = 0);
+	static int toInteger(LPCTSTR lpszValue, int nDefValue = 0);
+	static int toBoolean(LPCTSTR lpszValue, bool bDefValue = false);
+
+	static CStdString sTrim(const CStdString &sValue);
+	static CStdString sTrimLeft(const CStdString &sValue);
+	static CStdString sTrimRight(const CStdString &sValue);
+
+	static void stInner(const RECT &margins, RECT &inner);
+	static void stInner(const RECT &margins, SIZE &inner);
+	static void stOuter(const RECT &margins, RECT &outer);
+	static void stOuter(const RECT &margins, SIZE &outer);
+
+	template <class T> static void release(T* &obj)
+	{
+		if(obj != NULL)
+			delete obj;
+		obj = NULL;
+	}
+	template <class T> static void clear(CStdStringPtrMap& stDictionary)
+	{
+		for(int i = 0; i < stDictionary.GetSize(); i ++)
+			delete ((T*)stDictionary.Find(stDictionary.GetAt(i)));
+		stDictionary.Resize(0);
+	}
+	template <class T> static void clear(CStdPtrArray& stList)
+	{
+		for(int i = 0; i < stList.GetSize(); i ++)
+			delete ((T*)(stList.GetAt(i)));
+		stList.Empty();
+	}
+
+	template<class T1, class T2, class T3> static T1* iExtends(T3 *t3)
+	{
+		if(t3)
+		{
+			T1 *t1 = dynamic_cast<T1*>(t3);
+			return t1 ? t1 : new T1(*dynamic_cast<T2*>(t3));
+		}
+		return NULL;
+	}
+};
+/////////////////////////////////////////////////////////////////////////////////////
+//
+
+class UILIB_API CLayoutGravity
+{
+public:
+	CLayoutGravity();
+	virtual ~CLayoutGravity();
+
+	bool IsTop() const;
+	bool IsCenterVertical() const;
+	bool IsBottom() const;
+
+	bool IsLeft() const;
+	bool IsCenterHorizontal() const;
+	bool IsRight() const;
+
+	void SetGravity(const CStdString &gravity);
+	void AddGravity(const CStdString &gravity);
+
+private:
+	DWORD m_nGravity;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+
+class UILIB_API CLayoutParams
+{
+public:
+	CLayoutParams();
+	virtual ~CLayoutParams();
+
+	LONG GetWidth() const;
+	void SetWidth(LONG nWidth);
+	void SetWidth(LPCTSTR pszWidth);
+	bool IsWidthMatchParent() const;
+	bool IsWidthWrapContent() const;
+	void SetWidthMatchParent(bool bMatchParent);
+
+	LONG GetHeight() const;
+	void SetHeight(LONG nHeight);
+	void SetHeight(LPCTSTR pszHeight);
+	bool IsHeightMatchParent() const;
+	bool IsHeightWrapContent() const;
+	void SetHeightMatchParent(bool bMatchParent);
+
+	LONG GetWeight() const;
+	void SetWeight(LONG nWeight);
+
+	const RECT& GetMargins() const;
+	void SetMargins(const RECT &margins);
+
+	void MarginOut(RECT &stRect) const;
+	void MarginIn(RECT &stRect) const;
+	void MarginOut(SIZE &stSize) const;
+	void MarginIn(SIZE &stSize) const;
+
+private:
+	LONG m_nWidth, m_nHeight, m_nWeight;
+	RECT m_stMargins;
 };
 
 } // namespace DuiLib

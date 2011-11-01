@@ -529,7 +529,7 @@ void CStdString::Empty()
     m_szBuffer[0] = '\0'; 
 }
 
-LPCTSTR CStdString::GetData()
+LPCTSTR CStdString::GetData() const
 {
     return m_pstr;
 }
@@ -1187,6 +1187,317 @@ CWaitCursor::CWaitCursor()
 CWaitCursor::~CWaitCursor()
 {
     ::SetCursor(m_hOrigCursor);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+//
+
+void CommonUtils::toRECT( LPCTSTR lpszValue, RECT &stPos )
+{
+	LPTSTR pstr = NULL;
+	stPos.left = _tcstol(lpszValue, &pstr, 10);  ASSERT(pstr);    
+	stPos.top = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
+	stPos.right = _tcstol(pstr + 1, &pstr, 10);  ASSERT(pstr);    
+	stPos.bottom = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);
+}
+
+void CommonUtils::toSIZE( LPCTSTR lpszValue, SIZE &stSize )
+{
+	LPTSTR pstr = NULL;
+	stSize.cx = _tcstol(lpszValue, &pstr, 10);   ASSERT(pstr);    
+	stSize.cy = _tcstol(pstr + 1, &pstr, 10); ASSERT(pstr);
+}
+
+DWORD CommonUtils::toColor( LPCTSTR lpszValue, DWORD dwDefValue )
+{
+	if(lpszValue)
+	{
+		LPTSTR pstr = NULL;
+		if(*lpszValue == _T('#'))
+			lpszValue = ::CharNext(lpszValue);
+		DWORD dwColor = _tcstoul(lpszValue, &pstr, 16);
+		ASSERT(pstr);
+		return pstr - lpszValue > 6 ? dwColor : 0xff000000 | dwColor;
+	}
+	return dwDefValue;
+}
+
+int CommonUtils::toInteger( LPCTSTR lpszValue, int nDefValue )
+{
+	return lpszValue ? _ttoi(lpszValue) : nDefValue;
+}
+
+DuiLib::CStdString CommonUtils::sTrim( const CStdString &sValue )
+{
+	return sTrimRight(sTrimLeft(sValue));
+}
+
+DuiLib::CStdString CommonUtils::sTrimLeft( const CStdString &sValue )
+{
+	int i;
+	LPCTSTR lpszValue = sValue.GetData();
+	for(i = 0; i < sValue.GetLength(); i ++)
+	{
+		TCHAR c = lpszValue[i];
+		if(!_istspace(c))
+			return sValue.Mid(i);
+	}
+	return _T("");
+}
+
+DuiLib::CStdString CommonUtils::sTrimRight( const CStdString &sValue )
+{
+	int i;
+	LPCTSTR lpszValue = sValue.GetData();
+	for(i = sValue.GetLength() - 1; i >= 0; i --)
+	{
+		TCHAR c = lpszValue[i];
+		if(!_istspace(c))
+			return sValue.Left(i + i);
+	}
+	return _T("");
+}
+
+void CommonUtils::stOuter( const RECT &margins, SIZE &inner )
+{
+	inner.cx += (margins.left + margins.right);
+	inner.cy += (margins.top + margins.bottom);
+}
+
+void CommonUtils::stOuter( const RECT &margins, RECT &outer )
+{
+	outer.left -= margins.left;
+	outer.top -= margins.top;
+	outer.right += margins.right;
+	outer.bottom += margins.bottom;
+}
+
+void CommonUtils::stInner( const RECT &margins, SIZE &inner )
+{
+	inner.cx -= (margins.left + margins.right);
+	inner.cy -= (margins.top + margins.bottom);
+}
+
+void CommonUtils::stInner( const RECT &margins, RECT &outer )
+{
+	outer.left += margins.left;
+	outer.top += margins.top;
+	outer.right -= margins.right;
+	outer.bottom -= margins.bottom;	
+}
+
+int CommonUtils::toBoolean( LPCTSTR lpszValue, bool bDefValue)
+{
+	if(lpszValue)
+	{
+		if(_tcsicmp(lpszValue, _T("true")) == 0)
+			return true;
+		if(_tcsicmp(lpszValue, _T("false")) == 0)
+			return false;
+		return bDefValue;
+	}
+	return bDefValue;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+//
+//
+
+CLayoutGravity::CLayoutGravity()
+	: m_nGravity(5)
+{
+
+}
+
+CLayoutGravity::~CLayoutGravity()
+{
+
+}
+
+bool CLayoutGravity::IsTop() const
+{
+	return (m_nGravity & 3) == 1;
+}
+
+bool CLayoutGravity::IsCenterVertical() const
+{
+	return (m_nGravity & 3) == 3;
+}
+
+bool CLayoutGravity::IsBottom() const
+{
+	return (m_nGravity & 3) == 2;
+}
+
+bool CLayoutGravity::IsLeft() const
+{
+	return (m_nGravity & 12) == 4;
+}
+
+bool CLayoutGravity::IsCenterHorizontal() const
+{
+	return (m_nGravity & 12) == 12;
+}
+
+bool CLayoutGravity::IsRight() const
+{
+	return (m_nGravity & 12) == 8;
+}
+
+void CLayoutGravity::SetGravity(const CStdString &gravity)
+{
+	int pos = 0;
+	while(pos != -1)
+	{
+		int idx = gravity.Find(L'|', pos);
+		CStdString val = gravity.Mid(pos, idx != -1 ? idx - pos : -1);
+		pos = idx != -1 ? idx + 1 : -1;
+
+		AddGravity(val);
+	}
+}
+
+void CLayoutGravity::AddGravity(const CStdString &gravity)
+{
+	if(gravity == _T("center"))
+		m_nGravity = 15;
+	else if(gravity == _T("top"))
+		m_nGravity = (m_nGravity & ~3) | 1;
+	else if(gravity == _T("center_vertical"))
+		m_nGravity = (m_nGravity & ~3) | 3;
+	else if(gravity == _T("bottom"))
+		m_nGravity = (m_nGravity & ~3) | 2;
+	else if(gravity == _T("left"))
+		m_nGravity = (m_nGravity & ~12) | 4;
+	else if(gravity == _T("center_horizontal"))
+		m_nGravity = (m_nGravity & ~12) | 12;
+	else if(gravity == _T("right"))
+		m_nGravity = (m_nGravity & ~12) | 8;
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+
+CLayoutParams::CLayoutParams()
+	: m_nHeight(0), m_nWidth(0), m_nWeight(0)
+{
+	memset(&m_stMargins, 0, sizeof(RECT));
+}
+
+CLayoutParams::~CLayoutParams()
+{
+
+}
+
+LONG CLayoutParams::GetWidth() const
+{
+	return m_nWidth > 0 ? m_nWidth : 0;
+}
+
+void CLayoutParams::SetWidth( LONG nWidth )
+{
+	m_nWidth = nWidth;
+}
+
+void CLayoutParams::SetWidth( LPCTSTR pszWidth )
+{
+	if(_tcscmp(pszWidth, _T("match_parent")) == 0)
+		m_nWidth = -1;
+	else if(_tcscmp(pszWidth, _T("warp_content")) == 0)
+		m_nWidth = 0;
+	else
+		m_nWidth = _ttoi(pszWidth);
+}
+
+LONG CLayoutParams::GetHeight() const
+{
+	return m_nHeight > 0 ? m_nHeight : 0;
+}
+
+void CLayoutParams::SetHeight( LONG nHeight )
+{
+	m_nHeight = nHeight;
+}
+
+void CLayoutParams::SetHeight( LPCTSTR pszHeight )
+{
+	if(_tcscmp(pszHeight, _T("match_parent")) == 0)
+		m_nHeight = -1;
+	else if(_tcscmp(pszHeight, _T("warp_content")) == 0)
+		m_nHeight = 0;
+	else
+		m_nHeight = _ttoi(pszHeight);
+}
+
+LONG CLayoutParams::GetWeight() const
+{
+	return m_nWeight;
+}
+
+void CLayoutParams::SetWeight( LONG nWeight )
+{
+	m_nWeight = nWeight;
+}
+
+const RECT& CLayoutParams::GetMargins() const
+{
+	return m_stMargins;
+}
+
+void CLayoutParams::SetMargins( const RECT &margins )
+{
+	m_stMargins = margins;
+}
+
+void CLayoutParams::MarginOut( RECT &stRect ) const
+{
+	CommonUtils::stOuter(m_stMargins, stRect);
+}
+
+void CLayoutParams::MarginOut( SIZE &stSize ) const
+{
+	CommonUtils::stOuter(m_stMargins, stSize);
+}
+
+void CLayoutParams::MarginIn( RECT &stRect ) const
+{
+	CommonUtils::stInner(m_stMargins, stRect);
+}
+
+void CLayoutParams::MarginIn( SIZE &stSize ) const
+{
+	CommonUtils::stInner(m_stMargins, stSize);
+}
+
+bool CLayoutParams::IsWidthMatchParent() const
+{
+	return m_nWidth == -1;
+}
+
+void CLayoutParams::SetWidthMatchParent( bool bMatchParent )
+{
+	m_nWidth = bMatchParent ? -1 : GetWidth();
+}
+
+bool CLayoutParams::IsHeightMatchParent() const
+{
+	return m_nHeight == -1;
+}
+
+void CLayoutParams::SetHeightMatchParent( bool bMatchParent )
+{
+	m_nHeight = bMatchParent ? -1 : GetHeight();
+}
+
+bool CLayoutParams::IsWidthWrapContent() const
+{
+	return m_nWidth == 0;
+}
+
+bool CLayoutParams::IsHeightWrapContent() const
+{
+	return m_nHeight == 0;
 }
 
 } // namespace DuiLib
