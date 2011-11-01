@@ -58,3 +58,5 @@
 #include "UIDlgBuilder.h"
 #include "UIRender.h"
 
+#include "layout\UILinearLayout.h"
+#include "layout\UIFrameLayout.h"

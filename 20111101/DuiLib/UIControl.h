@@ -60,8 +60,14 @@ public:
     virtual int GetHeight() const;
     virtual int GetX() const;
     virtual int GetY() const;
-    virtual RECT GetPadding() const;
-    virtual void SetPadding(RECT rcPadding); // 设置外边距，由上层窗口绘制
+
+	RECT GetMargins() const;
+	void SetMargins(const RECT &rcMargins); // 设置外边距，由上层窗口绘制
+	RECT GetPadding() const;
+	void SetPadding(const RECT &rcMargins); // 设置外边距，由上层窗口绘制(兼容已有代码)
+	RECT GetPaddings() const;
+	void SetPaddings(const RECT &rcPaddings);// 设置内边距，由控件自己绘制
+
     virtual SIZE GetFixedXY() const;         // 实际大小位置使用GetPos获取，这里得到的是预设的参考值
     virtual void SetFixedXY(SIZE szXY);      // 仅float为true时有效
     virtual int GetFixedWidth() const;       // 实际大小位置使用GetPos获取，这里得到的是预设的参考值
@@ -80,6 +86,8 @@ public:
     virtual void SetRelativeParentSize(SIZE sz);
     virtual TRelativePosUI GetRelativePos() const;
     virtual bool IsRelativePos() const;
+
+	const CLayoutParams* GetLayoutParams() const;
 
     // 鼠标提示
     virtual CStdString GetToolTip() const;
@@ -156,9 +164,9 @@ protected:
     bool m_bUpdateNeeded;
     bool m_bMenuUsed;
     RECT m_rcItem;
-    RECT m_rcPadding;
+//    RECT m_rcPadding;
     SIZE m_cXY;
-    SIZE m_cxyFixed;
+//    SIZE m_cxyFixed;
     SIZE m_cxyMin;
     SIZE m_cxyMax;
     bool m_bVisible;
@@ -187,6 +195,9 @@ protected:
     int m_nBorderSize;
     SIZE m_cxyBorderRound;
     RECT m_rcPaint;
+
+	RECT m_rcPaddings;
+	CLayoutParams m_stLayoutParams;
 };
 
 } // namespace DuiLib

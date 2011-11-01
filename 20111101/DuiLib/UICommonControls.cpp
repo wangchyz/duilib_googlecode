@@ -90,7 +90,7 @@ void CLabelUI::SetShowHtml(bool bShowHtml)
 
 SIZE CLabelUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 4);
+    if( m_stLayoutParams.GetHeight() == 0 ) return CSize(m_stLayoutParams.GetWidth(), m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 4);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -410,7 +410,7 @@ void CButtonUI::SetDisabledImage(LPCTSTR pStrImage)
 
 SIZE CButtonUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
+    if( m_stLayoutParams.GetHeight() == 0 ) return CSize(m_stLayoutParams.GetWidth(), m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -661,7 +661,7 @@ void COptionUI::SetForeImage(LPCTSTR pStrImage)
 
 SIZE COptionUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
+    if( m_stLayoutParams.GetHeight() == 0 ) return CSize(m_stLayoutParams.GetWidth(), m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -836,7 +836,7 @@ void CTextUI::DoEvent(TEventUI& event)
 
 SIZE CTextUI::EstimateSize(SIZE szAvailable)
 {
-    RECT rcText = { 0, 0, MAX(szAvailable.cx, m_cxyFixed.cx), 9999 };
+    RECT rcText = { 0, 0, MAX(szAvailable.cx, m_stLayoutParams.GetWidth()), 9999 };
     rcText.left += m_rcTextPadding.left;
     rcText.right -= m_rcTextPadding.right;
     if( m_bShowHtml ) {   
@@ -849,7 +849,7 @@ SIZE CTextUI::EstimateSize(SIZE szAvailable)
     SIZE cXY = {rcText.right - rcText.left + m_rcTextPadding.left + m_rcTextPadding.right,
         rcText.bottom - rcText.top + m_rcTextPadding.top + m_rcTextPadding.bottom};
 
-    if( m_cxyFixed.cy != 0 ) cXY.cy = m_cxyFixed.cy;
+    if( m_stLayoutParams.GetHeight() != 0 ) cXY.cy = m_stLayoutParams.GetHeight();
     return cXY;
 }
 
@@ -1667,7 +1667,7 @@ void CEditUI::SetInternVisible(bool bVisible)
 
 SIZE CEditUI::EstimateSize(SIZE szAvailable)
 {
-    if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 6);
+    if( m_stLayoutParams.GetHeight() == 0 ) return CSize(m_stLayoutParams.GetWidth(), m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 6);
     return CControlUI::EstimateSize(szAvailable);
 }
 
@@ -1761,7 +1761,7 @@ CScrollBarUI::CScrollBarUI() : m_bHorizontal(false), m_nRange(100), m_nScrollPos
 m_pOwner(NULL), m_nLastScrollPos(0), m_nLastScrollOffset(0), m_nScrollRepeatDelay(0), m_uButton1State(0), \
 m_uButton2State(0), m_uThumbState(0), m_bShowButton1(true), m_bShowButton2(true)
 {
-    m_cxyFixed.cx = DEFAULT_SCROLLBAR_SIZE;
+    m_stLayoutParams.SetWidth(DEFAULT_SCROLLBAR_SIZE);
     ptLastMouse.x = ptLastMouse.y = 0;
     ::ZeroMemory(&m_rcThumb, sizeof(m_rcThumb));
     ::ZeroMemory(&m_rcButton1, sizeof(m_rcButton1));
@@ -1825,15 +1825,15 @@ void CScrollBarUI::SetHorizontal(bool bHorizontal)
 
     m_bHorizontal = bHorizontal;
     if( m_bHorizontal ) {
-        if( m_cxyFixed.cy == 0 ) {
-            m_cxyFixed.cx = 0;
-            m_cxyFixed.cy = DEFAULT_SCROLLBAR_SIZE;
+        if( m_stLayoutParams.GetHeight() == 0 ) {
+            m_stLayoutParams.SetWidth((LONG)0);
+            m_stLayoutParams.SetHeight(DEFAULT_SCROLLBAR_SIZE);
         }
     }
     else {
-        if( m_cxyFixed.cx == 0 ) {
-            m_cxyFixed.cx = DEFAULT_SCROLLBAR_SIZE;
-            m_cxyFixed.cy = 0;
+        if( m_stLayoutParams.GetWidth() == 0 ) {
+            m_stLayoutParams.SetWidth(DEFAULT_SCROLLBAR_SIZE);
+            m_stLayoutParams.SetHeight((LONG)0);
         }
     }
 
@@ -2129,14 +2129,14 @@ void CScrollBarUI::SetPos(RECT rc)
 
     if( m_bHorizontal ) {
         int cx = rc.right - rc.left;
-        if( m_bShowButton1 ) cx -= m_cxyFixed.cy;
-        if( m_bShowButton2 ) cx -= m_cxyFixed.cy;
-        if( cx > m_cxyFixed.cy ) {
+        if( m_bShowButton1 ) cx -= m_stLayoutParams.GetHeight();
+        if( m_bShowButton2 ) cx -= m_stLayoutParams.GetHeight();
+        if( cx > m_stLayoutParams.GetHeight() ) {
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
             if( m_bShowButton1 ) {
-                m_rcButton1.right = rc.left + m_cxyFixed.cy;
-                m_rcButton1.bottom = rc.top + m_cxyFixed.cy;
+                m_rcButton1.right = rc.left + m_stLayoutParams.GetHeight();
+                m_rcButton1.bottom = rc.top + m_stLayoutParams.GetHeight();
             }
             else {
                 m_rcButton1.right = m_rcButton1.left;
@@ -2146,8 +2146,8 @@ void CScrollBarUI::SetPos(RECT rc)
             m_rcButton2.top = rc.top;
             m_rcButton2.right = rc.right;
             if( m_bShowButton2 ) {
-                m_rcButton2.left = rc.right - m_cxyFixed.cy;
-                m_rcButton2.bottom = rc.top + m_cxyFixed.cy;
+                m_rcButton2.left = rc.right - m_stLayoutParams.GetHeight();
+                m_rcButton2.bottom = rc.top + m_stLayoutParams.GetHeight();
             }
             else {
                 m_rcButton2.left = m_rcButton2.right;
@@ -2155,10 +2155,10 @@ void CScrollBarUI::SetPos(RECT rc)
             }
 
             m_rcThumb.top = rc.top;
-            m_rcThumb.bottom = rc.top + m_cxyFixed.cy;
+            m_rcThumb.bottom = rc.top + m_stLayoutParams.GetHeight();
             if( m_nRange > 0 ) {
                 int cxThumb = cx * (rc.right - rc.left) / (m_nRange + rc.right - rc.left);
-                if( cxThumb < m_cxyFixed.cy ) cxThumb = m_cxyFixed.cy;
+                if( cxThumb < m_stLayoutParams.GetHeight() ) cxThumb = m_stLayoutParams.GetHeight();
 
                 m_rcThumb.left = m_nScrollPos * (cx - cxThumb) / m_nRange + m_rcButton1.right;
                 m_rcThumb.right = m_rcThumb.left + cxThumb;
@@ -2174,12 +2174,12 @@ void CScrollBarUI::SetPos(RECT rc)
         }
         else {
             int cxButton = (rc.right - rc.left) / 2;
-            if( cxButton > m_cxyFixed.cy ) cxButton = m_cxyFixed.cy;
+            if( cxButton > m_stLayoutParams.GetHeight() ) cxButton = m_stLayoutParams.GetHeight();
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
             if( m_bShowButton1 ) {
                 m_rcButton1.right = rc.left + cxButton;
-                m_rcButton1.bottom = rc.top + m_cxyFixed.cy;
+                m_rcButton1.bottom = rc.top + m_stLayoutParams.GetHeight();
             }
             else {
                 m_rcButton1.right = m_rcButton1.left;
@@ -2190,7 +2190,7 @@ void CScrollBarUI::SetPos(RECT rc)
             m_rcButton2.right = rc.right;
             if( m_bShowButton2 ) {
                 m_rcButton2.left = rc.right - cxButton;
-                m_rcButton2.bottom = rc.top + m_cxyFixed.cy;
+                m_rcButton2.bottom = rc.top + m_stLayoutParams.GetHeight();
             }
             else {
                 m_rcButton2.left = m_rcButton2.right;
@@ -2202,14 +2202,14 @@ void CScrollBarUI::SetPos(RECT rc)
     }
     else {
         int cy = rc.bottom - rc.top;
-        if( m_bShowButton1 ) cy -= m_cxyFixed.cx;
-        if( m_bShowButton2 ) cy -= m_cxyFixed.cx;
-        if( cy > m_cxyFixed.cx ) {
+        if( m_bShowButton1 ) cy -= m_stLayoutParams.GetWidth();
+        if( m_bShowButton2 ) cy -= m_stLayoutParams.GetWidth();
+        if( cy > m_stLayoutParams.GetWidth() ) {
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
             if( m_bShowButton1 ) {
-                m_rcButton1.right = rc.left + m_cxyFixed.cx;
-                m_rcButton1.bottom = rc.top + m_cxyFixed.cx;
+                m_rcButton1.right = rc.left + m_stLayoutParams.GetWidth();
+                m_rcButton1.bottom = rc.top + m_stLayoutParams.GetWidth();
             }
             else {
                 m_rcButton1.right = m_rcButton1.left;
@@ -2219,8 +2219,8 @@ void CScrollBarUI::SetPos(RECT rc)
             m_rcButton2.left = rc.left;
             m_rcButton2.bottom = rc.bottom;
             if( m_bShowButton2 ) {
-                m_rcButton2.top = rc.bottom - m_cxyFixed.cx;
-                m_rcButton2.right = rc.left + m_cxyFixed.cx;
+                m_rcButton2.top = rc.bottom - m_stLayoutParams.GetWidth();
+                m_rcButton2.right = rc.left + m_stLayoutParams.GetWidth();
             }
             else {
                 m_rcButton2.top = m_rcButton2.bottom;
@@ -2228,10 +2228,10 @@ void CScrollBarUI::SetPos(RECT rc)
             }
 
             m_rcThumb.left = rc.left;
-            m_rcThumb.right = rc.left + m_cxyFixed.cx;
+            m_rcThumb.right = rc.left + m_stLayoutParams.GetWidth();
             if( m_nRange > 0 ) {
                 int cyThumb = cy * (rc.bottom - rc.top) / (m_nRange + rc.bottom - rc.top);
-                if( cyThumb < m_cxyFixed.cx ) cyThumb = m_cxyFixed.cx;
+                if( cyThumb < m_stLayoutParams.GetWidth() ) cyThumb = m_stLayoutParams.GetWidth();
 
                 m_rcThumb.top = m_nScrollPos * (cy - cyThumb) / m_nRange + m_rcButton1.bottom;
                 m_rcThumb.bottom = m_rcThumb.top + cyThumb;
@@ -2247,11 +2247,11 @@ void CScrollBarUI::SetPos(RECT rc)
         }
         else {
             int cyButton = (rc.bottom - rc.top) / 2;
-            if( cyButton > m_cxyFixed.cx ) cyButton = m_cxyFixed.cx;
+            if( cyButton > m_stLayoutParams.GetWidth() ) cyButton = m_stLayoutParams.GetWidth();
             m_rcButton1.left = rc.left;
             m_rcButton1.top = rc.top;
             if( m_bShowButton1 ) {
-                m_rcButton1.right = rc.left + m_cxyFixed.cx;
+                m_rcButton1.right = rc.left + m_stLayoutParams.GetWidth();
                 m_rcButton1.bottom = rc.top + cyButton;
             }
             else {
@@ -2263,7 +2263,7 @@ void CScrollBarUI::SetPos(RECT rc)
             m_rcButton2.bottom = rc.bottom;
             if( m_bShowButton2 ) {
                 m_rcButton2.top = rc.bottom - cyButton;
-                m_rcButton2.right = rc.left + m_cxyFixed.cx;
+                m_rcButton2.right = rc.left + m_stLayoutParams.GetWidth();
             }
             else {
                 m_rcButton2.top = m_rcButton2.bottom;
@@ -2376,11 +2376,11 @@ void CScrollBarUI::DoEvent(TEventUI& event)
         if( (m_uThumbState & UISTATE_CAPTURED) != 0 ) {
             if( !m_bHorizontal ) {
                  m_nLastScrollOffset = (event.ptMouse.y - ptLastMouse.y) * m_nRange / \
-                    (m_rcItem.bottom - m_rcItem.top - m_rcThumb.bottom + m_rcThumb.top - 2 * m_cxyFixed.cx);
+                    (m_rcItem.bottom - m_rcItem.top - m_rcThumb.bottom + m_rcThumb.top - 2 * m_stLayoutParams.GetWidth());
             }
             else {
                 m_nLastScrollOffset = (event.ptMouse.x - ptLastMouse.x) * m_nRange / \
-                    (m_rcItem.right - m_rcItem.left - m_rcThumb.right + m_rcThumb.left - 2 * m_cxyFixed.cy);
+                    (m_rcItem.right - m_rcItem.left - m_rcThumb.right + m_rcThumb.left - 2 * m_stLayoutParams.GetHeight());
             }
         }
         else {
@@ -2694,15 +2694,15 @@ void CScrollBarUI::PaintRail(HDC hDC)
     m_sImageModify.Empty();
     if( !m_bHorizontal ) {
         m_sImageModify.SmallFormat(_T("dest='%d,%d,%d,%d'"), m_rcThumb.left - m_rcItem.left, \
-            (m_rcThumb.top + m_rcThumb.bottom) / 2 - m_rcItem.top - m_cxyFixed.cx / 2, \
+            (m_rcThumb.top + m_rcThumb.bottom) / 2 - m_rcItem.top - m_stLayoutParams.GetWidth() / 2, \
             m_rcThumb.right - m_rcItem.left, \
-            (m_rcThumb.top + m_rcThumb.bottom) / 2 - m_rcItem.top + m_cxyFixed.cx - m_cxyFixed.cx / 2);
+            (m_rcThumb.top + m_rcThumb.bottom) / 2 - m_rcItem.top + m_stLayoutParams.GetWidth() - m_stLayoutParams.GetWidth() / 2);
     }
     else {
         m_sImageModify.SmallFormat(_T("dest='%d,%d,%d,%d'"), \
-            (m_rcThumb.left + m_rcThumb.right) / 2 - m_rcItem.left - m_cxyFixed.cy / 2, \
+            (m_rcThumb.left + m_rcThumb.right) / 2 - m_rcItem.left - m_stLayoutParams.GetHeight() / 2, \
             m_rcThumb.top - m_rcItem.top, \
-            (m_rcThumb.left + m_rcThumb.right) / 2 - m_rcItem.left + m_cxyFixed.cy - m_cxyFixed.cy / 2, \
+            (m_rcThumb.left + m_rcThumb.right) / 2 - m_rcItem.left + m_stLayoutParams.GetHeight() - m_stLayoutParams.GetHeight() / 2, \
             m_rcThumb.bottom - m_rcItem.top);
     }
 
