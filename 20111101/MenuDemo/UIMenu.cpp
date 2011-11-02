@@ -470,7 +470,7 @@ const TCHAR* const kMenuElementUIInterfaceName = _T("MenuElement");
 CMenuElementUI::CMenuElementUI():
 m_pWindow(NULL)
 {
-	m_stLayoutParams.GetHeight() = 25;
+	SetFixedHeight(25);
 	m_bMouseChildEnabled = true;
 
 	SetMouseChildEnabled(false);

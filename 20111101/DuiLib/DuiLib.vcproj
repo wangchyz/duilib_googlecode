@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="DuiLib"
 	ProjectGUID="{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -104,9 +105,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -210,9 +208,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -313,9 +308,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -410,9 +402,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -924,6 +913,18 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<Filter
+				Name="layout"
+				>
+				<File
+					RelativePath=".\layout\UIFrameLayout.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\layout\UILinearLayout.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -989,6 +990,18 @@
 				RelativePath="UIRichEdit.h"
 				>
 			</File>
+			<Filter
+				Name="layout"
+				>
+				<File
+					RelativePath=".\layout\UIFrameLayout.h"
+					>
+				</File>
+				<File
+					RelativePath=".\layout\UILinearLayout.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
