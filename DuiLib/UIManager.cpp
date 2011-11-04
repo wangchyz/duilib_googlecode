@@ -1350,7 +1350,7 @@ void CPaintManagerUI::KillTimer(CControlUI* pControl)
         if( pTimer->pSender == pControl && pTimer->hWnd == m_hWndPaint ) {
             if( pTimer->bKilled == false ) ::KillTimer(pTimer->hWnd, pTimer->uWinTimer);
             delete pTimer;
-            m_aTimers.Remove(i);
+            m_aTimers.Remove(i - j);
             j++;
         }
     }
