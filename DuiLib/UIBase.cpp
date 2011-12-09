@@ -579,14 +579,14 @@ const CStdString& CStdString::operator=(const TCHAR ch)
     return *this;
 }
 
-CStdString CStdString::operator+(const CStdString& src)
+CStdString CStdString::operator+(const CStdString& src) const
 {
     CStdString sTemp = *this;
     sTemp.Append(src);
     return sTemp;
 }
 
-CStdString CStdString::operator+(LPCTSTR lpStr)
+CStdString CStdString::operator+(LPCTSTR lpStr) const
 {
     ASSERT(!::IsBadStringPtr(lpStr,-1));
     CStdString sTemp = *this;
