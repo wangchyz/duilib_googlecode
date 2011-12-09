@@ -195,8 +195,8 @@ public:
 #ifndef _UNICODE
     const CStdString& CStdString::operator=(LPCWSTR lpwStr);
 #endif
-    CStdString operator+(const CStdString& src);
-    CStdString operator+(LPCTSTR pstr);
+    CStdString operator+(const CStdString& src) const;
+    CStdString operator+(LPCTSTR pstr) const;
     const CStdString& operator+=(const CStdString& src);
     const CStdString& operator+=(LPCTSTR pstr);
     const CStdString& operator+=(const TCHAR ch);
