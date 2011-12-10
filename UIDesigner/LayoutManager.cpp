@@ -1829,6 +1829,18 @@ void CLayoutManager::SaveEditProperty(CControlUI* pControl, TiXmlElement* pNode)
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pNode->SetAttribute("nativebkcolor",StringConvertor::WideToUtf8(szBuf));
 	}
+
+	if(pEditUI->GetNormalImage() && _tcslen(pEditUI->GetNormalImage()) > 0)
+		pNode->SetAttribute("normalimage", StringConvertor::WideToUtf8(ConvertImageFileName(pEditUI->GetNormalImage())));
+
+	if(pEditUI->GetHotImage() && _tcslen(pEditUI->GetHotImage()) > 0)
+		pNode->SetAttribute("hotimage", StringConvertor::WideToUtf8(ConvertImageFileName(pEditUI->GetHotImage())));
+
+	if(pEditUI->GetFocusedImage() && _tcslen(pEditUI->GetFocusedImage()) > 0)
+		pNode->SetAttribute("focusedimage", StringConvertor::WideToUtf8(ConvertImageFileName(pEditUI->GetFocusedImage())));
+
+	if(pEditUI->GetDisabledImage() && _tcslen(pEditUI->GetDisabledImage()) > 0)
+		pNode->SetAttribute("disabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pEditUI->GetDisabledImage())));
 }
 
 void CLayoutManager::SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* pNode)
