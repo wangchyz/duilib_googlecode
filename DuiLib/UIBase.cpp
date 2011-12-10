@@ -557,7 +557,29 @@ const CStdString& CStdString::operator=(LPCTSTR lpStr)
     return *this;
 }
 
-#ifndef _UNICODE
+#ifdef _UNICODE
+
+const CStdString& CStdString::operator=(LPCSTR lpStr)
+{
+    ASSERT(!::IsBadStringPtrA(lpStr,-1));
+    int cchStr = (int) strlen(lpStr) + 1;
+    LPWSTR pwstr = (LPWSTR) _alloca(cchStr);
+    if( pwstr != NULL ) ::MultiByteToWideChar(::GetACP(), 0, lpStr, -1, pwstr, cchStr) ;
+    Assign(pwstr);
+    return *this;
+}
+
+const CStdString& CStdString::operator+=(LPCSTR lpStr)
+{
+    ASSERT(!::IsBadStringPtrA(lpStr,-1));
+    int cchStr = (int) strlen(lpStr) + 1;
+    LPWSTR pwstr = (LPWSTR) _alloca(cchStr);
+    if( pwstr != NULL ) ::MultiByteToWideChar(::GetACP(), 0, lpStr, -1, pwstr, cchStr) ;
+    Append(pwstr);
+    return *this;
+}
+
+#else
 
 const CStdString& CStdString::operator=(LPCWSTR lpwStr)
 {      
@@ -566,6 +588,16 @@ const CStdString& CStdString::operator=(LPCWSTR lpwStr)
     LPSTR pstr = (LPSTR) _alloca(cchStr);
     if( pstr != NULL ) ::WideCharToMultiByte(::GetACP(), 0, lpwStr, -1, pstr, cchStr, NULL, NULL);
     Assign(pstr);
+    return *this;
+}
+
+const CStdString& CStdString::operator+=(LPCWSTR lpwStr)
+{
+    ASSERT(!::IsBadStringPtrW(lpwStr,-1));
+    int cchStr = ((int) wcslen(lpwStr) * 2) + 1;
+    LPSTR pstr = (LPSTR) _alloca(cchStr);
+    if( pstr != NULL ) ::WideCharToMultiByte(::GetACP(), 0, lpwStr, -1, pstr, cchStr, NULL, NULL);
+    Append(pstr);
     return *this;
 }
 

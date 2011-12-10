@@ -192,8 +192,12 @@ public:
     const CStdString& operator=(const CStdString& src);
     const CStdString& operator=(const TCHAR ch);
     const CStdString& operator=(LPCTSTR pstr);
-#ifndef _UNICODE
+#ifdef _UNICODE
+    const CStdString& CStdString::operator=(LPCSTR lpStr);
+    const CStdString& CStdString::operator+=(LPCSTR lpStr);
+#else
     const CStdString& CStdString::operator=(LPCWSTR lpwStr);
+    const CStdString& CStdString::operator+=(LPCWSTR lpwStr);
 #endif
     CStdString operator+(const CStdString& src) const;
     CStdString operator+(LPCTSTR pstr) const;
