@@ -288,62 +288,85 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
     LPBYTE pData = NULL;
     DWORD dwSize = 0;
 
-    if( type == NULL ) {
-        CStdString sFile = CPaintManagerUI::GetResourcePath();
-        if( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
-            sFile += bitmap.m_lpstr;
-            HANDLE hFile = ::CreateFile(sFile.GetData(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
-                FILE_ATTRIBUTE_NORMAL, NULL);
-            if( hFile == INVALID_HANDLE_VALUE ) return NULL;
-            dwSize = ::GetFileSize(hFile, NULL);
-            if( dwSize == 0 ) return NULL;
+	do 
+	{
+		if( type == NULL ) {
+			CStdString sFile = CPaintManagerUI::GetResourcePath();
+			if( CPaintManagerUI::GetResourceZip().IsEmpty() ) {
+				sFile += bitmap.m_lpstr;
+				HANDLE hFile = ::CreateFile(sFile.GetData(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
+					FILE_ATTRIBUTE_NORMAL, NULL);
+				if( hFile == INVALID_HANDLE_VALUE ) break;
+				dwSize = ::GetFileSize(hFile, NULL);
+				if( dwSize == 0 ) break;
 
-            DWORD dwRead = 0;
-            pData = new BYTE[ dwSize ];
-            ::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
-            ::CloseHandle( hFile );
+				DWORD dwRead = 0;
+				pData = new BYTE[ dwSize ];
+				::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
+				::CloseHandle( hFile );
 
-            if( dwRead != dwSize ) {
-                delete[] pData;
-                return NULL;
-            }
-        }
-        else {
-            sFile += CPaintManagerUI::GetResourceZip();
-            HZIP hz = NULL;
-            if( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
-            else hz = OpenZip((void*)sFile.GetData(), 0, 2);
-            if( hz == NULL ) return NULL;
-            ZIPENTRY ze; 
-            int i; 
-            if( FindZipItem(hz, bitmap.m_lpstr, true, &i, &ze) != 0 ) return NULL;
-            dwSize = ze.unc_size;
-            if( dwSize == 0 ) return NULL;
-            pData = new BYTE[ dwSize ];
-            int res = UnzipItem(hz, i, pData, dwSize, 3);
-            if( res != 0x00000000 && res != 0x00000600) {
-                delete[] pData;
-                if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
-                return NULL;
-            }
-            if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
-        }
-    }
-    else {
-        HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), bitmap.m_lpstr, type);
-        if( hResource == NULL ) return NULL;
-        HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceDll(), hResource);
-        if( hGlobal == NULL ) {
-            FreeResource(hResource);
-            return NULL;
-        }
+				if( dwRead != dwSize ) {
+					delete[] pData;
+					break;
+				}
+			}
+			else {
+				sFile += CPaintManagerUI::GetResourceZip();
+				HZIP hz = NULL;
+				if( CPaintManagerUI::IsCachedResourceZip() ) hz = (HZIP)CPaintManagerUI::GetResourceZipHandle();
+				else hz = OpenZip((void*)sFile.GetData(), 0, 2);
+				if( hz == NULL ) break;
+				ZIPENTRY ze; 
+				int i; 
+				if( FindZipItem(hz, bitmap.m_lpstr, true, &i, &ze) != 0 ) break;
+				dwSize = ze.unc_size;
+				if( dwSize == 0 ) break;
+				pData = new BYTE[ dwSize ];
+				int res = UnzipItem(hz, i, pData, dwSize, 3);
+				if( res != 0x00000000 && res != 0x00000600) {
+					delete[] pData;
+					if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+					break;
+				}
+				if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
+			}
+		}
+		else {
+			HRSRC hResource = ::FindResource(CPaintManagerUI::GetResourceDll(), bitmap.m_lpstr, type);
+			if( hResource == NULL ) break;
+			HGLOBAL hGlobal = ::LoadResource(CPaintManagerUI::GetResourceDll(), hResource);
+			if( hGlobal == NULL ) {
+				FreeResource(hResource);
+				break;
+			}
 
-        dwSize = ::SizeofResource(CPaintManagerUI::GetResourceDll(), hResource);
-        if( dwSize == 0 ) return NULL;
-        pData = new BYTE[ dwSize ];
-        ::CopyMemory(pData, (LPBYTE)::LockResource(hGlobal), dwSize);
-        ::FreeResource(hResource);
-    }
+			dwSize = ::SizeofResource(CPaintManagerUI::GetResourceDll(), hResource);
+			if( dwSize == 0 ) break;
+			pData = new BYTE[ dwSize ];
+			::CopyMemory(pData, (LPBYTE)::LockResource(hGlobal), dwSize);
+			::FreeResource(hResource);
+		}
+	} while (0);
+
+	if (!pData)
+	{
+		//读不到图片, 则直接去读取bitmap.m_lpstr执向的路径
+		HANDLE hFile = ::CreateFile(bitmap.m_lpstr, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
+			FILE_ATTRIBUTE_NORMAL, NULL);
+		if( hFile == INVALID_HANDLE_VALUE ) return NULL;
+		dwSize = ::GetFileSize(hFile, NULL);
+		if( dwSize == 0 ) return NULL;
+
+		DWORD dwRead = 0;
+		pData = new BYTE[ dwSize ];
+		::ReadFile( hFile, pData, dwSize, &dwRead, NULL );
+		::CloseHandle( hFile );
+
+		if( dwRead != dwSize ) {
+			delete[] pData;
+			return NULL;
+		}
+	}
 
     LPBYTE pImage = NULL;
     int x,y,n;
