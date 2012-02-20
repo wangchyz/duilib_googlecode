@@ -288,6 +288,10 @@ public:
     void SetNativeEditBkColor(DWORD dwBkColor);
     DWORD GetNativeEditBkColor() const;
 
+    void SetSel(long nStartChar, long nEndChar);
+    void SetSelAll();
+    void SetReplaceSel(LPCTSTR lpszReplace);
+
     void SetPos(RECT rc);
     void SetVisible(bool bVisible = true);
     void SetInternVisible(bool bVisible = true);
