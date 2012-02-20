@@ -1644,6 +1644,21 @@ DWORD CEditUI::GetNativeEditBkColor() const
     return m_dwEditbkColor;
 }
 
+void CEditUI::SetSel(long nStartChar, long nEndChar)
+{
+     if( m_pWindow != NULL ) Edit_SetSel(*m_pWindow, nStartChar,nEndChar);
+}
+
+void CEditUI::SetSelAll()
+{
+    SetSel(0,-1);
+}
+
+void CEditUI::SetReplaceSel(LPCTSTR lpszReplace)
+{
+    if( m_pWindow != NULL ) Edit_ReplaceSel(*m_pWindow, lpszReplace);
+}
+
 void CEditUI::SetPos(RECT rc)
 {
     CControlUI::SetPos(rc);
