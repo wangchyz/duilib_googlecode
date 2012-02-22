@@ -13,7 +13,7 @@ public:
     virtual ~CDelegateBase();
     bool Equals(const CDelegateBase& rhs) const;
     bool operator() (void* param);
-    virtual CDelegateBase* Copy() = 0;
+    virtual CDelegateBase* Copy() const = 0; // add const for gcc
 
 protected:
     void* GetFn();
@@ -31,7 +31,7 @@ class CDelegateStatic: public CDelegateBase
 public:
     CDelegateStatic(Fn pFn) : CDelegateBase(NULL, pFn) { } 
     CDelegateStatic(const CDelegateStatic& rhs) : CDelegateBase(rhs) { } 
-    virtual CDelegateBase* Copy() { return new CDelegateStatic(*this); }
+    virtual CDelegateBase* Copy() const { return new CDelegateStatic(*this); }
 
 protected:
     virtual bool Invoke(void* param)
@@ -48,7 +48,7 @@ class CDelegate : public CDelegateBase
 public:
     CDelegate(O* pObj, Fn pFn) : CDelegateBase(pObj, &pFn), m_pFn(pFn) { }
     CDelegate(const CDelegate& rhs) : CDelegateBase(rhs) { m_pFn = rhs.m_pFn; } 
-    virtual CDelegateBase* Copy() { return new CDelegate(*this); }
+    virtual CDelegateBase* Copy() const { return new CDelegate(*this); }
 
 protected:
     virtual bool Invoke(void* param)
@@ -78,9 +78,9 @@ class UILIB_API CEventSource
 public:
     ~CEventSource();
     operator bool();
-    void operator+= (CDelegateBase& d);
+    void operator+= (const CDelegateBase& d); // add const for gcc
     void operator+= (FnType pFn);
-    void operator-= (CDelegateBase& d);
+    void operator-= (const CDelegateBase& d);
     void operator-= (FnType pFn);
     bool operator() (void* param);
 

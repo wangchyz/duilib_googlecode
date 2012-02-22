@@ -52,7 +52,7 @@ CEventSource::operator bool()
     return m_aDelegates.GetSize() > 0;
 }
 
-void CEventSource::operator+= (CDelegateBase& d)
+void CEventSource::operator+= (const CDelegateBase& d)
 { 
     for( int i = 0; i < m_aDelegates.GetSize(); i++ ) {
         CDelegateBase* pObject = static_cast<CDelegateBase*>(m_aDelegates[i]);
@@ -67,7 +67,7 @@ void CEventSource::operator+= (FnType pFn)
     (*this) += MakeDelegate(pFn);
 }
 
-void CEventSource::operator-= (CDelegateBase& d) 
+void CEventSource::operator-= (const CDelegateBase& d) 
 {
     for( int i = 0; i < m_aDelegates.GetSize(); i++ ) {
         CDelegateBase* pObject = static_cast<CDelegateBase*>(m_aDelegates[i]);

@@ -18,7 +18,7 @@ class CMarkupNode;
 
 class UILIB_API CMarkup
 {
-    friend CMarkupNode;
+    friend class CMarkupNode;
 public:
     CMarkup(LPCTSTR pstrXML = NULL);
     ~CMarkup();
@@ -70,7 +70,7 @@ private:
 
 class UILIB_API CMarkupNode
 {
-    friend CMarkup;
+    friend class CMarkup;
 private:
     CMarkupNode();
     CMarkupNode(CMarkup* pOwner, int iPos);
