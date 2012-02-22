@@ -258,7 +258,7 @@ class CEditWnd;
 
 class UILIB_API CEditUI : public CLabelUI
 {
-    friend CEditWnd;
+    friend class CEditWnd;
 public:
     CEditUI();
 

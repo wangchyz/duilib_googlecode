@@ -11,7 +11,7 @@ class CComboWnd;
 
 class UILIB_API CComboUI : public CContainerUI, public IListOwnerUI
 {
-    friend CComboWnd;
+    friend class CComboWnd;
 public:
     CComboUI();
 
