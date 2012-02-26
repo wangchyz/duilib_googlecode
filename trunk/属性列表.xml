@@ -910,8 +910,9 @@
 		<Attribute name="bordercolor" default="0x00000000" type="DWORD" comment="边框颜色,如(0xFF000000)"/>
 		<Attribute name="focusbordercolor" default="0x00000000" type="DWORD" comment="获得焦点时边框的颜色,如(0xFFFF0000)"/>
 		<Attribute name="colorhsl" default="false" type="BOOL" comment="本控件的颜色是否随窗口的hsl变化而变化,如(false)"/>
-		<Attribute name="bordersize" default="1" type="INT" comment="边框大小，如(1)"/>
+		<Attribute name="bordersize" default="0" type="INT" comment="边框大小，如(1)"/>
 		<Attribute name="borderround" default="0,0" type="SIZE" comment="边框圆角半径,如(2,2)"/>
+		<Attribute name="bordervisible" default="false" type="BOOL" comment="是否显示边框"/>
 		<Attribute name="bkimage" default="" type="STRING" comment="背景图片,如(bk.bmp或file='aaa.jpg' res='' restype='0' dest='0,0,0,0' source='0,0,0,0' corner='0,0,0,0' mask='#FF0000' fade='255' hole='false' xtiled='false' ytiled='false')"/>
 		<Attribute name="width" default="0" type="INT" comment="控件预设的宽度，如(100)"/>
 		<Attribute name="height" default="0" type="INT" comment="控件预设的高度，如(30)"/>
