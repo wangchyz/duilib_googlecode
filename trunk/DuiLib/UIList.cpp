@@ -855,7 +855,7 @@ CScrollBarUI* CListUI::GetHorizontalScrollBar() const
 CListBodyUI::CListBodyUI(CListUI* pOwner) : m_pOwner(pOwner)
 {
     ASSERT(m_pOwner);
-    SetInset(CRect(0,0,0,0));
+    SetInset(CRect(2,2,2,2));	//ÉèÖÃBodyÇøÄÚ±ß¾à£¬·ÀÖ¹ÕÚ¸Ç±ß¿ò
 }
 
 void CListBodyUI::SetScrollPos(SIZE szPos)
@@ -1074,6 +1074,7 @@ void CListBodyUI::DoEvent(TEventUI& event)
 
 CListHeaderUI::CListHeaderUI()
 {
+	SetPadding(CRect(2,2,2,2));	// ÉèÖÃHeaderÍâ±ß¾à£¬·ÀÖ¹ÕÚ¸Ç±ß¿ò
 }
 
 LPCTSTR CListHeaderUI::GetClass() const
