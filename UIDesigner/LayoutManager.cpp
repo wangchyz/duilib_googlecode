@@ -1468,7 +1468,7 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 		pNode->SetAttribute("shortcut", StringConvertor::WideToUtf8(szBuf));
 	}
 
-	if(pControl->GetBorderSize() != 1)
+	if(pControl->GetBorderSize() >0)
 	{
 		_stprintf_s(szBuf, _T("%d"),pControl->GetBorderSize());
 		pNode->SetAttribute("bordersize", StringConvertor::WideToUtf8(szBuf));
@@ -1580,6 +1580,11 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 		DWORD dwColor = pControl->GetFocusBorderColor();					
 		_stprintf_s(szBuf, _T("#%02X%02X%02X%02X"), HIBYTE(HIWORD(dwColor)), static_cast<BYTE>(GetBValue(dwColor)), static_cast<BYTE>(GetGValue(dwColor)), static_cast<BYTE>(GetRValue(dwColor)));
 		pNode->SetAttribute("focusbordercolor", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if (pControl->IsBorderVisible())
+	{
+		pNode->SetAttribute("bordervisible","true");
 	}
 
 	if(pControl->GetMaxHeight() != 9999)
