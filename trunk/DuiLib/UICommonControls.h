@@ -458,6 +458,69 @@ protected:
     CStdString m_sImageModify;
 };
 
+/// 最普通的单选按钮控件，只有是、否两种结果
+/// 派生于COptionUI，只是每组只有一个按钮而已，组名为空，配置文件默认属性举例：
+/// <CheckBox name="CheckBox" value="height='20' align='left' textpadding='24,0,0,0' normalimage='file='sys_check_btn.png' source='0,0,20,20' dest='0,0,20,20'' selectedimage='file='sys_check_btn.png' source='20,0,40,20' dest='0,0,20,20'' disabledimage='file='sys_check_btn.png' source='40,0,60,20' dest='0,0,20,20''"/>
+
+class UILIB_API CCheckBoxUI : public COptionUI
+{
+public:
+	LPCTSTR GetClass() const;
+
+	void SetCheck(bool bCheck);
+	bool GetCheck() const;
+};
+
+
+/// 扩展下拉列表框
+/// 增加arrowimage属性,一张图片平均分成5份,Normal/Hot/Pushed/Focused/Disabled(必须有source属性)
+/// <Default name="ComboBox" value="arrowimage=&quot;file='sys_combo_btn.png' source='0,0,16,16'&quot; "/>
+class UILIB_API CComboBoxUI : public CComboUI
+{
+public:
+	CComboBoxUI();
+	LPCTSTR GetClass() const;
+
+	void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+
+	void PaintText(HDC hDC);
+	void PaintStatusImage(HDC hDC);
+
+protected:
+	CStdString m_sArrowImage;
+	int        m_nArrowWidth;
+};
+
+
+class CDateTimeWnd;
+
+/// 时间选择控件
+class UILIB_API CDateTimeUI : public CLabelUI
+{
+	friend class CDateTimeWnd;
+public:
+	CDateTimeUI();
+	LPCTSTR GetClass() const;
+	LPVOID GetInterface(LPCTSTR pstrName);
+
+	SYSTEMTIME& GetTime();
+	void SetTime(SYSTEMTIME* pst);
+
+	void SetReadOnly(bool bReadOnly);
+	bool IsReadOnly() const;
+
+	void UpdateText();
+
+	void DoEvent(TEventUI& event);
+
+protected:
+	SYSTEMTIME m_sysTime;
+	int        m_nDTUpdateFlag;
+	bool       m_bReadOnly;
+
+	CDateTimeWnd* m_pWindow;
+};
+
 } // namespace DuiLib
 
 #endif // __UICOMMONCONTROLS_H__
