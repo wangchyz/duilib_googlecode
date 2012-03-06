@@ -10,6 +10,9 @@ CDialogBuilder::CDialogBuilder() : m_pCallback(NULL), m_pstrtype(NULL)
 CControlUI* CDialogBuilder::Create(STRINGorID xml, LPCTSTR type, IDialogBuilderCallback* pCallback, 
                                    CPaintManagerUI* pManager, CControlUI* pParent)
 {
+	//资源ID为0-65535，两个字节；字符串指针为4个字节
+	//字符串以<开头认为是XML字符串，否则认为是XML文件
+
     if( HIWORD(xml.m_lpstr) != NULL ) {
         if( *(xml.m_lpstr) == _T('<') ) {
             if( !m_xml.Load(xml.m_lpstr) ) return NULL;
@@ -292,6 +295,11 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
             case 8:
                 if( _tcscmp(pstrClass, _T("Progress")) == 0 )               pControl = new CProgressUI;
                 else if(  _tcscmp(pstrClass, _T("RichEdit")) == 0 )         pControl = new CRichEditUI;
+				// add by:zjie
+				else if (_tcscmp(pstrClass, _T("CheckBox")) == 0)				pControl = new CCheckBoxUI;
+				else if (_tcscmp(pstrClass, _T("ComboBox")) == 0)			pControl = new CComboBoxUI;
+				else if (_tcscmp(pstrClass, _T("DateTime")) == 0)			pControl = new CDateTimeUI;
+				// add by:zjie
                 break;
             case 9:
                 if( _tcscmp(pstrClass, _T("Container")) == 0 )              pControl = new CContainerUI;

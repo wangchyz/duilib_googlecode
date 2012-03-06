@@ -56,9 +56,9 @@
 #include "UIDelegate.h"
 #include "UIControl.h"
 #include "UIContainer.h"
-#include "UICommonControls.h"
 #include "UIList.h"
 #include "UICombo.h"
+#include "UICommonControls.h"
 #include "UIActiveX.h"
 #include "UIRichEdit.h"
 
