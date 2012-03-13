@@ -208,6 +208,7 @@ enum PropertyTag
 	tagComboFocusedImage,
 	tagComboDisabledImage,
 	tagComboTextPadding,
+	tagComboDropBoxSize,
 
 	//ActiveX
 	tagActiveX,
