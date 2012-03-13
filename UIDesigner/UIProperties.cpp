@@ -979,6 +979,13 @@ void CUIProperties::InitPropList()
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
+	pValueList=new CMFCPropertyGridProperty(_T("DropBoxSize"),tagComboDropBoxSize,TRUE);//dropboxsize
+	pProp=new CMFCPropertyGridProperty(_T("Width"),(_variant_t)(LONG)0,_T("下拉列表的宽度"));
+	pValueList->AddSubItem(pProp);
+	pProp=new CMFCPropertyGridProperty(_T("Height"),(_variant_t)(LONG)0,_T("下拉列表的高度"));
+	pValueList->AddSubItem(pProp);
+	pPropUI->AddSubItem(pValueList);
+
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion Combo
 
@@ -1746,6 +1753,13 @@ void CUIProperties::ShowComboProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)rect.top);
 	pValueList->GetSubItem(2)->SetOriginalValue((_variant_t)(LONG)rect.right);
 	pValueList->GetSubItem(3)->SetOriginalValue((_variant_t)(LONG)rect.bottom);
+	//dropboxsize
+	SIZE size=pCombo->GetDropBoxSize();
+	pValueList=pPropCombo->GetSubItem(tagComboDropBoxSize-tagCombo);
+	pValueList->GetSubItem(0)->SetValue((_variant_t)(LONG)size.cx);
+	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)size.cy);
+	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)size.cx);
+	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)size.cy);
 	pPropCombo->Show(TRUE,FALSE);
 }
 
