@@ -23,8 +23,7 @@ m_dwBackColor3(0),
 m_dwBorderColor(0),
 m_dwFocusBorderColor(0),
 m_bColorHSL(false),
-m_nBorderSize(0),
-m_bBorderVisible(false)
+m_nBorderSize(0)
 {
     m_cXY.cx = m_cXY.cy = 0;
     m_cxyFixed.cx = m_cxyFixed.cy = 0;
@@ -772,7 +771,6 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("mouse")) == 0 ) SetMouseEnabled(_tcscmp(pstrValue, _T("true")) == 0);
 	else if( _tcscmp(pstrName, _T("keyboard")) == 0 ) SetKeyboardEnabled(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("visible")) == 0 ) SetVisible(_tcscmp(pstrValue, _T("true")) == 0);
-	else if( _tcscmp(pstrName, _T("bordervisible")) == 0 ) SetBorderVisible(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("float")) == 0 ) SetFloat(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("shortcut")) == 0 ) SetShortcut(pstrValue[0]);
     else if( _tcscmp(pstrName, _T("menu")) == 0 ) SetContextMenuUsed(_tcscmp(pstrValue, _T("true")) == 0);
@@ -875,7 +873,7 @@ void CControlUI::PaintText(HDC hDC)
 
 void CControlUI::PaintBorder(HDC hDC)
 {
-	if( m_nBorderSize > 0 && IsBorderVisible())
+	if( m_nBorderSize > 0 )
 	{
         if( m_cxyBorderRound.cx > 0 || m_cxyBorderRound.cy > 0 )//»­Ô²½Ç±ß¿ò
 		{
@@ -897,16 +895,6 @@ void CControlUI::PaintBorder(HDC hDC)
 void CControlUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
 {
     return;
-}
-
-bool CControlUI::IsBorderVisible()
-{
-	return m_bBorderVisible;
-}
-
-void CControlUI::SetBorderVisible( bool bVisible/*=true*/ )
-{
-	m_bBorderVisible=bVisible;
 }
 
 } // namespace DuiLib

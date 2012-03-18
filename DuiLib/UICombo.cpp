@@ -18,6 +18,10 @@ public:
     void EnsureVisible(int iIndex);
     void Scroll(int dx, int dy);
 
+#if(_WIN32_WINNT >= 0x0501)
+	virtual UINT GetClassStyle() const;
+#endif
+
 public:
     CPaintManagerUI m_pm;
     CComboUI* m_pOwner;
@@ -101,10 +105,10 @@ LRESULT CComboWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         if( pDefaultAttributes ) {
             m_pLayout->ApplyAttributeList(pDefaultAttributes);
         }
-        m_pLayout->SetInset(CRect(2, 2, 2, 2));
+        m_pLayout->SetInset(CRect(1, 1, 1, 1));
         m_pLayout->SetBkColor(0xFFFFFFFF);
-        m_pLayout->SetBorderColor(0xFF85E4FF);
-        m_pLayout->SetBorderSize(2);
+        m_pLayout->SetBorderColor(0xFFC6C7D2);
+        m_pLayout->SetBorderSize(1);
         m_pLayout->SetAutoDestroy(false);
         m_pLayout->EnableScrollBar();
         m_pLayout->ApplyAttributeList(m_pOwner->GetDropBoxAttributeList());
@@ -188,6 +192,12 @@ void CComboWnd::Scroll(int dx, int dy)
     m_pLayout->SetScrollPos(CSize(sz.cx + dx, sz.cy + dy));
 }
 
+#if(_WIN32_WINNT >= 0x0501)
+UINT CComboWnd::GetClassStyle() const
+{
+	return __super::GetClassStyle() | CS_DROPSHADOW;
+}
+#endif
 ////////////////////////////////////////////////////////
 
 
@@ -505,11 +515,6 @@ CStdString CComboUI::GetDropBoxAttributeList()
 void CComboUI::SetDropBoxAttributeList(LPCTSTR pstrList)
 {
     m_sDropBoxAttributes = pstrList;
-	SIZE szDropBoxSize = { 0 };
-	LPTSTR pstr = NULL;
-	szDropBoxSize.cx = _tcstol(pstrList, &pstr, 10);		ASSERT(pstr);
-	szDropBoxSize.cy = _tcstol(pstr + 1, &pstr, 10);		ASSERT(pstr);
-	SetDropBoxSize(szDropBoxSize);
 }
 
 SIZE CComboUI::GetDropBoxSize() const
@@ -519,10 +524,7 @@ SIZE CComboUI::GetDropBoxSize() const
 
 void CComboUI::SetDropBoxSize(SIZE szDropBox)
 {
-	TCHAR szBuf[MAX_PATH] = {0};
-	::wsprintf(szBuf, _T("%d,%d"), szDropBox.cx, szDropBox.cy);
-	SetDropBoxAttributeList(szBuf);
-	m_szDropBox = szDropBox;
+    m_szDropBox = szDropBox;
 }
 
 RECT CComboUI::GetTextPadding() const
@@ -797,7 +799,15 @@ void CComboUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("pushedimage")) == 0 ) SetPushedImage(pstrValue);
     else if( _tcscmp(pstrName, _T("focusedimage")) == 0 ) SetFocusedImage(pstrValue);
     else if( _tcscmp(pstrName, _T("disabledimage")) == 0 ) SetDisabledImage(pstrValue);
-    else if( _tcscmp(pstrName, _T("dropboxsize")) == 0 ) SetDropBoxAttributeList(pstrValue);
+    else if( _tcscmp(pstrName, _T("dropbox")) == 0 ) SetDropBoxAttributeList(pstrValue);
+	else if( _tcscmp(pstrName, _T("dropboxsize")) == 0)
+	{
+		SIZE szDropBoxSize = { 0 };
+		LPTSTR pstr = NULL;
+		szDropBoxSize.cx = _tcstol(pstrValue, &pstr, 10);  ASSERT(pstr);    
+		szDropBoxSize.cy = _tcstol(pstr + 1, &pstr, 10);    ASSERT(pstr);    
+		SetDropBoxSize(szDropBoxSize);
+	}
     else if( _tcscmp(pstrName, _T("itemfont")) == 0 ) m_ListInfo.nFont = _ttoi(pstrValue);
     else if( _tcscmp(pstrName, _T("itemalign")) == 0 ) {
         if( _tcsstr(pstrValue, _T("left")) != NULL ) {
