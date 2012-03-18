@@ -49,8 +49,6 @@ public:
     void SetColorHSL(bool bColorHSL);
     int GetBorderSize() const;
     void SetBorderSize(int nSize);
-	bool IsBorderVisible();
-	void SetBorderVisible(bool bVisible=true);
     SIZE GetBorderRound() const;
     void SetBorderRound(SIZE cxyRound);
     bool DrawImage(HDC hDC, LPCTSTR pStrImage, LPCTSTR pStrModify = NULL);
@@ -171,7 +169,6 @@ protected:
     bool m_bFocused;
     bool m_bFloat;
     bool m_bSetPos; // ·ÀÖ¹SetPosÑ­»·µ÷ÓÃ
-	bool m_bBorderVisible;//ÊÇ·ñ»­±ß¿ò
     TRelativePosUI m_tRelativePos;
 
     CStdString m_sText;

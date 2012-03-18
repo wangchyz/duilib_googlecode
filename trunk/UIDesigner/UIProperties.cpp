@@ -552,10 +552,6 @@ void CUIProperties::InitPropList()
 	pValueList->AddSubItem(pProp);
 	pPropUI->AddSubItem(pValueList);
 
-	//bordervisible
-	pProp=new CMFCPropertyGridProperty(_T("BorderVisible"),(_variant_t)false,_T("指示是否启用边框\nTrue"),tagEnabled);//enabled
-	pPropUI->AddSubItem(pProp);
-
 	pProp=new CMFCPropertyGridProperty(_T("Enabled"),(_variant_t)true,_T("指示是否已启用该控件\nTrue"),tagEnabled);//enabled
 	pPropUI->AddSubItem(pProp);
 
@@ -1465,9 +1461,6 @@ void CUIProperties::ShowControlProperty(CControlUI* pControl)
 	pValueList->GetSubItem(1)->SetValue((_variant_t)(LONG)pControl->GetBorderRound().cy);
 	pValueList->GetSubItem(0)->SetOriginalValue((_variant_t)(LONG)pControl->GetBorderRound().cx);
 	pValueList->GetSubItem(1)->SetOriginalValue((_variant_t)(LONG)pControl->GetBorderRound().cy);
-	//bordervisible
-	pPropControl->GetSubItem(tagBorderVisible-tagControl)->SetValue((_variant_t)pControl->IsBorderVisible());
-	pPropControl->GetSubItem(tagBorderVisible-tagControl)->SetOriginalValue((_variant_t)pControl->IsBorderVisible());
 	//enabled
 	pPropControl->GetSubItem(tagEnabled-tagControl)->SetValue((_variant_t)pControl->IsEnabled());
 	pPropControl->GetSubItem(tagEnabled-tagControl)->SetOriginalValue((_variant_t)pControl->IsEnabled());

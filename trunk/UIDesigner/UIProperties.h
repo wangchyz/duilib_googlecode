@@ -118,7 +118,6 @@ enum PropertyTag
 	tagFocusBorderColor,
 	tagBorderSize,
 	tagBorderRound,
-	tagBorderVisible,
 	tagEnabled,
 	tagFloat,
 	tagVisible,

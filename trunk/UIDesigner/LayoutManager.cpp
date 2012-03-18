@@ -1582,11 +1582,6 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 		pNode->SetAttribute("focusbordercolor", StringConvertor::WideToUtf8(szBuf));
 	}
 
-	if (pControl->IsBorderVisible())
-	{
-		pNode->SetAttribute("bordervisible","true");
-	}
-
 	if(pControl->GetMaxHeight() != 9999)
 	{
 		_stprintf_s(szBuf, _T("%d"), pControl->GetMaxHeight());
