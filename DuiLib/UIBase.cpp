@@ -988,6 +988,7 @@ HWND CWindowWnd::Subclass(HWND hWnd)
     if( m_OldWndProc == NULL ) return NULL;
     m_bSubclassed = true;
     m_hWnd = hWnd;
+    ::SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LPARAM>(this));
     return m_hWnd;
 }
 
