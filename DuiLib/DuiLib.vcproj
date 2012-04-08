@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="DuiLib"
 	ProjectGUID="{E106ACD7-4E53-4AEE-942B-D0DD426DB34E}"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -106,9 +107,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -177,13 +175,13 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="Riched20.lib"
 				OutputFile="../bin/DuiLib_d.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/DuiLib.pdb"
+				ProgramDatabaseFile=".\Debug/DuiLib_d.pdb"
 				BaseAddress="0x11000000"
 				ImportLibrary="../bin/DuiLib_d.lib"
 				TargetMachine="1"
@@ -208,9 +206,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -286,7 +281,7 @@
 				GenerateManifest="false"
 				DelayLoadDLLs=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug_u/DuiLib_ud.pdb"
+				ProgramDatabaseFile=".\Debug_u\DuiLib_ud.pdb"
 				BaseAddress="0x11000000"
 				ImportLibrary="../bin/DuiLib_ud.lib"
 				TargetMachine="1"
@@ -311,9 +306,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -410,9 +402,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

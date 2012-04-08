@@ -169,7 +169,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="../bin/QQDemo_d.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/QQDemo.pdb"
