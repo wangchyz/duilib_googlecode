@@ -17,12 +17,31 @@ void CRichListWnd::OnFinalMessage( HWND hWnd)
 
 DuiLib::tString CRichListWnd::GetSkinFolder()
 {
+#ifdef _DEBUG
 	return _T("skin\\RichListRes\\");
+#else
+	return _T("skin\\");
+#endif
+	
 }
 
 DuiLib::tString CRichListWnd::GetSkinFile()
 {
 	return _T("duilib.xml");
+}
+
+UILIB_RESOURCETYPE CRichListWnd::GetResourceType() const
+{
+#ifdef _DEBUG
+	return UILIB_FILE;
+#else
+	return UILIB_ZIP;
+#endif
+}
+
+DuiLib::tString CRichListWnd::GetZIPFileName() const
+{
+	return _T("RichListRes.zip");
 }
 
 LPCTSTR CRichListWnd::GetWindowClassName( void ) const

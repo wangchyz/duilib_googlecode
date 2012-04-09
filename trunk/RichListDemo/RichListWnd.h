@@ -17,6 +17,8 @@ public:
 	virtual void Init();
 	virtual LRESULT OnMouseHover( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled );
 	virtual LRESULT OnChar( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled );
+	virtual UILIB_RESOURCETYPE GetResourceType() const;
+	virtual tString GetZIPFileName() const;
 
 private:
 	CButtonUI* m_pCloseBtn;
