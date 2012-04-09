@@ -3454,6 +3454,16 @@ int unzLocateFile (unzFile file, const TCHAR *szFileName, int iCaseSensitivity)
 	strcpy(szFileNameA, szFileName);
 #endif
 
+	// support Windows subdirectory by:daviyang35
+	int iLen=strlen(szFileNameA);
+	for (int i=0;i<iLen;i++)
+	{
+		if (szFileNameA[i]=='\\')
+		{
+			szFileNameA[i]='/';
+		}
+	}
+
 	s=(unz_s*)file;
 	if (!s->current_file_ok)
 		return UNZ_END_OF_LIST_OF_FILE;
