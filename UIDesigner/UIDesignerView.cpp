@@ -581,7 +581,20 @@ void CUIDesignerView::InitUI(CControlUI* pControl, int depth)
 
 void CUIDesignerView::OnFormEditTest()
 {
-	m_LayoutManager.TestForm();
+ 	if (this->GetDocument()->IsModified())
+ 	{
+ 		int nResult=AfxMessageBox(_T("±£´æÐÞ¸ÄºóÔ¤ÀÀ£¿"),MB_YESNOCANCEL);
+ 		if (nResult==IDOK)
+ 		{
+ 			this->SaveSkinFile(this->GetDocument()->GetPathName());
+ 		}
+		else if (nResult==IDCANCEL)
+		{
+			return;
+		}
+ 	}
+	
+	m_LayoutManager.TestForm(this->GetDocument()->GetPathName());
 }
 
 void CUIDesignerView::OnAlignLeft()

@@ -131,7 +131,7 @@ public:
 	inline CWindowUI* GetForm() const;
 	CControlUI* FindControl(CPoint point) const;
 
-	void TestForm();
+	void TestForm(LPCTSTR pstrFile);
 	BOOL IsEmptyForm() const;
 	void AlignLeft(CControlUI* pFocused,CArray<CControlUI*,CControlUI*>& arrSelected);
 	void AlignRight(CControlUI* pFocused,CArray<CControlUI*,CControlUI*>& arrSelected);
