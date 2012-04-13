@@ -237,6 +237,24 @@ protected:
     int m_iCurSel;
 };
 
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+
+class UILIB_API CChildWindowWnd : public CContainerUI
+{
+public:
+	CChildWindowWnd();
+
+	void Init();
+	void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+	void SetChildWindowXML(CStdString pXML);
+	DuiLib::CStdString GetChildWindowXML();
+
+private:
+	DuiLib::CStdString m_pstrXMLFile;
+};
+
 } // namespace DuiLib
 
 #endif // __UICONTAINER_H__
