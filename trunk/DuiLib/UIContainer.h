@@ -241,15 +241,17 @@ protected:
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
-class UILIB_API CChildWindowWnd : public CContainerUI
+class UILIB_API CChildWindowUI : public CContainerUI
 {
 public:
-	CChildWindowWnd();
+	CChildWindowUI();
 
 	void Init();
 	void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void SetChildWindowXML(CStdString pXML);
 	DuiLib::CStdString GetChildWindowXML();
+	virtual LPVOID GetInterface(LPCTSTR pstrName);
+	virtual LPCTSTR GetClass() const;
 
 private:
 	DuiLib::CStdString m_pstrXMLFile;

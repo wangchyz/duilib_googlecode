@@ -1087,6 +1087,8 @@ void CUIDesignerView::ShowPropertyDialog(CControlUI* pControl)
 		break;
 	case classTileLayout:
 		break;
+	case classChildWindow:
+		break;
 	default:
 		return;
 	}

@@ -1793,12 +1793,12 @@ void CTabLayoutUI::SetPos(RECT rc)
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
-CChildWindowWnd::CChildWindowWnd()
+CChildWindowUI::CChildWindowUI()
 {
 
 }
 
-void CChildWindowWnd::Init()
+void CChildWindowUI::Init()
 {
 	if (!m_pstrXMLFile.IsEmpty())
 	{
@@ -1815,7 +1815,7 @@ void CChildWindowWnd::Init()
 	}
 }
 
-void CChildWindowWnd::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
+void CChildWindowUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 {
 	if( _tcscmp(pstrName, _T("xmlfile")) == 0 )
 		SetChildWindowXML(pstrValue);
@@ -1823,14 +1823,25 @@ void CChildWindowWnd::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 		CContainerUI::SetAttribute(pstrName,pstrValue);
 }
 
-void CChildWindowWnd::SetChildWindowXML( DuiLib::CStdString pXML )
+void CChildWindowUI::SetChildWindowXML( DuiLib::CStdString pXML )
 {
 	m_pstrXMLFile=pXML;
 }
 
-DuiLib::CStdString CChildWindowWnd::GetChildWindowXML()
+DuiLib::CStdString CChildWindowUI::GetChildWindowXML()
 {
 	return m_pstrXMLFile;
+}
+
+LPVOID CChildWindowUI::GetInterface( LPCTSTR pstrName )
+{
+	if( _tcscmp(pstrName, _T("ChildWindow")) == 0 ) return static_cast<CChildWindowUI*>(this);
+	return CControlUI::GetInterface(pstrName);
+}
+
+LPCTSTR CChildWindowUI::GetClass() const
+{
+	return _T("ChildWindowUI");
 }
 
 } // namespace DuiLib
