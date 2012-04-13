@@ -891,14 +891,19 @@ void CLayoutManager::CDelayRepos::Repos()
 	}
 }
 
-void CLayoutManager::TestForm()
+void CLayoutManager::TestForm(LPCTSTR pstrFile)
 {
 	CFormTestWnd* pFrame=new CFormTestWnd();
 	CPaintManagerUI* pManager=new CPaintManagerUI();
 	SIZE size=m_Manager.GetInitSize();
 	pManager->SetInitSize(size.cx,size.cy);
 	pManager->SetSizeBox(m_Manager.GetSizeBox());
-	pManager->SetCaptionRect(m_Manager.GetCaptionRect());
+	RECT rect=m_Manager.GetCaptionRect();
+	if (rect.bottom==0)
+	{
+		rect.bottom=30;
+	}
+	pManager->SetCaptionRect(rect);
 	size=m_Manager.GetRoundCorner();
 	pManager->SetRoundCorner(size.cx,size.cy);
 	size=m_Manager.GetMinInfo();
@@ -910,7 +915,10 @@ void CLayoutManager::TestForm()
 	if( pFrame == NULL )
 		return;
 
-	CControlUI* pRoot=CloneControls(GetForm()->GetItemAt(0));
+	// CControlUI* pRoot=CloneControls(GetForm()->GetItemAt(0));
+	// 使用新建的XML树来预览，不会挂掉
+	CDialogBuilder builder;
+	CContainerUI* pRoot=static_cast<CContainerUI*>(builder.Create(pstrFile,(UINT)0));
 	if(pRoot==NULL)
 		return;
 
