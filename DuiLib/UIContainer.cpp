@@ -1789,4 +1789,48 @@ void CTabLayoutUI::SetPos(RECT rc)
     }
 }
 
+
+/////////////////////////////////////////////////////////////////////////////////////
+//
+
+CChildWindowWnd::CChildWindowWnd()
+{
+
+}
+
+void CChildWindowWnd::Init()
+{
+	if (!m_pstrXMLFile.IsEmpty())
+	{
+		CDialogBuilder builder;
+		CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(m_pstrXMLFile.GetData(), (UINT)0));
+		if (pChildWindow)
+		{
+			this->Add(pChildWindow);
+		}
+		else
+		{
+			this->RemoveAll();
+		}
+	}
+}
+
+void CChildWindowWnd::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
+{
+	if( _tcscmp(pstrName, _T("xmlfile")) == 0 )
+		SetChildWindowXML(pstrValue);
+	else
+		CContainerUI::SetAttribute(pstrName,pstrValue);
+}
+
+void CChildWindowWnd::SetChildWindowXML( DuiLib::CStdString pXML )
+{
+	m_pstrXMLFile=pXML;
+}
+
+DuiLib::CStdString CChildWindowWnd::GetChildWindowXML()
+{
+	return m_pstrXMLFile;
+}
+
 } // namespace DuiLib
