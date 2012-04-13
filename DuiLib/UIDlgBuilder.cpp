@@ -311,7 +311,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
                 else if( _tcscmp(pstrClass, _T("TileLayout")) == 0 )        pControl = new CTileLayoutUI;
                 break;
 			case 11:
-				if (_tcscmp(pstrClass, _T("ChildWindow")) == 0)			pControl=new CChildWindowWnd;
+				if (_tcscmp(pstrClass, _T("ChildWindow")) == 0)			pControl=new CChildWindowUI;
 				break;
             case 14:
                 if( _tcscmp(pstrClass, _T("VerticalLayout")) == 0 )         pControl = new CVerticalLayoutUI;

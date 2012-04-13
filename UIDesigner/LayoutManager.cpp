@@ -2,6 +2,7 @@
 #include "LayoutManager.h"
 #include "UIUtil.h"
 #include <vector>
+#include <map>
 
 using DuiLib::IListOwnerUI;
 
@@ -534,7 +535,25 @@ public:
 		mClassName = className;
 		mClassName+=_T("UI");
 	}
-	virtual LPCTSTR GetClass() const{return mClassName;}
+	virtual LPCTSTR GetClass() const
+	{
+		return mClassName;
+	}
+
+	virtual LPVOID GetInterface(LPCTSTR pstrName)
+	{
+		if( _tcscmp(pstrName, _T("UserDefinedControl")) == 0 )
+			return static_cast<CUserDefineUI*>(this);
+		return NULL;
+	}
+
+	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
+	{
+		TRACE(_T("%s:%s\n"),pstrName,pstrValue);
+		m_pAttributeList[CStdString(pstrName)]=CStdString(pstrValue);
+	}
+
+	std::map<CStdString,CStdString> m_pAttributeList;
 protected:
 	CStdString mClassName;
 };
@@ -991,6 +1010,9 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 		break;
 	case classContainer:
 		pCopyControl = new CContainerUI(*static_cast<CContainerUI*>(pControl->GetInterface(_T("Container"))));
+		break;
+	case classChildWindow:
+		pCopyControl = new CChildWindowUI(*static_cast<CChildWindowUI*>(pControl->GetInterface(_T("ChildWindow"))));
 		break;
 	case classVerticalLayout:
 		pCopyControl = new CVerticalLayoutUI(*static_cast<CVerticalLayoutUI*>(pControl->GetInterface(_T("VerticalLayout"))));
@@ -2136,6 +2158,16 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	CString strClass = pControl->GetClass();
 	strClass = strClass.Mid(0, strClass.GetLength() - 2);
 	TiXmlElement* pNode = new TiXmlElement(StringConvertor::WideToUtf8(strClass.GetBuffer()));
+	CUserDefineUI* pUserDefinedControl=static_cast<CUserDefineUI*>(pControl->GetInterface(_T("UserDefinedControl")));
+	if (pUserDefinedControl!=NULL)
+	{
+		std::map<CStdString,CStdString>::iterator iter=pUserDefinedControl->m_pAttributeList.begin();
+		for (;iter!=pUserDefinedControl->m_pAttributeList.end();iter++)
+		{
+			pNode->SetAttribute(StringConvertor::WideToUtf8(iter->first),StringConvertor::WideToUtf8(iter->second));
+		}
+	}
+
 	ExtendedAttributes* pExtended=(ExtendedAttributes*)pControl->GetTag();
 
 	ExtendedAttributes mDummy;
@@ -2208,6 +2240,9 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		break;
 	case classTileLayout:
 		SaveTileLayoutProperty(pControl, pNode);
+		break;
+	case classChildWindow:
+		SaveChildWindowProperty(pControl,pNode);
 		break;
 	default:
 		break;
@@ -2631,5 +2666,19 @@ void CLayoutManager::SaveTabLayoutProperty( CControlUI* pControl, TiXmlElement* 
 		ZeroMemory(szBuf,sizeof(szBuf));
 		_stprintf_s(szBuf, _T("%d"), pTabLayout->GetCurSel());
 		pNode->SetAttribute("selectedid", StringConvertor::WideToUtf8(szBuf));
+	}
+}
+
+void CLayoutManager::SaveChildWindowProperty( CControlUI* pControl, TiXmlElement* pNode )
+{
+	SaveControlProperty(pControl , pNode);
+
+	ASSERT(pControl);
+	CChildWindowUI* pChildWindow=static_cast<CChildWindowUI*>(pControl->GetInterface(_T("ChildWindow")));
+	ASSERT(pChildWindow);
+
+	if ( ! pChildWindow->GetChildWindowXML().IsEmpty())
+	{
+		pNode->SetAttribute("xmlfile",StringConvertor::WideToUtf8(pChildWindow->GetChildWindowXML()));
 	}
 }

@@ -185,6 +185,7 @@ protected:
 	static void SaveListContainerElementProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveItemProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveTabLayoutProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveChildWindowProperty(CControlUI* pControl, TiXmlElement* pNode);
 
 	static CString ConvertImageFileName(LPCTSTR pstrImageAttrib);
 
