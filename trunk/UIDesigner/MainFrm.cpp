@@ -41,6 +41,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(ID_MDITABS_NEW_HORZ_TAB_GROUP, OnMdiNewHorzTabGroup)
 	ON_COMMAND(ID_MDITABS_NEW_VERT_TAB_GROUP, OnMdiNewVertTabGroup)
 	ON_COMMAND(ID_APP_CHECK_UPDATE, &CMainFrame::OnAppCheckUpdate)
+	ON_COMMAND(ID_DOC_PROPERTY, &CMainFrame::OnDocProperty)
+	ON_COMMAND(ID_DOC_FILE, &CMainFrame::OnDocFile)
+	ON_COMMAND(ID_DOC_CLASS, &CMainFrame::OnDocClass)
+	ON_COMMAND(ID_DOC_RESOURCE, &CMainFrame::OnDocResource)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -641,4 +645,24 @@ void CMainFrame::OnAppCheckUpdate()
 	// TODO: Add your command handler code here
 	CDialogCheckUpdate dlg;
 	dlg.DoModal();
+}
+
+void CMainFrame::OnDocProperty()
+{
+	ShowPane(&m_wndProperties, TRUE, TRUE, TRUE);
+}
+
+void CMainFrame::OnDocFile()
+{
+	ShowPane(&m_wndFileView, TRUE, TRUE, TRUE);
+}
+
+void CMainFrame::OnDocClass()
+{
+	ShowPane(&m_wndClassView, TRUE, TRUE, TRUE);
+}
+
+void CMainFrame::OnDocResource()
+{
+	ShowPane(&m_wndResourceView, TRUE, TRUE, TRUE);
 }

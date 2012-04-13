@@ -83,4 +83,9 @@ public:
 	afx_msg void OnUpdateProjectExist(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateFileCloseAll(CCmdUI *pCmdUI);
 	afx_msg void OnAppCheckUpdate();
+
+	afx_msg void OnDocProperty();
+	afx_msg void OnDocFile();
+	afx_msg void OnDocClass();
+	afx_msg void OnDocResource();
 };
