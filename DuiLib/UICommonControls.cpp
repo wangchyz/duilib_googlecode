@@ -121,23 +121,27 @@ void CLabelUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("align")) == 0 ) {
         if( _tcsstr(pstrValue, _T("left")) != NULL ) {
-            m_uTextStyle &= ~(DT_CENTER | DT_RIGHT | DT_TOP | DT_BOTTOM);
+            m_uTextStyle &= ~(DT_CENTER | DT_RIGHT);
             m_uTextStyle |= DT_LEFT;
         }
         if( _tcsstr(pstrValue, _T("center")) != NULL ) {
-            m_uTextStyle &= ~(DT_LEFT | DT_RIGHT | DT_TOP | DT_BOTTOM);
+            m_uTextStyle &= ~(DT_LEFT | DT_RIGHT);
             m_uTextStyle |= DT_CENTER;
         }
         if( _tcsstr(pstrValue, _T("right")) != NULL ) {
-            m_uTextStyle &= ~(DT_LEFT | DT_CENTER | DT_TOP | DT_BOTTOM);
+            m_uTextStyle &= ~(DT_LEFT | DT_CENTER);
             m_uTextStyle |= DT_RIGHT;
         }
 		if( _tcsstr(pstrValue, _T("top")) != NULL ) {
-			m_uTextStyle &= ~(DT_BOTTOM | DT_VCENTER | DT_LEFT | DT_RIGHT);
+			m_uTextStyle &= ~(DT_BOTTOM | DT_VCENTER);
 			m_uTextStyle |= DT_TOP;
 		}
+		if( _tcsstr(pstrValue, _T("vcenter")) != NULL ) {
+			m_uTextStyle &= ~(DT_TOP | DT_BOTTOM);			
+			m_uTextStyle |= DT_VCENTER;
+		}
 		if( _tcsstr(pstrValue, _T("bottom")) != NULL ) {
-			m_uTextStyle &= ~(DT_TOP | DT_VCENTER | DT_LEFT | DT_RIGHT);
+			m_uTextStyle &= ~(DT_TOP | DT_VCENTER);
 			m_uTextStyle |= DT_BOTTOM;
 		}
     }
