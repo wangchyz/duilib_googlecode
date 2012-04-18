@@ -1305,6 +1305,10 @@ void CEditWnd::Init(CEditUI* pOwner)
     SendMessage(EM_SETMARGINS, EC_LEFTMARGIN | EC_RIGHTMARGIN, MAKELPARAM(0, 0));
     Edit_Enable(m_hWnd, m_pOwner->IsEnabled() == true);
     Edit_SetReadOnly(m_hWnd, m_pOwner->IsReadOnly() == true);
+	//Styls
+	LONG styleValue = ::GetWindowLong(m_hWnd, GWL_STYLE);
+	styleValue |= pOwner->GetWindowStyls();
+	::SetWindowLong(GetHWND(), GWL_STYLE, styleValue);
     ::ShowWindow(m_hWnd, SW_SHOWNOACTIVATE);
     ::SetFocus(m_hWnd);
     m_bInit = true;    
@@ -1404,7 +1408,8 @@ LRESULT CEditWnd::OnEditChanged(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lPara
 //
 
 CEditUI::CEditUI() : m_pWindow(NULL), m_uMaxChar(255), m_bReadOnly(false), 
-m_bPasswordMode(false), m_cPasswordChar(_T('*')), m_uButtonState(0), m_dwEditbkColor(0xFFFFFFFF)
+m_bPasswordMode(false), m_cPasswordChar(_T('*')), m_uButtonState(0), 
+m_dwEditbkColor(0xFFFFFFFF), m_iWindowStyls(0)
 {
     SetTextPadding(CRect(4, 3, 4, 3));
     SetBkColor(0xFFFFFFFF);
@@ -1569,6 +1574,28 @@ bool CEditUI::IsReadOnly() const
     return m_bReadOnly;
 }
 
+void CEditUI::SetNumberOnly(bool bNumberOnly)
+{
+	if( bNumberOnly )
+	{
+		m_iWindowStyls |= ES_NUMBER;
+	}
+	else
+	{
+		m_iWindowStyls |= ~ES_NUMBER;
+	}
+}
+
+bool CEditUI::IsNumberOnly() const
+{
+	return m_iWindowStyls&ES_NUMBER ? true:false;
+}
+
+int CEditUI::GetWindowStyls() const 
+{
+	return m_iWindowStyls;
+}
+
 void CEditUI::SetPasswordMode(bool bPasswordMode)
 {
     if( m_bPasswordMode == bPasswordMode ) return;
@@ -1693,6 +1720,7 @@ SIZE CEditUI::EstimateSize(SIZE szAvailable)
 void CEditUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("readonly")) == 0 ) SetReadOnly(_tcscmp(pstrValue, _T("true")) == 0);
+	else if( _tcscmp(pstrName, _T("numberonly")) == 0 ) SetNumberOnly(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("password")) == 0 ) SetPasswordMode(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("maxchar")) == 0 ) SetMaxChar(_ttoi(pstrValue));
     else if( _tcscmp(pstrName, _T("normalimage")) == 0 ) SetNormalImage(pstrValue);

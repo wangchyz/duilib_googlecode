@@ -276,6 +276,9 @@ public:
     bool IsPasswordMode() const;
     void SetPasswordChar(TCHAR cPasswordChar);
     TCHAR GetPasswordChar() const;
+	void SetNumberOnly(bool bNumberOnly);
+	bool IsNumberOnly() const;
+	int GetWindowStyls() const;
 
     LPCTSTR GetNormalImage();
     void SetNormalImage(LPCTSTR pStrImage);
@@ -315,6 +318,7 @@ protected:
     CStdString m_sFocusedImage;
     CStdString m_sDisabledImage;
     DWORD m_dwEditbkColor;
+	int m_iWindowStyls;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
