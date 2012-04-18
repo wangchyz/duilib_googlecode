@@ -1785,10 +1785,10 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
             if( bDraw && bLineDraw ) {
 				if( (uStyle & DT_CENTER) != 0 ) {
-					 ptPos.x = MAX(ptPos.x,(rc.right - rc.left - szText.cx - ptPos.x)/2);
+					ptPos.x += (rc.right - rc.left - szText.cx)/2;
 				}
 				else if( (uStyle & DT_RIGHT) != 0) {
-					ptPos.x = MAX(ptPos.x,(rc.right - rc.left - szText.cx - ptPos.x));
+					ptPos.x += (rc.right - rc.left - szText.cx);
 				}
 				::TextOut(hDC, ptPos.x, ptPos.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, pstrText, cchSize);
 				if( pt.x >= rc.right && (uStyle & DT_END_ELLIPSIS) != 0 ) 
