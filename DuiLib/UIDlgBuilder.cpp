@@ -309,6 +309,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
             case 10:
                 if( _tcscmp(pstrClass, _T("ListHeader")) == 0 )             pControl = new CListHeaderUI;
                 else if( _tcscmp(pstrClass, _T("TileLayout")) == 0 )        pControl = new CTileLayoutUI;
+				else if( _tcscmp(pstrClass, _T("WebBrowser")) == 0 )        pControl = new CWebBrowserUI;
                 break;
 			case 11:
 				if (_tcscmp(pstrClass, _T("ChildWindow")) == 0)			pControl=new CChildWindowUI;

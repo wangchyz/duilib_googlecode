@@ -60,9 +60,11 @@
 #include "UICombo.h"
 #include "UICommonControls.h"
 #include "UIActiveX.h"
+#include "UIWebBrowser.h"
 #include "UIRichEdit.h"
 
 #include "UIMarkup.h"
 #include "UIDlgBuilder.h"
 #include "UIRender.h"
 
+#include "WebBrowserEventHandler.h"
