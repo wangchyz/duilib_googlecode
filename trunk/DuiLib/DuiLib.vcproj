@@ -157,7 +157,7 @@
 				ProgramDataBaseFileName=".\Debug/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
-				Detect64BitPortabilityProblems="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -878,6 +878,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UIWebBrowser.cpp"
+				>
+			</File>
+			<File
 				RelativePath="XUnzip.cpp"
 				>
 				<FileConfiguration
@@ -918,6 +922,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\downloadmgr.h"
+				>
+			</File>
 			<File
 				RelativePath="StdAfx.h"
 				>
@@ -976,6 +984,14 @@
 			</File>
 			<File
 				RelativePath="UIRichEdit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UIWebBrowser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WebBrowserEventHandler.h"
 				>
 			</File>
 		</Filter>
