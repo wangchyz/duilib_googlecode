@@ -1810,6 +1810,9 @@ void CLayoutManager::SaveProgressProperty(CControlUI* pControl, TiXmlElement* pN
 
 	if(pProgressUI->IsHorizontal())
 		pNode->SetAttribute("hor", pProgressUI->IsHorizontal()?"true":"false");
+
+	if (!pProgressUI->IsStretchForeImage())
+		pNode->SetAttribute("isstretchfore",pProgressUI->IsStretchForeImage()?"true":"false");
 }
 
 void CLayoutManager::SaveSliderProperty(CControlUI* pControl, TiXmlElement* pNode)

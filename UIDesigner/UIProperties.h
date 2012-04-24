@@ -170,6 +170,7 @@ enum PropertyTag
 	tagMinMax,
 	tagValue,
 	tagHor,
+	tagIsStretchFore,
 
 	//Slider
 	tagSlider,

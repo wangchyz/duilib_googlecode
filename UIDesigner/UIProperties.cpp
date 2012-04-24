@@ -753,6 +753,9 @@ void CUIProperties::InitPropList()
 	pProp=new CMFCPropertyGridProperty(_T("Hor"),(_variant_t)false,_T("指示进度条是否水平"),tagHor);//hor
 	pPropUI->AddSubItem(pProp);
 
+	pProp=new CMFCPropertyGridProperty(_T("IsStretchFore"),(_variant_t)false,_T("指定前景是否缩放"),tagIsStretchFore);
+	pPropUI->AddSubItem(pProp);
+
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion Progress
 
@@ -1543,7 +1546,7 @@ void CUIProperties::ShowLabelProperty(CControlUI* pControl)
 	pPropLabel->GetSubItem(tagShowHtml-tagLabel)->SetOriginalValue((_variant_t)pLabel->IsShowHtml());
 	//endellipsis
 	DWORD dwStyle=pLabel->GetTextStyle();
-	bool bEndEllipsis=(dwStyle&DT_END_ELLIPSIS);
+	bool bEndEllipsis=(dwStyle&DT_END_ELLIPSIS) !=0 ;
 	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetValue((_variant_t)bEndEllipsis);
 	pPropLabel->GetSubItem(tagEndEllipsis-tagLabel)->SetOriginalValue((_variant_t)bEndEllipsis);
 
@@ -1673,6 +1676,9 @@ void CUIProperties::ShowProgressProperty(CControlUI* pControl)
 	//hor
 	pPropProgress->GetSubItem(tagHor-tagProgress)->SetValue((_variant_t)pProgress->IsHorizontal());
 	pPropProgress->GetSubItem(tagHor-tagProgress)->SetOriginalValue((_variant_t)pProgress->IsHorizontal());
+	//tagIsStretchFore
+	pPropProgress->GetSubItem(tagIsStretchFore-tagProgress)->SetValue((_variant_t)pProgress->IsStretchForeImage());
+	pPropProgress->GetSubItem(tagIsStretchFore-tagProgress)->SetOriginalValue((_variant_t)pProgress->IsStretchForeImage());
 
 	pPropProgress->Show(TRUE,FALSE);
 }
