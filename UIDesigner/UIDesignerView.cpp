@@ -132,6 +132,22 @@ void CUIDesignerView::OnDraw(CDC* pDrawDC)
 	hNewBitmap=::CreateCompatibleBitmap(pDC->GetSafeHdc(),szForm.cx,szForm.cy);
 	HBITMAP hOldBitmap=(HBITMAP)hCloneDC.SelectObject(hNewBitmap);
 
+	if (m_brHatch.m_hObject){
+		CDC cloneDC;
+		cloneDC.Attach(hCloneDC);
+		CRect rcTemp = rectClient;
+		//rcTemp.right  = max(rcTemp.right , m_pScrollHelper->GetDisplaySize().cx);
+		//rcTemp.bottom = max(rcTemp.bottom, m_pScrollHelper->GetDisplaySize().cy);
+		m_brHatch.UnrealizeObject();
+		CPoint pt(0, 0);
+		cloneDC.LPtoDP(&pt);
+		pt = cloneDC.SetBrushOrg(pt.x % 8, pt.y % 8);
+		CBrush* old = cloneDC.SelectObject(&m_brHatch);
+		cloneDC.FillRect(&rcTemp, &m_brHatch);
+		cloneDC.SelectObject(old);
+		cloneDC.Detach();
+	}
+
 	m_LayoutManager.Draw(&hCloneDC);
 	pDC->BitBlt(szFormOffset.cx,szFormOffset.cy,szForm.cx,szForm.cy,&hCloneDC,0,0,SRCCOPY);
 	hCloneDC.SelectObject(hOldBitmap);
@@ -202,6 +218,8 @@ CUIDesignerDoc* CUIDesignerView::GetDocument() const // 非调试版本是内联的
 void CUIDesignerView::OnInitialUpdate()
 {
 	__super::OnInitialUpdate();
+
+	m_brHatch.CreateHatchBrush(HS_DIAGCROSS, RGB(191, 191, 191));
 
 	// TODO: 在此添加专用代码和/或调用基类
 	CUIDesignerDoc* pDoc=GetDocument();
