@@ -84,8 +84,16 @@ public:
 	afx_msg void OnUpdateFileCloseAll(CCmdUI *pCmdUI);
 	afx_msg void OnAppCheckUpdate();
 
-	afx_msg void OnDocProperty();
-	afx_msg void OnDocFile();
-	afx_msg void OnDocClass();
-	afx_msg void OnDocResource();
+	afx_msg void OnViewControls();
+	afx_msg void OnViewResource();
+	afx_msg void OnViewProject();
+	afx_msg void OnViewToolsBox();
+	afx_msg void OnViewProperty();
+/*
+	bool m_bViewControls;
+	bool m_bViewResources;
+	bool m_bViewProject;
+	bool m_bViewToolsBox;
+	bool m_bViewProperty;
+*/
 };
