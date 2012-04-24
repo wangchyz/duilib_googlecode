@@ -187,6 +187,8 @@ public:
 
     bool IsHorizontal();
     void SetHorizontal(bool bHorizontal = true);
+	bool IsStretchForeImage();
+	void SetStretchForeImage(bool bStretchForeImage = true);
     int GetMinValue() const;
     void SetMinValue(int nMin);
     int GetMaxValue() const;
@@ -201,6 +203,7 @@ public:
 
 protected:
     bool m_bHorizontal;
+	bool m_bStretchForeImage;
     int m_nMax;
     int m_nMin;
     int m_nValue;
