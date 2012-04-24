@@ -158,11 +158,6 @@ BEGIN
     SEPARATOR
     BUTTON      ID_EDIT_UNDO
     BUTTON      ID_EDIT_REDO
-    SEPARATOR
-    BUTTON      ID_DOC_PROPERTY
-    BUTTON      ID_DOC_FILE
-    BUTTON      ID_DOC_CLASS
-    BUTTON      ID_DOC_RESOURCE
 END
 
 IDR_SORT TOOLBAR  16, 16
@@ -303,6 +298,14 @@ BEGIN
                 MENUITEM "银色样式(&S)",                    ID_VIEW_APPLOOK_OFF_2007_SILVER
                 MENUITEM "水绿色样式(&A)",                   ID_VIEW_APPLOOK_OFF_2007_AQUA
             END
+        END
+        POPUP "窗口"
+        BEGIN
+            MENUITEM "控件视图",                        ID_View_Controls
+            MENUITEM "项目视图",                        ID_View_Project
+            MENUITEM "资源视图",                        ID_View_Resources
+            MENUITEM "工具箱",                         ID_View_ToolsBox
+            MENUITEM "属性",                          ID_View_Property
         END
     END
     POPUP "帮助(&H)"

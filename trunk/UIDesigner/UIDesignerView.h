@@ -87,7 +87,6 @@ private:
 
 	static CLIPFORMAT m_cfUI;//custom clipboard format
 
-	CBrush m_brHatch;
 // 生成的消息映射函数
 protected:
 	afx_msg void OnFilePrintPreview();

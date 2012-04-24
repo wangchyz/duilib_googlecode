@@ -238,18 +238,18 @@
 #define ID_32872                        32872
 #define ID_32873                        32873
 #define ID_32874                        32874
-#define ID_DOC_PROPERTY                 32885
-#define ID_DOC_FILE                     32886
-#define ID_DOC_CLASS                    32887
-#define ID_BUTTON32888                  32888
-#define ID_DOC_RESOURCE                 32888
+#define ID_View_Resources               32889
+#define ID_View_Controls                32890
+#define ID_View_Project                 32891
+#define ID_View_ToolsBox                32892
+#define ID_View_Property                32893
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        348
-#define _APS_NEXT_COMMAND_VALUE         32889
+#define _APS_NEXT_COMMAND_VALUE         32900
 #define _APS_NEXT_CONTROL_VALUE         1043
 #define _APS_NEXT_SYMED_VALUE           351
 #endif

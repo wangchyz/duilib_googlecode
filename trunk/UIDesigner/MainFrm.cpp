@@ -41,10 +41,11 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_COMMAND(ID_MDITABS_NEW_HORZ_TAB_GROUP, OnMdiNewHorzTabGroup)
 	ON_COMMAND(ID_MDITABS_NEW_VERT_TAB_GROUP, OnMdiNewVertTabGroup)
 	ON_COMMAND(ID_APP_CHECK_UPDATE, &CMainFrame::OnAppCheckUpdate)
-	ON_COMMAND(ID_DOC_PROPERTY, &CMainFrame::OnDocProperty)
-	ON_COMMAND(ID_DOC_FILE, &CMainFrame::OnDocFile)
-	ON_COMMAND(ID_DOC_CLASS, &CMainFrame::OnDocClass)
-	ON_COMMAND(ID_DOC_RESOURCE, &CMainFrame::OnDocResource)
+	ON_COMMAND(ID_View_Controls, &CMainFrame::OnViewControls)
+	ON_COMMAND(ID_View_Project, &CMainFrame::OnViewProject)
+	ON_COMMAND(ID_View_Resources, &CMainFrame::OnViewResource)
+	ON_COMMAND(ID_View_ToolsBox, &CMainFrame::OnViewToolsBox)
+	ON_COMMAND(ID_View_Property, &CMainFrame::OnViewProperty)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -647,22 +648,27 @@ void CMainFrame::OnAppCheckUpdate()
 	dlg.DoModal();
 }
 
-void CMainFrame::OnDocProperty()
+void CMainFrame::OnViewProperty()
 {
 	ShowPane(&m_wndProperties, TRUE, TRUE, TRUE);
 }
 
-void CMainFrame::OnDocFile()
+void CMainFrame::OnViewProject()
 {
 	ShowPane(&m_wndFileView, TRUE, TRUE, TRUE);
 }
 
-void CMainFrame::OnDocClass()
-{
-	ShowPane(&m_wndClassView, TRUE, TRUE, TRUE);
-}
-
-void CMainFrame::OnDocResource()
+void CMainFrame::OnViewResource()
 {
 	ShowPane(&m_wndResourceView, TRUE, TRUE, TRUE);
+}
+
+void CMainFrame::OnViewToolsBox()
+{
+	ShowPane(&m_wndToolBox, TRUE, TRUE, TRUE);
+}
+
+void CMainFrame::OnViewControls()
+{
+	ShowPane(&m_wndClassView,TRUE,TRUE,TRUE);
 }
