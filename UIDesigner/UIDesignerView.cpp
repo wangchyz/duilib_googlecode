@@ -582,20 +582,15 @@ void CUIDesignerView::InitUI(CControlUI* pControl, int depth)
 
 void CUIDesignerView::OnFormEditTest()
 {
- 	if (this->GetDocument()->IsModified())
- 	{
- 		int nResult=AfxMessageBox(_T("保存修改后预览？"),MB_YESNOCANCEL);
- 		if (nResult==IDOK)
- 		{
- 			this->SaveSkinFile(this->GetDocument()->GetPathName());
- 		}
-		else if (nResult==IDCANCEL)
-		{
-			return;
-		}
- 	}
+	TCHAR szFileName[MAX_PATH];
+	CString strFilePath=GetDocument()->GetPathName();
+	strFilePath=strFilePath.Mid(0,strFilePath.ReverseFind(_T('\\'))+1);
+	// 在原XML文件目录中创建临时文件用于预览
+	::GetTempFileName(strFilePath, _T("Dui"), 0, szFileName);
+
+	this->SaveSkinFile(szFileName);
 	
-	m_LayoutManager.TestForm(this->GetDocument()->GetPathName());
+	m_LayoutManager.TestForm(szFileName);
 }
 
 void CUIDesignerView::OnAlignLeft()

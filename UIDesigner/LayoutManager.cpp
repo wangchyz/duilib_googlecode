@@ -950,6 +950,8 @@ void CLayoutManager::TestForm(LPCTSTR pstrFile)
 	if( msg.message == WM_QUIT ) ::PostQuitMessage(msg.wParam);
 
 	g_HookAPI.EnableInvalidate(true);
+
+	DeleteFile(pstrFile);
 }
 
 BOOL CLayoutManager::IsEmptyForm() const
