@@ -1724,6 +1724,7 @@ bool CTabLayoutUI::SelectItem(int iIndex)
         if( it == iIndex ) {
             GetItemAt(it)->SetVisible(true);
             GetItemAt(it)->SetFocus();
+			SetPos(m_rcItem);
         }
         else GetItemAt(it)->SetVisible(false);
     }
