@@ -91,6 +91,7 @@ public:
 	void SetManager(CPaintManagerUI* pPaintManager);
 	CPaintManagerUI* GetManager() const;
 	void SetRoot(CControlUI* pControl);
+	void Init();
 
 	void Notify(TNotifyUI& msg);
 	LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);

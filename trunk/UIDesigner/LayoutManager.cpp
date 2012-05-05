@@ -396,16 +396,6 @@ LRESULT CFormTestWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	::SetWindowPos(*this, NULL, rcClient.left, rcClient.top, rcClient.right - rcClient.left, \
 		rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
 
-	m_pManager->Init(m_hWnd);
-	m_pManager->AttachDialog(m_pRoot);
-	m_pManager->AddNotifier(this);
-	m_pManager->SetBackgroundTransparent(true);
-
-	SIZE szInitWindowSize = m_pManager->GetInitSize();
-	if( szInitWindowSize.cx != 0 ) {
-		::SetWindowPos(m_hWnd, NULL, 0, 0, szInitWindowSize.cx, szInitWindowSize.cy, SWP_NOMOVE | SWP_NOZORDER);
-	}
-
 	return 0;
 }
 
@@ -513,6 +503,19 @@ LRESULT CFormTestWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if( m_pManager->MessageHandler(uMsg, wParam, lParam, lRes) )
 		return lRes;
 	return CWindowWnd::HandleMessage(uMsg, wParam, lParam);
+}
+
+void CFormTestWnd::Init()
+{
+	m_pManager->Init(m_hWnd);
+	m_pManager->AttachDialog(m_pRoot);
+	m_pManager->AddNotifier(this);
+	m_pManager->SetBackgroundTransparent(true);
+
+	SIZE szInitWindowSize = m_pManager->GetInitSize();
+	if( szInitWindowSize.cx != 0 ) {
+		::SetWindowPos(m_hWnd, NULL, 0, 0, szInitWindowSize.cx, szInitWindowSize.cy, SWP_NOMOVE | SWP_NOZORDER);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -915,19 +918,24 @@ void CLayoutManager::TestForm(LPCTSTR pstrFile)
 	if( pFrame == NULL )
 		return;
 
-	// CControlUI* pRoot=CloneControls(GetForm()->GetItemAt(0));
-	// 使用新建的XML树来预览，不会挂掉
-	CDialogBuilder builder;
-	CContainerUI* pRoot=static_cast<CContainerUI*>(builder.Create(pstrFile,(UINT)0));
-	if(pRoot==NULL)
-		return;
-
 	g_HookAPI.EnableInvalidate(false);
 
 	pFrame->SetManager(pManager);
-	pRoot->SetManager(NULL,NULL);
+	HWND h_wnd =pFrame->Create(m_Manager.GetPaintWindow(),_T("FormTest"),UI_WNDSTYLE_FRAME,0,0,0,size.cx,size.cy);
+
+	// CControlUI* pRoot=CloneControls(GetForm()->GetItemAt(0));
+	// 使用新建的XML树来预览，不会挂掉
+	pManager->Init(h_wnd);
+	CDialogBuilder builder;
+	CContainerUI* pRoot=static_cast<CContainerUI*>(builder.Create(pstrFile,(UINT)0,NULL,pManager));
+	if(pRoot==NULL)
+		return;
+
+	//pRoot->SetManager(NULL,NULL);
 	pFrame->SetRoot(pRoot);
-	pFrame->Create(m_Manager.GetPaintWindow(),_T("FormTest"),UI_WNDSTYLE_FRAME,0,0,0,size.cx,size.cy);
+	pFrame->Init();
+
+
 	pFrame->CenterWindow();
 
 	HWND m_hWnd=pFrame->GetHWND();

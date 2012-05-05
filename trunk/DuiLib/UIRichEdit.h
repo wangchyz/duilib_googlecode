@@ -136,6 +136,7 @@ protected:
     int m_iFont;
     int m_iLimitText;
     LONG m_lTwhStyle;
+	bool m_bInited;
 };
 
 } // namespace DuiLib

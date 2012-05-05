@@ -1013,7 +1013,7 @@ void CTxtWinHost::SetParaFormat(PARAFORMAT2 &p)
 
 CRichEditUI::CRichEditUI() : m_pTwh(NULL), m_bVScrollBarFixing(false), m_bWantTab(true), m_bWantReturn(true), 
     m_bWantCtrlReturn(true), m_bRich(true), m_bReadOnly(false), m_bWordWrap(false), m_dwTextColor(0), m_iFont(-1), 
-    m_iLimitText(cInitTextMax), m_lTwhStyle(ES_MULTILINE)
+    m_iLimitText(cInitTextMax), m_lTwhStyle(ES_MULTILINE), m_bInited(false)
 {
 }
 
@@ -1617,6 +1617,9 @@ long CRichEditUI::StreamOut(int nFormat, EDITSTREAM &es)
 
 void CRichEditUI::DoInit()
 {
+	if(m_bInited)
+		return ;
+
     CREATESTRUCT cs;
     cs.style = m_lTwhStyle;
     cs.x = 0;
@@ -1632,6 +1635,8 @@ void CRichEditUI::DoInit()
         m_pTwh->OnTxInPlaceActivate(NULL);
         m_pManager->AddMessageFilter(this);
     }
+
+	m_bInited= true;
 }
 
 HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plresult) const
