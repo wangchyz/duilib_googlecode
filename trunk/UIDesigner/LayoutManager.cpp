@@ -1474,7 +1474,13 @@ void CLayoutManager::SaveControlProperty(CControlUI* pControl, TiXmlElement* pNo
 	TCHAR szBuf[MAX_PATH] = {0};
 
 	if(pControl->GetName() && _tcslen(pControl->GetName()) > 0)
-		pNode->SetAttribute("name", StringConvertor::WideToUtf8(pControl->GetName()));
+	{
+			CString strUIName=pControl->GetName();
+			if (strUIName.Find(pControl->GetClass()) != 0)
+			{
+				pNode->SetAttribute("name", StringConvertor::WideToUtf8(pControl->GetName()));
+			}
+	}
 
 	if(pControl->GetText() && _tcslen(pControl->GetText()) > 0)
 		pNode->SetAttribute("text", StringConvertor::WideToUtf8(pControl->GetText()));
@@ -2006,6 +2012,9 @@ void CLayoutManager::SaveListProperty(CControlUI* pControl, TiXmlElement* pNode)
 
 void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
+	SaveContainerProperty(pControl, pNode);
+	SaveItemProperty(pControl,pNode);
+
 	CComboUI* pComboUI = static_cast<CComboUI*>(pControl->GetInterface(_T("Combo")));
 
 	TCHAR szBuf[MAX_PATH] = {0};
@@ -2041,9 +2050,6 @@ void CLayoutManager::SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode
 		_stprintf_s(szBuf, _T("%d,%d,%d,%d"), rcInset.left, rcInset.top, rcInset.right, rcInset.bottom);
 		pNode->SetAttribute("inset", StringConvertor::WideToUtf8(szBuf));
 	}
-
-	SaveItemProperty(pControl,pNode);
-	SaveContainerProperty(pControl, pNode);
 }
 
 void CLayoutManager::SaveListHeaderItemProperty(CControlUI* pControl, TiXmlElement* pNode)
