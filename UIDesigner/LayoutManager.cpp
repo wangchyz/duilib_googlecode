@@ -597,6 +597,7 @@ void CLayoutManager::Init(HWND hWnd,LPCTSTR pstrLoad)
 
 		SIZE size=m_Manager.GetInitSize();
 		m_pFormUI->SetInitSize(size.cx,size.cy);
+		m_pFormUI->SetAlpha(m_Manager.GetTransparent());
 	}
 	m_Manager.AttachDialog(m_pFormUI);
 }
@@ -784,6 +785,12 @@ CControlUI* CLayoutManager::NewUI(int nClass,CRect& rect,CControlUI* pParent, CL
 		ExtendedAttributes* pParentExtended = (ExtendedAttributes*)pParentContainer->GetTag();
 		pExtended->nDepth = pParentExtended->nDepth + 1;
 		pParent->SetPos(pParent->GetPos());
+
+		if (!pControl->IsFloat())
+		{
+			pControl->SetFixedWidth(pParent->GetFixedWidth());
+			pControl->SetFixedHeight(pParent->GetFixedHeight());
+		}
 	}
 
 	if(pLayout)
