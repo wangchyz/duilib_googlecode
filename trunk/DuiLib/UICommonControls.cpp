@@ -1726,6 +1726,7 @@ void CEditUI::SetVisible(bool bVisible)
 
 void CEditUI::SetInternVisible(bool bVisible)
 {
+	CControlUI::SetInternVisible(bVisible);
     if( !IsVisible() && m_pWindow != NULL ) m_pManager->SetFocus(NULL);
 }
 
