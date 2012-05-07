@@ -1820,6 +1820,15 @@ void CEditUI::PaintText(HDC hDC)
     }
 }
 
+void CEditUI::SetFocus()
+{
+	if (IsVisible())
+	{
+		SetInternVisible(true);
+		CControlUI::SetFocus();
+	}
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 //
 //
