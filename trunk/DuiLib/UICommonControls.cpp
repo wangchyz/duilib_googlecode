@@ -1429,6 +1429,7 @@ CEditUI::CEditUI() : m_pWindow(NULL), m_uMaxChar(255), m_bReadOnly(false),
 m_bPasswordMode(false), m_cPasswordChar(_T('*')), m_uButtonState(0), 
 m_dwEditbkColor(0xFFFFFFFF), m_iWindowStyls(0)
 {
+	m_bInternVisible=false;
     SetTextPadding(CRect(4, 3, 4, 3));
     SetBkColor(0xFFFFFFFF);
 }
@@ -1488,7 +1489,7 @@ void CEditUI::DoEvent(TEventUI& event)
     {
         if( IsEnabled() ) {
             GetManager()->ReleaseCapture();
-            if( IsFocused() && m_pWindow == NULL )
+            if( m_pWindow == NULL )
             {
                 m_pWindow = new CEditWnd();
                 ASSERT(m_pWindow);
@@ -1726,8 +1727,8 @@ void CEditUI::SetVisible(bool bVisible)
 
 void CEditUI::SetInternVisible(bool bVisible)
 {
-	CControlUI::SetInternVisible(bVisible);
-    if( !IsVisible() && m_pWindow != NULL ) m_pManager->SetFocus(NULL);
+	m_bInternVisible=bVisible;
+    //if( !IsVisible() && m_pWindow != NULL ) m_pManager->SetFocus(NULL);
 }
 
 SIZE CEditUI::EstimateSize(SIZE szAvailable)

@@ -1257,7 +1257,8 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
     if( pControl != NULL 
         && pControl->GetManager() == this 
         && pControl->IsVisible() 
-        && pControl->IsEnabled() ) 
+        && pControl->IsEnabled() 
+		&& pControl->IsInternVisible() ) 
     {
         m_pFocus = pControl;
         TEventUI event = { 0 };
