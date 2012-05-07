@@ -1015,6 +1015,7 @@ CRichEditUI::CRichEditUI() : m_pTwh(NULL), m_bVScrollBarFixing(false), m_bWantTa
     m_bWantCtrlReturn(true), m_bRich(true), m_bReadOnly(false), m_bWordWrap(false), m_dwTextColor(0), m_iFont(-1), 
     m_iLimitText(cInitTextMax), m_lTwhStyle(ES_MULTILINE), m_bInited(false)
 {
+	m_bInternVisible=false;
 }
 
 CRichEditUI::~CRichEditUI()
@@ -1790,6 +1791,7 @@ void CRichEditUI::DoEvent(TEventUI& event)
         }
     }
     if( event.Type == UIEVENT_KILLFOCUS )  {
+		SetInternVisible(false);
         if( m_pTwh ) {
             m_pTwh->OnTxInPlaceActivate(NULL);
             m_pTwh->GetTextServices()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
@@ -2104,6 +2106,7 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
         if( dwHitResult != HITRESULT_HIT ) return 0;
         if( uMsg == WM_SETCURSOR ) bWasHandled = false;
         else if( uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK || uMsg == WM_RBUTTONDOWN ) {
+			SetInternVisible(true);
             SetFocus();
         }
     }
@@ -2142,6 +2145,11 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
         if( m_pTwh->IsCaptured() ) bHandled = bWasHandled;
     }
     return lResult;
+}
+
+void CRichEditUI::SetInternVisible( bool bVisible )
+{
+	m_bInternVisible=bVisible;
 }
 
 } // namespace DuiLib

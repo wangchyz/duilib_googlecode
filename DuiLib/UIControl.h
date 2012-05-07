@@ -101,6 +101,7 @@ public:
 
     // 一些重要的属性
     virtual bool IsVisible() const;
+	virtual bool IsInternVisible() const;
     virtual void SetVisible(bool bVisible = true);
     virtual void SetInternVisible(bool bVisible = true); // 仅供内部调用，有些UI拥有窗口句柄，需要重写此函数
     virtual bool IsEnabled() const;

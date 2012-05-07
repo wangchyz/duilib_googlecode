@@ -187,7 +187,11 @@ void CContainerUI::SetVisible(bool bVisible)
     if( m_bVisible == bVisible ) return;
     CControlUI::SetVisible(bVisible);
     for( int it = 0; it < m_items.GetSize(); it++ ) {
-        static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
+		CControlUI* pControl=static_cast<CControlUI*>(m_items[it]);
+		CContainerUI* PContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
+		if (PContainer)	// 子控件为布局控件才显示内部对象
+			PContainer->SetInternVisible(IsVisible());
+        //static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
     }
 }
 
@@ -196,7 +200,11 @@ void CContainerUI::SetInternVisible(bool bVisible)
     CControlUI::SetInternVisible(bVisible);
     if( m_items.IsEmpty() ) return;
     for( int it = 0; it < m_items.GetSize(); it++ ) {
-        static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
+		CControlUI* pControl=static_cast<CControlUI*>(m_items[it]);
+		CContainerUI* PContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
+		if (PContainer)		// 子控件为布局控件才显示内部对象
+			PContainer->SetInternVisible(IsVisible());
+        //static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
     }
 }
 

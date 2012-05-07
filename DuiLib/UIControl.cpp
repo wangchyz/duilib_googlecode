@@ -486,7 +486,12 @@ void CControlUI::SetTag(UINT_PTR pTag)
 
 bool CControlUI::IsVisible() const
 {
-    return m_bVisible && m_bInternVisible;
+    return m_bVisible;
+}
+
+bool CControlUI::IsInternVisible() const
+{
+	return m_bInternVisible ;
 }
 
 void CControlUI::SetVisible(bool bVisible)
