@@ -2107,7 +2107,7 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
         if( uMsg == WM_SETCURSOR ) bWasHandled = false;
         else if( uMsg == WM_LBUTTONDOWN || uMsg == WM_LBUTTONDBLCLK || uMsg == WM_RBUTTONDOWN ) {
 			SetInternVisible(true);
-            SetFocus();
+			CControlUI::SetFocus();
         }
     }
 #ifdef _UNICODE
@@ -2150,6 +2150,19 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
 void CRichEditUI::SetInternVisible( bool bVisible )
 {
 	m_bInternVisible=bVisible;
+}
+
+void CRichEditUI::SetFocus()
+{
+	if (IsVisible())
+	{
+		SetInternVisible(true);
+		if( m_pTwh )
+		{
+			m_pTwh->OnTxInPlaceActivate(NULL);
+			m_pTwh->GetTextServices()->TxSendMessage(WM_SETFOCUS, 0, 0, 0);
+		}
+	}
 }
 
 } // namespace DuiLib

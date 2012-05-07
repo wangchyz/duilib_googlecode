@@ -117,6 +117,7 @@ public:
     SIZE EstimateSize(SIZE szAvailable);
     void SetPos(RECT rc);
 	void SetInternVisible(bool bVisible );
+	void SetFocus();
     void DoEvent(TEventUI& event);
     void DoPaint(HDC hDC, const RECT& rcPaint);
 
