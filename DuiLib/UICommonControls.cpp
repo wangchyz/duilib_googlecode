@@ -1483,6 +1483,7 @@ void CEditUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_KILLFOCUS && IsEnabled() ) 
     {
+		SetInternVisible(false);
         Invalidate();
     }
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK || event.Type == UIEVENT_RBUTTONDOWN) 
