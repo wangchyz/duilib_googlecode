@@ -1228,18 +1228,27 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
 
     // If the drawstyle include a alignment, we'll need to first determine the text-size so
     // we can draw it at the correct position...
-    if( ( (uStyle & DT_BOTTOM ) != 0 || (uStyle &  DT_VCENTER) != 0 ) && (uStyle & DT_CALCRECT) == 0 ) {
-        RECT rcText = { 0, 0, 9999, 100 };
-        int nLinks = 0;
-        DrawHtmlText(hDC, pManager, rcText, pstrText, dwTextColor, NULL, NULL, nLinks, uStyle | DT_CALCRECT);
-		if( (uStyle & DT_BOTTOM) != 0 ) {
-			rc.top = rc.bottom - (rcText.bottom - rcText.top);
+	if( ((uStyle & DT_CENTER) != 0 || (uStyle & DT_RIGHT) != 0 || (uStyle & DT_VCENTER) != 0 || (uStyle & DT_BOTTOM) != 0) && (uStyle & DT_CALCRECT) == 0 ) {
+		RECT rcText = { 0, 0, 9999, 100 };
+		int nLinks = 0;
+		DrawHtmlText(hDC, pManager, rcText, pstrText, dwTextColor, NULL, NULL, nLinks, uStyle | DT_CALCRECT);
+		if( (uStyle & DT_SINGLELINE) != 0 ){
+			if( (uStyle & DT_CENTER) != 0 ) {
+				rc.left = rc.left + ((rc.right - rc.left) / 2) - ((rcText.right - rcText.left) / 2);
+				rc.right = rc.left + (rcText.right - rcText.left);
+			}
+			if( (uStyle & DT_RIGHT) != 0 ) {
+				rc.left = rc.right - (rcText.right - rcText.left);
+			}
 		}
 		if( (uStyle & DT_VCENTER) != 0 ) {
 			rc.top = rc.top + ((rc.bottom - rc.top) / 2) - ((rcText.bottom - rcText.top) / 2);
 			rc.bottom = rc.top + (rcText.bottom - rcText.top);
 		}
-    }
+		if( (uStyle & DT_BOTTOM) != 0 ) {
+			rc.top = rc.bottom - (rcText.bottom - rcText.top);
+		}
+	}
 
     bool bHoverLink = false;
     CStdString sHoverLink;
@@ -1784,10 +1793,10 @@ void CRenderEngine::DrawHtmlText(HDC hDC, CPaintManagerUI* pManager, RECT& rc, L
             
             ::GetTextExtentPoint32(hDC, pstrText, cchSize, &szText);
             if( bDraw && bLineDraw ) {
-				if( (uStyle & DT_CENTER) != 0 ) {
+				if( (uStyle & DT_SINGLELINE) == 0 && (uStyle & DT_CENTER) != 0 ) {
 					ptPos.x += (rc.right - rc.left - szText.cx)/2;
 				}
-				else if( (uStyle & DT_RIGHT) != 0) {
+				else if( (uStyle & DT_SINGLELINE) == 0 && (uStyle & DT_RIGHT) != 0) {
 					ptPos.x += (rc.right - rc.left - szText.cx);
 				}
 				::TextOut(hDC, ptPos.x, ptPos.y + cyLineHeight - pTm->tmHeight - pTm->tmExternalLeading, pstrText, cchSize);
