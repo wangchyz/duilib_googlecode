@@ -87,6 +87,7 @@ m_bMouseTracking(false),
 m_bMouseCapture(false),
 m_bOffscreenPaint(true),
 m_bAlphaBackground(false),
+m_nOpacity(255),
 m_pParentResourcePM(NULL)
 {
     m_dwDefaultDisabledColor = 0xFFA7A6AA;
@@ -407,8 +408,18 @@ void CPaintManagerUI::SetMaxInfo(int cx, int cy)
     m_szMaxWindow.cy = cy;
 }
 
+int CPaintManagerUI::GetTransparent() const
+{
+	return m_nOpacity;
+}
 void CPaintManagerUI::SetTransparent(int nOpacity)
 {
+	if (nOpacity<0)
+		m_nOpacity = 0;
+	else if (nOpacity>255)
+		m_nOpacity = 255;
+	else
+		m_nOpacity = nOpacity;
     if( m_hWndPaint != NULL ) {
         typedef BOOL (__stdcall *PFUNCSETLAYEREDWINDOWATTR)(HWND, COLORREF, BYTE, DWORD);
         PFUNCSETLAYEREDWINDOWATTR fSetLayeredWindowAttributes;
