@@ -188,6 +188,7 @@ public:
     void SetMinInfo(int cx, int cy);
     SIZE GetMaxInfo() const;
     void SetMaxInfo(int cx, int cy);
+	int GetTransparent() const;
     void SetTransparent(int nOpacity);
     void SetBackgroundTransparent(bool bTrans);
     bool IsShowUpdateRect() const;
@@ -328,6 +329,7 @@ private:
 
 private:
     HWND m_hWndPaint;
+	int m_nOpacity;
     HDC m_hDcPaint;
     HDC m_hDcOffscreen;
     HDC m_hDcBackground;
