@@ -111,6 +111,8 @@ public:
 
 	void DoEvent(TEventUI& event);
 
+	bool IsVisible() const;
+
 	CMenuWnd* GetMenuWnd();
 
 	void CreateMenuWnd();
