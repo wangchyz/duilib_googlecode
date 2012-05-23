@@ -189,8 +189,10 @@ void CContainerUI::SetVisible(bool bVisible)
     for( int it = 0; it < m_items.GetSize(); it++ ) {
 		CControlUI* pControl=static_cast<CControlUI*>(m_items[it]);
 		CContainerUI* PContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
-		if (PContainer)	// 子控件为布局控件才显示内部对象
+		if (PContainer)	// 子控件为布局控件,处理内部控件
 			PContainer->SetInternVisible(IsVisible());
+		else
+			pControl->SetVisible(IsVisible());	// 非布局控件，直接处理
         //static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
     }
 }
