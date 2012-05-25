@@ -186,27 +186,21 @@ void CContainerUI::SetVisible(bool bVisible)
 {
     if( m_bVisible == bVisible ) return;
     CControlUI::SetVisible(bVisible);
-    for( int it = 0; it < m_items.GetSize(); it++ ) {
-		CControlUI* pControl=static_cast<CControlUI*>(m_items[it]);
-		CContainerUI* PContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
-		if (PContainer)	// 子控件为布局控件,处理内部控件
-			PContainer->SetInternVisible(IsVisible());
-		else
-			pControl->SetVisible(IsVisible());	// 非布局控件，直接处理
-        //static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
-    }
+	// Container布局控件，需要处理子控件显示状态
+    SetInternVisible(bVisible);
 }
 
+// 逻辑上，对于Container控件不公开此方法
+// 调用此方法的结果是，内部子控件隐藏，控件本身依然显示，背景等效果存在
 void CContainerUI::SetInternVisible(bool bVisible)
 {
     CControlUI::SetInternVisible(bVisible);
     if( m_items.IsEmpty() ) return;
-    for( int it = 0; it < m_items.GetSize(); it++ ) {
-		CControlUI* pControl=static_cast<CControlUI*>(m_items[it]);
-		CContainerUI* PContainer=static_cast<CContainerUI*>(pControl->GetInterface(_T("Container")));
-		if (PContainer)		// 子控件为布局控件才显示内部对象
-			PContainer->SetInternVisible(IsVisible());
-        //static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
+    for( int it = 0; it < m_items.GetSize(); it++ )
+	{
+		// 控制子控件显示状态
+		// InternVisible状态应由子控件自己控制
+		static_cast<CControlUI*>(m_items[it])->SetVisible(bVisible);
     }
 }
 
