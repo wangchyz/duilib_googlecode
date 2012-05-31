@@ -302,7 +302,6 @@ public:
     void SetVisible(bool bVisible = true);
     void SetInternVisible(bool bVisible = true);
     SIZE EstimateSize(SIZE szAvailable);
-	void SetFocus();
     void DoEvent(TEventUI& event);
     void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 

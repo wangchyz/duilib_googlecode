@@ -697,9 +697,5 @@ void CMenuElementUI::CreateMenuWnd()
 	m_pWindow->Init(static_cast<CMenuElementUI*>(this), _T(""), _T(""), CPoint());
 }
 
-bool CMenuElementUI::IsVisible() const
-{
-	return m_bVisible && m_bInternVisible;	// 内部显示状态代表控件显示状态
-}
 
 } // namespace DuiLib
