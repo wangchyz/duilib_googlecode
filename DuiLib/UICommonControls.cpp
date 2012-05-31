@@ -37,6 +37,7 @@ UINT CLabelUI::GetTextStyle() const
 void CLabelUI::SetTextColor(DWORD dwTextColor)
 {
     m_dwTextColor = dwTextColor;
+	Invalidate();
 }
 
 DWORD CLabelUI::GetTextColor() const
@@ -47,6 +48,7 @@ DWORD CLabelUI::GetTextColor() const
 void CLabelUI::SetDisabledTextColor(DWORD dwTextColor)
 {
     m_dwDisabledTextColor = dwTextColor;
+	Invalidate();
 }
 
 DWORD CLabelUI::GetDisabledTextColor() const
@@ -57,6 +59,7 @@ DWORD CLabelUI::GetDisabledTextColor() const
 void CLabelUI::SetFont(int index)
 {
     m_iFont = index;
+	Invalidate();
 }
 
 int CLabelUI::GetFont() const
@@ -1429,7 +1432,6 @@ CEditUI::CEditUI() : m_pWindow(NULL), m_uMaxChar(255), m_bReadOnly(false),
 m_bPasswordMode(false), m_cPasswordChar(_T('*')), m_uButtonState(0), 
 m_dwEditbkColor(0xFFFFFFFF), m_iWindowStyls(0)
 {
-	m_bInternVisible=false;
     SetTextPadding(CRect(4, 3, 4, 3));
     SetBkColor(0xFFFFFFFF);
 }
@@ -1483,14 +1485,13 @@ void CEditUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_KILLFOCUS && IsEnabled() ) 
     {
-		SetInternVisible(false);
         Invalidate();
     }
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK || event.Type == UIEVENT_RBUTTONDOWN) 
     {
         if( IsEnabled() ) {
             GetManager()->ReleaseCapture();
-            if( m_pWindow == NULL )
+            if( IsFocused() && m_pWindow == NULL )
             {
                 m_pWindow = new CEditWnd();
                 ASSERT(m_pWindow);
@@ -1728,8 +1729,7 @@ void CEditUI::SetVisible(bool bVisible)
 
 void CEditUI::SetInternVisible(bool bVisible)
 {
-	m_bInternVisible=bVisible;
-    //if( !IsVisible() && m_pWindow != NULL ) m_pManager->SetFocus(NULL);
+    if( !IsVisible() && m_pWindow != NULL ) m_pManager->SetFocus(NULL);
 }
 
 SIZE CEditUI::EstimateSize(SIZE szAvailable)
@@ -1818,15 +1818,7 @@ void CEditUI::PaintText(HDC hDC)
     else {
         CRenderEngine::DrawText(hDC, m_pManager, rc, sText, m_dwDisabledTextColor, \
             m_iFont, DT_SINGLELINE | m_uTextStyle);
-    }
-}
 
-void CEditUI::SetFocus()
-{
-	if (IsVisible())
-	{
-		SetInternVisible(true);
-		CControlUI::SetFocus();
 	}
 }
 

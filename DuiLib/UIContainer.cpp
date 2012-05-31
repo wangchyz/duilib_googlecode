@@ -186,8 +186,9 @@ void CContainerUI::SetVisible(bool bVisible)
 {
     if( m_bVisible == bVisible ) return;
     CControlUI::SetVisible(bVisible);
-	// Container布局控件，需要处理子控件显示状态
-    SetInternVisible(bVisible);
+    for( int it = 0; it < m_items.GetSize(); it++ ) {
+        static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
+    }
 }
 
 // 逻辑上，对于Container控件不公开此方法
@@ -196,11 +197,10 @@ void CContainerUI::SetInternVisible(bool bVisible)
 {
     CControlUI::SetInternVisible(bVisible);
     if( m_items.IsEmpty() ) return;
-    for( int it = 0; it < m_items.GetSize(); it++ )
-	{
+    for( int it = 0; it < m_items.GetSize(); it++ ) {
 		// 控制子控件显示状态
 		// InternVisible状态应由子控件自己控制
-		static_cast<CControlUI*>(m_items[it])->SetVisible(bVisible);
+        static_cast<CControlUI*>(m_items[it])->SetInternVisible(IsVisible());
     }
 }
 
