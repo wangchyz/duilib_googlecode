@@ -716,6 +716,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\UIDesigner.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\UIDesignerDoc.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\uimenu.bmp"
 				>
 			</File>
