@@ -2,7 +2,7 @@
 #include "MainFrm.h"
 #include "ClassView.h"
 #include "Resource.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 
 //////////////////////////////////////////////////////////////////////////
 //CClassViewTree

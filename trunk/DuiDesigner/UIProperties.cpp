@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "UIProperties.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 
 #include "UIDesignerView.h"
 #include "ImageDialog.h"

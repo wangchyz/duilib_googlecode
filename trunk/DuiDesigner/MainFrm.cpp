@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 #include "MainFrm.h"
 #include "DialogTemplateOpen.h"
 #include "DialogCheckUpdate.h"

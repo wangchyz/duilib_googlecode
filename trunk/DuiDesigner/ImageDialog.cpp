@@ -1,7 +1,7 @@
 // ImageDialog.cpp : implementation file
 //
 #include "stdafx.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 #include "ImageDialog.h"
 
 //////////////////////////////////////////////////////////////////////////

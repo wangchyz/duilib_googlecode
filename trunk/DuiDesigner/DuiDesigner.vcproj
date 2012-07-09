@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="UIDesigner"
+	Name="DuiDesigner"
 	ProjectGUID="{8CC28A8B-CD88-44A7-8994-066CCD8938CB}"
-	RootNamespace="UIDesigner"
+	RootNamespace="DuiDesigner"
 	Keyword="MFCProj"
 	TargetFrameworkVersion="131072"
 	>
@@ -69,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\bin\UIDesigner_d.exe"
+				OutputFile="..\bin\DuiDesigner_d.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -152,7 +152,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="..\bin\UIDesigner.exe"
+				OutputFile="..\bin\DuiDesigner.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -232,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DuiDesigner.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FileView.cpp"
 				>
 			</File>
@@ -308,10 +312,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UIDesigner.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\UIDesignerDoc.cpp"
 				>
 			</File>
@@ -382,6 +382,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DuiDesigner.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FileView.h"
 				>
 			</File>
@@ -447,10 +451,6 @@
 			</File>
 			<File
 				RelativePath=".\UICommandHistory.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UIDesigner.h"
 				>
 			</File>
 			<File
@@ -537,6 +537,22 @@
 			</File>
 			<File
 				RelativePath=".\res\ToolBox\DialogLayout.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\DuiDesigner.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\DuiDesigner.rc"
+				>
+			</File>
+			<File
+				RelativePath=".\res\DuiDesigner.rc2"
+				>
+			</File>
+			<File
+				RelativePath=".\res\DuiDesignerDoc.ico"
 				>
 			</File>
 			<File
@@ -700,22 +716,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\res\UIDesigner.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\UIDesigner.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\res\UIDesigner.rc2"
-				>
-			</File>
-			<File
-				RelativePath=".\res\UIDesignerDoc.ico"
-				>
-			</File>
-			<File
 				RelativePath=".\res\uimenu.bmp"
 				>
 			</File>
@@ -821,18 +821,18 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\ReadMe.txt"
+			RelativePath=".\DuiDesigner.reg"
 			>
 		</File>
 		<File
-			RelativePath=".\UIDesigner.reg"
+			RelativePath=".\ReadMe.txt"
 			>
 		</File>
 	</Files>
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="UIDesigner.rc"
+			Value="DuiDesigner.rc"
 		/>
 	</Globals>
 </VisualStudioProject>

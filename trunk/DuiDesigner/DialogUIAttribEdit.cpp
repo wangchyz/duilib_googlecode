@@ -1,7 +1,7 @@
 // DialogUIAttribEdit.cpp : 实现文件
 //
 #include "stdafx.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 #include "DialogUIAttribEdit.h"
 
 
