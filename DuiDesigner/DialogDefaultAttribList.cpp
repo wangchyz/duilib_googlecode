@@ -1,7 +1,7 @@
 // DialogDefaultAttribList.cpp : implementation file
 //
 #include "stdafx.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 #include "DialogDefaultAttribList.h"
 #include "DialogUIAttribEdit.h"
 #include "LayoutManager.h"

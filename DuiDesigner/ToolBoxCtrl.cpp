@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 #include "ToolBoxCtrl.h"
 
 #define AFX_ID_SCROLL_VERT 2

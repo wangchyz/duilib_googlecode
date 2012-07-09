@@ -3,7 +3,7 @@
 //
 
 #include "stdafx.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 
 #include "UIDesignerDoc.h"
 #include "DialogSkinFileNew.h"

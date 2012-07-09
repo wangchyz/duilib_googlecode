@@ -8,7 +8,7 @@
 // Microsoft Foundation Classes product.
 
 #include "stdafx.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 #include "MainFrm.h"
 #include "ResourceView.h"
 

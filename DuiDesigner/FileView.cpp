@@ -2,7 +2,7 @@
 #include "MainFrm.h"
 #include "FileView.h"
 #include "Resource.h"
-#include "UIDesigner.h"
+#include "DuiDesigner.h"
 
 #include "DialogProjectNew.h"
 #include "UIUtil.h"
