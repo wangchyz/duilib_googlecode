@@ -107,6 +107,7 @@ BOOL CUIDesignerApp::InitInstance()
 		return FALSE;
 	}
 	m_pMainWnd = pMainFrame;
+	m_pMainWnd->SetWindowText(_T("Dui Designer"));
 	// 仅当具有后缀时才调用 DragAcceptFiles
 	//  在 MDI 应用程序中，这应在设置 m_pMainWnd 之后立即发生
 	// 启用拖/放

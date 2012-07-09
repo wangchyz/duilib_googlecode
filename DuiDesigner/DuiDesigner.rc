@@ -311,7 +311,7 @@ BEGIN
     POPUP "帮助(&H)"
     BEGIN
         MENUITEM "检查更新(&U)...",                 ID_APP_CHECK_UPDATE
-        MENUITEM "关于 UIDesigner(&A)...",        ID_APP_ABOUT
+        MENUITEM "关于 Dui Designer(&A)...",      ID_APP_ABOUT
     END
 END
 
@@ -420,7 +420,7 @@ BEGIN
     POPUP "帮助(&H)"
     BEGIN
         MENUITEM "检查更新(&U)...",                 ID_APP_CHECK_UPDATE
-        MENUITEM "关于 UIDesigner(&A)...",        ID_APP_ABOUT
+        MENUITEM "关于 Dui Designer(&A)...",      ID_APP_ABOUT
     END
 END
 
@@ -572,7 +572,7 @@ END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 231, 119
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "关于 UIDesigner"
+CAPTION "关于 Dui Designer"
 FONT 9, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         346,IDC_STATIC,"Static",SS_BITMAP,0,0,229,57
