@@ -301,6 +301,20 @@ STDMETHODIMP DuiLib::CWebBrowserUI::TranslateAccelerator( LPMSG lpMsg, const GUI
 	return S_OK;
 }
 
+LRESULT DuiLib::CWebBrowserUI::TranslateAccelerator( MSG *pMsg )
+{
+	throw std::exception("The method or operation is not implemented.");
+}
+
+LRESULT DuiLib::CWebBrowserUI::TranslateAccelerator( MSG *pMsg )
+{
+	IOleInPlaceActiveObject *pObj;
+	if (FAILED(m_pWebBrowser2->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
+		return S_FALSE;
+
+	return pObj->TranslateAccelerator(pMsg);
+}
+
 STDMETHODIMP DuiLib::CWebBrowserUI::GetOptionKeyPath( LPOLESTR* pchKey, DWORD dwReserved )
 {
 	if (m_pWebBrowserEventHandler)

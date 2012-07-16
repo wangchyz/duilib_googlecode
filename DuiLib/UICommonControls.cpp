@@ -111,11 +111,11 @@ void CLabelUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_MOUSEENTER )
     {
-        return;
+        // return;
     }
     if( event.Type == UIEVENT_MOUSELEAVE )
     {
-        return;
+        // return;
     }
     CControlUI::DoEvent(event);
 }
@@ -298,7 +298,7 @@ void CButtonUI::DoEvent(TEventUI& event)
             m_uButtonState |= UISTATE_HOT;
             Invalidate();
         }
-        return;
+        // return;
     }
     if( event.Type == UIEVENT_MOUSELEAVE )
     {
@@ -306,7 +306,7 @@ void CButtonUI::DoEvent(TEventUI& event)
             m_uButtonState &= ~UISTATE_HOT;
             Invalidate();
         }
-        return;
+        // return;
     }
     if( event.Type == UIEVENT_SETCURSOR ) {
         ::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND)));

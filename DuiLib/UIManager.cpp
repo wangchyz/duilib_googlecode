@@ -2191,4 +2191,59 @@ CControlUI* CALLBACK CPaintManagerUI::__FindControlsFromClass(CControlUI* pThis,
     return NULL;
 }
 
+bool CPaintManagerUI::TranslateAccelerator(LPMSG pMsg)
+{
+	for (int i = 0; i < m_aTranslateAccelerator.GetSize(); i++)
+	{
+		bool bHandled = false;
+		LRESULT lResult = static_cast<ITranslateAccelerator *>(m_aTranslateAccelerator[i])->TranslateAccelerator(pMsg);
+		return lResult;
+	}
+	return false;
+}
+
+bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
+{
+	// Pretranslate Message takes care of system-wide messages, such as
+	// tabbing and shortcut key-combos. We'll look for all messages for
+	// each window and any child control attached.
+	HWND hwndParent = ::GetParent(pMsg->hwnd);
+	UINT uStyle = GetWindowStyle(pMsg->hwnd);
+	LRESULT lRes = 0;
+	for (int i = 0; i < m_aPreMessages.GetSize(); i++)
+	{
+		CPaintManagerUI *pT = static_cast<CPaintManagerUI *>(m_aPreMessages[i]);
+		if (pMsg->hwnd == pT->GetPaintWindow()
+			|| (hwndParent == pT->GetPaintWindow() && ((uStyle & WS_CHILD) != 0)))
+		{
+			if (pT->PreMessageHandler(pMsg->message, pMsg->wParam, pMsg->lParam, lRes)) 
+				return true;
+		}
+		else if (pMsg->hwnd != pT->GetPaintWindow())
+		{
+			pT->TranslateAccelerator(pMsg);
+		}
+	}
+	return false;
+}
+
+
+bool CPaintManagerUI::AddTranslateAccelerator(ITranslateAccelerator *pTranslateAccelerator)
+{
+	ASSERT(m_aTranslateAccelerator.Find(pTranslateAccelerator) < 0);
+	return m_aTranslateAccelerator.Add(pTranslateAccelerator);
+}
+
+bool CPaintManagerUI::RemoveTranslateAccelerator(ITranslateAccelerator *pTranslateAccelerator)
+{
+	for (int i = 0; i < m_aTranslateAccelerator.GetSize(); i++)
+	{
+		if (static_cast<ITranslateAccelerator *>(m_aTranslateAccelerator[i]) == pTranslateAccelerator)
+		{
+			return m_aTranslateAccelerator.Remove(i);
+		}
+	}
+	return false;
+}
+
 } // namespace DuiLib

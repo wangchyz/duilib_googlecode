@@ -153,6 +153,12 @@ public:
     virtual LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled) = 0;
 };
 
+class ITranslateAccelerator
+{
+public:
+	virtual LRESULT TranslateAccelerator(MSG *pMsg) = 0;
+};
+
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
@@ -300,6 +306,10 @@ public:
 
     void AddDelayedCleanup(CControlUI* pControl);
 
+	bool AddTranslateAccelerator(ITranslateAccelerator *pTranslateAccelerator);
+	bool RemoveTranslateAccelerator(ITranslateAccelerator *pTranslateAccelerator);
+	bool TranslateAccelerator(LPMSG pMsg);
+
     CControlUI* GetRoot() const;
     CControlUI* FindControl(POINT pt) const;
     CControlUI* FindControl(LPCTSTR pstrName) const;
@@ -397,8 +407,8 @@ private:
     static CStdPtrArray m_aPlugins;
 
 public:
-	//added by cddjr at 05/18/2012
 	static CStdString m_pStrDefaultFontName;
+	CStdPtrArray m_aTranslateAccelerator;
 };
 
 } // namespace DuiLib

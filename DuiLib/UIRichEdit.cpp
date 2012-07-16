@@ -1665,8 +1665,45 @@ bool CRichEditUI::OnTxViewChanged()
     return true;
 }
 
+bool CRichEditUI::SetDropAcceptFile(bool bAccept) 
+{
+	LRESULT lResult;
+	TxSendMessage(EM_SETEVENTMASK, 0,ENM_DROPFILES|ENM_LINK, // ENM_CHANGE| ENM_CORRECTTEXT | ENM_DRAGDROPDONE | ENM_DROPFILES | ENM_IMECHANGE | ENM_LINK | ENM_OBJECTPOSITIONS | ENM_PROTECTED | ENM_REQUESTRESIZE | ENM_SCROLL | ENM_SELCHANGE | ENM_UPDATE,
+		&lResult);
+	return (BOOL)lResult == FALSE;
+}
+
 void CRichEditUI::OnTxNotify(DWORD iNotify, void *pv)
 {
+	switch(iNotify)
+	{ 
+	case EN_DROPFILES:   
+	case EN_MSGFILTER:   
+	case EN_OLEOPFAILED:   
+	case EN_PROTECTED:   
+	case EN_SAVECLIPBOARD:   
+	case EN_SELCHANGE:   
+	case EN_STOPNOUNDO:   
+	case EN_LINK:   
+	case EN_OBJECTPOSITIONS:   
+	case EN_DRAGDROPDONE:   
+		{
+			if(pv)                        // Fill out NMHDR portion of pv   
+			{   
+				LONG nId =  GetWindowLong(this->GetManager()->GetPaintWindow(), GWL_ID);   
+				NMHDR  *phdr = (NMHDR *)pv;   
+				phdr->hwndFrom = this->GetManager()->GetPaintWindow();   
+				phdr->idFrom = nId;   
+				phdr->code = iNotify;  
+
+				if(SendMessage(this->GetManager()->GetPaintWindow(), WM_NOTIFY, (WPARAM) nId, (LPARAM) pv))   
+				{   
+					//hr = S_FALSE;   
+				}   
+			}    
+		}
+		break;
+	}
 }
 
 // 多行非rich格式的richedit有一个滚动条bug，在最后一行是空行时，LineDown和SetScrollPos无法滚动到最后
