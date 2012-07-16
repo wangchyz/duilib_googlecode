@@ -13,9 +13,6 @@ DuiLib::CWebBrowserUI::CWebBrowserUI()
 
 bool DuiLib::CWebBrowserUI::DoCreateControl()
 {
-	if (m_bDelayCreate)
-		return true;
-
 	if (!CActiveXUI::DoCreateControl())
 		return false;
 	SetDispatchHandler(this);
@@ -26,7 +23,7 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 	{
 		this->Navigate2(m_sUrl);
 	}
-	return S_OK;
+	return true;
 }
 
 void DuiLib::CWebBrowserUI::ReleaseControl()
