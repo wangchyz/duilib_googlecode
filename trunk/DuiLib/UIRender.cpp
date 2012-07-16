@@ -307,6 +307,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 
 				if( dwRead != dwSize ) {
 					delete[] pData;
+					pData = NULL;
 					break;
 				}
 			}
@@ -325,6 +326,7 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 				int res = UnzipItem(hz, i, pData, dwSize, 3);
 				if( res != 0x00000000 && res != 0x00000600) {
 					delete[] pData;
+					pData = NULL;
 					if( !CPaintManagerUI::IsCachedResourceZip() ) CloseZip(hz);
 					break;
 				}
@@ -348,14 +350,14 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 		}
 	} while (0);
 
-	if (!pData)
+	while (!pData)
 	{
-		//读不到图片, 则直接去读取bitmap.m_lpstr执向的路径
+		//读不到图片, 则直接去读取bitmap.m_lpstr指向的路径
 		HANDLE hFile = ::CreateFile(bitmap.m_lpstr, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, \
 			FILE_ATTRIBUTE_NORMAL, NULL);
-		if( hFile == INVALID_HANDLE_VALUE ) return NULL;
+		if( hFile == INVALID_HANDLE_VALUE ) break;
 		dwSize = ::GetFileSize(hFile, NULL);
-		if( dwSize == 0 ) return NULL;
+		if( dwSize == 0 ) break;
 
 		DWORD dwRead = 0;
 		pData = new BYTE[ dwSize ];
@@ -364,15 +366,24 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
 
 		if( dwRead != dwSize ) {
 			delete[] pData;
-			return NULL;
+			pData = NULL;
 		}
+		break;
+	}
+	if (!pData)
+	{
+		//::MessageBox(0, _T("读取图片数据失败！"), _T("抓BUG"), MB_OK);
+		return NULL;
 	}
 
     LPBYTE pImage = NULL;
     int x,y,n;
     pImage = stbi_load_from_memory(pData, dwSize, &x, &y, &n, 4);
     delete[] pData;
-    if( !pImage ) return NULL;
+	if( !pImage ) {
+		//::MessageBox(0, _T("解析图片失败"), _T("抓BUG"), MB_OK);
+		return NULL;
+	}
 
     BITMAPINFO bmi;
     ::ZeroMemory(&bmi, sizeof(BITMAPINFO));
@@ -387,7 +398,10 @@ TImageInfo* CRenderEngine::LoadImage(STRINGorID bitmap, LPCTSTR type, DWORD mask
     bool bAlphaChannel = false;
     LPBYTE pDest = NULL;
     HBITMAP hBitmap = ::CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, (void**)&pDest, NULL, 0);
-    if( !hBitmap ) return NULL;
+	if( !hBitmap ) {
+		//::MessageBox(0, _T("CreateDIBSection失败"), _T("抓BUG"), MB_OK);
+		return NULL;
+	}
 
     for( int i = 0; i < x * y; i++ ) 
     {
@@ -447,7 +461,7 @@ void CRenderEngine::DrawImage(HDC hDC, HBITMAP hBitmap, const RECT& rc, const RE
 
     HDC hCloneDC = ::CreateCompatibleDC(hDC);
     HBITMAP hOldBitmap = (HBITMAP) ::SelectObject(hCloneDC, hBitmap);
-    ::SetStretchBltMode(hDC, COLORONCOLOR);
+    ::SetStretchBltMode(hDC, HALFTONE);
 
     RECT rcTemp = {0};
     RECT rcDest = {0};
@@ -887,6 +901,9 @@ bool DrawImage(HDC hDC, CPaintManagerUI* pManager, const RECT& rc, const RECT& r
 		const CStdString& sImageResType, RECT rcItem, RECT rcBmpPart, RECT rcCorner, DWORD dwMask, BYTE bFade, \
 		bool bHole, bool bTiledX, bool bTiledY)
 {
+	if (sImageName.IsEmpty()) {
+		return false;
+	}
 	const TImageInfo* data = NULL;
 	if( sImageResType.IsEmpty() ) {
 		data = pManager->GetImageEx((LPCTSTR)sImageName, NULL, dwMask);

@@ -54,6 +54,7 @@ typedef struct tagTIMERINFO
 HPEN m_hUpdateRectPen = NULL;
 HINSTANCE CPaintManagerUI::m_hInstance = NULL;
 HINSTANCE CPaintManagerUI::m_hResourceInstance = NULL;
+CStdString CPaintManagerUI::m_pStrDefaultFontName;//added by cddjr at 05/18/2012
 CStdString CPaintManagerUI::m_pStrResourcePath;
 CStdString CPaintManagerUI::m_pStrResourceZip;
 bool CPaintManagerUI::m_bCachedResourceZip = false;
@@ -98,6 +99,10 @@ m_pParentResourcePM(NULL)
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
     lf.lfCharSet = DEFAULT_CHARSET;
+	if (CPaintManagerUI::m_pStrDefaultFontName.GetLength()>0)
+	{
+		_tcscpy_s(lf.lfFaceName, LF_FACESIZE, CPaintManagerUI::m_pStrDefaultFontName.GetData());
+	}
     HFONT hDefaultFont = ::CreateFontIndirect(&lf);
     m_DefaultFontInfo.hFont = hDefaultFont;
     m_DefaultFontInfo.sFontName = lf.lfFaceName;
@@ -1200,6 +1205,7 @@ void CPaintManagerUI::RemoveAllOptionGroups()
 			delete aOptionGroup;
 		}
 	}
+	m_mOptionGroup.RemoveAll();
 }
 
 void CPaintManagerUI::MessageLoop()
@@ -1208,7 +1214,14 @@ void CPaintManagerUI::MessageLoop()
     while( ::GetMessage(&msg, NULL, 0, 0) ) {
         if( !CPaintManagerUI::TranslateMessage(&msg) ) {
             ::TranslateMessage(&msg);
+			try{
             ::DispatchMessage(&msg);
+			} catch(...) {
+				TRACE(_T("EXCEPTION: %s(%d)\n"), __FILET__, __LINE__);
+				#ifdef _DEBUG
+				throw "CPaintManagerUI::MessageLoop";
+				#endif
+			}
         }
     }
 }
@@ -1951,11 +1964,13 @@ void CPaintManagerUI::RemoveAllImages()
     TImageInfo* data;
     for( int i = 0; i< m_mImageHash.GetSize(); i++ ) {
         if(LPCTSTR key = m_mImageHash.GetAt(i)) {
-            data = static_cast<TImageInfo*>(m_mImageHash.Find(key));
-            ::DeleteObject(data->hBitmap);
-            delete data;
+            data = static_cast<TImageInfo*>(m_mImageHash.Find(key, false));
+			if (data) {
+				CRenderEngine::FreeImage(data);
+			}
         }
     }
+	m_mImageHash.RemoveAll();
 }
 
 void CPaintManagerUI::ReloadAllImages()
@@ -2037,6 +2052,7 @@ void CPaintManagerUI::RemoveAllDefaultAttributeList()
 			delete pDefaultAttr;
 		}
 	}
+	m_DefaultAttrHash.RemoveAll();
 }
 
 CControlUI* CPaintManagerUI::GetRoot() const

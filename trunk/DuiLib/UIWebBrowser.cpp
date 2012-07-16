@@ -13,6 +13,9 @@ DuiLib::CWebBrowserUI::CWebBrowserUI()
 
 bool DuiLib::CWebBrowserUI::DoCreateControl()
 {
+	if (m_bDelayCreate)
+		return true;
+
 	if (!CActiveXUI::DoCreateControl())
 		return false;
 	SetDispatchHandler(this);
@@ -28,7 +31,8 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 
 void DuiLib::CWebBrowserUI::ReleaseControl()
 {
-
+	m_bCreated=false;
+	CActiveXUI::ReleaseControl();
 }
 
 DuiLib::CWebBrowserUI::~CWebBrowserUI()
@@ -69,8 +73,10 @@ STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LC
 			pDispParams->rgvarg[1].pvarVal,
 			pDispParams->rgvarg[0].pboolVal);
 		break;
-		break;
-		case DISPID_COMMANDSTATECHANGE:
+	case DISPID_COMMANDSTATECHANGE:
+			CommandStateChange(
+				pDispParams->rgvarg[1].lVal,
+				pDispParams->rgvarg[0].boolVal);
 		break;
 	case DISPID_NAVIGATECOMPLETE2:
 		NavigateComplete2(
@@ -97,6 +103,11 @@ STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LC
 			pDispParams->rgvarg[1].bstrVal,
 			pDispParams->rgvarg[0].bstrVal);
 		break;
+// 	case DISPID_PROPERTYCHANGE:
+// 		if (pDispParams->cArgs>0 && pDispParams->rgvarg[0].vt == VT_BSTR) {
+// 			TRACE(_T("PropertyChange(%s)\n"), pDispParams->rgvarg[0].bstrVal);
+// 		}
+// 		break;
 	default:
 		return E_NOTIMPL;
 	}
@@ -179,6 +190,13 @@ void DuiLib::CWebBrowserUI::NewWindow3( IDispatch **pDisp, VARIANT_BOOL *&Cancel
 	if (m_pWebBrowserEventHandler)
 	{
 		m_pWebBrowserEventHandler->NewWindow3(pDisp,Cancel,dwFlags,bstrUrlContext,bstrUrl);
+	}
+}
+void DuiLib::CWebBrowserUI::CommandStateChange(long Command,VARIANT_BOOL Enable)
+{
+	if (m_pWebBrowserEventHandler)
+	{
+		m_pWebBrowserEventHandler->CommandStateChange(Command,Enable);
 	}
 }
 
@@ -358,3 +376,16 @@ void DuiLib::CWebBrowserUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 		CActiveXUI::SetAttribute(pstrName, pstrValue);
 }
 
+void DuiLib::CWebBrowserUI::NavigateDefaultUrl()
+{
+	if (!m_sUrl.IsEmpty())
+		this->NavigateUrl(m_sUrl);
+}
+
+void DuiLib::CWebBrowserUI::NavigateUrl( LPCTSTR lpszUrl )
+{
+	if (m_pWebBrowser2 && lpszUrl)
+	{
+			m_pWebBrowser2->Navigate((BSTR)SysAllocString(T2BSTR(lpszUrl)),NULL,NULL,NULL,NULL);
+	}
+}
