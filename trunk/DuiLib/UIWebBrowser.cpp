@@ -303,11 +303,6 @@ STDMETHODIMP DuiLib::CWebBrowserUI::TranslateAccelerator( LPMSG lpMsg, const GUI
 
 LRESULT DuiLib::CWebBrowserUI::TranslateAccelerator( MSG *pMsg )
 {
-	throw std::exception("The method or operation is not implemented.");
-}
-
-LRESULT DuiLib::CWebBrowserUI::TranslateAccelerator( MSG *pMsg )
-{
 	IOleInPlaceActiveObject *pObj;
 	if (FAILED(m_pWebBrowser2->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
 		return S_FALSE;

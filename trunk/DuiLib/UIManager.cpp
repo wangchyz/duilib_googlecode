@@ -1226,25 +1226,6 @@ void CPaintManagerUI::MessageLoop()
     }
 }
 
-bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
-{
-    // Pretranslate Message takes care of system-wide messages, such as
-    // tabbing and shortcut key-combos. We'll look for all messages for
-    // each window and any child control attached.
-    HWND hwndParent = ::GetParent(pMsg->hwnd);
-    UINT uStyle = GetWindowStyle(pMsg->hwnd);
-    LRESULT lRes = 0;
-    for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) {
-        CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
-        if( pMsg->hwnd == pT->GetPaintWindow()
-            || (hwndParent == pT->GetPaintWindow() && ((uStyle & WS_CHILD) != 0)) )
-        {
-            if( pT->PreMessageHandler(pMsg->message, pMsg->wParam, pMsg->lParam, lRes) ) return true;
-        }
-    }
-    return false;
-}
-
 void CPaintManagerUI::Term()
 {
     if( m_bCachedResourceZip && m_hResourceZip != NULL ) {
@@ -2197,7 +2178,7 @@ bool CPaintManagerUI::TranslateAccelerator(LPMSG pMsg)
 	{
 		bool bHandled = false;
 		LRESULT lResult = static_cast<ITranslateAccelerator *>(m_aTranslateAccelerator[i])->TranslateAccelerator(pMsg);
-		return lResult;
+		return lResult !=0 ? true : false ;
 	}
 	return false;
 }
