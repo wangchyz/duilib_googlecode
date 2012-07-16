@@ -12,6 +12,7 @@ namespace DuiLib
 		, public IDispatch
 		, public IDocHostUIHandler
 		, public IDownloadManager
+		, public ITranslateAccelerator
 	{
 	public:
 		/// ¹¹Ôìº¯Êý
@@ -70,6 +71,10 @@ namespace DuiLib
 		STDMETHOD(OnFrameWindowActivate)(BOOL fActivate);
 		STDMETHOD(ResizeBorder)(LPCRECT prcBorder, IOleInPlaceUIWindow* pUIWindow, BOOL fFrameWindow);
 		STDMETHOD(TranslateAccelerator)(LPMSG lpMsg, const GUID* pguidCmdGroup, DWORD nCmdID);
+
+		// ITranslateAccelerator
+		virtual LRESULT TranslateAccelerator( MSG *pMsg );
+
 		STDMETHOD(GetOptionKeyPath)(LPOLESTR* pchKey, DWORD dwReserved);
 		STDMETHOD(GetDropTarget)(IDropTarget* pDropTarget, IDropTarget** ppDropTarget);
 		STDMETHOD(GetExternal)(IDispatch** ppDispatch);
