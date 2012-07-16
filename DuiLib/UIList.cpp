@@ -1335,6 +1335,10 @@ void CListHeaderItemUI::DoEvent(TEventUI& event)
     {
         if( !IsEnabled() ) return;
         RECT rcSeparator = GetThumbRect();
+		if (m_iSepWidth>=0)//111024 by cddjr, 增加分隔符区域，方便用户拖动
+			rcSeparator.left-=4;
+		else
+			rcSeparator.right+=4;
         if( ::PtInRect(&rcSeparator, event.ptMouse) ) {
             if( m_bDragable ) {
                 m_uButtonState |= UISTATE_CAPTURED;
@@ -1384,6 +1388,10 @@ void CListHeaderItemUI::DoEvent(TEventUI& event)
     if( event.Type == UIEVENT_SETCURSOR )
     {
         RECT rcSeparator = GetThumbRect();
+		if (m_iSepWidth>=0)//111024 by cddjr, 增加分隔符区域，方便用户拖动
+			rcSeparator.left-=4;
+		else
+			rcSeparator.right+=4;
         if( IsEnabled() && m_bDragable && ::PtInRect(&rcSeparator, event.ptMouse) ) {
             ::SetCursor(::LoadCursor(NULL, MAKEINTRESOURCE(IDC_SIZEWE)));
             return;
@@ -1899,8 +1907,10 @@ void CListTextElementUI::SetText(int iIndex, LPCTSTR pstrText)
     CStdString* pText = static_cast<CStdString*>(m_aTexts[iIndex]);
     if( (pText == NULL && pstrText == NULL) || (pText && *pText == pstrText) ) return;
 
-    if( pText ) delete pText;
-    m_aTexts.SetAt(iIndex, new CStdString(pstrText));
+	if ( pText ) //by cddjr 2011/10/20
+		pText->Assign(pstrText);
+	else
+		m_aTexts.SetAt(iIndex, new CStdString(pstrText));
     Invalidate();
 }
 
@@ -2007,14 +2017,14 @@ void CListTextElementUI::DrawItemText(HDC hDC, const RECT& rcItem)
         rcItem.top += pInfo->rcTextPadding.top;
         rcItem.bottom -= pInfo->rcTextPadding.bottom;
 
-        LPCTSTR pstrText = NULL;
-        if( pCallback ) pstrText = pCallback->GetItemText(this, m_iIndex, i);
-        else pstrText = GetText(i);
+        CStdString strText;//不使用LPCTSTR，否则限制太多 by cddjr 2011/10/20
+        if( pCallback ) strText = pCallback->GetItemText(this, m_iIndex, i);
+        else strText.Assign(GetText(i));
         if( pInfo->bShowHtml )
-            CRenderEngine::DrawHtmlText(hDC, m_pManager, rcItem, pstrText, iTextColor, \
+            CRenderEngine::DrawHtmlText(hDC, m_pManager, rcItem, strText.GetData(), iTextColor, \
                 &m_rcLinks[m_nLinks], &m_sLinks[m_nLinks], nLinks, DT_SINGLELINE | pInfo->uTextStyle);
         else
-            CRenderEngine::DrawText(hDC, m_pManager, rcItem, pstrText, iTextColor, \
+            CRenderEngine::DrawText(hDC, m_pManager, rcItem, strText.GetData(), iTextColor, \
             pInfo->nFont, DT_SINGLELINE | pInfo->uTextStyle);
 
         m_nLinks += nLinks;

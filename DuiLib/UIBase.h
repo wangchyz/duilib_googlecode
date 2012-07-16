@@ -183,7 +183,7 @@ public:
     TCHAR GetAt(int nIndex) const;
     void Append(LPCTSTR pstr);
     void Assign(LPCTSTR pstr, int nLength = -1);
-    LPCTSTR GetData();
+    LPCTSTR GetData() const;
 
     void SetAt(int nIndex, TCHAR ch);
     operator LPCTSTR() const;
@@ -243,6 +243,7 @@ struct TITEM
 {
     CStdString Key;
     LPVOID Data;
+	struct TITEM* pPrev;
     struct TITEM* pNext;
 };
 
@@ -253,10 +254,11 @@ public:
     ~CStdStringPtrMap();
 
     void Resize(int nSize = 83);
-    LPVOID Find(LPCTSTR key) const;
+    LPVOID Find(LPCTSTR key, bool optimize = true) const;
     bool Insert(LPCTSTR key, LPVOID pData);
     LPVOID Set(LPCTSTR key, LPVOID pData);
     bool Remove(LPCTSTR key);
+	void RemoveAll();
     int GetSize() const;
     LPCTSTR GetAt(int iIndex) const;
     LPCTSTR operator[] (int nIndex) const;
@@ -264,6 +266,7 @@ public:
 protected:
     TITEM** m_aT;
     int m_nBuckets;
+	int m_nCount;
 };
 
 
@@ -283,6 +286,7 @@ public:
 
     HWND Create(HWND hwndParent, LPCTSTR pstrName, DWORD dwStyle, DWORD dwExStyle, const RECT rc, HMENU hMenu = NULL);
     HWND Create(HWND hwndParent, LPCTSTR pstrName, DWORD dwStyle, DWORD dwExStyle, int x = CW_USEDEFAULT, int y = CW_USEDEFAULT, int cx = CW_USEDEFAULT, int cy = CW_USEDEFAULT, HMENU hMenu = NULL);
+    HWND CreateDuiWindow(HWND hwndParent, LPCTSTR pstrWindowName,DWORD dwStyle =0, DWORD dwExStyle =0);
     HWND Subclass(HWND hWnd);
     void Unsubclass();
     void ShowWindow(bool bShow = true, bool bTakeFocus = true);

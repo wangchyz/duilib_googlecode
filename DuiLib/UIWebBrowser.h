@@ -18,12 +18,17 @@ namespace DuiLib
 		CWebBrowserUI();
 		virtual ~CWebBrowserUI();
 
+		void SetDefaultUrl(LPCTSTR lpszUrl)
+		{
+			m_sUrl.Format(_T("%s"),lpszUrl);
+		}
+
 		void SetWebBrowserEventHandler(CWebBrowserEventHandler* pEventHandler);
 		void Navigate2(LPCTSTR lpszUrl);
 		void Refresh();
 		void Refresh2(int Level);
-		
-
+		void NavigateDefaultUrl();
+		void NavigateUrl(LPCTSTR lpszUrl);
 	protected:
 		IWebBrowser2* m_pWebBrowser2; //ä¯ÀÀÆ÷Ö¸Õë
 		LONG m_dwRef;
@@ -40,6 +45,7 @@ namespace DuiLib
 		void NavigateComplete2(IDispatch *pDisp,VARIANT *&url);
 		void ProgressChange(LONG nProgress, LONG nProgressMax);
 		void NewWindow3(IDispatch **pDisp, VARIANT_BOOL *&Cancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl);
+		void CommandStateChange(long Command,VARIANT_BOOL Enable);
 
 	public:
 		// IUnknown

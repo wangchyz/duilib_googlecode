@@ -13,6 +13,7 @@ public:
 	virtual void NavigateComplete2(IDispatch *pDisp,VARIANT *&url){}
 	virtual void ProgressChange(LONG nProgress, LONG nProgressMax){}
 	virtual void NewWindow3(IDispatch **pDisp, VARIANT_BOOL *&Cancel, DWORD dwFlags, BSTR bstrUrlContext, BSTR bstrUrl){}
+	virtual void CommandStateChange(long Command,VARIANT_BOOL Enable){};
 
 	// interface IDocHostUIHandler
 	virtual HRESULT STDMETHODCALLTYPE ShowContextMenu(

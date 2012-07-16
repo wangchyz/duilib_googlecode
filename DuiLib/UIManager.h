@@ -395,6 +395,10 @@ private:
     static short m_L;
     static CStdPtrArray m_aPreMessages;
     static CStdPtrArray m_aPlugins;
+
+public:
+	//added by cddjr at 05/18/2012
+	static CStdString m_pStrDefaultFontName;
 };
 
 } // namespace DuiLib
