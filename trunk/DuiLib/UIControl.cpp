@@ -11,6 +11,8 @@ m_bVisible(true),
 m_bInternVisible(true),
 m_bFocused(false),
 m_bEnabled(true),
+m_bRandom(false),
+m_bGetRegion(false),
 m_bMouseEnabled(true),
 m_bKeyboardEnabled(true),
 m_bFloat(false),
@@ -35,10 +37,13 @@ m_nBorderSize(0)
     ::ZeroMemory(&m_rcItem, sizeof(RECT));
     ::ZeroMemory(&m_rcPaint, sizeof(RECT));
     ::ZeroMemory(&m_tRelativePos, sizeof(TRelativePosUI));
+
+	m_hRgn = CreateRectRgn(0,0,0,0); //定义新的空的HRGN.不能初始化为NULL
 }
 
 CControlUI::~CControlUI()
 {
+	::DeleteObject(m_hRgn);
     if( OnDestroy ) OnDestroy(this);
     if( m_pManager != NULL ) m_pManager->ReapObjects(this);
 }
@@ -155,6 +160,7 @@ void CControlUI::SetBkImage(LPCTSTR pStrImage)
     if( m_sBkImage == pStrImage ) return;
 
     m_sBkImage = pStrImage;
+	m_bGetRegion = true;
     Invalidate();
 }
 
@@ -224,6 +230,58 @@ void CControlUI::SetBorderRound(SIZE cxyRound)
 bool CControlUI::DrawImage(HDC hDC, LPCTSTR pStrImage, LPCTSTR pStrModify)
 {
     return CRenderEngine::DrawImageString(hDC, m_pManager, m_rcItem, m_rcPaint, pStrImage, pStrModify);
+}
+
+void CControlUI::GetRegion(HDC hDC, LPCTSTR pStrImage, COLORREF dwColorKey)
+{
+	m_bGetRegion = false;
+	HDC memDC;
+	memDC = ::CreateCompatibleDC(hDC);
+
+	const TImageInfo* data = NULL;
+	data = m_pManager->GetImageEx((LPCTSTR)pStrImage, NULL);
+	if( !data ) return;
+	HBITMAP pOldMemBmp=NULL;
+	//将位图选入临时DC
+	pOldMemBmp = (HBITMAP)SelectObject(memDC,data->hBitmap);
+
+	BITMAP bit;  
+	::GetObject(data->hBitmap, sizeof(BITMAP), &bit);//取得位图参数，这里要用到位图的长和宽
+	int y = 0;
+	int iX = 0;
+	HRGN rgnTemp; //保存临时region
+	for(y=0;y<=bit.bmHeight  ;y++)
+	{
+		iX = 0;
+		do
+		{
+			//跳过透明色找到下一个非透明色的点.
+			COLORREF res1 = RGB(255,255,255);
+			COLORREF RES = ::GetPixel(memDC,iX,y);
+			while (iX <= bit.bmWidth  && ::GetPixel(memDC,iX,y) == dwColorKey)
+				iX++;
+
+			//记住这个起始点
+			int iLeftX = iX;
+
+			//寻找下个透明色的点
+			while (iX <= bit.bmWidth  && ::GetPixel(memDC,iX,y) != dwColorKey)
+				++iX;
+
+			//创建一个包含起点与重点间高为1像素的临时“region”
+			rgnTemp = ::CreateRectRgn(iLeftX, y, iX, y+1);
+
+			//合并到主"region".
+			::CombineRgn(m_hRgn,m_hRgn,rgnTemp, RGN_OR);
+
+			//删除临时"region",否则下次创建时和出错
+			::DeleteObject(rgnTemp);
+
+		} while(iX < bit.bmWidth );
+		iX = 0;
+	}
+	if(pOldMemBmp)
+		::SelectObject(memDC,pOldMemBmp);
 }
 
 const RECT& CControlUI::GetPos() const
@@ -518,11 +576,24 @@ bool CControlUI::IsEnabled() const
     return m_bEnabled;
 }
 
+bool CControlUI::IsRandom() const
+{
+	return m_bRandom;
+}
+
 void CControlUI::SetEnabled(bool bEnabled)
 {
     if( m_bEnabled == bEnabled ) return;
 
     m_bEnabled = bEnabled;
+    Invalidate();
+}
+
+void CControlUI::SetRandom(bool bRandom)
+{
+    if( m_bRandom == bRandom ) return;
+
+    m_bRandom = bRandom;
     Invalidate();
 }
 
@@ -572,7 +643,22 @@ CControlUI* CControlUI::FindControl(FINDCONTROLPROC Proc, LPVOID pData, UINT uFl
 {
     if( (uFlags & UIFIND_VISIBLE) != 0 && !IsVisible() ) return NULL;
     if( (uFlags & UIFIND_ENABLED) != 0 && !IsEnabled() ) return NULL;
-    if( (uFlags & UIFIND_HITTEST) != 0 && (!m_bMouseEnabled || !::PtInRect(&m_rcItem, * static_cast<LPPOINT>(pData))) ) return NULL;
+	//判断是否启用不规则区，而非矩形
+	if( (uFlags & UIFIND_HITTEST) != 0)
+	{
+		if (!m_bMouseEnabled)
+			return NULL;
+		if (!IsRandom())
+		{
+			if(!::PtInRect(&m_rcItem, * static_cast<LPPOINT>(pData)))
+				return NULL;
+		}
+		else
+		{
+			if(!::PtInRegion(m_hRgn,static_cast<LPPOINT>(pData)->x,static_cast<LPPOINT>(pData)->y))
+				return NULL;
+		}
+	}
     return Proc(this, pData);
 }
 
@@ -772,6 +858,7 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("mouse")) == 0 ) SetMouseEnabled(_tcscmp(pstrValue, _T("true")) == 0);
 	else if( _tcscmp(pstrName, _T("keyboard")) == 0 ) SetKeyboardEnabled(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("visible")) == 0 ) SetVisible(_tcscmp(pstrValue, _T("true")) == 0);
+    else if( _tcscmp(pstrName, _T("random")) == 0 ) SetRandom(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("float")) == 0 ) SetFloat(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("shortcut")) == 0 ) SetShortcut(pstrValue[0]);
     else if( _tcscmp(pstrName, _T("menu")) == 0 ) SetContextMenuUsed(_tcscmp(pstrValue, _T("true")) == 0);
@@ -859,6 +946,10 @@ void CControlUI::PaintBkColor(HDC hDC)
 void CControlUI::PaintBkImage(HDC hDC)
 {
     if( m_sBkImage.IsEmpty() ) return;
+	if (m_bGetRegion)
+	{
+		GetRegion(hDC,m_sBkImage,RGB(0,0,0));
+	}
     if( !DrawImage(hDC, (LPCTSTR)m_sBkImage) ) m_sBkImage.Empty();
 }
 
