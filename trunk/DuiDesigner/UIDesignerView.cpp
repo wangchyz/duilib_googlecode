@@ -308,7 +308,7 @@ void CUIDesignerView::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 
 	g_pClassView->SelectUITreeItem(m_MultiTracker.GetFocused());
-	g_pClassView->SetFocus();
+
 	if(m_MultiTracker.GetSize()==1)
 		g_pPropertiesWnd->ShowProperty(m_MultiTracker.GetFocused());
 	else
