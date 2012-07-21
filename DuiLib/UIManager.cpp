@@ -2178,7 +2178,7 @@ bool CPaintManagerUI::TranslateAccelerator(LPMSG pMsg)
 	{
 		bool bHandled = false;
 		LRESULT lResult = static_cast<ITranslateAccelerator *>(m_aTranslateAccelerator[i])->TranslateAccelerator(pMsg);
-		return lResult !=0 ? true : false ;
+		return lResult == S_OK;
 	}
 	return false;
 }
@@ -2191,36 +2191,21 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 	HWND hwndParent = ::GetParent(pMsg->hwnd);
 	UINT uStyle = GetWindowStyle(pMsg->hwnd);
 	LRESULT lRes = 0;
-
-	bool preHandled = false;
 	for (int i = 0; i < m_aPreMessages.GetSize(); i++)
 	{
 		CPaintManagerUI *pT = static_cast<CPaintManagerUI *>(m_aPreMessages[i]);
-		if (pMsg->hwnd == pT->GetPaintWindow()
-			|| (hwndParent == pT->GetPaintWindow() && ((uStyle & WS_CHILD) != 0)))
+		if (	pMsg->hwnd == pT->GetPaintWindow()
+			|| (hwndParent == pT->GetPaintWindow()
+			&& ((uStyle & WS_CHILD) != 0)))
 		{
-			if (pT->PreMessageHandler(pMsg->message, pMsg->wParam, pMsg->lParam, lRes))
+			if (pT->PreMessageHandler(pMsg->message, pMsg->wParam, pMsg->lParam, lRes)) 
 				return true;
-
-			// 消息不再传递到TranslateAcce中，若存在多个窗口，加速键消息在webbrowser中被处理后
-			// 会导致其他窗口内Edit部分按键消息（回格键、方向键）无法响应
-			preHandled = true;
 		}
-	}
-
-	if (!preHandled)
-	{
-		for (int i = 0; i < m_aPreMessages.GetSize(); i++)
+		else if (pMsg->hwnd != pT->GetPaintWindow())
 		{
-			CPaintManagerUI *pT = static_cast<CPaintManagerUI *>(m_aPreMessages[i]);
-			if (pMsg->hwnd != pT->GetPaintWindow())
-			{
-				if (pT->TranslateAccelerator(pMsg))
-					return true;
-			}
+			return pT->TranslateAccelerator(pMsg);
 		}
 	}
-
 	return false;
 }
 
