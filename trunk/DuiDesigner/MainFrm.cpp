@@ -21,6 +21,7 @@ const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 
 BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWndEx)
 	ON_WM_CREATE()
+	ON_WM_DROPFILES()
 	ON_COMMAND(ID_WINDOW_MANAGER, &CMainFrame::OnWindowManager)
 	ON_COMMAND(ID_VIEW_CUSTOMIZE, &CMainFrame::OnViewCustomize)
 	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
@@ -671,4 +672,34 @@ void CMainFrame::OnViewToolsBox()
 void CMainFrame::OnViewControls()
 {
 	ShowPane(&m_wndClassView,TRUE,TRUE,TRUE);
+}
+
+void CMainFrame::OnDropFiles( HDROP hDropInfo )
+{
+	SetActiveWindow();      // activate us first !
+
+	CWinApp* pApp = AfxGetApp();
+	ASSERT(pApp != NULL);
+
+	CString strFile;
+	UINT nFilesCount=DragQueryFile(hDropInfo,INFINITE,NULL,0);
+	for(UINT i=0; i<nFilesCount; i++)
+	{
+		int pathLen = DragQueryFile(hDropInfo, i, strFile.GetBuffer(MAX_PATH), MAX_PATH);
+		strFile.ReleaseBuffer(pathLen);
+		DWORD dwFileAttr = ::GetFileAttributes(strFile);
+		if ((dwFileAttr & FILE_ATTRIBUTE_DIRECTORY)==FILE_ATTRIBUTE_DIRECTORY)
+		{
+			//目录，需要递归里面包含的文件
+		}
+		else
+		{
+			CString strExt=strFile.Mid(strFile.GetLength()-4,4);
+			if (strExt.CompareNoCase(_T(".xml"))==0)
+			{
+				pApp->OpenDocumentFile(strFile);
+			}
+		}
+	}
+	DragFinish(hDropInfo);
 }
