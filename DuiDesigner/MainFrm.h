@@ -61,6 +61,7 @@ protected:
 	afx_msg void OnUpdateApplicationLook(CCmdUI* pCmdUI);
 	afx_msg LRESULT OnGetTabToolTip(WPARAM wp, LPARAM lp);
 	afx_msg LRESULT OnChangeActiveTab(WPARAM wp,LPARAM lp);
+	afx_msg void OnDropFiles(HDROP hDropInfo);
 	DECLARE_MESSAGE_MAP()
 
 	BOOL CreateDockingWindows();
