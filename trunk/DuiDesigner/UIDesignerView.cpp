@@ -136,6 +136,8 @@ void CUIDesignerView::OnDraw(CDC* pDrawDC)
 		CDC cloneDC;
 		cloneDC.Attach(hCloneDC);
 		CRect rcTemp = rectClient;
+		rcTemp.top= rcTemp.top>=20 ? rcTemp.top-20 : 0;
+		rcTemp.left= rcTemp.left>=20 ? rcTemp.left-20 : 0;
 		//rcTemp.right  = max(rcTemp.right , m_pScrollHelper->GetDisplaySize().cx);
 		//rcTemp.bottom = max(rcTemp.bottom, m_pScrollHelper->GetDisplaySize().cy);
 		m_brHatch.UnrealizeObject();
@@ -353,7 +355,7 @@ void CUIDesignerView::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	UpDateDPtoLPOffset();
-
+	this->Invalidate(FALSE);
 	__super::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
@@ -361,7 +363,7 @@ void CUIDesignerView::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	UpDateDPtoLPOffset();
-
+	this->Invalidate(FALSE);
 	__super::OnVScroll(nSBCode, nPos, pScrollBar);
 }
 
