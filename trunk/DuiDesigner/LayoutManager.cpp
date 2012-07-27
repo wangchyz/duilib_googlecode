@@ -2153,7 +2153,6 @@ void CLayoutManager::SaveTileLayoutProperty(CControlUI* pControl, TiXmlElement* 
 	SaveContainerProperty(pControl, pNode);
 }
 
-//added by µË¾°ÈÊ 2011-09-08
 void CLayoutManager::SaveActiveXProperty(CControlUI* pControl, TiXmlElement* pNode)
 {
 	SaveControlProperty(pControl, pNode);
@@ -2305,13 +2304,13 @@ bool CLayoutManager::SaveSkinFile( LPCTSTR pstrPathName )
 		return false;
 	m_strSkinDir = strPathName.Left(nPos + 1);
 
-	HANDLE hFile = ::CreateFile(pstrPathName, GENERIC_ALL, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if(hFile == INVALID_HANDLE_VALUE)
-	{
-		return false;
-	}
-	if(hFile != INVALID_HANDLE_VALUE)
-		CloseHandle(hFile);
+// 	HANDLE hFile = ::CreateFile(pstrPathName, GENERIC_ALL, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+// 	if(hFile == INVALID_HANDLE_VALUE)
+// 	{
+// 		return false;
+// 	}
+// 	if(hFile != INVALID_HANDLE_VALUE)
+// 		CloseHandle(hFile);
 
 	TCHAR szBuf[MAX_PATH] = {0};
 	TiXmlDocument xmlDoc(StringConvertor::WideToAnsi(pstrPathName));
@@ -2541,43 +2540,49 @@ void CLayoutManager::SetDefaultUIName(CControlUI* pControl)
 CString CLayoutManager::ConvertImageFileName(LPCTSTR pstrImageAttrib)
 {
 	CString strImageAttrib(pstrImageAttrib);
-	CStdString sItem;
-	CStdString sValue;
-	LPTSTR pstr = (LPTSTR)pstrImageAttrib;
-	while( *pstr != _T('\0') ) {
-		sItem.Empty();
-		sValue.Empty();
-		while( *pstr != _T('\0') && *pstr != _T('=') ) {
-			LPTSTR pstrTemp = ::CharNext(pstr);
-			while( pstr < pstrTemp) {
-				sItem += *pstr++;
-			}
-		}
-		if( *pstr++ != _T('=') ) break;
-		if( *pstr++ != _T('\'') ) break;
-		while( *pstr != _T('\0') && *pstr != _T('\'') ) {
-			LPTSTR pstrTemp = ::CharNext(pstr);
-			while( pstr < pstrTemp) {
-				sValue += *pstr++;
-			}
-		}
-		if( *pstr++ != _T('\'') ) break;
-		if( !sValue.IsEmpty() ) {
-			if( sItem == _T("file"))
-				break;
-		}
-		if( *pstr++ != _T(' ') ) break;
-	}
-
-	if(sValue.IsEmpty())
-		sValue = sItem;
-	CString strFileName = sValue;
-	int nPos = strFileName.ReverseFind(_T('\\'));
-	if(nPos != -1)
-	{
-		strFileName = strFileName.Right(strFileName.GetLength() - nPos - 1);
-		strImageAttrib.Replace(sValue, strFileName);
-	}
+	strImageAttrib.Replace(m_strSkinDir,_T(""));
+// 	CStdString sItem;
+// 	CStdString sValue;
+// 	LPTSTR pstr = (LPTSTR)pstrImageAttrib;
+// 	while( *pstr != _T('\0') )
+// 	{
+// 		sItem.Empty();
+// 		sValue.Empty();
+// 		while( *pstr != _T('\0') && *pstr != _T('=') )
+// 		{
+// 			LPTSTR pstrTemp = ::CharNext(pstr);
+// 			while( pstr < pstrTemp)
+// 			{
+// 				sItem += *pstr++;
+// 			}
+// 		}
+// 		if( *pstr++ != _T('=') ) break;
+// 		if( *pstr++ != _T('\'') ) break;
+// 		while( *pstr != _T('\0') && *pstr != _T('\'') )
+// 		{
+// 			LPTSTR pstrTemp = ::CharNext(pstr);
+// 			while( pstr < pstrTemp)
+// 			{
+// 				sValue += *pstr++;
+// 			}
+// 		}
+// 		if( *pstr++ != _T('\'') ) break;
+// 		if( !sValue.IsEmpty() ) {
+// 			if( sItem == _T("file"))
+// 				break;
+// 		}
+// 		if( *pstr++ != _T(' ') ) break;
+// 	}
+// 
+// 	if(sValue.IsEmpty())
+// 		sValue = sItem;
+// 	CString strFileName = sValue;
+// 	int nPos = strFileName.ReverseFind(_T('\\'));
+// 	if(nPos != -1)
+// 	{
+// 		strFileName = strFileName.Right(strFileName.GetLength() - nPos - 1);
+// 		strImageAttrib.Replace(sValue, strFileName);
+// 	}
 
 	return strImageAttrib;
 }
@@ -2716,3 +2721,5 @@ void CLayoutManager::SaveChildWindowProperty( CControlUI* pControl, TiXmlElement
 		pNode->SetAttribute("xmlfile",StringConvertor::WideToUtf8(pChildWindow->GetChildWindowXML()));
 	}
 }
+
+CString CLayoutManager::m_strSkinDir=_T("");

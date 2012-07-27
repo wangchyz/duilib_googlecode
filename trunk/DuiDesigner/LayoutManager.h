@@ -208,7 +208,7 @@ protected:
 private:
 	CPaintManagerUI m_Manager;
 	CWindowUI* m_pFormUI;
-	CString m_strSkinDir;
+	static CString m_strSkinDir;
 
 	bool m_bShowGrid;
 	bool m_bShowAuxBorder;
