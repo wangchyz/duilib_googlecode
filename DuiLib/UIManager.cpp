@@ -2203,7 +2203,8 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 		}
 		else if (pMsg->hwnd != pT->GetPaintWindow())
 		{
-			return pT->TranslateAccelerator(pMsg);
+			if( pT->TranslateAccelerator(pMsg) )
+				return true;
 		}
 	}
 	return false;

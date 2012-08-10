@@ -9,6 +9,7 @@ DuiLib::CWebBrowserUI::CWebBrowserUI()
 {
 	m_clsid=CLSID_WebBrowser;
 	m_sUrl.Empty();
+	m_pManager->AddTranslateAccelerator(this);
 }
 
 bool DuiLib::CWebBrowserUI::DoCreateControl()
@@ -34,7 +35,7 @@ void DuiLib::CWebBrowserUI::ReleaseControl()
 
 DuiLib::CWebBrowserUI::~CWebBrowserUI()
 {
-
+	m_pManager->RemoveTranslateAccelerator(this);
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfoCount( UINT *iTInfo )
@@ -300,11 +301,14 @@ STDMETHODIMP DuiLib::CWebBrowserUI::TranslateAccelerator( LPMSG lpMsg, const GUI
 
 LRESULT DuiLib::CWebBrowserUI::TranslateAccelerator( MSG *pMsg )
 {
-	IOleInPlaceActiveObject *pObj;
-	if (FAILED(m_pWebBrowser2->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
-		return S_FALSE;
-
-	return pObj->TranslateAccelerator(pMsg);
+	if( m_pWebBrowser2 != NULL )
+	{
+		IOleInPlaceActiveObject *pObj;
+		if (FAILED(m_pWebBrowser2->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
+			return S_FALSE;
+		return pObj->TranslateAccelerator(pMsg);
+	}
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetOptionKeyPath( LPOLESTR* pchKey, DWORD dwReserved )
