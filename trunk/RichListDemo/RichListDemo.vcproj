@@ -63,6 +63,7 @@
 				OutputFile="$(OutDir)\$(ProjectName)_d.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\$(ConfigurationName)\$(TargetName).pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -136,6 +137,7 @@
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\$(ConfigurationName)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -211,6 +213,7 @@
 				OutputFile="$(OutDir)\$(ProjectName)_u.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\$(ConfigurationName)\$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -285,6 +288,7 @@
 				OutputFile="$(OutDir)\$(ProjectName)_ud.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile=".\$(ConfigurationName)\$(TargetName).pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>

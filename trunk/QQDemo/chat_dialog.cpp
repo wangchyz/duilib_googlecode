@@ -242,7 +242,7 @@ void ChatDialog::SendMsg()
     CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(paint_manager_.FindControl(kInputRichEditControlName));
     if( pRichEdit == NULL ) return;
     pRichEdit->SetFocus();
-    CStdString sText = pRichEdit->GetTextRange(0, pRichEdit->GetTextLength());
+    CDuiString sText = pRichEdit->GetTextRange(0, pRichEdit->GetTextLength());
     if( sText.IsEmpty() ) return;
     pRichEdit->SetText(_T(""));
 
@@ -361,8 +361,8 @@ void ChatDialog::Notify(TNotifyUI& msg)
 		else if (_tcsicmp(msg.pSender->GetName(), kEmotionButtonControlName) == 0)
 		{
 			POINT pt = {0};
-			CRect rcEmotionBtn = msg.pSender->GetPos();
-			CRect rcWindow;
+			CDuiRect rcEmotionBtn = msg.pSender->GetPos();
+			CDuiRect rcWindow;
 			GetWindowRect(m_hWnd, &rcWindow);
 
 			pt.y = rcWindow.top + rcEmotionBtn.top;
@@ -393,9 +393,9 @@ void ChatDialog::Notify(TNotifyUI& msg)
 			if (pFontbar != NULL)
 			{
 				POINT pt = {0};
-				CRect rcFontbar = pFontbar->GetPos();
-				CRect rcColorBtn = msg.pSender->GetPos();
-				CRect rcWindow;
+				CDuiRect rcFontbar = pFontbar->GetPos();
+				CDuiRect rcColorBtn = msg.pSender->GetPos();
+				CDuiRect rcWindow;
 				GetWindowRect(m_hWnd, &rcWindow);
 
 				pt.y = rcWindow.top + rcFontbar.top;

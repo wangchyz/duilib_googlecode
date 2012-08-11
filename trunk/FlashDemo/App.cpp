@@ -105,7 +105,7 @@ public:
     {
         SIZE szRoundCorner = m_pm.GetRoundCorner();
         if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
-            CRect rcWnd;
+            CDuiRect rcWnd;
             ::GetWindowRect(*this, &rcWnd);
             rcWnd.Offset(-rcWnd.left, -rcWnd.top);
             rcWnd.right++; rcWnd.bottom++;

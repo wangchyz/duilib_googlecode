@@ -228,7 +228,7 @@ Node* CGroupsUI::AddNode(const GroupsListItemInfo& item, Node* parent)
 	if (parent != root_node_ && !parent->data().list_elment_->IsVisible())
 		pListElement->SetVisible(false);
 
-	CRect rcPadding = text_padding_;
+	CDuiRect rcPadding = text_padding_;
 	for (int i = 0; i < node->data().level_; ++i)
 	{
 		rcPadding.left += level_text_start_pos_;		

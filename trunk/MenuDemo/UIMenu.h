@@ -84,7 +84,7 @@ public:
 	HWND m_hParent;
 	POINT m_BasedPoint;
 	STRINGorID m_xml;
-	CStdString m_sType;
+	CDuiString m_sType;
     CPaintManagerUI m_pm;
     CMenuElementUI* m_pOwner;
     CMenuUI* m_pLayout;

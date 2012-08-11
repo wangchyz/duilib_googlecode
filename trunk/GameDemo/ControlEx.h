@@ -18,7 +18,7 @@ public:
     {
         int _level;
         bool _expand;
-        CStdString _text;
+        CDuiString _text;
         CListLabelElementUI* _pListElement;
     };
 
@@ -215,7 +215,7 @@ public:
                 pListElement->SetInternVisible(false);
         }
 
-        CStdString html_text;
+        CDuiString html_text;
         html_text += _T("<x 6>");
         for( int i = 0; i < node->data()._level; ++i ) {
             html_text += _T("<x 24>");
@@ -271,7 +271,7 @@ public:
         if( node->data()._expand == expand ) return;
         node->data()._expand = expand;
 
-        CStdString html_text;
+        CDuiString html_text;
         html_text += _T("<x 6>");
         for( int i = 0; i < node->data()._level; ++i ) {
             html_text += _T("<x 24>");
@@ -334,7 +334,7 @@ public:
                 if( pDesk != NULL ) {
                     this->Add(pDesk);
                     TCHAR indexBuffer[16];
-                    CStdString strIndexString = _T("- ");
+                    CDuiString strIndexString = _T("- ");
                     strIndexString += _itot(i+1, indexBuffer, 10);
                     strIndexString += _T(" -");
                     pDesk->GetItemAt(3)->SetText(strIndexString);

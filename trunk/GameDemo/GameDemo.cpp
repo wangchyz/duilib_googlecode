@@ -101,7 +101,7 @@ public:
     {
         SIZE szRoundCorner = m_pm.GetRoundCorner();
         if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
-            CRect rcWnd;
+            CDuiRect rcWnd;
             ::GetWindowRect(*this, &rcWnd);
             rcWnd.Offset(-rcWnd.left, -rcWnd.top);
             rcWnd.right++; rcWnd.bottom++;
@@ -294,7 +294,7 @@ public:
             else if( msg.pSender == m_pMinBtn ) { SendMessage(WM_SYSCOMMAND, SC_MINIMIZE, 0); return; }
             else if( msg.pSender == m_pMaxBtn ) { SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0); return; }
             else if( msg.pSender == m_pRestoreBtn ) { SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0); return; }
-            CStdString name = msg.pSender->GetName();
+            CDuiString name = msg.pSender->GetName();
             if( name == _T("quitbtn") ) {
                 /*Close()*/PostQuitMessage(0); // 因为activex的原因，使用close可能会出现错误
             }
@@ -334,7 +334,7 @@ public:
             }
         }
         else if( msg.sType == _T("selectchanged") ) {
-            CStdString name = msg.pSender->GetName();
+            CDuiString name = msg.pSender->GetName();
             if( name == _T("hallswitch") ) {
                 CTabLayoutUI* pControl = static_cast<CTabLayoutUI*>(m_pm.FindControl(_T("switch")));
                 if( pControl && pControl->GetCurSel() != 0 ) pControl->SelectItem(0);
@@ -516,7 +516,7 @@ public:
     {
         SIZE szRoundCorner = m_pm.GetRoundCorner();
         if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
-            CRect rcWnd;
+            CDuiRect rcWnd;
             ::GetWindowRect(*this, &rcWnd);
             rcWnd.Offset(-rcWnd.left, -rcWnd.top);
             rcWnd.right++; rcWnd.bottom++;
@@ -534,7 +534,7 @@ public:
         MONITORINFO oMonitor = {};
         oMonitor.cbSize = sizeof(oMonitor);
         ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-        CRect rcWork = oMonitor.rcWork;
+        CDuiRect rcWork = oMonitor.rcWork;
         LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
         lpMMI->ptMaxPosition.x = rcWork.left;
         lpMMI->ptMaxPosition.y = rcWork.top;

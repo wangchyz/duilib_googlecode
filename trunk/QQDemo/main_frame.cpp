@@ -485,7 +485,7 @@ void MainFrame::Notify(TNotifyUI& msg)
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), kChangeColorSkinControlName) == 0)
 		{
-			CRect rcWindow;
+			CDuiRect rcWindow;
 			GetWindowRect(m_hWnd, &rcWindow);
 			rcWindow.top = rcWindow.top + msg.pSender->GetPos().bottom;
 			new ColorSkinWindow(this, rcWindow);

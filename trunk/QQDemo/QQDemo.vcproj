@@ -443,7 +443,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\DuiLib\XUnzip.cpp"
+				RelativePath="..\DuiLib\Utils\XUnzip.cpp"
 				>
 			</File>
 		</Filter>

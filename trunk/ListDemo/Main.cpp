@@ -15,15 +15,15 @@ using namespace DuiLib;
 
 #ifdef _DEBUG
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\bin\\DuiLib_ud.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib_ud.lib")
 #   else
-#       pragma comment(lib, "..\\bin\\DuiLib_d.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib_d.lib")
 #   endif
 #else
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\bin\\DuiLib_u.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib_u.lib")
 #   else
-#       pragma comment(lib, "..\\bin\\DuiLib.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib.lib")
 #   endif
 #endif
 
@@ -44,7 +44,7 @@ struct Prama
     HWND hWnd;
     CListUI* pList;
     CButtonUI* pSearch;
-    CStdString tDomain;
+    CDuiString tDomain;
 };
 
 #include "MenuWnd.h"
@@ -90,7 +90,7 @@ public:
             struct Prama* prama = (struct Prama *)lpParameter;
             CListUI* pList = prama->pList;
             CButtonUI* pSearch = prama->pSearch;
-            CStdString tDomain = prama->tDomain;
+            CDuiString tDomain = prama->tDomain;
             //-------------------------------------
             /*
             * 添加数据循环
@@ -132,7 +132,7 @@ public:
         CListUI* pList = static_cast<CListUI*>(m_pm.FindControl(_T("domainlist")));
         CEditUI* pEdit = static_cast<CEditUI*>(m_pm.FindControl(_T("input")));
         pEdit->SetEnabled(false);
-        CStdString input = pEdit->GetText();
+        CDuiString input = pEdit->GetText();
         m_pSearch->SetEnabled(false);
         pList->RemoveAll();
         domain.empty();
@@ -231,7 +231,7 @@ public:
         else if( msg.sType == _T("itemactivate") ) 
         {
             int iIndex = msg.pSender->GetTag();
-            CStdString sMessage = _T("Click: ");;
+            CDuiString sMessage = _T("Click: ");;
 #ifdef _UNICODE		
             int iLen = domain[iIndex].length();
             LPWSTR lpText = new WCHAR[iLen + 1];
@@ -358,7 +358,7 @@ public:
     {
         SIZE szRoundCorner = m_pm.GetRoundCorner();
         if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
-            CRect rcWnd;
+            CDuiRect rcWnd;
             ::GetWindowRect(*this, &rcWnd);
             rcWnd.Offset(-rcWnd.left, -rcWnd.top);
             rcWnd.right++; rcWnd.bottom++;
@@ -380,7 +380,7 @@ public:
         MONITORINFO oMonitor = {};
         oMonitor.cbSize = sizeof(oMonitor);
         ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-        CRect rcWork = oMonitor.rcWork;
+        CDuiRect rcWork = oMonitor.rcWork;
         rcWork.Offset(-rcWork.left, -rcWork.top);
 
         LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;

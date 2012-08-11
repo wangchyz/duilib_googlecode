@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="FlashDemo"
 	ProjectGUID="{41B017E7-7805-40D5-9D96-AABF572F5700}"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -103,9 +104,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -173,7 +171,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="comsuppwd.lib"
 				OutputFile="../bin/FlashDemo_d.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/FlashDemo.pdb"
@@ -201,9 +199,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -303,9 +298,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -397,9 +389,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

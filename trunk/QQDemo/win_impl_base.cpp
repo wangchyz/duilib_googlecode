@@ -109,7 +109,7 @@ LRESULT WindowImplBase::OnGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	MONITORINFO oMonitor = {};
 	oMonitor.cbSize = sizeof(oMonitor);
 	::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-	CRect rcWork = oMonitor.rcWork;
+	CDuiRect rcWork = oMonitor.rcWork;
 	rcWork.Offset(-rcWork.left, -rcWork.top);
 
 	LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
@@ -171,7 +171,7 @@ LRESULT WindowImplBase::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 	SIZE szRoundCorner = paint_manager_.GetRoundCorner();
 #if defined(WIN32) && !defined(UNDER_CE)
 	if( !::IsIconic(*this) && (szRoundCorner.cx != 0 || szRoundCorner.cy != 0) ) {
-		CRect rcWnd;
+		CDuiRect rcWnd;
 		::GetWindowRect(*this, &rcWnd);
 		rcWnd.Offset(-rcWnd.left, -rcWnd.top);
 		rcWnd.right++; rcWnd.bottom++;
