@@ -51,7 +51,7 @@ private:
 	LONG	delay_deltaY_;
 	DWORD	delay_number_;
 	DWORD	delay_left_;
-	CRect	text_padding_;
+	CDuiRect	text_padding_;
 	int level_text_start_pos_;
 	tString level_expand_image_;
 	tString level_collapse_image_;

@@ -99,7 +99,7 @@ public:
     }
 
     void AdjustPostion() {
-        CRect rcWnd;
+        CDuiRect rcWnd;
         GetWindowRect(m_hWnd, &rcWnd);
         int nWidth = rcWnd.GetWidth();
         int nHeight = rcWnd.GetHeight();
@@ -110,7 +110,7 @@ public:
         MONITORINFO oMonitor = {};
         oMonitor.cbSize = sizeof(oMonitor);
         ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-        CRect rcWork = oMonitor.rcWork;
+        CDuiRect rcWork = oMonitor.rcWork;
 
         if( rcWnd.bottom > rcWork.bottom ) {
             if( nHeight >= rcWork.GetHeight() ) {
@@ -217,7 +217,7 @@ public:
     LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
     {
         if( !::IsIconic(*this) ) {
-            CRect rcWnd;
+            CDuiRect rcWnd;
             ::GetWindowRect(*this, &rcWnd);
             rcWnd.Offset(-rcWnd.left, -rcWnd.top);
             HRGN hRgn = ::CreateRectRgn(rcWnd.left + 8, rcWnd.top + 8, rcWnd.right - 8, rcWnd.bottom - 8);

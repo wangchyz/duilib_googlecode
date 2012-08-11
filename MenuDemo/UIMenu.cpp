@@ -182,7 +182,7 @@ void CMenuWnd::Init(CMenuElementUI* pOwner, STRINGorID xml, LPCTSTR pSkinType, P
 
 	s_context_menu_observer.AddReceiver(this);
 
-	Create((m_pOwner == NULL) ? m_hParent : m_pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST, CRect());
+	Create((m_pOwner == NULL) ? m_hParent : m_pOwner->GetManager()->GetPaintWindow(), NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST, CDuiRect());
     // HACK: Don't deselect the parent's caption
     HWND hWndParent = m_hWnd;
     while( ::GetParent(hWndParent) != NULL ) hWndParent = ::GetParent(hWndParent);
@@ -262,9 +262,9 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			MONITORINFO oMonitor = {}; 
 			oMonitor.cbSize = sizeof(oMonitor);
 			::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-			CRect rcWork = oMonitor.rcWork;
+			CDuiRect rcWork = oMonitor.rcWork;
 #else
-			CRect rcWork;
+			CDuiRect rcWork;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWork);
 #endif
 			SIZE szAvailable = { rcWork.right - rcWork.left, rcWork.bottom - rcWork.top };
@@ -368,9 +368,9 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			MONITORINFO oMonitor = {}; 
 			oMonitor.cbSize = sizeof(oMonitor);
 			::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
-			CRect rcWork = oMonitor.rcWork;
+			CDuiRect rcWork = oMonitor.rcWork;
 #else
-			CRect rcWork;
+			CDuiRect rcWork;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWork);
 #endif
 			SIZE szAvailable = { rcWork.right - rcWork.left, rcWork.bottom - rcWork.top };
@@ -380,7 +380,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			DWORD dwAlignment = eMenuAlignment_Left | eMenuAlignment_Top;
 
 			SIZE szInit = m_pm.GetInitSize();
-			CRect rc;
+			CDuiRect rc;
 			CPoint point = m_BasedPoint;
 			rc.left = point.x;
 			rc.top = point.y;

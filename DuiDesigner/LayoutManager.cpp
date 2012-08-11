@@ -553,12 +553,12 @@ public:
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
 		TRACE(_T("%s:%s\n"),pstrName,pstrValue);
-		m_pAttributeList[CStdString(pstrName)]=CStdString(pstrValue);
+		m_pAttributeList[CDuiString(pstrName)]=CDuiString(pstrValue);
 	}
 
-	std::map<CStdString,CStdString> m_pAttributeList;
+	std::map<CDuiString,CDuiString> m_pAttributeList;
 protected:
-	CStdString mClassName;
+	CDuiString mClassName;
 };
 
 CControlUI* CLayoutManager::CreateControl(LPCTSTR pstrClass)
@@ -1037,7 +1037,7 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 		pCopyControl = new CContainerUI(*static_cast<CContainerUI*>(pControl->GetInterface(_T("Container"))));
 		break;
 	case classChildWindow:
-		pCopyControl = new CChildWindowUI(*static_cast<CChildWindowUI*>(pControl->GetInterface(_T("ChildWindow"))));
+		pCopyControl = new CChildLayoutUI(*static_cast<CChildLayoutUI*>(pControl->GetInterface(_T("ChildLayout"))));
 		break;
 	case classVerticalLayout:
 		pCopyControl = new CVerticalLayoutUI(*static_cast<CVerticalLayoutUI*>(pControl->GetInterface(_T("VerticalLayout"))));
@@ -2194,7 +2194,7 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	CUserDefineUI* pUserDefinedControl=static_cast<CUserDefineUI*>(pControl->GetInterface(_T("UserDefinedControl")));
 	if (pUserDefinedControl!=NULL)
 	{
-		std::map<CStdString,CStdString>::iterator iter=pUserDefinedControl->m_pAttributeList.begin();
+		std::map<CDuiString,CDuiString>::iterator iter=pUserDefinedControl->m_pAttributeList.begin();
 		for (;iter!=pUserDefinedControl->m_pAttributeList.end();iter++)
 		{
 			pNode->SetAttribute(StringConvertor::WideToUtf8(iter->first),StringConvertor::WideToUtf8(iter->second));
@@ -2676,7 +2676,7 @@ void CLayoutManager::SaveItemProperty( CControlUI* pControl, TiXmlElement* pNode
 	if(pListInfo->sDisabledImage && _tcslen(pListInfo->sDisabledImage) > 0)
 		pNode->SetAttribute("itemdisabledimage", StringConvertor::WideToUtf8(ConvertImageFileName(pListInfo->sDisabledImage)));
 
-	CStdString tstrAlgin;
+	CDuiString tstrAlgin;
 	UINT uTextStyle = pListInfo->uTextStyle;
 
 	if(uTextStyle == DT_LEFT)
@@ -2713,12 +2713,12 @@ void CLayoutManager::SaveChildWindowProperty( CControlUI* pControl, TiXmlElement
 	SaveControlProperty(pControl , pNode);
 
 	ASSERT(pControl);
-	CChildWindowUI* pChildWindow=static_cast<CChildWindowUI*>(pControl->GetInterface(_T("ChildWindow")));
+	CChildLayoutUI* pChildWindow=static_cast<CChildLayoutUI*>(pControl->GetInterface(_T("ChildLayout")));
 	ASSERT(pChildWindow);
 
-	if ( ! pChildWindow->GetChildWindowXML().IsEmpty())
+	if ( ! pChildWindow->GetChildLayoutXML().IsEmpty())
 	{
-		pNode->SetAttribute("xmlfile",StringConvertor::WideToUtf8(pChildWindow->GetChildWindowXML()));
+		pNode->SetAttribute("xmlfile",StringConvertor::WideToUtf8(pChildWindow->GetChildLayoutXML()));
 	}
 }
 

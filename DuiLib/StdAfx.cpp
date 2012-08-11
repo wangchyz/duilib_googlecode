@@ -2,7 +2,7 @@
 //	UIlib.pch will be the pre-compiled header
 //	stdafx.obj will contain the pre-compiled type information
 
-#include "stdafx.h"
+#include "StdAfx.h"
 
 
 #pragma comment( lib, "winmm.lib" )

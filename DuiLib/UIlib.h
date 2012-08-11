@@ -51,20 +51,43 @@
 #include <crtdbg.h>
 #include <malloc.h>
 
-#include "UIBase.h"
-#include "UIManager.h"
-#include "UIDelegate.h"
-#include "UIControl.h"
-#include "UIContainer.h"
-#include "UIList.h"
-#include "UICombo.h"
-#include "UICommonControls.h"
-#include "UIActiveX.h"
-#include "UIWebBrowser.h"
-#include "UIRichEdit.h"
+#include "Utils/Utils.h"
+#include "Utils/UIDelegate.h"
+#include "Core/UIBase.h"
+#include "Core/UIManager.h"
 
-#include "UIMarkup.h"
-#include "UIDlgBuilder.h"
-#include "UIRender.h"
+#include "Core/UIControl.h"
+#include "Core/UIContainer.h"
 
-#include "WebBrowserEventHandler.h"
+#include "Layout/UIVerticalLayout.h"
+#include "Layout/UIHorizontalLayout.h"
+#include "Layout/UITileLayout.h"
+#include "Layout/UITabLayout.h"
+#include "Layout/UIChildLayout.h"
+
+#include "Control/UIList.h"
+#include "Control/UICombo.h"
+#include "Control/UIScrollBar.h"
+
+#include "Control/UILabel.h"
+#include "Control/UIText.h"
+#include "Control/UIEdit.h"
+
+#include "Control/UIButton.h"
+#include "Control/UIOption.h"
+#include "Control/UICheckBox.h"
+
+#include "Control/UIProgress.h"
+#include "Control/UISlider.h"
+
+#include "Control/UIComboBox.h"
+#include "Control/UIRichEdit.h"
+#include "Control/UIDateTime.h"
+
+#include "Control/UIActiveX.h"
+#include "Control/UIWebBrowser.h"
+
+#include "Core/UIMarkup.h"
+#include "Core/UIDlgBuilder.h"
+#include "Core/UIRender.h"
+

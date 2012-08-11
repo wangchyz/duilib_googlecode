@@ -52,15 +52,15 @@
 
 #ifdef _DEBUG
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\bin\\DuiLib_ud.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib_ud.lib")
 #   else
-#       pragma comment(lib, "..\\bin\\DuiLib_d.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib_d.lib")
 #   endif
 #else
 #   ifdef _UNICODE
-#       pragma comment(lib, "..\\bin\\DuiLib_u.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib_u.lib")
 #   else
-#       pragma comment(lib, "..\\bin\\DuiLib.lib")
+#       pragma comment(lib, "..\\Lib\\DuiLib.lib")
 #   endif
 #endif
 
@@ -165,7 +165,7 @@ using DuiLib::IMessageFilterUI;
 using DuiLib::CStdPtrArray;
 using DuiLib::CStdValArray;
 using DuiLib::CStdStringPtrMap;
-using DuiLib::CStdString;
+using DuiLib::CDuiString;
 using DuiLib::TListInfoUI;
 using DuiLib::CRenderEngine;
 using DuiLib::CDialogBuilder;
@@ -181,7 +181,7 @@ using DuiLib::CSliderUI;
 using DuiLib::CProgressUI;
 using DuiLib::CActiveXUI;
 using DuiLib::CContainerUI;
-using DuiLib::CChildWindowUI;
+using DuiLib::CChildLayoutUI;
 using DuiLib::CVerticalLayoutUI;
 using DuiLib::CHorizontalLayoutUI;
 using DuiLib::CTabLayoutUI;
