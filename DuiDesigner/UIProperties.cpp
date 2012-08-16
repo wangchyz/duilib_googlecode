@@ -1161,6 +1161,21 @@ void CUIProperties::InitPropList()
 	m_wndPropList.AddProperty(pPropUI);
 #pragma endregion ListHeaderItem
 
+#pragma region WebBrowser
+
+	pPropUI=new CMFCPropertyGridProperty(_T("WebBrowser"),classWebBrowser);
+
+	// homepage
+	pProp=new CMFCPropertyGridProperty(_T("homepage"),(_variant_t)_T(""),_T("默认网址\n"),tagWebBrowserHomePage);
+	pPropUI->AddSubItem(pProp);
+
+	// autonavi
+	pProp=new CMFCPropertyGridProperty(_T("autonavi"),(_variant_t)true,_T("是否显示默认页面\ntrue"),tagDragable);
+	pPropUI->AddSubItem(pProp);
+
+	m_wndPropList.AddProperty(pPropUI);
+#pragma endregion WebBrowser
+
 	HideAllProperties();
 }
 
@@ -1270,6 +1285,9 @@ void CUIProperties::ShowProperty(CControlUI* pControl)
 		break;
 	case classListHeaderItem:
 		ShowListHeaderItemPropery(pControl);
+		break;
+	case classWebBrowser:
+		ShowWebBrowserPropery(pControl);
 		break;
 	default:
 		ShowControlProperty(pControl);
@@ -2198,4 +2216,28 @@ void CUIProperties::ShowListHeaderItemPropery( CControlUI* pControl )
 	//	sepimage
 	pPropItem->GetSubItem(tagSepImage-classListHeaderItem)->SetValue((_variant_t)pListHeaderItem->GetSepImage());
 	pPropItem->GetSubItem(tagSepImage-classListHeaderItem)->SetOriginalValue((_variant_t)pListHeaderItem->GetSepImage());
+
+	pPropItem->Show(TRUE,FALSE);
+}
+
+void CUIProperties::ShowWebBrowserPropery( CControlUI* pControl )
+{
+	ShowControlProperty(pControl);
+
+	ASSERT(pControl);
+	CWebBrowserUI* pWebBrowser=static_cast<CWebBrowserUI*>(pControl->GetInterface(_T("WebBrowser")));
+	ASSERT(pWebBrowser);
+
+	CMFCPropertyGridProperty* pPropItem=m_wndPropList.FindItemByData(classWebBrowser,FALSE);
+	ASSERT(pPropItem);
+
+	//	homepage
+	pPropItem->GetSubItem(tagWebBrowserHomePage-tagWebBrowser)->SetValue((_variant_t)pWebBrowser->GetHomePage());
+	pPropItem->GetSubItem(tagWebBrowserHomePage-tagWebBrowser)->SetOriginalValue((_variant_t)pWebBrowser->GetHomePage());
+
+	//	autonavi
+	pPropItem->GetSubItem(tagWebBrowserAutoNavi-tagWebBrowser)->SetValue((_variant_t)pWebBrowser->IsAutoNavigation());
+	pPropItem->GetSubItem(tagWebBrowserAutoNavi-tagWebBrowser)->SetOriginalValue((_variant_t)pWebBrowser->IsAutoNavigation());
+
+	pPropItem->Show(TRUE,FALSE);
 }

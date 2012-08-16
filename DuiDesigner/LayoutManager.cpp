@@ -1036,7 +1036,7 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 	case classContainer:
 		pCopyControl = new CContainerUI(*static_cast<CContainerUI*>(pControl->GetInterface(_T("Container"))));
 		break;
-	case classChildWindow:
+	case classChildLayout:
 		pCopyControl = new CChildLayoutUI(*static_cast<CChildLayoutUI*>(pControl->GetInterface(_T("ChildLayout"))));
 		break;
 	case classVerticalLayout:
@@ -1063,6 +1063,9 @@ CControlUI* CLayoutManager::CloneControl(CControlUI* pControl)
 	case classListContainerElement:
 		pCopyControl = new CListContainerElementUI(*static_cast<CListContainerElementUI*>(pControl->GetInterface(_T("ListContainerElement"))));
 		break;
+	case classWebBrowser:
+		pCopyControl=new CWebBrowserUI(*static_cast<CWebBrowserUI*>(pControl->GetInterface(_T("WebBrowser"))));
+			break;
 	case classList:
 		{//0917 by 邓景仁(cddjr) , 在不改动duilib的前提下，只能采用如下代码 
 			CListUI &copyList = *static_cast<CListUI*>(pControl->GetInterface(_T("List")));
@@ -2276,8 +2279,11 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 	case classTileLayout:
 		SaveTileLayoutProperty(pControl, pNode);
 		break;
-	case classChildWindow:
+	case classChildLayout:
 		SaveChildWindowProperty(pControl,pNode);
+		break;
+	case classWebBrowser:
+		SaveWebBrowserProperty(pControl,pNode);
 		break;
 	default:
 		break;
@@ -2740,6 +2746,23 @@ void CLayoutManager::SaveListHeaderProperty( CControlUI* pControl, TiXmlElement*
 	if(pListHeaderUI->IsSepImmMode())
 	{
 		pNode->SetAttribute("sepimm","true");
+	}
+}
+
+void CLayoutManager::SaveWebBrowserProperty( CControlUI* pControl, TiXmlElement* pNode )
+{
+	SaveControlProperty(pControl, pNode);
+
+	CWebBrowserUI * pWebBrowserUI = static_cast<CWebBrowserUI*>(pControl->GetInterface(_T("WebBrowser")));
+
+	if (pWebBrowserUI->IsAutoNavigation())
+	{
+		pNode->SetAttribute("autonavi", "true");
+	}
+
+	if (pWebBrowserUI->GetHomePage() && _tcslen(pWebBrowserUI->GetHomePage()) >0 )
+	{
+		pNode->SetAttribute("homepage", StringConvertor::WideToUtf8(pWebBrowserUI->GetHomePage()));
 	}
 }
 
