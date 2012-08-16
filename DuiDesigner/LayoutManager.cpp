@@ -2261,6 +2261,8 @@ void CLayoutManager::SaveProperties(CControlUI* pControl, TiXmlElement* pParentN
 		SaveActiveXProperty(pControl, pNode);
 		break;
 	case classListHeader:
+		SaveListHeaderProperty(pControl,pNode);
+		break;
 	case classContainer:
 	case classVerticalLayout:
 		SaveContainerProperty(pControl,pNode);
@@ -2719,6 +2721,25 @@ void CLayoutManager::SaveChildWindowProperty( CControlUI* pControl, TiXmlElement
 	if ( ! pChildWindow->GetChildLayoutXML().IsEmpty())
 	{
 		pNode->SetAttribute("xmlfile",StringConvertor::WideToUtf8(pChildWindow->GetChildLayoutXML()));
+	}
+}
+
+void CLayoutManager::SaveListHeaderProperty( CControlUI* pControl, TiXmlElement* pNode )
+{
+	SaveContainerProperty(pControl,pNode);
+
+	TCHAR szBuf[MAX_PATH] = {0};
+	CListHeaderUI * pListHeaderUI = static_cast<CListHeaderUI*>(pControl->GetInterface(_T("ListHeader")));
+
+	if(0 != pListHeaderUI->GetSepWidth())
+	{
+		_stprintf_s(szBuf, _T("%d"), pListHeaderUI->GetSepWidth());
+		pNode->SetAttribute("sepwidth", StringConvertor::WideToUtf8(szBuf));
+	}
+
+	if(pListHeaderUI->IsSepImmMode())
+	{
+		pNode->SetAttribute("sepimm","true");
 	}
 }
 
