@@ -177,6 +177,7 @@ protected:
 	static void SaveScrollBarProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveListProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveComboProperty(CControlUI* pControl, TiXmlElement* pNode);
+	static void SaveListHeaderProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveListHeaderItemProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveListElementProperty(CControlUI* pControl, TiXmlElement* pNode);
 	static void SaveContainerProperty(CControlUI* pControl, TiXmlElement* pNode);
