@@ -16,9 +16,9 @@
 		<Attribute name="linkhoverfontcolor" default="0xFFD3215F" type="DWORD" comment="默认的linkhoverfont字体颜色,如(0xFFD3215F)"/>
 		<Attribute name="selectedcolor" default="0xFFBAE4FF" type="DWORD" comment="默认的selected字体颜色,如(0xFFBAE4FF)"/>
 	</Window>
-	<ChildWindow parent="Container" >
+	<ChildLayout parent="Container" >
 		<Attribute name="xmlfile" default="" type="STRING" comment="子窗体XML布局文件"/>
-	</ChildWindow>
+	</ChildLayout>
 	<Control parent="" notifies="setfocus killfocus timer menu windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
@@ -259,6 +259,10 @@
 		<Attribute name="modulename" default="" type="STRING" comment="activex从指定位置加载,如(flash/flash.ocx)"/>
 		<Attribute name="delaycreate" default="true" type="BOOL" comment="是否需要延迟创建activex,如(false)"/>
 	</ActiveX>
+	<WebBrowser parent="ActiveX" >
+		<Attribute name="homepage" default="" type="STRING" comment="默认首页" />
+		<Attribute name="autonavi" default="false" type="BOOL" comment="是否打开默认首页" />
+	</WebBrowser>
 	<Combo parent="Container" notifies="setfocus killfocus timer menu dropdown itemselect windowinit(root)">
 		<Attribute name="name" default="" type="STRING" comment="控件名字，同一窗口内必须唯一，如(testbtn)"/>
 		<Attribute name="pos" default="0,0,0,0" type="RECT" comment="位置，如果为float控件则指定位置和大小，否则只指定大小,如(0,0,100,100)"/>
