@@ -8,21 +8,21 @@ DuiLib::CWebBrowserUI::CWebBrowserUI()
 	, m_bAutoNavi(false)
 {
 	m_clsid=CLSID_WebBrowser;
-	m_sUrl.Empty();
-	m_pManager->AddTranslateAccelerator(this);
+	m_sHomePage.Empty();
 }
 
 bool DuiLib::CWebBrowserUI::DoCreateControl()
 {
 	if (!CActiveXUI::DoCreateControl())
 		return false;
+	m_pManager->AddTranslateAccelerator(this);
 	SetDispatchHandler(this);
 	SetExternalUIHandler(this);
 	SetDownloadManager(this);
 	GetControl(IID_IWebBrowser2,(LPVOID*)&m_pWebBrowser2);
-	if ( m_bAutoNavi && !m_sUrl.IsEmpty())
+	if ( m_bAutoNavi && !m_sHomePage.IsEmpty())
 	{
-		this->Navigate2(m_sUrl);
+		this->Navigate2(m_sHomePage);
 	}
 	return true;
 }
@@ -30,12 +30,13 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 void DuiLib::CWebBrowserUI::ReleaseControl()
 {
 	m_bCreated=false;
+	m_pManager->RemoveTranslateAccelerator(this);
 	CActiveXUI::ReleaseControl();
 }
 
 DuiLib::CWebBrowserUI::~CWebBrowserUI()
 {
-	m_pManager->RemoveTranslateAccelerator(this);
+
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfoCount( UINT *iTInfo )
@@ -374,9 +375,9 @@ void DuiLib::CWebBrowserUI::Refresh2( int Level )
 
 void DuiLib::CWebBrowserUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 {
-	if (_tcscmp(pstrName, _T("url")) == 0)
+	if (_tcscmp(pstrName, _T("homepage")) == 0)
 	{
-		m_sUrl = pstrValue;
+		m_sHomePage = pstrValue;
 	}
 	else if (_tcscmp(pstrName, _T("autonavi"))==0)
 	{
@@ -386,10 +387,10 @@ void DuiLib::CWebBrowserUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
 		CActiveXUI::SetAttribute(pstrName, pstrValue);
 }
 
-void DuiLib::CWebBrowserUI::NavigateDefaultUrl()
+void DuiLib::CWebBrowserUI::NavigateHomePage()
 {
-	if (!m_sUrl.IsEmpty())
-		this->NavigateUrl(m_sUrl);
+	if (!m_sHomePage.IsEmpty())
+		this->NavigateUrl(m_sHomePage);
 }
 
 void DuiLib::CWebBrowserUI::NavigateUrl( LPCTSTR lpszUrl )
@@ -398,4 +399,37 @@ void DuiLib::CWebBrowserUI::NavigateUrl( LPCTSTR lpszUrl )
 	{
 			m_pWebBrowser2->Navigate((BSTR)SysAllocString(T2BSTR(lpszUrl)),NULL,NULL,NULL,NULL);
 	}
+}
+
+LPCTSTR DuiLib::CWebBrowserUI::GetClass() const
+{
+	return _T("WebBrowserUI");
+}
+
+LPVOID DuiLib::CWebBrowserUI::GetInterface( LPCTSTR pstrName )
+{
+	if( _tcscmp(pstrName, _T("WebBrowser")) == 0 ) return static_cast<CWebBrowserUI*>(this);
+	return CActiveXUI::GetInterface(pstrName);
+}
+
+void DuiLib::CWebBrowserUI::SetHomePage( LPCTSTR lpszUrl )
+{
+	m_sHomePage.Format(_T("%s"),lpszUrl);
+}
+
+LPCTSTR DuiLib::CWebBrowserUI::GetHomePage()
+{
+	return m_sHomePage;
+}
+
+void DuiLib::CWebBrowserUI::SetAutoNavigation( bool bAuto /*= TRUE*/ )
+{
+	if (m_bAutoNavi==bAuto)	return;
+
+	m_bAutoNavi=bAuto;
+}
+
+bool DuiLib::CWebBrowserUI::IsAutoNavigation()
+{
+	return m_bAutoNavi;
 }

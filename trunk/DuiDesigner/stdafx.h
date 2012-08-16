@@ -128,7 +128,8 @@ enum UIClass
 	classListContainerElement,
 	classItem,
 	classScrollBar,
-	classChildWindow,
+	classChildLayout,
+	classWebBrowser
 };
 
 typedef struct tagExtendedAttributes
@@ -180,6 +181,7 @@ using DuiLib::CListUI;
 using DuiLib::CSliderUI;
 using DuiLib::CProgressUI;
 using DuiLib::CActiveXUI;
+using DuiLib::CWebBrowserUI;
 using DuiLib::CContainerUI;
 using DuiLib::CChildLayoutUI;
 using DuiLib::CVerticalLayoutUI;

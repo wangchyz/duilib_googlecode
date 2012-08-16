@@ -19,24 +19,26 @@ namespace DuiLib
 		CWebBrowserUI();
 		virtual ~CWebBrowserUI();
 
-		void SetDefaultUrl(LPCTSTR lpszUrl)
-		{
-			m_sUrl.Format(_T("%s"),lpszUrl);
-		}
+		void SetHomePage(LPCTSTR lpszUrl);
+		LPCTSTR GetHomePage();
+
+		void SetAutoNavigation(bool bAuto = TRUE);
+		bool IsAutoNavigation();
 
 		void SetWebBrowserEventHandler(CWebBrowserEventHandler* pEventHandler);
 		void Navigate2(LPCTSTR lpszUrl);
 		void Refresh();
 		void Refresh2(int Level);
-		void NavigateDefaultUrl();
+		void NavigateHomePage();
 		void NavigateUrl(LPCTSTR lpszUrl);
+		virtual bool DoCreateControl();
+
 	protected:
 		IWebBrowser2* m_pWebBrowser2; //浏览器指针
 		LONG m_dwRef;
-		virtual bool DoCreateControl();
 		virtual void ReleaseControl();
 		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-		CDuiString m_sUrl;	// 默认页面
+		CDuiString m_sHomePage;	// 默认页面
 		bool m_bAutoNavi;	// 是否启动时打开默认页面
 		CWebBrowserEventHandler* m_pWebBrowserEventHandler;	//浏览器事件处理
 
@@ -91,6 +93,10 @@ namespace DuiLib
 			/* [in] */ LPCOLESTR pszHeaders,
 			/* [in] */ LPCOLESTR pszRedir,
 			/* [in] */ UINT uiCP);
+
+		virtual LPCTSTR GetClass() const;
+		virtual LPVOID GetInterface( LPCTSTR pstrName );
+
 	};
 } // namespace DuiLib
 #endif // __UIWEBBROWSER_H__

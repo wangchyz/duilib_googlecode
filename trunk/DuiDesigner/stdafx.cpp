@@ -46,9 +46,10 @@ int gGetUIClass(LPCTSTR pstrClass)
 			else if( _tcscmp(pstrClass, _T("TileLayoutUI")) == 0 )        nClass=classTileLayout;
 			else if (_tcscmp(pstrClass, _T("VScrollBarUI")) == 0 )			nClass=classScrollBar;
 			else if (_tcscmp(pstrClass, _T("HScrollBarUI")) == 0 )			nClass=classScrollBar;
+			else if( _tcscmp(pstrClass, _T("WebBrowserUI")) == 0 )     nClass=classWebBrowser;
 			break;
 		case 13:
-			if( _tcscmp(pstrClass, _T("ChildWindowUI")) == 0 )             nClass=classChildWindow;
+			if( _tcscmp(pstrClass, _T("ChildLayoutUI")) == 0 )             nClass=classChildLayout;
 			break;
 		case 16:
 			if( _tcscmp(pstrClass, _T("VerticalLayoutUI")) == 0 )         nClass=classVerticalLayout;

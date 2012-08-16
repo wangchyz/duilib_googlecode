@@ -279,6 +279,11 @@ enum PropertyTag
 	tagListHeaderItemPushedImage,
 	tagListHeaderItemFocusedImage,
 	tagSepImage,
+
+	// WebBrowser
+	tagWebBrowser,
+	tagWebBrowserHomePage=tagWebBrowser,
+	tagWebBrowserAutoNavi,
 };
 
 extern UINT WM_UI_PROPERTY_CHANGED;
@@ -326,6 +331,7 @@ protected:
 	void ShowScrollBarProperty(CControlUI* pControl);
 	void ShowTabLayoutPropery(CControlUI* pControl);
 	void ShowListHeaderItemPropery(CControlUI* pControl);
+	void ShowWebBrowserPropery(CControlUI* pControl);
 
 	//Container Property
 	void ShowContainerProperty(CControlUI* pControl);
