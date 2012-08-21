@@ -381,7 +381,7 @@ public:
         oMonitor.cbSize = sizeof(oMonitor);
         ::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
         CDuiRect rcWork = oMonitor.rcWork;
-        rcWork.Offset(-rcWork.left, -rcWork.top);
+		rcWork.Offset(-oMonitor.rcMonitor.left, -oMonitor.rcMonitor.top);
 
         LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
         lpMMI->ptMaxPosition.x	= rcWork.left;
