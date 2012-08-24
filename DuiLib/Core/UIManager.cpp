@@ -2190,9 +2190,9 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 	HWND hWndParent = ::GetParent(pMsg->hwnd);
 	UINT uStyle = GetWindowStyle(pMsg->hwnd);
     LRESULT lRes = 0;
-    for( int i = 0; i < ms_aPreMessages.GetSize(); i++ ) 
+    for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) 
 	{
-		CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(ms_aPreMessages[i]);        
+		CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);        
 		HWND hTempParent = hWndParent;
 		while(hTempParent)
 		{
