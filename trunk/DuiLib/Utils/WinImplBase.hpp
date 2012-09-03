@@ -32,7 +32,7 @@ namespace DuiLib
 
 		virtual void InitWindow(){};
 
-		virtual void OnFinalMessage()
+		virtual void OnFinalMessage( HWND hWnd )
 		{
 			m_PaintManager.RemovePreMessageFilter(this);
 			m_PaintManager.RemoveNotifier(this);
@@ -245,13 +245,13 @@ namespace DuiLib
 
 			CDialogBuilder builder;
 			CDuiString strResourcePath=m_PaintManager.GetInstancePath();
-			strResourcePath+=GetSkinFolder().c_str();
-			m_PaintManager.SetResourcePath(strResourcePath.c_str());
+			strResourcePath+=GetSkinFolder().GetData();
+			m_PaintManager.SetResourcePath(strResourcePath.GetData());
 
 			switch(GetResourceType())
 			{
 			case UILIB_ZIP:
-				m_PaintManager.SetResourceZip(GetZIPFileName().c_str(), true);
+				m_PaintManager.SetResourceZip(GetZIPFileName().GetData(), true);
 				break;
 			case UILIB_ZIPRESOURCE:
 				{
@@ -283,7 +283,7 @@ namespace DuiLib
 				break;
 			}
 
-			CControlUI* pRoot = builder.Create(GetSkinFile().c_str(), (UINT)0, this, &m_PaintManager);
+			CControlUI* pRoot = builder.Create(GetSkinFile().GetData(), (UINT)0, this, &m_PaintManager);
 			ASSERT(pRoot);
 			if (pRoot==NULL)
 			{
