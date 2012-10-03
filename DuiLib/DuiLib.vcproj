@@ -687,7 +687,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Utils\WinImplBase.hpp"
+					RelativePath=".\Utils\WinImplBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Utils\WinImplBase.h"
 					>
 				</File>
 			</Filter>
@@ -704,6 +708,10 @@
 				</File>
 				<File
 					RelativePath=".\Core\UIControl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Core\UIDefine.h"
 					>
 				</File>
 				<File
