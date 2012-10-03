@@ -36,12 +36,6 @@
 
 // TODO: 在此处引用程序需要的其他头文件
 
-namespace DuiLib
-{
-	// tString is a TCHAR std::string
-	typedef std::basic_string<TCHAR> tString;
-}
-
 using namespace DuiLib;
 
 #include <objbase.h>
