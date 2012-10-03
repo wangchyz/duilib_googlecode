@@ -856,7 +856,7 @@ STDMETHODIMP CActiveXCtrl::TranslateAccelerator(LPMSG lpMsg, const GUID* pguidCm
 	if( m_pOwner == NULL ) return E_UNEXPECTED;
 	HRESULT hr = S_FALSE;
 	if (m_pOwner->m_HostUIHandler != NULL)
-		m_pOwner->m_HostUIHandler->TranslateAccelerator(lpMsg, pguidCmdGroup, nCmdID);
+		hr = m_pOwner->m_HostUIHandler->TranslateAccelerator(lpMsg, pguidCmdGroup, nCmdID);
 	return hr;
 }
 
