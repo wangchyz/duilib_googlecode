@@ -1,23 +1,27 @@
-cmake_minimum_required(VERSION 2.6)
-# set(CMAKE_RC_COMPILER "D:/mingw32/bin/windres.exe")
-add_library(DuiLib SHARED
-stb_image.c            
-StdAfx.cpp                
-UIActiveX.cpp             
-UIBase.cpp                
-UICombo.cpp               
-UICommonControls.cpp      
-UIContainer.cpp           
-UIControl.cpp             
-UIDelegate.cpp            
-UIDlgBuilder.cpp          
-UIList.cpp                
-UIManager.cpp             
-UIMarkup.cpp              
-UIRender.cpp              
-UIRichEdit.cpp            
-UIlib.cpp                 
-XUnzip.cpp                )
-target_link_libraries(DuiLib riched20 comctl32)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -fpermissive")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s")
+# CMake root file for duilib related apps
+#Date 2012-09-16
+#Author: Qi Gao(monkgau@gmail.com)
+#
+#  CMake files for duilib
+#  file for each app is under the related sub-dir
+#
+
+cmake_minimum_required(VERSION 2.8)
+
+project(dui)
+
+message(STATUS," CMake project files for duilib")
+
+# this line is for UNICODE release,which is required by DuiDesigner 
+add_definitions(-DUNICODE -D_UNICODE)
+
+# add each CMake file
+add_subdirectory(duilib)
+add_subdirectory(DuiDesigner)
+add_subdirectory(360SafeDemo)
+add_subdirectory(FlashDemo)
+add_subdirectory(GameDemo)
+add_subdirectory(ListDemo)
+add_subdirectory(MenuDemo)
+add_subdirectory(QQDemo)
+add_subdirectory(RichListDemo)

@@ -104,9 +104,7 @@ public:
     virtual void SetVisible(bool bVisible = true);
     virtual void SetInternVisible(bool bVisible = true); // 仅供内部调用，有些UI拥有窗口句柄，需要重写此函数
     virtual bool IsEnabled() const;
-	virtual bool IsRandom() const;
     virtual void SetEnabled(bool bEnable = true);
-    virtual void SetRandom(bool bRandom = true);
     virtual bool IsMouseEnabled() const;
     virtual void SetMouseEnabled(bool bEnable = true);
     virtual bool IsKeyboardEnabled() const;
@@ -157,7 +155,6 @@ protected:
     CDuiString m_sName;
     bool m_bUpdateNeeded;
     bool m_bMenuUsed;
-	HRGN m_hRgn;			//当启用不规则区域时，此变量保存该对象的区域
     RECT m_rcItem;
     RECT m_rcPadding;
     SIZE m_cXY;
@@ -167,8 +164,6 @@ protected:
     bool m_bVisible;
     bool m_bInternVisible;
     bool m_bEnabled;
-	bool m_bRandom;			// Is Tool random?
-	bool m_bGetRegion;		//是否刷新区域信息
     bool m_bMouseEnabled;
 	bool m_bKeyboardEnabled ;
     bool m_bFocused;
@@ -192,10 +187,6 @@ protected:
     int m_nBorderSize;
     SIZE m_cxyBorderRound;
     RECT m_rcPaint;
-public:
-
-	// 取控件图片非透明色区域
-	void GetRegion(HDC hDC, LPCTSTR pStrImage, COLORREF dwColorKey);
 };
 
 } // namespace DuiLib
