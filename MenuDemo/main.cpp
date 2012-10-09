@@ -17,7 +17,7 @@
 //
 
 #include "stdafx.h"
-#include "win_impl_base.hpp"
+#include "..\DuiLib\Utils\WinImplBase.h"
 #include "main_frame.hpp"
 
 #if defined(WIN32) && !defined(UNDER_CE)

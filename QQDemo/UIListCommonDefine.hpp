@@ -12,8 +12,8 @@ struct NodeData
 	bool folder_;
 	bool child_visible_;
 	bool has_child_;
-	tString text_;
-	tString value;
+	CDuiString text_;
+	CDuiString value;
 	CListContainerElementUI* list_elment_;
 };
 

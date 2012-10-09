@@ -19,7 +19,6 @@
 #ifndef MAINFRAME_HPP
 #define MAINFRAME_HPP
 
-class WindowImplBase;
 class MainFrame : public WindowImplBase
 {
 public:
@@ -30,23 +29,15 @@ public:
 public:
 
 	LPCTSTR GetWindowClassName() const;	
-
 	virtual void OnFinalMessage(HWND hWnd);
-
 	virtual void Init();
-
 	virtual LRESULT ResponseDefaultKeyEvent(WPARAM wParam);
-
-	virtual tString GetSkinFile();
-
-	virtual tString GetSkinFolder();
-
+	virtual UILIB_RESOURCETYPE GetResourceType() const;
+	virtual CDuiString GetSkinFile();
+	virtual CDuiString GetSkinFolder();
 	virtual CControlUI* CreateControl(LPCTSTR pstrClass);
-
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 	virtual LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-
 	virtual LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 protected:	

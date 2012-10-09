@@ -39,10 +39,6 @@
 
 #include "..\DuiLib\UIlib.h"
 
-namespace DuiLib {
-// tString is a TCHAR std::string
-typedef std::basic_string<TCHAR> tString;
-}
 #ifndef NO_USING_DUILIB_NAMESPACE
 	using namespace DuiLib;
 	using namespace std;
@@ -67,9 +63,6 @@ typedef std::basic_string<TCHAR> tString;
 
 #define USE(FEATURE) (defined USE_##FEATURE  && USE_##FEATURE)
 #define ENABLE(FEATURE) (defined ENABLE_##FEATURE  && ENABLE_##FEATURE)
-
-#define USE_ZIP_SKIN 1
-#define USE_EMBEDED_RESOURCE 1
 
 #define MESSAGE_RICHEDIT_MAX  1024
 

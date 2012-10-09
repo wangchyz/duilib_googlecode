@@ -1,8 +1,9 @@
 #ifndef COLORSKIN_HPP
 #define COLORSKIN_HPP
 
-class WindowImplBase;
 class MainFrame;
+using namespace DuiLib;
+
 class ColorSkinWindow : public WindowImplBase
 {
 public:
@@ -16,9 +17,9 @@ public:
 
 	void Init();
 
-	virtual tString GetSkinFile();
+	virtual CDuiString GetSkinFile();
 
-	virtual tString GetSkinFolder();
+	virtual CDuiString GetSkinFolder();
 
 	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 

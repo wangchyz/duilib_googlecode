@@ -41,7 +41,7 @@ const TCHAR* const kSendButtonControlName = _T("sendbtn");
 const int kEmotionRefreshTimerId = 1001;
 const int kEmotionRefreshInterval = 150;
 
-ChatDialog::ChatDialog(const tString& bgimage, DWORD bkcolor, const FriendListItemInfo& myselft_info, const FriendListItemInfo& friend_info)
+ChatDialog::ChatDialog(const CDuiString& bgimage, DWORD bkcolor, const FriendListItemInfo& myselft_info, const FriendListItemInfo& friend_info)
 : bgimage_(bgimage)
 , bkcolor_(bkcolor)
 , myselft_(myselft_info)
@@ -81,16 +81,16 @@ BOOL ChatDialog::Receive(SkinChangedParam param)
 {
 	bgimage_ = param.bgimage;
 	bkcolor_ = param.bkcolor;
-	CControlUI* background = paint_manager_.FindControl(kBackgroundControlName);
+	CControlUI* background = m_PaintManager.FindControl(kBackgroundControlName);
 	if (background != NULL)
 	{
-		if (!param.bgimage.empty())
+		if (!param.bgimage.IsEmpty())
 		{
 			TCHAR szBuf[MAX_PATH] = {0};
 #if defined(UNDER_WINCE)
 			_stprintf(szBuf, _T("file='%s' corner='600,200,1,1'"), param.bgimage.c_str());
 #else
-			_stprintf_s(szBuf, MAX_PATH - 1, _T("file='%s' corner='600,200,1,1'"), param.bgimage.c_str());
+			_stprintf_s(szBuf, MAX_PATH - 1, _T("file='%s' corner='600,200,1,1'"), param.bgimage);
 #endif
 			background->SetBkImage(szBuf);
 		}
@@ -103,14 +103,14 @@ BOOL ChatDialog::Receive(SkinChangedParam param)
 	return TRUE;
 }
 
-tString ChatDialog::GetSkinFile()
+CDuiString ChatDialog::GetSkinFile()
 {
 	return _T("chatbox.xml");
 }
 
-tString ChatDialog::GetSkinFolder()
+CDuiString ChatDialog::GetSkinFolder()
 {
-	return tString(CPaintManagerUI::GetInstancePath()) + _T("skin\\");
+	return CDuiString(CPaintManagerUI::GetInstancePath()) + _T("skin\\");
 }
 
 LRESULT ChatDialog::OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -134,16 +134,16 @@ LRESULT ChatDialog::OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	{
 		if (!bZoomed)
 		{
-			CControlUI* pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kMaxButtonControlName));
+			CControlUI* pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kMaxButtonControlName));
 			if( pControl ) pControl->SetVisible(false);
-			pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kRestoreButtonControlName));
+			pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kRestoreButtonControlName));
 			if( pControl ) pControl->SetVisible(true);
 		}
 		else 
 		{
-			CControlUI* pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kMaxButtonControlName));
+			CControlUI* pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kMaxButtonControlName));
 			if( pControl ) pControl->SetVisible(true);
-			pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kRestoreButtonControlName));
+			pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kRestoreButtonControlName));
 			if( pControl ) pControl->SetVisible(false);
 		}
 	}
@@ -187,43 +187,43 @@ void ChatDialog::OnPrepare(TNotifyUI& msg)
 {
 	TCHAR szBuf[MAX_PATH] = {0};
 
-	CControlUI* background = paint_manager_.FindControl(kBackgroundControlName);
+	CControlUI* background = m_PaintManager.FindControl(kBackgroundControlName);
 	if (background != NULL)
 	{
 #if defined(UNDER_WINCE)
 		_stprintf(szBuf, _T("file='%s' corner='600,200,1,1'"), bgimage_.c_str());
 #else
-		_stprintf_s(szBuf, MAX_PATH - 1, _T("file='%s' corner='600,200,1,1'"), bgimage_.c_str());
+		_stprintf_s(szBuf, MAX_PATH - 1, _T("file='%s' corner='600,200,1,1'"), bgimage_);
 #endif
 		background->SetBkImage(szBuf);
 		background->SetBkColor(bkcolor_);
 	}
 
-	CButtonUI* log_button = static_cast<CButtonUI*>(paint_manager_.FindControl(kLogoButtonControlName));
+	CButtonUI* log_button = static_cast<CButtonUI*>(m_PaintManager.FindControl(kLogoButtonControlName));
 	if (log_button != NULL)
 	{
 #if defined(UNDER_WINCE)
 		_stprintf(szBuf, _T("%s"), friend_.logo.c_str());
 #else
-		_stprintf_s(szBuf, MAX_PATH - 1, _T("%s"), friend_.logo.c_str());
+		_stprintf_s(szBuf, MAX_PATH - 1, _T("%s"), friend_.logo);
 #endif
 		log_button->SetNormalImage(szBuf);
 	}
 
-	CControlUI* nick_name = paint_manager_.FindControl(kNickNameControlName);
+	CControlUI* nick_name = m_PaintManager.FindControl(kNickNameControlName);
 	if (nick_name != NULL)
-		nick_name->SetText(friend_.nick_name.c_str());
+		nick_name->SetText(friend_.nick_name);
 
-	CControlUI* desciption = paint_manager_.FindControl(kDescriptionControlName);
+	CControlUI* desciption = m_PaintManager.FindControl(kDescriptionControlName);
 	if (desciption != NULL)
-		desciption->SetText(friend_.description.c_str());
+		desciption->SetText(friend_.description);
 
-	CContainerUI* pFontbar = static_cast<CContainerUI*>(paint_manager_.FindControl(kFontbarControlName));
+	CContainerUI* pFontbar = static_cast<CContainerUI*>(m_PaintManager.FindControl(kFontbarControlName));
 	if (pFontbar != NULL)
 		pFontbar->SetVisible(!pFontbar->IsVisible());
 }
 
-tString GetCurrentTimeString()
+CDuiString GetCurrentTimeString()
 {
 	SYSTEMTIME time = {0};
 	TCHAR szTime[MAX_PATH] = {0};
@@ -239,14 +239,14 @@ tString GetCurrentTimeString()
 
 void ChatDialog::SendMsg()
 {
-    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(paint_manager_.FindControl(kInputRichEditControlName));
+    CRichEditUI* pRichEdit = static_cast<CRichEditUI*>(m_PaintManager.FindControl(kInputRichEditControlName));
     if( pRichEdit == NULL ) return;
     pRichEdit->SetFocus();
     CDuiString sText = pRichEdit->GetTextRange(0, pRichEdit->GetTextLength());
     if( sText.IsEmpty() ) return;
     pRichEdit->SetText(_T(""));
 
-    pRichEdit = static_cast<CRichEditUI*>(paint_manager_.FindControl(kViewRichEditControlName));
+    pRichEdit = static_cast<CRichEditUI*>(m_PaintManager.FindControl(kViewRichEditControlName));
     if( pRichEdit == NULL ) return;
     long lSelBegin = 0, lSelEnd = 0;
     CHARFORMAT2 cf;
@@ -332,9 +332,9 @@ void ChatDialog::Notify(TNotifyUI& msg)
 		{
 #if defined(UNDER_CE)
 			::ShowWindow(m_hWnd, SW_MAXIMIZE);
-			CControlUI* pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kMaxButtonControlName));
+			CControlUI* pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kMaxButtonControlName));
 			if( pControl ) pControl->SetVisible(false);
-			pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kRestoreButtonControlName));
+			pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kRestoreButtonControlName));
 			if( pControl ) pControl->SetVisible(true);
 #else
 			SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
@@ -344,9 +344,9 @@ void ChatDialog::Notify(TNotifyUI& msg)
 		{
 #if defined(UNDER_CE)
 			::ShowWindow(m_hWnd, SW_RESTORE);
-			CControlUI* pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kMaxButtonControlName));
+			CControlUI* pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kMaxButtonControlName));
 			if( pControl ) pControl->SetVisible(true);
-			pControl = static_cast<CControlUI*>(paint_manager_.FindControl(kRestoreButtonControlName));
+			pControl = static_cast<CControlUI*>(m_PaintManager.FindControl(kRestoreButtonControlName));
 			if( pControl ) pControl->SetVisible(false);
 #else
 			SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0);
@@ -354,7 +354,7 @@ void ChatDialog::Notify(TNotifyUI& msg)
 		}
 		else if (_tcsicmp(msg.pSender->GetName(), kFontButtonControlName) == 0)
 		{
-			CContainerUI* pFontbar = static_cast<CContainerUI*>(paint_manager_.FindControl(kFontbarControlName));
+			CContainerUI* pFontbar = static_cast<CContainerUI*>(m_PaintManager.FindControl(kFontbarControlName));
 			if (pFontbar != NULL)
 				pFontbar->SetVisible(!pFontbar->IsVisible());
 		}
@@ -389,7 +389,7 @@ void ChatDialog::Notify(TNotifyUI& msg)
 	{
 		if (_tcsicmp(msg.pSender->GetName(), kColorButtonControlName) == 0)
 		{
-			CContainerUI* pFontbar = static_cast<CContainerUI*>(paint_manager_.FindControl(kFontbarControlName));
+			CContainerUI* pFontbar = static_cast<CContainerUI*>(m_PaintManager.FindControl(kFontbarControlName));
 			if (pFontbar != NULL)
 			{
 				POINT pt = {0};
@@ -456,7 +456,7 @@ void ChatDialog::Notify(TNotifyUI& msg)
 
 void ChatDialog::SetTextColor(DWORD dwColor)
 {
-	COptionUI* color_button = static_cast<COptionUI*>(paint_manager_.FindControl(kColorButtonControlName));
+	COptionUI* color_button = static_cast<COptionUI*>(m_PaintManager.FindControl(kColorButtonControlName));
 	if (color_button != NULL)
 	{
 		color_button->Selected(false);

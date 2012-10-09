@@ -4,7 +4,6 @@
 #include "skin_change_event.hpp"
 #include "UIFriends.hpp"
 
-class WindowImplBase;
 class MainFrame : public WindowImplBase
 {
 public:
@@ -15,26 +14,17 @@ public:
 public:
 
 	LPCTSTR GetWindowClassName() const;	
-
 	virtual void OnFinalMessage(HWND hWnd);
-
 	virtual void Init();
-
 	virtual LRESULT ResponseDefaultKeyEvent(WPARAM wParam);
-
-	virtual tString GetSkinFile();
-
-	virtual tString GetSkinFolder();
-
+	virtual CDuiString GetSkinFile();
+	virtual CDuiString GetSkinFolder();
+	virtual UILIB_RESOURCETYPE GetResourceType() const;
 	virtual CControlUI* CreateControl(LPCTSTR pstrClass);
-
-	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 	virtual LRESULT OnSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-
 	virtual LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-
 	virtual LRESULT OnClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	virtual LPCTSTR GetResourceID() const;
 
     DWORD GetBkColor();
     void SetBkColor(DWORD dwBackColor);

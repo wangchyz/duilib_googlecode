@@ -4,7 +4,6 @@
 #include <shellapi.h>
 #endif
 
-#include "win_impl_base.hpp"
 #include "ColorPicker.hpp"
 #include "chat_dialog.hpp"
 
@@ -50,11 +49,11 @@ void CColorPicker::Notify(TNotifyUI& msg)
 {
 	if (_tcsicmp(msg.sType, _T("click")) == 0)
 	{
-		CControlUI* pOne = static_cast<CControlUI*>(paint_manager_.FindControl(msg.ptMouse));
+		CControlUI* pOne = static_cast<CControlUI*>(m_PaintManager.FindControl(msg.ptMouse));
 		if (_tcsicmp(pOne->GetClass(), _T("ButtonUI")) == 0)
 		{
 			DWORD nColor = pOne->GetBkColor();
-			CVerticalLayoutUI* pColorContiner = static_cast<CVerticalLayoutUI*>(paint_manager_.FindControl(_T("color")));
+			CVerticalLayoutUI* pColorContiner = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl(_T("color")));
 			pColorContiner->SetBkColor(nColor);
 			UpdateWindow(m_hWnd);
 			Sleep(500);
@@ -65,7 +64,7 @@ void CColorPicker::Notify(TNotifyUI& msg)
 
 void CColorPicker::Init()
 {
-	CVerticalLayoutUI* pColorContiner = static_cast<CVerticalLayoutUI*>(paint_manager_.FindControl(_T("color")));
+	CVerticalLayoutUI* pColorContiner = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl(_T("color")));
 	for (int i = 0; (i < 5) && (pColorContiner != NULL); i ++)
 	{
 		CHorizontalLayoutUI* pLine = new CHorizontalLayoutUI();
@@ -86,18 +85,18 @@ void CColorPicker::Init()
 		}
 	}
 
-	SIZE size = paint_manager_.GetInitSize();
-	MoveWindow(m_hWnd, based_point_.x - static_cast<LONG>(size.cx / 2), based_point_.y - size.cy, size.cx, size.cy, FALSE);
+	SIZE size = m_PaintManager.GetInitSize();
+	MoveWindow(GetHWND(), based_point_.x - static_cast<LONG>(size.cx / 2), based_point_.y - size.cy, size.cx, size.cy, FALSE);
 }
 
-tString CColorPicker::GetSkinFile()
+CDuiString CColorPicker::GetSkinFile()
 {
 	return _T("color.xml");
 }
 
-tString CColorPicker::GetSkinFolder()
+CDuiString CColorPicker::GetSkinFolder()
 {
-	return tString(CPaintManagerUI::GetInstancePath()) + _T("skin\\");
+	return CDuiString(CPaintManagerUI::GetInstancePath()) + _T("skin\\");
 }
 
 LRESULT CColorPicker::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

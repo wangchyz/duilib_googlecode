@@ -4,12 +4,11 @@
 #include "skin_change_event.hpp"
 #include "UIFriends.hpp"
 
-class WindowImplBase;
 class ChatDialog : public WindowImplBase, public SkinChangedReceiver
 {
 public:
 
-	ChatDialog(const tString& bgimage, DWORD bkcolor, const FriendListItemInfo& myselft_info, const FriendListItemInfo& friend_info);
+	ChatDialog(const CDuiString& bgimage, DWORD bkcolor, const FriendListItemInfo& myselft_info, const FriendListItemInfo& friend_info);
 	~ChatDialog();
 
 public:
@@ -22,9 +21,9 @@ public:
 
 	virtual LRESULT ResponseDefaultKeyEvent(WPARAM wParam);
 
-	virtual tString GetSkinFile();
+	virtual CDuiString GetSkinFile();
 
-	virtual tString GetSkinFolder();
+	virtual CDuiString GetSkinFolder();
 
 	virtual CControlUI* CreateControl(LPCTSTR pstrClass);
 
@@ -62,9 +61,9 @@ private:
 	bool underline_;
 	DWORD text_color_;
 	DWORD font_size_;
-	tString font_face_name_;
+	CDuiString font_face_name_;
 
-	tString bgimage_;
+	CDuiString bgimage_;
 	DWORD bkcolor_;
 	FriendListItemInfo myselft_;
 	FriendListItemInfo friend_;
