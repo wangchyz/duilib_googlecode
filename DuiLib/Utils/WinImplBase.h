@@ -3,18 +3,15 @@
 
 #include "stdafx.h"
 
-#define USE(FEATURE) (defined USE_##FEATURE  && USE_##FEATURE)
-#define ENABLE(FEATURE) (defined ENABLE_##FEATURE  && ENABLE_##FEATURE)
-
 namespace DuiLib
 {
 
 	enum UILIB_RESOURCETYPE
 	{
-		UILIB_FILE=1,
-		UILIB_ZIP,
-		UILIB_RESOURCE,
-		UILIB_ZIPRESOURCE,
+		UILIB_FILE=1,				// 来自磁盘文件
+		UILIB_ZIP,						// 来自磁盘zip压缩包
+		UILIB_RESOURCE,			// 来自资源
+		UILIB_ZIPRESOURCE,	// 来自资源的zip压缩包
 	};
 
 	class UILIB_API WindowImplBase

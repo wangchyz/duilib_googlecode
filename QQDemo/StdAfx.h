@@ -61,9 +61,6 @@
 #   endif
 #endif
 
-#define USE(FEATURE) (defined USE_##FEATURE  && USE_##FEATURE)
-#define ENABLE(FEATURE) (defined ENABLE_##FEATURE  && ENABLE_##FEATURE)
-
 #define MESSAGE_RICHEDIT_MAX  1024
 
 //{{AFX_INSERT_LOCATION}}
