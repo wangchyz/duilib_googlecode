@@ -650,6 +650,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Control\UITreeView.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Control\UIWebBrowser.cpp"
 					>
 				</File>
@@ -816,6 +820,10 @@
 				</File>
 				<File
 					RelativePath=".\Control\UIText.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Control\UITreeView.h"
 					>
 				</File>
 				<File

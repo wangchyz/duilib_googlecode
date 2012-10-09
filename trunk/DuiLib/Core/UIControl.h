@@ -181,6 +181,7 @@ protected:
     DWORD m_dwBackColor2;
     DWORD m_dwBackColor3;
     CDuiString m_sBkImage;
+	CDuiString m_sForeImage;
     DWORD m_dwBorderColor;
 	DWORD m_dwFocusBorderColor;
     bool m_bColorHSL;

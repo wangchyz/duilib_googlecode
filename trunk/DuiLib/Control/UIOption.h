@@ -22,8 +22,14 @@ namespace DuiLib
 		LPCTSTR GetSelectedImage();
 		void SetSelectedImage(LPCTSTR pStrImage);
 
+		LPCTSTR GetSelectedHotImage();
+		void SetSelectedHotImage(LPCTSTR pStrImage);
+
 		void SetSelectedTextColor(DWORD dwTextColor);
 		DWORD GetSelectedTextColor();
+
+		void SetSelectedBkColor(DWORD dwBkColor);
+		DWORD GetSelectBkColor();
 
 		LPCTSTR GetForeImage();
 		void SetForeImage(LPCTSTR pStrImage);
@@ -40,13 +46,15 @@ namespace DuiLib
 		void PaintText(HDC hDC);
 
 	protected:
-		bool m_bSelected;
-		CDuiString m_sGroupName;
+		bool			m_bSelected;
+		CDuiString		m_sGroupName;
 
-		DWORD m_dwSelectedTextColor;
+		DWORD			m_dwSelectedBkColor;
+		DWORD			m_dwSelectedTextColor;
 
-		CDuiString m_sSelectedImage;
-		CDuiString m_sForeImage;
+		CDuiString		m_sSelectedImage;
+		CDuiString		m_sSelectedHotImage;
+		CDuiString		m_sForeImage;
 	};
 
 } // namespace DuiLib

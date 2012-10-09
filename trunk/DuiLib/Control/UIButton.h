@@ -28,7 +28,13 @@ namespace DuiLib
 		void SetFocusedImage(LPCTSTR pStrImage);
 		LPCTSTR GetDisabledImage();
 		void SetDisabledImage(LPCTSTR pStrImage);
+		LPCTSTR GetForeImage();
+		void SetForeImage(LPCTSTR pStrImage);
+		LPCTSTR GetHotForeImage();
+		void SetHotForeImage(LPCTSTR pStrImage);
 
+		void SetHotBkColor(DWORD dwColor);
+		DWORD GetHotBkColor() const;
 		void SetHotTextColor(DWORD dwColor);
 		DWORD GetHotTextColor() const;
 		void SetPushedTextColor(DWORD dwColor);
@@ -44,13 +50,16 @@ namespace DuiLib
 	protected:
 		UINT m_uButtonState;
 
+		DWORD m_dwHotBkColor;
 		DWORD m_dwHotTextColor;
 		DWORD m_dwPushedTextColor;
 		DWORD m_dwFocusedTextColor;
 
 		CDuiString m_sNormalImage;
 		CDuiString m_sHotImage;
+		CDuiString m_sHotForeImage;
 		CDuiString m_sPushedImage;
+		CDuiString m_sPushedForeImage;
 		CDuiString m_sFocusedImage;
 		CDuiString m_sDisabledImage;
 	};
