@@ -3,12 +3,6 @@
 
 #include "stdafx.h"
 
-#define USE(FEATURE) (defined USE_##FEATURE  && USE_##FEATURE)
-#define ENABLE(FEATURE) (defined ENABLE_##FEATURE  && ENABLE_##FEATURE)
-
-#define USE_ZIP_SKIN 0
-#define USE_EMBEDED_RESOURCE 0
-
 namespace DuiLib
 {
 

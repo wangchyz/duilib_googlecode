@@ -4,7 +4,6 @@
 #include <shellapi.h>
 #endif
 
-#include "win_impl_base.hpp"
 #include "color_skin.hpp"
 #include "main_frame.hpp"
 

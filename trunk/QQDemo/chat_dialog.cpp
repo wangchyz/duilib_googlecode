@@ -2,13 +2,8 @@
 #include <windows.h>
 #include <shellapi.h>
 
-#include "win_impl_base.hpp"
 #include "chat_dialog.hpp"
 #include "ColorPicker.hpp"
-
-#if USE(ZIP_SKIN)
-static const TCHAR* const kResourceSkinZipFileName = _T("QQRes.zip");
-#endif
 
 const TCHAR* const kTitleControlName = _T("apptitle");
 const TCHAR* const kCloseButtonControlName = _T("closebtn");
