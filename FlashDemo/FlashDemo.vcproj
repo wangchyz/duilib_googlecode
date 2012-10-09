@@ -268,7 +268,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="comsuppwd.lib"
 				OutputFile="../bin/FlashDemo_ud.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug_u/FlashDemo.pdb"

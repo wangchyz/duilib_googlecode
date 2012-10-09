@@ -3,8 +3,12 @@
 
 namespace DuiLib
 {
-	CButtonUI::CButtonUI() : m_uButtonState(0), m_dwHotTextColor(0), m_dwPushedTextColor(0), m_dwFocusedTextColor(0)
-
+	CButtonUI::CButtonUI()
+		: m_uButtonState(0)
+		, m_dwHotTextColor(0)
+		, m_dwPushedTextColor(0)
+		, m_dwFocusedTextColor(0)
+		,m_dwHotBkColor(0)
 	{
 		m_uTextStyle = DT_SINGLELINE | DT_VCENTER | DT_CENTER;
 	}
@@ -121,6 +125,33 @@ namespace DuiLib
 		}
 	}
 
+	//************************************
+	// Method:    SetHotBkColor
+	// FullName:  CButtonUI::SetHotBkColor
+	// Access:    public 
+	// Returns:   void
+	// Qualifier:
+	// Parameter: DWORD dwColor
+	// Note:	  
+	//************************************
+	void CButtonUI::SetHotBkColor( DWORD dwColor )
+	{
+		m_dwHotBkColor = dwColor;
+	}
+
+	//************************************
+	// Method:    GetHotBkColor
+	// FullName:  CButtonUI::GetHotBkColor
+	// Access:    public 
+	// Returns:   DWORD
+	// Qualifier: const
+	// Note:	  
+	//************************************
+	DWORD CButtonUI::GetHotBkColor() const
+	{
+		return m_dwHotBkColor;
+	}
+
 	void CButtonUI::SetHotTextColor(DWORD dwColor)
 	{
 		m_dwHotTextColor = dwColor;
@@ -206,6 +237,62 @@ namespace DuiLib
 		Invalidate();
 	}
 
+	//************************************
+	// Method:    GetForeImage
+	// FullName:  CButtonUI::GetForeImage
+	// Access:    public 
+	// Returns:   LPCTSTR
+	// Qualifier:
+	// Note:	  
+	//************************************
+	LPCTSTR CButtonUI::GetForeImage()
+	{
+		return m_sForeImage;
+	}
+
+	//************************************
+	// Method:    SetForeImage
+	// FullName:  CButtonUI::SetForeImage
+	// Access:    public 
+	// Returns:   void
+	// Qualifier:
+	// Parameter: LPCTSTR pStrImage
+	// Note:	  
+	//************************************
+	void CButtonUI::SetForeImage( LPCTSTR pStrImage )
+	{
+		m_sForeImage = pStrImage;
+		Invalidate();
+	}
+
+	//************************************
+	// Method:    GetHotForeImage
+	// FullName:  CButtonUI::GetHotForeImage
+	// Access:    public 
+	// Returns:   LPCTSTR
+	// Qualifier:
+	// Note:	  
+	//************************************
+	LPCTSTR CButtonUI::GetHotForeImage()
+	{
+		return m_sHotForeImage;
+	}
+
+	//************************************
+	// Method:    SetHotForeImage
+	// FullName:  CButtonUI::SetHotForeImage
+	// Access:    public 
+	// Returns:   void
+	// Qualifier:
+	// Parameter: LPCTSTR pStrImage
+	// Note:	  
+	//************************************
+	void CButtonUI::SetHotForeImage( LPCTSTR pStrImage )
+	{
+		m_sHotForeImage = pStrImage;
+		Invalidate();
+	}
+
 	SIZE CButtonUI::EstimateSize(SIZE szAvailable)
 	{
 		if( m_cxyFixed.cy == 0 ) return CSize(m_cxyFixed.cx, m_pManager->GetFontInfo(GetFont())->tm.tmHeight + 8);
@@ -219,19 +306,31 @@ namespace DuiLib
 		else if( _tcscmp(pstrName, _T("pushedimage")) == 0 ) SetPushedImage(pstrValue);
 		else if( _tcscmp(pstrName, _T("focusedimage")) == 0 ) SetFocusedImage(pstrValue);
 		else if( _tcscmp(pstrName, _T("disabledimage")) == 0 ) SetDisabledImage(pstrValue);
-		else if( _tcscmp(pstrName, _T("hottextcolor")) == 0 ) {
+		else if( _tcscmp(pstrName, _T("foreimage")) == 0 ) SetForeImage(pstrValue);
+		else if( _tcscmp(pstrName, _T("hotforeimage")) == 0 ) SetHotForeImage(pstrValue);
+		else if( _tcscmp(pstrName, _T("hotbkcolor")) == 0 )
+		{
+			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
+			LPTSTR pstr = NULL;
+			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
+			SetHotBkColor(clrColor);
+		}
+		else if( _tcscmp(pstrName, _T("hottextcolor")) == 0 )
+		{
 			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetHotTextColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("pushedtextcolor")) == 0 ) {
+		else if( _tcscmp(pstrName, _T("pushedtextcolor")) == 0 )
+		{
 			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
 			SetPushedTextColor(clrColor);
 		}
-		else if( _tcscmp(pstrName, _T("focusedtextcolor")) == 0 ) {
+		else if( _tcscmp(pstrName, _T("focusedtextcolor")) == 0 )
+		{
 			if( *pstrValue == _T('#')) pstrValue = ::CharNext(pstrValue);
 			LPTSTR pstr = NULL;
 			DWORD clrColor = _tcstoul(pstrValue, &pstr, 16);
@@ -283,33 +382,63 @@ namespace DuiLib
 		else m_uButtonState &= ~ UISTATE_DISABLED;
 
 		if( (m_uButtonState & UISTATE_DISABLED) != 0 ) {
-			if( !m_sDisabledImage.IsEmpty() ) {
+			if( !m_sDisabledImage.IsEmpty() )
+			{
 				if( !DrawImage(hDC, (LPCTSTR)m_sDisabledImage) ) m_sDisabledImage.Empty();
-				else return;
+				else goto Label_ForeImage;
 			}
 		}
 		else if( (m_uButtonState & UISTATE_PUSHED) != 0 ) {
 			if( !m_sPushedImage.IsEmpty() ) {
-				if( !DrawImage(hDC, (LPCTSTR)m_sPushedImage) ) m_sPushedImage.Empty();
-				else return;
+				if( !DrawImage(hDC, (LPCTSTR)m_sPushedImage) ){
+					m_sPushedImage.Empty();
+				}
+				if( !m_sPushedForeImage.IsEmpty() )
+				{
+					if( !DrawImage(hDC, (LPCTSTR)m_sPushedForeImage) )
+						m_sPushedForeImage.Empty();
+					return;
+				}
+				else goto Label_ForeImage;
 			}
 		}
 		else if( (m_uButtonState & UISTATE_HOT) != 0 ) {
 			if( !m_sHotImage.IsEmpty() ) {
-				if( !DrawImage(hDC, (LPCTSTR)m_sHotImage) ) m_sHotImage.Empty();
-				else return;
+				if( !DrawImage(hDC, (LPCTSTR)m_sHotImage) ){
+					m_sHotImage.Empty();
+				}
+				if( !m_sHotForeImage.IsEmpty() ) {
+					if( !DrawImage(hDC, (LPCTSTR)m_sHotForeImage) )
+						m_sHotForeImage.Empty();
+					return;
+				}
+				else goto Label_ForeImage;
+			}
+			else if(m_dwHotBkColor != 0) {
+				CRenderEngine::DrawColor(hDC, m_rcPaint, GetAdjustColor(m_dwHotBkColor));
+				return;
 			}
 		}
 		else if( (m_uButtonState & UISTATE_FOCUSED) != 0 ) {
 			if( !m_sFocusedImage.IsEmpty() ) {
 				if( !DrawImage(hDC, (LPCTSTR)m_sFocusedImage) ) m_sFocusedImage.Empty();
-				else return;
+				else goto Label_ForeImage;
 			}
 		}
 
 		if( !m_sNormalImage.IsEmpty() ) {
 			if( !DrawImage(hDC, (LPCTSTR)m_sNormalImage) ) m_sNormalImage.Empty();
-			else return;
+			else goto Label_ForeImage;
+		}
+
+		if(!m_sForeImage.IsEmpty() )
+			goto Label_ForeImage;
+
+		return;
+
+Label_ForeImage:
+		if(!m_sForeImage.IsEmpty() ) {
+			if( !DrawImage(hDC, (LPCTSTR)m_sForeImage) ) m_sForeImage.Empty();
 		}
 	}
 }
