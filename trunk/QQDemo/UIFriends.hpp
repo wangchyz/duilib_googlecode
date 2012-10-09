@@ -9,10 +9,10 @@ struct FriendListItemInfo
 {
 	bool folder;
 	bool empty;
-	tString id;
-	tString logo;
-	tString nick_name;
-	tString description;
+	CDuiString id;
+	CDuiString logo;
+	CDuiString nick_name;
+	CDuiString description;
 };
 
 
@@ -56,8 +56,8 @@ private:
 	DWORD	delay_left_;
 	CDuiRect	text_padding_;
 	int level_text_start_pos_;
-	tString level_expand_image_;
-	tString level_collapse_image_;
+	CDuiString level_expand_image_;
+	CDuiString level_collapse_image_;
 	CPaintManagerUI& paint_manager_;
 
     CDialogBuilder m_dlgBuilder;

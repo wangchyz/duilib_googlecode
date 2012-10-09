@@ -1,7 +1,7 @@
 #ifndef COLORPICKER_HPP
 #define COLORPICKER_HPP
+#include "..\DuiLib\Utils\WinImplBase.h"
 
-class WindowImplBase;
 class ChatDialog;
 class CColorPicker : public WindowImplBase
 {
@@ -16,9 +16,9 @@ public:
 
 	void Init();
 
-	virtual tString GetSkinFile();
+	virtual CDuiString GetSkinFile();
 
-	virtual tString GetSkinFolder();
+	virtual CDuiString GetSkinFolder();
 
 	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 

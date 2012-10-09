@@ -43,16 +43,16 @@ void ColorSkinWindow::Notify(TNotifyUI& msg)
 {
 	if (_tcsicmp(msg.sType, _T("click")) == 0)
 	{
-		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(paint_manager_.FindControl(kTabControlName));
+		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (pTabControl != NULL)
 		{
 			if (pTabControl->GetCurSel() == 0)
 			{
 				if (_tcsstr(msg.pSender->GetName(), _T("colour_")) != 0)
 				{
-					CSliderUI* AdjustColorSliderR = static_cast<CSliderUI*>(paint_manager_.FindControl(kAdjustColorSliderRControlName));
-					CSliderUI* AdjustColorSliderG = static_cast<CSliderUI*>(paint_manager_.FindControl(kAdjustColorSliderGControlName));
-					CSliderUI* AdjustColorSliderB = static_cast<CSliderUI*>(paint_manager_.FindControl(kAdjustColorSliderBControlName));
+					CSliderUI* AdjustColorSliderR = static_cast<CSliderUI*>(m_PaintManager.FindControl(kAdjustColorSliderRControlName));
+					CSliderUI* AdjustColorSliderG = static_cast<CSliderUI*>(m_PaintManager.FindControl(kAdjustColorSliderGControlName));
+					CSliderUI* AdjustColorSliderB = static_cast<CSliderUI*>(m_PaintManager.FindControl(kAdjustColorSliderBControlName));
 					if ((AdjustColorSliderR != NULL) && (AdjustColorSliderG != NULL) && (AdjustColorSliderB != NULL))
 					{
 						DWORD dwColor = msg.pSender->GetBkColor();
@@ -70,14 +70,14 @@ void ColorSkinWindow::Notify(TNotifyUI& msg)
 	}
 	else if (_tcsicmp(msg.sType, _T("valuechanged")) == 0)
 	{
-		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(paint_manager_.FindControl(kTabControlName));
+		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (pTabControl != NULL)
 		{
 			if (pTabControl->GetCurSel() == 0)
 			{
-				CSliderUI* AdjustColorSliderR = static_cast<CSliderUI*>(paint_manager_.FindControl(kAdjustColorSliderRControlName));
-				CSliderUI* AdjustColorSliderG = static_cast<CSliderUI*>(paint_manager_.FindControl(kAdjustColorSliderGControlName));
-				CSliderUI* AdjustColorSliderB = static_cast<CSliderUI*>(paint_manager_.FindControl(kAdjustColorSliderBControlName));
+				CSliderUI* AdjustColorSliderR = static_cast<CSliderUI*>(m_PaintManager.FindControl(kAdjustColorSliderRControlName));
+				CSliderUI* AdjustColorSliderG = static_cast<CSliderUI*>(m_PaintManager.FindControl(kAdjustColorSliderGControlName));
+				CSliderUI* AdjustColorSliderB = static_cast<CSliderUI*>(m_PaintManager.FindControl(kAdjustColorSliderBControlName));
 				if ((AdjustColorSliderR != NULL) && (AdjustColorSliderG != NULL) && (AdjustColorSliderB != NULL))
 				{
 					if ((_tcsicmp(msg.pSender->GetName(), kAdjustColorSliderRControlName) == 0) ||
@@ -106,7 +106,7 @@ void ColorSkinWindow::Notify(TNotifyUI& msg)
 	}
 	else if (_tcsicmp(msg.sType, _T("selectchanged")) == 0)
 	{
-		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(paint_manager_.FindControl(kTabControlName));
+		CTabLayoutUI* pTabControl = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(kTabControlName));
 		if (_tcsicmp(msg.pSender->GetName(), kAdjustColorControlName) == 0)
 		{
 			if (pTabControl && pTabControl->GetCurSel() != 0)
@@ -126,18 +126,18 @@ void ColorSkinWindow::Notify(TNotifyUI& msg)
 
 void ColorSkinWindow::Init()
 {
-	SIZE size = paint_manager_.GetInitSize();
+	SIZE size = m_PaintManager.GetInitSize();
 	MoveWindow(m_hWnd, parent_window_rect_.right - size.cx, parent_window_rect_.top, size.cx, size.cy, FALSE);
 }
 
-tString ColorSkinWindow::GetSkinFile()
+CDuiString ColorSkinWindow::GetSkinFile()
 {
 	return _T("ColorWnd.xml");
 }
 
-tString ColorSkinWindow::GetSkinFolder()
+CDuiString ColorSkinWindow::GetSkinFolder()
 {
-	return tString(CPaintManagerUI::GetInstancePath()) + _T("skin\\");
+	return CDuiString(CPaintManagerUI::GetInstancePath()) + _T("skin\\");
 }
 
 LRESULT ColorSkinWindow::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

@@ -41,10 +41,6 @@
 
 #include "UICrack.h"
 
-namespace DuiLib {
-// tString is a TCHAR std::string
-typedef std::basic_string<TCHAR> tString;
-}
 #ifndef NO_USING_DUILIB_NAMESPACE
 	using namespace DuiLib;
 	using namespace std;

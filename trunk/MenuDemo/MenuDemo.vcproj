@@ -418,10 +418,6 @@
 				RelativePath=".\UIMenu.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\win_impl_base.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -452,10 +448,6 @@
 			</File>
 			<File
 				RelativePath=".\UIMenu.h"
-				>
-			</File>
-			<File
-				RelativePath=".\win_impl_base.hpp"
 				>
 			</File>
 		</Filter>

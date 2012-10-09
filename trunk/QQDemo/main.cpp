@@ -17,7 +17,7 @@
 //
 
 #include "stdafx.h"
-#include "win_impl_base.hpp"
+#include "..\DuiLib\Utils\WinImplBase.h"
 #include "main_frame.hpp"
 
 #include <atlbase.h>
@@ -61,8 +61,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	CPaintManagerUI::Term();
 
 	_Module.Term();
-
-	WindowImplBase::Cleanup();
 
 	::OleUninitialize();
 	::CoUninitialize();

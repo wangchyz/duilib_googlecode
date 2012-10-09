@@ -238,12 +238,12 @@ Node* CGroupsUI::AddNode(const GroupsListItemInfo& item, Node* parent)
 	CButtonUI* log_button = static_cast<CButtonUI*>(paint_manager_.FindSubControlByName(pListElement, kLogoButtonControlName));
 	if (log_button != NULL)
 	{
-		if (!item.folder && !item.logo.empty())
+		if (!item.folder && !item.logo.IsEmpty())
 		{
 #if defined(UNDER_WINCE)
-			_stprintf(szBuf, _T("%s"), item.logo.c_str());
+			_stprintf(szBuf, _T("%s"), item.logo);
 #else
-			_stprintf_s(szBuf, MAX_PATH - 1, _T("%s"), item.logo.c_str());
+			_stprintf_s(szBuf, MAX_PATH - 1, _T("%s"), item.logo);
 #endif
 			log_button->SetNormalImage(szBuf);
 		}
@@ -257,7 +257,7 @@ Node* CGroupsUI::AddNode(const GroupsListItemInfo& item, Node* parent)
         log_button->OnEvent += MakeDelegate(&OnLogoButtonEvent);
 	}
 
-	tString html_text;
+	CDuiString html_text;
 	if (node->data().has_child_)
 	{
 		if (node->data().child_visible_)
@@ -280,9 +280,9 @@ Node* CGroupsUI::AddNode(const GroupsListItemInfo& item, Node* parent)
 	else
 	{
 #if defined(UNDER_WINCE)
-		_stprintf(szBuf, _T("%s"), item.nick_name.c_str());
+		_stprintf(szBuf, _T("%s"), item.nick_name);
 #else
-		_stprintf_s(szBuf, MAX_PATH - 1, _T("%s"), item.nick_name.c_str());
+		_stprintf_s(szBuf, MAX_PATH - 1, _T("%s"), item.nick_name);
 #endif
 		html_text += szBuf;
 	}
@@ -294,18 +294,18 @@ Node* CGroupsUI::AddNode(const GroupsListItemInfo& item, Node* parent)
 			nick_name->SetFixedWidth(0);
 
 		nick_name->SetShowHtml(true);
-		nick_name->SetText(html_text.c_str());
+		nick_name->SetText(html_text);
 	}
 
-	if (!item.folder && !item.description.empty())
+	if (!item.folder && !item.description.IsEmpty())
 	{
 		CLabelUI* description = static_cast<CLabelUI*>(paint_manager_.FindSubControlByName(pListElement, kDescriptionControlName));
 		if (description != NULL)
 		{
 #if defined(UNDER_WINCE)
-			_stprintf(szBuf, _T("<x 20><c #808080>%s</c>"), item.description.c_str());
+			_stprintf(szBuf, _T("<x 20><c #808080>%s</c>"), item.description);
 #else
-			_stprintf_s(szBuf, MAX_PATH - 1, _T("<x 20><c #808080>%s</c>"), item.description.c_str());
+			_stprintf_s(szBuf, MAX_PATH - 1, _T("<x 20><c #808080>%s</c>"), item.description);
 #endif
 			description->SetShowHtml(true);
 			description->SetText(szBuf);
@@ -366,7 +366,7 @@ void CGroupsUI::SetChildVisible(Node* node, bool visible)
 	node->data().child_visible_ = visible;
 
 	TCHAR szBuf[MAX_PATH] = {0};
-	tString html_text;
+	CDuiString html_text;
 	if (node->data().has_child_)
 	{
 		if (node->data().child_visible_)
@@ -387,7 +387,7 @@ void CGroupsUI::SetChildVisible(Node* node, bool visible)
 		if (nick_name != NULL)
 		{
 			nick_name->SetShowHtml(true);
-			nick_name->SetText(html_text.c_str());
+			nick_name->SetText(html_text);
 		}
 	}
 
