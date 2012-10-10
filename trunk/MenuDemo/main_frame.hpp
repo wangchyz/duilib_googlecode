@@ -30,7 +30,7 @@ public:
 
 	LPCTSTR GetWindowClassName() const;	
 	virtual void OnFinalMessage(HWND hWnd);
-	virtual void Init();
+	virtual void InitWindow();
 	virtual LRESULT ResponseDefaultKeyEvent(WPARAM wParam);
 	virtual UILIB_RESOURCETYPE GetResourceType() const;
 	virtual CDuiString GetSkinFile();

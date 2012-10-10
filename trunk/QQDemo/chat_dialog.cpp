@@ -175,7 +175,7 @@ void ChatDialog::OnExit(TNotifyUI& msg)
 	Close();
 }
 
-void ChatDialog::Init()
+void ChatDialog::InitWindow()
 {}
 
 void ChatDialog::OnPrepare(TNotifyUI& msg)

@@ -62,7 +62,7 @@ void CColorPicker::Notify(TNotifyUI& msg)
 	}
 }
 
-void CColorPicker::Init()
+void CColorPicker::InitWindow()
 {
 	CVerticalLayoutUI* pColorContiner = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl(_T("color")));
 	for (int i = 0; (i < 5) && (pColorContiner != NULL); i ++)

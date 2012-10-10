@@ -15,7 +15,7 @@ public:
 
 	void Notify(TNotifyUI& msg);
 
-	void Init();
+	virtual void InitWindow();
 
 	virtual CDuiString GetSkinFile();
 
