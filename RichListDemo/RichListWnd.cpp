@@ -250,7 +250,7 @@ LRESULT CRichListWnd::OnSysCommand( UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 	return lRes;
 }
 
-void CRichListWnd::Init()
+void CRichListWnd::InitWindow()
 {
 	m_pCloseBtn = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("closebtn")));
 	m_pMaxBtn = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("maxbtn")));

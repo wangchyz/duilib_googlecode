@@ -17,7 +17,7 @@ public:
 
 	virtual void OnFinalMessage(HWND hWnd);
 
-	virtual void Init();
+	virtual void InitWindow();
 
 	virtual LRESULT ResponseDefaultKeyEvent(WPARAM wParam);
 

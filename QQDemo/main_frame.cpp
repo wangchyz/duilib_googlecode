@@ -148,7 +148,7 @@ void MainFrame::OnExit(TNotifyUI& msg)
 	Close();
 }
 
-void MainFrame::Init()
+void MainFrame::InitWindow()
 {}
 
 DWORD MainFrame::GetBkColor()

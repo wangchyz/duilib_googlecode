@@ -129,7 +129,7 @@ void MainFrame::OnExit(TNotifyUI& msg)
 	Close();
 }
 
-void MainFrame::Init()
+void MainFrame::InitWindow()
 {}
 
 void MainFrame::OnPrepare(TNotifyUI& msg)

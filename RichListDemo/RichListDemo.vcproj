@@ -389,10 +389,6 @@
 				RelativePath=".\stdafx.h"
 				>
 			</File>
-			<File
-				RelativePath=".\WinImplBase.hpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="资源文件"

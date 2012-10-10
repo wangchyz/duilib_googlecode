@@ -123,7 +123,7 @@ void ColorSkinWindow::Notify(TNotifyUI& msg)
 	}
 }
 
-void ColorSkinWindow::Init()
+void ColorSkinWindow::InitWindow()
 {
 	SIZE size = m_PaintManager.GetInitSize();
 	MoveWindow(m_hWnd, parent_window_rect_.right - size.cx, parent_window_rect_.top, size.cx, size.cy, FALSE);
