@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+	<Window size="640,90" mininfo="640,90" caption="0,0,0,20" sizebox="4,4,4,4" roundcorner="4,4,4,4">
+
+	<Font name="宋体" size="12" bold="false" default="true" />
+	<Font name="宋体" size="14" bold="true" default="true" />
+
+		<HorizontalLayout name="bk" bkimage="file='bkg.png' corner='640,90,0,0'" hole="true">
+			<Button name="tietu" visible="false" float="true" pos="25,35,0,0" width="365" height="22" bkcolor="#05132121" />
+			<Progress name="jdt" visible="false" float="true" pos="26,35,0,0" foreimage="file='progress_fore.png'" min="0" value="0" width="365" height="22"/>
+			<Button name="stop" float="true"  pos="460,20,0,0" width="48" height="48" normalimage="file='globe_disconnected.png'" tooltip="停止下载.."/>
+			<Button name="run" float="true"  pos="530,20,0,0" width="48" height="48" normalimage="file='down_arrow.png'" tooltip="开始下载.." />
+			<Button name="closebtn" float="true" pos="600,15,0,0" width="19" height="19" normalimage="file='close.png'" hotimage="closeHover.png" tooltip="关闭"/>
+			<Text name="print" visible="false" float="true" pos="25,40,0,0" width="365" height="22" text="等待下载.." textcolor="#D34565544" font="0"/>
+			<Text name="url" float="true" pos="15,25,0,0" width="50" height="22" text="URL" textcolor="#ffffffff" font="0"/>
+			<RichEdit name="editurl" float="true"  pos="40,20,0,0" inset="4,2,2,2" bordercolor="#FFCCCCCC" bordersize="1" bkcolor="#05132121" width="365" height="22" text="" multiline="false" rich="false" font="1"/>
+			<Text name="outFile" float="true" pos="15,55,0,0" width="50" height="22" text="保存到" textcolor="#ffffffff" font="0"/>
+			<RichEdit name="editoutFile" float="true"  pos="60,50,0,0" inset="4,2,2,2" bordercolor="#FFCCCCCC" bordersize="1" bkcolor="#05132121" width="300" height="22" text="" multiline="false" rich="false" font="1"/>
+			<Button name="file" float="true" pos="361,40,0,0" width="48" height="48" normalimage="file='3d_stuff.png'" tooltip="打开文件选择保存路径.."/>
+		</HorizontalLayout>
+	</Window>
