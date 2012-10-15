@@ -34,10 +34,10 @@ namespace DuiLib {
 #endif
 #define DUITRACEMSG DUI__TraceMsg
 #else
-#ifndef TRACE
-#define TRACE
+#ifndef DUITRACE
+#define DUITRACE
 #endif
-#define TRACEMSG _T("")
+#define DUITRACEMSG _T("")
 #endif
 
 void UILIB_API DUI__Trace(LPCTSTR pstrFormat, ...);
