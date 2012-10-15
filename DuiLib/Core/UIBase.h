@@ -29,10 +29,10 @@ namespace DuiLib {
 #endif
 
 #ifdef _DEBUG
-#ifndef TRACE
-#define TRACE __Trace
+#ifndef DUITRACE
+#define DUITRACE DUI__Trace
 #endif
-#define TRACEMSG __TraceMsg
+#define DUITRACEMSG DUI__TraceMsg
 #else
 #ifndef TRACE
 #define TRACE
@@ -40,8 +40,8 @@ namespace DuiLib {
 #define TRACEMSG _T("")
 #endif
 
-void UILIB_API __Trace(LPCTSTR pstrFormat, ...);
-LPCTSTR UILIB_API __TraceMsg(UINT uMsg);
+void UILIB_API DUI__Trace(LPCTSTR pstrFormat, ...);
+LPCTSTR UILIB_API DUI__TraceMsg(UINT uMsg);
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
