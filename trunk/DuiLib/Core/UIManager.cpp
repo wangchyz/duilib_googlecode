@@ -523,7 +523,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
 //    case WM_SETCURSOR:
 //       break;
 //    default:
-//       TRACE(_T("MSG: %-20s (%08ld)"), TRACEMSG(uMsg), ::GetTickCount());
+//       DUITRACE(_T("MSG: %-20s (%08ld)"), DUITRACEMSG(uMsg), ::GetTickCount());
 //    }
 //#endif
     // Not ready yet?
@@ -1217,7 +1217,7 @@ void CPaintManagerUI::MessageLoop()
 			try{
             ::DispatchMessage(&msg);
 			} catch(...) {
-				TRACE(_T("EXCEPTION: %s(%d)\n"), __FILET__, __LINE__);
+				DUITRACE(_T("EXCEPTION: %s(%d)\n"), __FILET__, __LINE__);
 				#ifdef _DEBUG
 				throw "CPaintManagerUI::MessageLoop";
 				#endif

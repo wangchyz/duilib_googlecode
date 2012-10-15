@@ -24,7 +24,10 @@ namespace DuiLib
 			/* [in] */ IUnknown __RPC_FAR *pcmdtReserved,
 			/* [in] */ IDispatch __RPC_FAR *pdispReserved)
 		{
+			//return E_NOTIMPL;
+			//返回 E_NOTIMPL 正常弹出系统右键菜单
 			return S_OK;
+			//返回S_OK 则可屏蔽系统右键菜单
 		}
 
 		virtual HRESULT STDMETHODCALLTYPE GetHostInfo(

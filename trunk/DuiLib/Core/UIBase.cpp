@@ -11,7 +11,7 @@ namespace DuiLib {
 //
 //
 
-void UILIB_API __Trace(LPCTSTR pstrFormat, ...)
+void UILIB_API DUI__Trace(LPCTSTR pstrFormat, ...)
 {
 #ifdef _DEBUG
     TCHAR szBuffer[300] = { 0 };
@@ -24,7 +24,7 @@ void UILIB_API __Trace(LPCTSTR pstrFormat, ...)
 #endif
 }
 
-LPCTSTR __TraceMsg(UINT uMsg)
+LPCTSTR DUI__TraceMsg(UINT uMsg)
 {
 #define MSGDEF(x) if(uMsg==x) return _T(#x)
     MSGDEF(WM_SETCURSOR);
