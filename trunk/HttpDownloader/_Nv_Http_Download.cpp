@@ -14,9 +14,12 @@ void Thread_Download_Task(void *vpPtr)
 
 	if (bRet == FALSE)
 	{
-		//有个线程下载出现错误
-		//安全关闭 或 打开迅雷
-		Nv_Download_->Nv_Download_Ptr_->thread_SecurityCloseTask();
+		DegMsg("一个下载线程出错了...");
+		//未完成任务
+		Nv_Download_->NvInternetCloseHandle(NULL);
+		Nv_Download_->dwTaskOk_ = Thread_ON;
+		_endthreadex(Thread_download_Ok);
+		return;
 	}
 
 	//暂停下载
@@ -35,7 +38,7 @@ void Thread_Download_Task(void *vpPtr)
 	
 	//任务完成
 	Nv_Download_->NvInternetCloseHandle(NULL);
-	Nv_Download_->bTaskOk_ = TRUE;
+	Nv_Download_->dwTaskOk_ = Thread_OK;
 	_endthreadex(Thread_download_Ok);
 }
 
@@ -70,6 +73,7 @@ void Thread_DetectTask(void *vpPtr)
 			BOOL bRet = CloseHandle(Nv_Download_->Handle_DetectTask_Out_);
 
 			Nv_Download_->Handle_DetectTask_Out_ = NULL;
+			DegMsg("Thread_DetectTask OUT....");
 			//关闭线程 设置代码
 			_endthreadex(Thread_download_Ok);
 			return;
@@ -114,14 +118,14 @@ _Nv_Download_Task::_Nv_Download_Task(
 							__in CONST CHAR *strSaveFilePath, 
 							__in __int64 _n64X,
 							__in __int64 _n64Size,
-							__out __int64 *n64CallCnt,
+							__out int *nCallCnt,
 							__in CONST CHAR *strCoolie,
 							__in BOOL bFalg
 )
 {
 	Init();
 
-	n64CallByteCnt_ = n64CallCnt;
+	nCallByteCnt_ = nCallCnt;
 
 	strUrl_ = strDownloadUrl;
 	strFilePath_ = strSaveFilePath;
@@ -189,7 +193,7 @@ VOID _Nv_Download_Task::Init(VOID)
 
 	n64_Download_Byte_Cnt_ = 0;
 
-	bTaskOk_ = FALSE;
+	dwTaskOk_ = 0;
 
 	bCoolie_ = FALSE;
 
@@ -750,14 +754,20 @@ BOOL _Nv_Download_Task::NvDownload_Task(__in CONST CHAR *strSaveFilePath)
 		dwError = ::GetLastError();
 		
 		//错误处理
-		if (dwError == 12002)
+		if (dwError == 12002 || bRecv == FALSE)
 		{
 			//设置一个错误 这个错误由线程管理器重新执行该线程
 			dwLinkCnt++;
 
 			if (dwLinkCnt == 20) { 
+				CHAR strData[1024] = {0};
+				sprintf(strData, "线程信息1: 错误编号:%u 编号: %lld  下载量: %lld, 已经下载:%lld..", dwError, n64X_,
+					n64DownloadSize_, n64_Download_Byte_Cnt_
+					);
+				DegMsg(strData);
 				NvInternetCloseHandle(NULL); CloseHandle(hFile); 
-				delete []strRecvBuf;  return FALSE; 
+				delete []strRecvBuf;  
+				return FALSE; 
 			}
 			else continue;
 			
@@ -767,7 +777,7 @@ BOOL _Nv_Download_Task::NvDownload_Task(__in CONST CHAR *strSaveFilePath)
 
 		//累计当前工作线程下载了多少字节
 		n64_Download_Byte_Cnt_ += dwWriteSize;
-		*n64CallByteCnt_ += dwWriteSize;
+		*nCallByteCnt_ += dwWriteSize;
 		
 		//设置退出下载
 		if (bStop_Download_ == TRUE)
@@ -786,6 +796,12 @@ BOOL _Nv_Download_Task::NvDownload_Task(__in CONST CHAR *strSaveFilePath)
 	delete []strRecvBuf;
 	CloseHandle(hFile);
 	NvInternetCloseHandle(NULL);
+	
+	CHAR strData[1024] = {0};
+	sprintf(strData, "线程信息2: 编号: %lld  下载量: %lld, 已经下载:%lld..", n64X_,
+		n64DownloadSize_, n64_Download_Byte_Cnt_
+		);
+	DegMsg(strData);
 
 	return TRUE;
 }
@@ -977,6 +993,7 @@ _Nv_Download::_Nv_Download(
 
 	//测试单线程下载任务
 	//开始接收数据
+	//Thread_Download_Fun
 	Handle_ThreadTask_ = (HANDLE)_beginthreadex(
 		NULL, 
 		0, 
@@ -1042,11 +1059,15 @@ _Nv_Download::~_Nv_Download()
 //************************************************************************
 VOID _Nv_Download::Init()
 {
+	InitializeCriticalSection(&chitical_section_);
+
 	bCoolie_ = FALSE;
 	strCoolie_ = "";
 
 	vtThread_Task_.clear();
 	vtTagTaskData.clear();
+	vtDownloadNo_.clear();
+	//vt64DownloadCount_.clear();
 	
 	//线程数量
 	dwThreadCnt_ = 10;
@@ -1071,6 +1092,15 @@ VOID _Nv_Download::Init()
 	dwIsSpeed_ = 0;
 
 	bTaskStop_ = FALSE;
+
+	bDownloadTaskCmd_ = FALSE;
+	
+	nDataCount_ = 0;
+
+	if (nDownloadCount_ == NULL)
+	{
+		DegMsg("内存分配错误!");
+	}
 }
 
 
@@ -1094,6 +1124,22 @@ BOOL _Nv_Download::Download(__in CONST CHAR *strUrl, __in CONST CHAR *strFileSav
 
 	//获取文件大小
 	__int64 n64FileSize = get_TaskFileSize(strUrl);
+	
+	dwDownloadVectorSize_ = (n64FileSize / n64ThreadDownloadCnt_) + 5;
+	nDownloadCount_ = new int[dwDownloadVectorSize_];
+
+	if (nDownloadCount_ == NULL)
+	{
+		DegMsg("下载错误: 字节记录数组分配不成功!");
+		return FALSE;
+	}
+	else
+	{
+		for (int i=0; i<dwDownloadVectorSize_; ++i)
+		{
+			nDownloadCount_[i] = 0;
+		}
+	}
 
 	//获取url
 	strUrl_ = strUrl;
@@ -1164,19 +1210,96 @@ BOOL _Nv_Download::call_AssignTasks(__in __int64 &n641, __in __int64 &n642, __in
 	{
 		return FALSE;
 	}
-	if ((n641 + n642) < n643)
+
+	if ((n641 + n642) < (n643 - n642))
 	{
 		n641 += n642;
 	}
-
-	//最后
-	if ((n641 + n642) > n643)
+	else if (((n641 + n642) < n643) && ((n641+n642+n642) > n643))
 	{
+		n641 += n642;
 		n642 = n643 - n641;
 	}
 
 	return TRUE;
 }
+
+
+
+//************************************************************************
+//
+// 函数:	decete_TaskFailure
+// 参数:	
+// 返回值:	
+// 功能:	修补错误线程函数
+//
+//
+//************************************************************************
+BOOL _Nv_Download::decete_TaskFailure(
+						__in CONST CHAR *strDownloadUrl, 
+						__in CONST CHAR *strSaveFilePath,
+						__in CONST CHAR *strCoolie
+						)
+{
+	DWORD dwTask = vtDownloadNo_.size();
+	if (dwTask != 0)
+	{
+		EnterCriticalSection(&chitical_section_);
+		dwDownloadVectorSize_ += 1;
+		int *npNew = new int[dwDownloadVectorSize_];
+		if (npNew != NULL)
+		{
+			for (int i=0; i<nDataCount_; ++i)
+			{
+				npNew[i] = nDownloadCount_[i];
+			}
+			delete nDownloadCount_;
+			nDownloadCount_ = new int[dwDownloadVectorSize_];
+			if (nDownloadCount_ != NULL)
+			{
+				for (int i=0; i<nDataCount_; ++i)
+					nDownloadCount_[i] = npNew[i];
+			}
+			delete npNew;
+		}
+		LeaveCriticalSection(&chitical_section_);
+
+		_Nv_Tag_Download_Data Nv_Tag_Data_;
+		Nv_Tag_Data_.n64X_ = vtDownloadNo_[0].n64X_;
+		Nv_Tag_Data_.n64TaskCnt_ = vtDownloadNo_[0].n64TaskCnt_;
+		Nv_Tag_Data_.n64DownloadCnt_ = vtDownloadNo_[0].n64DownloadCnt_;
+		vtDownloadNo_.erase(vtDownloadNo_.begin() + 0);
+
+		//创建一个工作线程任务;
+		_Nv_Download_Task *Nv_Task_ = new _Nv_Download_Task(
+			strDownloadUrl, strSaveFilePath, Nv_Tag_Data_.n64X_ + Nv_Tag_Data_.n64DownloadCnt_, 
+			Nv_Tag_Data_.n64TaskCnt_ - Nv_Tag_Data_.n64DownloadCnt_ - 1, &nDownloadCount_[nDataCount_++], strCoolie
+			);
+
+		if (Nv_Task_ != NULL)
+		{
+			CHAR strData[1024] = {0};
+			sprintf(strData, "线程错误修复: 原始下载点:%lld, 已下载:%lld. 修复下载点:%lld, 下载量:%lld, 原始下载量:%lld..", 
+				Nv_Tag_Data_.n64X_, Nv_Tag_Data_.n64DownloadCnt_, 
+				Nv_Tag_Data_.n64X_ + Nv_Tag_Data_.n64DownloadCnt_,
+				Nv_Tag_Data_.n64TaskCnt_ - Nv_Tag_Data_.n64DownloadCnt_ - 1,
+				Nv_Tag_Data_.n64TaskCnt_
+				);
+			DegMsg(strData);
+
+			Nv_Task_->get_DownloadThisPtr(this);
+			vtThread_Task_.push_back(Nv_Task_);
+		}
+		
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+
+
 //************************************************************************
 //
 // 函数:	thread_Task
@@ -1193,6 +1316,8 @@ BOOL _Nv_Download::thread_Task(
 			__in BOOL bModeFalg /* = Run_Mode_2 */ 
 )
 {
+	__int64 n64CopyCount = n64ThreadDownloadCnt_;
+
 	while(TRUE)
 	{
 		//任务线程创建已满？
@@ -1207,39 +1332,67 @@ BOOL _Nv_Download::thread_Task(
 				DegMsg("thread_Task线程安全关闭");
 				//停止任务检查
 				stop_DetectTask();
-				//关闭线程 设置代码
-				_endthreadex(Thread_ThreadTask_Out);
 				return TRUE;
 			}
 			
+			//是否有下载失败的线程
+			if (decete_TaskFailure(strDownloadUrl, strSaveFilePath, strCoolie) == TRUE)
+			{
+				Sleep(100);
+				continue;
+			}
 			//任务量分配
-			if (FALSE == call_AssignTasks(n64ThreadTaskSion_, n64ThreadDownloadCnt_, n64FileSize_))
+			if ((vtTagTaskData.size() == 0) && (n64CopyCount == n64ThreadDownloadCnt_))
+			{
+				if (FALSE == call_AssignTasks(n64ThreadTaskSion_, n64ThreadDownloadCnt_, n64FileSize_))
+				{
+					NULL;
+				}
+			}
+			else if (vtTagTaskData.size() == 0)
 			{
 				//下载完成
-				break;
+				if (get_DownloadCount() == n64FileSize_)
+					break;
+				else
+					Sleep(100);
+					continue;
 			}
-
 			//断点续传任务
 			__int64 n64GetTaskCnt = 0;
 			__int64 n64RetCode = set_ThreadTaskData(n64ThreadTaskSion_, n64ThreadDownloadCnt_, n64GetTaskCnt);
 			
+
+			nDownloadCount_[nDataCount_] = 0;
 			//创建一个工作线程任务;
 			_Nv_Download_Task *Nv_Task_ = new _Nv_Download_Task(
 				strDownloadUrl, strSaveFilePath, n64ThreadTaskSion_, 
-					n64ThreadDownloadCnt_ - 1, &n64DownloadCount_, strCoolie
+					n64ThreadDownloadCnt_ - 1, &nDownloadCount_[nDataCount_], strCoolie
 				);
+			nDataCount_++;
+
+			if (Nv_Task_ == NULL)
+			{
+				DegMsg("严重的错误,Nv_Task_内存分配失败..");
+			}
 
 			if ((n64RetCode != T_X) && (n64RetCode != T_Z))
 			{
 				//最后
-				n64ThreadTaskSion_ = n64RetCode;
+				n64ThreadTaskSion_ = (n64RetCode - n64CopyCount) + n64ThreadDownloadCnt_;
+				n64ThreadDownloadCnt_ = n64CopyCount;
 			}
 
-			Nv_Task_->get_DownloadThisPtr(this);
-			
 			//
 			if (Nv_Task_ != NULL)
 			{
+				/*CHAR strData[1024] = {0};
+				sprintf(strData, "Thread: from %lld to %lld, count:%lld..", n64ThreadTaskSion_,
+					n64ThreadTaskSion_ + (n64ThreadDownloadCnt_ - 1), n64ThreadDownloadCnt_ - 1
+					);
+				DegMsg(strData);*/
+				//设置this
+				Nv_Task_->get_DownloadThisPtr(this);
 				//追踪该任务
 				vtThread_Task_.push_back(Nv_Task_);
 			}
@@ -1251,6 +1404,12 @@ BOOL _Nv_Download::thread_Task(
 	//停止检查
 	stop_DetectTask();
 
+	bDownloadTaskCmd_ = TRUE;
+	
+	EnterCriticalSection(&chitical_section_);
+	delete []nDownloadCount_;
+	nDownloadCount_ = NULL;
+	LeaveCriticalSection(&chitical_section_);
 	return TRUE;
 }
 
@@ -1268,23 +1427,40 @@ BOOL _Nv_Download::thread_Task(
 VOID _Nv_Download::detect_vtThread_Task(VOID)
 {
 	DWORD dwSize = vtThread_Task_.size();
-
+	
 	for (int i=0; i<dwSize; ++i)
 	{
-		if (vtThread_Task_[i]->bTaskOk_ == TRUE)
+		if (vtThread_Task_[i]->dwTaskOk_ == Thread_ON)
+		{
+			_Nv_Tag_Download_Data Nv_Data;
+			Nv_Data.n64X_ = vtThread_Task_[i]->n64X_;
+			Nv_Data.n64TaskCnt_ = vtThread_Task_[i]->n64DownloadSize_ + 1;
+			Nv_Data.n64DownloadCnt_ = vtThread_Task_[i]->n64_Download_Byte_Cnt_;
+			vtDownloadNo_.push_back(Nv_Data);
+		}
+
+		if ((vtThread_Task_[i]->dwTaskOk_ == Thread_ON) ||
+			(vtThread_Task_[i]->dwTaskOk_ == Thread_OK))
 		{
 			//获取线程退出代码
 			//检查退出代码
-			DWORD dwOutCode = 0;
-			::GetExitCodeThread(vtThread_Task_[i]->Handle_Download_Ok, &dwOutCode);
-			if (dwOutCode == Thread_download_Ok)
+			while(TRUE)
 			{
-				//该线程已经安全退出
-				delete vtThread_Task_[i];
-				vtThread_Task_[i] = NULL;
-				vtThread_Task_.erase(vtThread_Task_.begin() + i);
-				dwSize = vtThread_Task_.size();
-				break;
+				DWORD dwOutCode = 0;
+				::GetExitCodeThread(vtThread_Task_[i]->Handle_Download_Ok, &dwOutCode);
+				if (dwOutCode == Thread_download_Ok)
+				{
+					CloseHandle(vtThread_Task_[i]->Handle_Download_Ok);
+					//该线程已经安全退出
+					EnterCriticalSection(&chitical_section_);
+					delete vtThread_Task_[i];
+					LeaveCriticalSection(&chitical_section_);
+					vtThread_Task_[i] = NULL;
+					vtThread_Task_.erase(vtThread_Task_.begin() + i);
+					dwSize = vtThread_Task_.size();
+					return;
+				}
+				Sleep(100);
 			}
 		}
 	}
@@ -1328,7 +1504,7 @@ BOOL _Nv_Download::stop_ThreadTask(VOID)
 	while (TRUE)
 	{
 		::GetExitCodeThread(Handle_ThreadTask_, &dwOutCode);
-		if (dwOutCode == Thread_ThreadTask_Out)
+		if (dwOutCode == Thread_Download_Fun)
 		{
 			return TRUE;
 		}
@@ -1351,7 +1527,23 @@ BOOL _Nv_Download::stop_ThreadTask(VOID)
 //************************************************************************
 __int64 _Nv_Download::get_DownloadCount(VOID)
 {
-	return n64DownloadCount_ + n64JiDonwloadCnt_;
+	EnterCriticalSection(&chitical_section_);
+
+	if (nDownloadCount_ == NULL)
+	{
+		return n64DownloadCount_;
+	}
+	__int64 n64Ret = n64JiDonwloadCnt_;
+
+	DWORD dwSize = vtThread_Task_.size();
+
+	for (int i=0; i<nDataCount_; ++i)
+	{
+		n64Ret += (__int64)nDownloadCount_[i];
+	}
+	n64DownloadCount_ = n64Ret;
+	LeaveCriticalSection(&chitical_section_);
+	return n64Ret;
 }
 
 
@@ -1546,6 +1738,7 @@ BOOL _Nv_Download::detect_TaskComplete(VOID)
 {
 	if (n64FileSize_ == get_DownloadCount())
 	{
+		DegMsg("下载器: detect_TaskComplete");
 		return TRUE;
 	}
 	else
@@ -1753,5 +1946,98 @@ __int64 _Nv_Download::set_ThreadTaskData(__out __int64 &n64X, __out __int64 &n64
 //************************************************************************
 BOOL _Nv_Download::get_TaskStop(VOID)
 {
+	if (bTaskStop_ == TRUE)
+		DegMsg("下载器: get_TaskStop");
 	return bTaskStop_;
+}
+
+
+//************************************************************************
+//
+// 函数:	get_DownloadTaskCmdOut
+// 参数:	
+// 返回值:	
+// 功能:	
+//
+//
+//************************************************************************
+BOOL _Nv_Download::get_DownloadTaskCmdOut(VOID)
+{
+	if (bDownloadTaskCmd_ == TRUE)
+		DegMsg("下载器: get_DownloadTaskCmdOut");
+	return bDownloadTaskCmd_;
+}
+
+
+//************************************************************************
+//
+// 函数:	get_StopPrintf
+// 参数:	
+// 返回值:	
+// 功能:	供外部显示进度代码判断是否可以停止显示进度
+//
+//
+//************************************************************************
+BOOL _Nv_Download::get_StopPrintf(VOID)
+{
+	if ((detect_TaskComplete() == TRUE) || (get_TaskStop() == TRUE) || (get_DownloadTaskCmdOut() == TRUE))
+	{
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
+}
+
+
+
+
+//************************************************************************
+//
+// 函数:	detect_DownlaodIsClose
+// 参数:	
+// 返回值:	
+// 功能:	检查该类是否已经完全停止， 达到可以释放该类的目的
+//
+//
+//************************************************************************
+BOOL _Nv_Download::detect_DownlaodIsClose(VOID)
+{
+	DWORD dwOutCode = 0;
+	BOOL bRet = FALSE;
+
+	::GetExitCodeThread(Handle_DetectTask_, &dwOutCode);
+	if (dwOutCode == Thread_download_Ok)
+	{
+		CloseHandle(Handle_DetectTask_);
+		bRet = TRUE;
+
+		if (bRet == FALSE)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	::GetExitCodeThread(Handle_ThreadTask_, &dwOutCode);
+	if (dwOutCode == Thread_Download_Fun)
+	{
+		CloseHandle(Handle_ThreadTask_);
+		bRet = TRUE;
+
+		if (bRet == FALSE)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
+
+	return TRUE;
 }

@@ -378,6 +378,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\Resource.h"
+				>
+			</File>
+			<File
 				RelativePath=".\_Nv_Http_Download.h"
 				>
 			</File>
@@ -387,6 +391,20 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="资源文件"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+			<File
+				RelativePath=".\HttpDownloader.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\HttpDownloader.rc"
 				>
 			</File>
 		</Filter>
