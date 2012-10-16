@@ -4,6 +4,7 @@
 #include "MainDlg.h"
 
 CMainDlg::CMainDlg(void)
+	: Nv_Download_Task_(NULL)
 {
 }
 
@@ -22,9 +23,9 @@ void Thread_Count(void *vpPtr)
 		Sleep(100);
 		Nv_Download_->SendMessage(WM_USER_EDIT);
 
-		if ((Nv_Download_->Nv_Download_Task_->detect_TaskComplete() == TRUE) ||
-			(Nv_Download_->Nv_Download_Task_->get_TaskStop() == TRUE))
+		if (Nv_Download_->Nv_Download_Task_->get_StopPrintf() == TRUE)
 		{
+			DegMsg("主界面线程1退出..");
 			return;
 		}
 	}
@@ -39,9 +40,9 @@ void Thread_Download_Data(void *vpPtr)
 	{
 		Sleep(1000);
 		Nv_Download_->SendMessage(WM_USER_PRINT);
-		if ((Nv_Download_->Nv_Download_Task_->detect_TaskComplete() == TRUE) ||
-			(Nv_Download_->Nv_Download_Task_->get_TaskStop() == TRUE))
+		if (Nv_Download_->Nv_Download_Task_->get_StopPrintf() == TRUE)
 		{
+			DegMsg("主界面线程2退出..");
 			return;
 		}
 	}
@@ -63,7 +64,7 @@ void Thread_OpenFileDlg_File(void *vpPtr)
 		return;
 	}
 
-	pdlg->m_pEditFilePath->SetText(pdlg->m_strFilePath);
+	//pdlg->m_pEditFilePath->SetText(pdlg->m_strFilePath);
 
 	return;
 }
@@ -77,9 +78,10 @@ void Thread_Download_Print(void *vpPtr)
 		Sleep(100);
 		Nv_Download_->SendMessage(WM_USER_PROG);
 
-		if ((Nv_Download_->Nv_Download_Task_->detect_TaskComplete() == TRUE) ||
-			(Nv_Download_->Nv_Download_Task_->get_TaskStop() == TRUE))
+		if (Nv_Download_->Nv_Download_Task_->get_StopPrintf() == TRUE)
 		{
+			DegMsg("主界面线程3退出..");
+			Nv_Download_->m_pTextPrint->SetText("下载已完成..");
 			return;
 		}
 	}
@@ -119,25 +121,35 @@ void CMainDlg::Notify( TNotifyUI& msg )
 
 		if (m_pBtnRun == msg.pSender)
 		{
+			if (Nv_Download_Task_ != NULL)
+			{
+				if (Nv_Download_Task_->detect_DownlaodIsClose() == FALSE)
+				{
+					return;
+				}
+				delete Nv_Download_Task_;
+				Nv_Download_Task_ = NULL;
+			}
 			m_pBtnOpenFile->SetVisible(false);
-			m_pEditFilePath->SetVisible(false);
+			//m_pEditFilePath->SetVisible(false);
 			m_pEditInput->SetVisible(false);
 			m_pTextUrl->SetVisible(false);
-			m_pTextOutFile->SetVisible(false);
+			//m_pTextOutFile->SetVisible(false);
 
 			m_pTextPrint->SetVisible(true);
 			m_pProgPrint->SetVisible(true);
 			m_pBtnTieTu->SetVisible(true);
 
 			CDuiString	strUrl = m_pEditInput->GetText();
-			CDuiString	strFile = m_pEditFilePath->GetText();
+			//CDuiString	strFile = m_pEditFilePath->GetText();
+			CDuiString	strFile = m_strFilePath;
 
 			_Nv_Download *Nv_Download_T = new _Nv_Download;
 			Nv_Download_Task_ = Nv_Download_T;
 			//设置线程数
 			Nv_Download_T->set_ThreadCount(10);
 			//设置连接数
-			Nv_Download_T->set_HttpLinkCount(12);
+			Nv_Download_T->set_HttpLinkCount(64);
 			//设置每个线程需要下载的字节 任务量
 			m_pProgPrint->SetMinValue(0);
 			Nv_Download_T->set_DownloadTaskCnt(205000);
@@ -227,6 +239,12 @@ LRESULT CMainDlg::OnUserProg( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 
 LRESULT CMainDlg::OnUserPrint( UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled )
 {
+	if ((Nv_Download_Task_->detect_TaskComplete() == TRUE) ||
+		(Nv_Download_Task_->get_TaskStop() == TRUE))
+	{
+		m_pTextPrint->SetText("下载已完成..");
+		return 0;
+	}
 	CHAR strCnt[1024] = {0};
 	sprintf(strCnt, "已下载 %0.2fMB, %lld/KBs, 还有:%s", 
 		(float)((float)Nv_Download_Task_->get_DownloadCount() / (float)1024 / (float)1024),

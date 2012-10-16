@@ -57,6 +57,10 @@ using std::sort;
 #define		T_Y										0x2
 #define		T_Z										0x3
 
+//两种状态
+#define		Thread_OK								0x01
+#define		Thread_ON								0x02
+
 
 //////////////////////////////////////////////////////////////////////////
 //断点传文件
@@ -96,7 +100,7 @@ public:
 		__in CONST CHAR *strSaveFilePath, 
 		__in __int64 _n64X,  
 		__in __int64 _n64Size,
-		__out __int64 *n64CallCnt,
+		__out int *nCallCnt,
 		__in CONST CHAR *strCoolie,
 		__in BOOL bFalg = Run_Mode_2
 		);
@@ -119,7 +123,7 @@ public:
 	CHAR		strFileName_[1024];
 
 	//引用数据
-	__int64		*n64CallByteCnt_;
+	int		*nCallByteCnt_;
 
 	//记录url
 	string		strUrl_;
@@ -148,7 +152,7 @@ public:
 	//限速
 	DWORD		*dwSleep_;
 	//已完成任务
-	BOOL		bTaskOk_;
+	DWORD		dwTaskOk_;
 
 	//是否有Coolie
 	BOOL		bCoolie_;
@@ -239,6 +243,8 @@ public:
 public:
 	//////////////////////////////////////////////////////////////////////////
 	//对象
+	CRITICAL_SECTION chitical_section_;
+
 	BOOL		bCoolie_;
 	string		strCoolie_;
 
@@ -262,6 +268,9 @@ public:
 
 	//下载量
 	__int64		n64DownloadCount_;
+	int			nDataCount_;
+	int			*nDownloadCount_;
+	DWORD		dwDownloadVectorSize_;
 
 	//检查任务线程安全信号
 	HANDLE		Handle_DetectTask_;
@@ -283,9 +292,14 @@ public:
 
 	//保存断点续传每个线程的数据
 	vector<_Nv_Tag_Download_Data>	vtTagTaskData;
+	//未完成下载 需要重新下载
+	vector<_Nv_Tag_Download_Data>	vtDownloadNo_;
 
 	//停止任务下载
 	BOOL		bTaskStop_;
+
+	//下载任务管理器已经退出
+	BOOL		bDownloadTaskCmd_;
 
 public:
 	//////////////////////////////////////////////////////////////////////////
@@ -318,6 +332,12 @@ public:
 	BOOL	get_TaskStop			(VOID);
 	//设置连接数
 	VOID	set_HttpLinkCount		(__in DWORD dwCount);
+	//获取线程管理器是否已经退出
+	BOOL	get_DownloadTaskCmdOut	(VOID);
+	//供外部显示进度代码判断是否可以停止显示进度
+	BOOL	get_StopPrintf(VOID);
+	//是否可以销毁该类
+	BOOL	detect_DownlaodIsClose(VOID);
 	
 	//获取工作线程状态
 	VOID	get_ThreadTaskData(
@@ -361,4 +381,12 @@ private:
 		__out __int64 &n64TaskCnt,
 		__out __int64 &n64Count
 		);
+
+	//修补出错线程
+	BOOL decete_TaskFailure( 
+		__in CONST CHAR *strDownloadUrl, 
+		__in CONST CHAR *strSaveFilePath, 
+		__in CONST CHAR *strCoolie 
+		);
+	
 };
