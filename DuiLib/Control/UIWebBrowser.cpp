@@ -15,7 +15,6 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 {
 	if (!CActiveXUI::DoCreateControl())
 		return false;
-	m_pManager->AddTranslateAccelerator(this);
 	SetDispatchHandler(this);
 	SetExternalUIHandler(this);
 	SetDownloadManager(this);
@@ -30,13 +29,11 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 void DuiLib::CWebBrowserUI::ReleaseControl()
 {
 	m_bCreated=false;
-	m_pManager->RemoveTranslateAccelerator(this);
-	CActiveXUI::ReleaseControl();
 }
 
 DuiLib::CWebBrowserUI::~CWebBrowserUI()
 {
-
+	ReleaseControl();
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfoCount( UINT *iTInfo )
