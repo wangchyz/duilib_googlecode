@@ -36,7 +36,6 @@ namespace DuiLib
 	protected:
 		IWebBrowser2* m_pWebBrowser2; //浏览器指针
 		LONG m_dwRef;
-		virtual void ReleaseControl();
 		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 		CDuiString m_sHomePage;	// 默认页面
 		bool m_bAutoNavi;	// 是否启动时打开默认页面

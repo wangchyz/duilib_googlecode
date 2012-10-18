@@ -26,14 +26,9 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 	return true;
 }
 
-void DuiLib::CWebBrowserUI::ReleaseControl()
-{
-	m_bCreated=false;
-}
-
 DuiLib::CWebBrowserUI::~CWebBrowserUI()
 {
-	ReleaseControl();
+
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfoCount( UINT *iTInfo )
