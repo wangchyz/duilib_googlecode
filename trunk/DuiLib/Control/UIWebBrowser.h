@@ -4,14 +4,15 @@
 #pragma once
 
 #include "Utils/WebBrowserEventHandler.h"
+#include <ExDisp.h>
 
 namespace DuiLib
 {
 	class UILIB_API CWebBrowserUI
 		: public CActiveXUI
-		, public IDispatch
 		, public IDocHostUIHandler
-		, public IDownloadManager
+		, public IServiceProvider
+		, public IDispatch
 		, public ITranslateAccelerator
 	{
 	public:
@@ -32,10 +33,19 @@ namespace DuiLib
 		void NavigateHomePage();
 		void NavigateUrl(LPCTSTR lpszUrl);
 		virtual bool DoCreateControl();
+		static DISPID FindId(IDispatch *pObj, LPOLESTR pName);
+		static HRESULT InvokeMethod(IDispatch *pObj, LPOLESTR pMehtod, VARIANT *pVarResult, VARIANT *ps, int cArgs);
+		static HRESULT GetProperty(IDispatch *pObj, LPOLESTR pName, VARIANT *pValue);
+		static HRESULT SetProperty(IDispatch *pObj, LPOLESTR pName, VARIANT *pValue);
+		IDispatch*		   GetHtmlWindow();
 
 	protected:
-		IWebBrowser2* m_pWebBrowser2; //浏览器指针
+		IWebBrowser2*			m_pWebBrowser2; //浏览器指针
+		IHTMLWindow2*		_pHtmlWnd2;
 		LONG m_dwRef;
+		DWORD m_dwCookie;
+		virtual void ReleaseControl();
+		HRESULT RegisterEventHandler(BOOL inAdvise);
 		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 		CDuiString m_sHomePage;	// 默认页面
 		bool m_bAutoNavi;	// 是否启动时打开默认页面
@@ -50,6 +60,9 @@ namespace DuiLib
 		void CommandStateChange(long Command,VARIANT_BOOL Enable);
 
 	public:
+		virtual LPCTSTR GetClass() const;
+		virtual LPVOID GetInterface( LPCTSTR pstrName );
+
 		// IUnknown
 		STDMETHOD_(ULONG,AddRef)();
 		STDMETHOD_(ULONG,Release)();
@@ -71,16 +84,15 @@ namespace DuiLib
 		STDMETHOD(OnDocWindowActivate)(BOOL fActivate);
 		STDMETHOD(OnFrameWindowActivate)(BOOL fActivate);
 		STDMETHOD(ResizeBorder)(LPCRECT prcBorder, IOleInPlaceUIWindow* pUIWindow, BOOL fFrameWindow);
-		STDMETHOD(TranslateAccelerator)(LPMSG lpMsg, const GUID* pguidCmdGroup, DWORD nCmdID);
-
-		// ITranslateAccelerator
-		virtual LRESULT TranslateAccelerator( MSG *pMsg );
-
+		STDMETHOD(TranslateAccelerator)(LPMSG lpMsg, const GUID* pguidCmdGroup, DWORD nCmdID);	//浏览器消息过滤
 		STDMETHOD(GetOptionKeyPath)(LPOLESTR* pchKey, DWORD dwReserved);
 		STDMETHOD(GetDropTarget)(IDropTarget* pDropTarget, IDropTarget** ppDropTarget);
 		STDMETHOD(GetExternal)(IDispatch** ppDispatch);
 		STDMETHOD(TranslateUrl)(DWORD dwTranslate, OLECHAR* pchURLIn, OLECHAR** ppchURLOut);
 		STDMETHOD(FilterDataObject)(IDataObject* pDO, IDataObject** ppDORet);
+
+		// IServiceProvider
+		STDMETHOD(QueryService)(REFGUID guidService, REFIID riid, void** ppvObject);
 
 		// IDownloadManager
 		STDMETHOD(Download)( 
@@ -93,9 +105,9 @@ namespace DuiLib
 			/* [in] */ LPCOLESTR pszRedir,
 			/* [in] */ UINT uiCP);
 
-		virtual LPCTSTR GetClass() const;
-		virtual LPVOID GetInterface( LPCTSTR pstrName );
-
+		// ITranslateAccelerator
+		// Duilib消息分发给WebBrowser
+		virtual LRESULT TranslateAccelerator( MSG *pMsg );
 	};
 } // namespace DuiLib
 #endif // __UIWEBBROWSER_H__

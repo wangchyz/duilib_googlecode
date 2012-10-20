@@ -244,6 +244,47 @@ namespace DuiLib
 		HCURSOR m_hOrigCursor;
 	};
 
+	/////////////////////////////////////////////////////////////////////////////////////
+	//
+
+	class CVariant : public VARIANT
+	{
+	public:
+		CVariant() 
+		{ 
+			VariantInit(this); 
+		}
+		CVariant(int i)
+		{
+			VariantInit(this);
+			this->vt = VT_I4;
+			this->intVal = i;
+		}
+		CVariant(float f)
+		{
+			VariantInit(this);
+			this->vt = VT_R4;
+			this->fltVal = f;
+		}
+		CVariant(LPOLESTR s)
+		{
+			VariantInit(this);
+			this->vt = VT_BSTR;
+			this->bstrVal = s;
+		}
+		CVariant(IDispatch *disp)
+		{
+			VariantInit(this);
+			this->vt = VT_DISPATCH;
+			this->pdispVal = disp;
+		}
+
+		~CVariant() 
+		{ 
+			VariantClear(this); 
+		}
+	};
+
 }// namespace DuiLib
 
 #endif // __UTILS_H__
