@@ -114,6 +114,15 @@ namespace DuiLib
 		return true;
 	}
 
+	bool CTabLayoutUI::SelectItem( CControlUI* pControl )
+	{
+		int iIndex=GetItemIndex(pControl);
+		if (iIndex==-1)
+			return false;
+		else
+			return SelectItem(iIndex);
+	}
+
 	void CTabLayoutUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	{
 		if( _tcscmp(pstrName, _T("selectedid")) == 0 ) SelectItem(_ttoi(pstrValue));

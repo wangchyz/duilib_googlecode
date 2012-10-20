@@ -1,11 +1,17 @@
 #include "StdAfx.h"
 #include "UIWebBrowser.h"
 #include <atlconv.h>
+#include <atlcomcli.h>
+#include "../Utils/downloadmgr.h"
+#include <mshtml.h>
 
 DuiLib::CWebBrowserUI::CWebBrowserUI()
-	: m_pWebBrowser2(NULL)
-	, m_pWebBrowserEventHandler(NULL)
-	, m_bAutoNavi(false)
+: m_pWebBrowser2(NULL)
+, _pHtmlWnd2(NULL)
+, m_pWebBrowserEventHandler(NULL)
+, m_bAutoNavi(false)
+, m_dwRef(0)
+, m_dwCookie(0)
 {
 	m_clsid=CLSID_WebBrowser;
 	m_sHomePage.Empty();
@@ -15,20 +21,27 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 {
 	if (!CActiveXUI::DoCreateControl())
 		return false;
-	SetDispatchHandler(this);
-	SetExternalUIHandler(this);
-	SetDownloadManager(this);
+	GetManager()->AddTranslateAccelerator(this);
 	GetControl(IID_IWebBrowser2,(LPVOID*)&m_pWebBrowser2);
+	this->Navigate2(_T("about:black"));
 	if ( m_bAutoNavi && !m_sHomePage.IsEmpty())
 	{
 		this->Navigate2(m_sHomePage);
 	}
+	RegisterEventHandler(TRUE);
 	return true;
+}
+
+void DuiLib::CWebBrowserUI::ReleaseControl()
+{
+	m_bCreated=false;
+	GetManager()->RemoveTranslateAccelerator(this);
+	RegisterEventHandler(FALSE);
 }
 
 DuiLib::CWebBrowserUI::~CWebBrowserUI()
 {
-
+	ReleaseControl();
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfoCount( UINT *iTInfo )
@@ -39,12 +52,12 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfoCount( UINT *iTInfo )
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfo( UINT iTInfo, LCID lcid, ITypeInfo **ppTInfo )
 {
-return E_NOTIMPL;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetIDsOfNames( REFIID riid, OLECHAR **rgszNames, UINT cNames, LCID lcid,DISPID *rgDispId )
 {
-return E_NOTIMPL;
+	return DISP_E_UNKNOWNLCID;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid,WORD wFlags, DISPPARAMS* pDispParams,VARIANT* pVarResult, EXCEPINFO* pExcepInfo,UINT* puArgErr )
@@ -65,9 +78,9 @@ STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LC
 			pDispParams->rgvarg[0].pboolVal);
 		break;
 	case DISPID_COMMANDSTATECHANGE:
-			CommandStateChange(
-				pDispParams->rgvarg[1].lVal,
-				pDispParams->rgvarg[0].boolVal);
+		CommandStateChange(
+			pDispParams->rgvarg[1].lVal,
+			pDispParams->rgvarg[0].boolVal);
 		break;
 	case DISPID_NAVIGATECOMPLETE2:
 		NavigateComplete2(
@@ -107,7 +120,18 @@ STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LC
 
 STDMETHODIMP DuiLib::CWebBrowserUI::QueryInterface( REFIID riid, LPVOID *ppvObject )
 {
-	return S_OK;
+	*ppvObject = NULL;
+
+	if( riid == IID_IDocHostUIHandler)
+		*ppvObject = static_cast<IDocHostUIHandler*>(this);
+	else if( riid == IID_IDispatch)
+		*ppvObject = static_cast<IDispatch*>(this);
+	else if( riid == IID_IServiceProvider)
+		*ppvObject = static_cast<IServiceProvider*>(this);
+
+	if( *ppvObject != NULL )
+		AddRef();
+	return *ppvObject == NULL ? E_NOINTERFACE : S_OK;
 }
 
 STDMETHODIMP_(ULONG) DuiLib::CWebBrowserUI::AddRef()
@@ -129,10 +153,10 @@ void DuiLib::CWebBrowserUI::Navigate2( LPCTSTR lpszUrl )
 
 	if (m_pWebBrowser2)
 	{
-		VARIANT v;
-		v.vt=VT_BSTR;
-		v.bstrVal=T2BSTR(lpszUrl);
-		HRESULT hr = m_pWebBrowser2->Navigate2(&v, NULL, NULL, NULL, NULL);
+		CVariant url;
+		url.vt=VT_BSTR;
+		url.bstrVal=T2BSTR(lpszUrl);
+		HRESULT hr = m_pWebBrowser2->Navigate2(&url, NULL, NULL, NULL, NULL);
 	}
 }
 
@@ -208,7 +232,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::ShowContextMenu( DWORD dwID, POINT* pptPosit
 	{
 		return m_pWebBrowserEventHandler->ShowContextMenu(dwID,pptPosition,pCommandTarget,pDispatchObjectHit);
 	}
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetHostInfo( DOCHOSTUIINFO* pInfo )
@@ -319,15 +343,12 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetDropTarget( IDropTarget* pDropTarget, IDr
 	{
 		return m_pWebBrowserEventHandler->GetDropTarget(pDropTarget,ppDropTarget);
 	}
-	return S_OK;
+	return E_NOTIMPL;	// 使用系统拖拽
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetExternal( IDispatch** ppDispatch )
 {
-	if (m_pWebBrowserEventHandler)
-	{
-		return m_pWebBrowserEventHandler->GetExternal(ppDispatch);
-	}
+	*ppDispatch = this;
 	return S_OK;
 }
 
@@ -357,12 +378,10 @@ void DuiLib::CWebBrowserUI::SetWebBrowserEventHandler( CWebBrowserEventHandler* 
 
 void DuiLib::CWebBrowserUI::Refresh2( int Level )
 {
-	VARIANT vLevel;
-	VariantInit(&vLevel);
+	CVariant vLevel;
 	vLevel.vt=VT_I4;
 	vLevel.intVal=Level;
 	m_pWebBrowser2->Refresh2(&vLevel);
-	VariantClear(&vLevel);
 }
 
 void DuiLib::CWebBrowserUI::SetAttribute( LPCTSTR pstrName, LPCTSTR pstrValue )
@@ -424,4 +443,134 @@ void DuiLib::CWebBrowserUI::SetAutoNavigation( bool bAuto /*= TRUE*/ )
 bool DuiLib::CWebBrowserUI::IsAutoNavigation()
 {
 	return m_bAutoNavi;
+}
+
+STDMETHODIMP DuiLib::CWebBrowserUI::QueryService( REFGUID guidService, REFIID riid, void** ppvObject )
+{
+	HRESULT hr = E_NOINTERFACE;
+	*ppvObject = NULL;
+
+	if ( guidService == SID_SDownloadManager && riid == IID_IDownloadManager)
+	{
+		*ppvObject = this;
+		return S_OK;
+	}
+
+	return hr;
+}
+
+HRESULT DuiLib::CWebBrowserUI::RegisterEventHandler( BOOL inAdvise )
+{
+	CComPtr<IWebBrowser2> pWebBrowser;
+	CComPtr<IConnectionPointContainer>  pCPC;
+	CComPtr<IConnectionPoint> pCP;
+	HRESULT hr = GetControl(IID_IWebBrowser2, (void**)&pWebBrowser);
+	if (FAILED(hr))
+		return hr;
+	hr=pWebBrowser->QueryInterface(IID_IConnectionPointContainer,(void **)&pCPC);
+	if (FAILED(hr))
+		return hr;
+	hr=pCPC->FindConnectionPoint(DIID_DWebBrowserEvents2,&pCP);
+	if (FAILED(hr))
+		return hr;
+
+	CComPtr<IDispatch> spDoc;   
+	pWebBrowser->get_Document(&spDoc);   
+
+	if (spDoc)
+	{   
+		CComQIPtr<ICustomDoc, &IID_ICustomDoc> spCustomDoc(spDoc);   
+		if (spCustomDoc)   
+			spCustomDoc->SetUIHandler(this);   
+	}
+
+	if (inAdvise)
+	{
+		hr = pCP->Advise((IDispatch*)this, &m_dwCookie);
+	}
+	else
+	{
+		hr = pCP->Unadvise(m_dwCookie);
+	}
+	return hr; 
+}
+
+DISPID DuiLib::CWebBrowserUI::FindId( IDispatch *pObj, LPOLESTR pName )
+{
+	DISPID id = 0;
+	if(FAILED(pObj->GetIDsOfNames(IID_NULL,&pName,1,LOCALE_SYSTEM_DEFAULT,&id))) id = -1;
+	return id;
+}
+
+HRESULT DuiLib::CWebBrowserUI::InvokeMethod( IDispatch *pObj, LPOLESTR pMehtod, VARIANT *pVarResult, VARIANT *ps, int cArgs )
+{
+	DISPID dispid = FindId(pObj, pMehtod);
+	if(dispid == -1) return E_FAIL;
+
+	DISPPARAMS dispparams;
+	dispparams.cArgs = cArgs;
+	dispparams.rgvarg = ps;
+	dispparams.cNamedArgs = 0;
+	dispparams.rgdispidNamedArgs = NULL;
+
+	return pObj->Invoke(dispid, IID_NULL, LOCALE_SYSTEM_DEFAULT, DISPATCH_METHOD, &dispparams, pVarResult, NULL, NULL);
+}
+
+HRESULT DuiLib::CWebBrowserUI::GetProperty( IDispatch *pObj, LPOLESTR pName, VARIANT *pValue )
+{
+	DISPID dispid = FindId(pObj, pName);
+	if(dispid == -1) return E_FAIL;
+
+	DISPPARAMS ps;
+	ps.cArgs = 0;
+	ps.rgvarg = NULL;
+	ps.cNamedArgs = 0;
+	ps.rgdispidNamedArgs = NULL;
+
+	return pObj->Invoke(dispid, IID_NULL, LOCALE_SYSTEM_DEFAULT, DISPATCH_PROPERTYGET, &ps, pValue, NULL, NULL);
+}
+
+HRESULT DuiLib::CWebBrowserUI::SetProperty( IDispatch *pObj, LPOLESTR pName, VARIANT *pValue )
+{
+	DISPID dispid = FindId(pObj, pName);
+	if(dispid == -1) return E_FAIL;
+
+	DISPPARAMS ps;
+	ps.cArgs = 1;
+	ps.rgvarg = pValue;
+	ps.cNamedArgs = 0;
+	ps.rgdispidNamedArgs = NULL;
+
+	return pObj->Invoke(dispid, IID_NULL, LOCALE_SYSTEM_DEFAULT, DISPATCH_PROPERTYPUT, &ps, NULL, NULL, NULL);
+}
+
+IDispatch* DuiLib::CWebBrowserUI::GetHtmlWindow()
+{
+	IDispatch* pDp =  NULL;
+	HRESULT hr;
+	if (m_pWebBrowser2)
+		hr=m_pWebBrowser2->get_Document(&pDp);
+
+	if (FAILED(hr))
+		return NULL;
+
+	IHTMLDocument2 *pHtmlDoc2 = NULL;
+	hr=pDp->QueryInterface(IID_IHTMLDocument2,(void**)&pHtmlDoc2);
+
+	if (FAILED(hr))
+		return NULL;
+
+	hr=pHtmlDoc2->get_parentWindow(&_pHtmlWnd2);
+
+	if (FAILED(hr))
+		return NULL;
+
+	IDispatch *pHtmlWindown = NULL;
+	hr=_pHtmlWnd2->QueryInterface(IID_IDispatch, (void**)&pHtmlWindown);
+	if (FAILED(hr))
+		return NULL;
+
+	pHtmlDoc2->Release();
+
+	return pHtmlWindown;
 }

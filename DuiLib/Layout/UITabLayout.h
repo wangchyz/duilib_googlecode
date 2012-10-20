@@ -19,6 +19,7 @@ namespace DuiLib
 		void RemoveAll();
 		int GetCurSel() const;
 		bool SelectItem(int iIndex);
+		bool SelectItem(CControlUI* pControl);
 
 		void SetPos(RECT rc);
 

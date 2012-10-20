@@ -1,6 +1,7 @@
 #pragma once
 #include <ExDisp.h>
 #include <ExDispid.h>
+#include <mshtmhst.h>
 
 namespace DuiLib
 {
@@ -91,7 +92,7 @@ namespace DuiLib
 			/* [in] */ const GUID __RPC_FAR *pguidCmdGroup,
 			/* [in] */ DWORD nCmdID)
 		{
-			return S_OK;
+			return S_FALSE;
 		}
 
 		virtual HRESULT STDMETHODCALLTYPE GetOptionKeyPath(
@@ -105,13 +106,7 @@ namespace DuiLib
 			/* [in] */ IDropTarget __RPC_FAR *pDropTarget,
 			/* [out] */ IDropTarget __RPC_FAR *__RPC_FAR *ppDropTarget)
 		{
-			return S_OK;
-		}
-
-		virtual HRESULT STDMETHODCALLTYPE GetExternal(
-			/* [out] */ IDispatch __RPC_FAR *__RPC_FAR *ppDispatch)
-		{
-			return S_OK;
+			return E_NOTIMPL;
 		}
 
 		virtual HRESULT STDMETHODCALLTYPE TranslateUrl(
