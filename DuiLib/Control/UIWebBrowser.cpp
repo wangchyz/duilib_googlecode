@@ -97,8 +97,8 @@ STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LC
 		break;
 	case DISPID_STATUSTEXTCHANGE:
 		break;
-//  	case DISPID_NEWWINDOW2:
-//  		break;
+		//  	case DISPID_NEWWINDOW2:
+		//  		break;
 	case DISPID_NEWWINDOW3:
 		NewWindow3(
 			pDispParams->rgvarg[4].ppdispVal,
@@ -115,7 +115,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LC
 	default:
 		return E_NOTIMPL;
 	}
-	return S_OK;
+	return DISP_E_MEMBERNOTFOUND;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::QueryInterface( REFIID riid, LPVOID *ppvObject )
@@ -348,7 +348,10 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetDropTarget( IDropTarget* pDropTarget, IDr
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetExternal( IDispatch** ppDispatch )
 {
-	*ppDispatch = this;
+	if (m_pWebBrowserEventHandler)
+	{
+		return m_pWebBrowserEventHandler->GetExternal(ppDispatch);
+	}
 	return S_OK;
 }
 
@@ -408,7 +411,7 @@ void DuiLib::CWebBrowserUI::NavigateUrl( LPCTSTR lpszUrl )
 {
 	if (m_pWebBrowser2 && lpszUrl)
 	{
-			m_pWebBrowser2->Navigate((BSTR)SysAllocString(T2BSTR(lpszUrl)),NULL,NULL,NULL,NULL);
+		m_pWebBrowser2->Navigate((BSTR)SysAllocString(T2BSTR(lpszUrl)),NULL,NULL,NULL,NULL);
 	}
 }
 
