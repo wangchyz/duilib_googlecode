@@ -33,11 +33,11 @@ namespace DuiLib
 		void NavigateHomePage();
 		void NavigateUrl(LPCTSTR lpszUrl);
 		virtual bool DoCreateControl();
+		IDispatch*		   GetHtmlWindow();
 		static DISPID FindId(IDispatch *pObj, LPOLESTR pName);
 		static HRESULT InvokeMethod(IDispatch *pObj, LPOLESTR pMehtod, VARIANT *pVarResult, VARIANT *ps, int cArgs);
 		static HRESULT GetProperty(IDispatch *pObj, LPOLESTR pName, VARIANT *pValue);
 		static HRESULT SetProperty(IDispatch *pObj, LPOLESTR pName, VARIANT *pValue);
-		IDispatch*		   GetHtmlWindow();
 
 	protected:
 		IWebBrowser2*			m_pWebBrowser2; //ä¯ÀÀÆ÷Ö¸Õë
