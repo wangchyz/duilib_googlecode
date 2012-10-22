@@ -469,8 +469,15 @@ namespace DuiLib
 
 	const CDuiString& CDuiString::operator=(LPCTSTR lpStr)
 	{      
-		ASSERT(!::IsBadStringPtr(lpStr,-1));
-		Assign(lpStr);
+		if ( lpStr )
+		{
+			ASSERT(!::IsBadStringPtr(lpStr,-1));
+			Assign(lpStr);
+		}
+		else
+		{
+			Empty();
+		}
 		return *this;
 	}
 
@@ -478,21 +485,32 @@ namespace DuiLib
 
 	const CDuiString& CDuiString::operator=(LPCSTR lpStr)
 	{
-		ASSERT(!::IsBadStringPtrA(lpStr,-1));
-		int cchStr = (int) strlen(lpStr) + 1;
-		LPWSTR pwstr = (LPWSTR) _alloca(cchStr);
-		if( pwstr != NULL ) ::MultiByteToWideChar(::GetACP(), 0, lpStr, -1, pwstr, cchStr) ;
-		Assign(pwstr);
+		if ( lpStr )
+		{
+			ASSERT(!::IsBadStringPtrA(lpStr,-1));
+			int cchStr = (int) strlen(lpStr) + 1;
+			LPWSTR pwstr = (LPWSTR) _alloca(cchStr);
+			if( pwstr != NULL ) ::MultiByteToWideChar(::GetACP(), 0, lpStr, -1, pwstr, cchStr) ;
+			Assign(pwstr);
+		}
+		else
+		{
+			Empty();
+		}
 		return *this;
 	}
 
 	const CDuiString& CDuiString::operator+=(LPCSTR lpStr)
 	{
-		ASSERT(!::IsBadStringPtrA(lpStr,-1));
-		int cchStr = (int) strlen(lpStr) + 1;
-		LPWSTR pwstr = (LPWSTR) _alloca(cchStr);
-		if( pwstr != NULL ) ::MultiByteToWideChar(::GetACP(), 0, lpStr, -1, pwstr, cchStr) ;
-		Append(pwstr);
+		if ( lpStr )
+		{
+			ASSERT(!::IsBadStringPtrA(lpStr,-1));
+			int cchStr = (int) strlen(lpStr) + 1;
+			LPWSTR pwstr = (LPWSTR) _alloca(cchStr);
+			if( pwstr != NULL ) ::MultiByteToWideChar(::GetACP(), 0, lpStr, -1, pwstr, cchStr) ;
+			Append(pwstr);
+		}
+		
 		return *this;
 	}
 
@@ -500,21 +518,33 @@ namespace DuiLib
 
 	const CDuiString& CDuiString::operator=(LPCWSTR lpwStr)
 	{      
-		ASSERT(!::IsBadStringPtrW(lpwStr,-1));
-		int cchStr = ((int) wcslen(lpwStr) * 2) + 1;
-		LPSTR pstr = (LPSTR) _alloca(cchStr);
-		if( pstr != NULL ) ::WideCharToMultiByte(::GetACP(), 0, lpwStr, -1, pstr, cchStr, NULL, NULL);
-		Assign(pstr);
+		if ( lpwStr )
+		{
+			ASSERT(!::IsBadStringPtrW(lpwStr,-1));
+			int cchStr = ((int) wcslen(lpwStr) * 2) + 1;
+			LPSTR pstr = (LPSTR) _alloca(cchStr);
+			if( pstr != NULL ) ::WideCharToMultiByte(::GetACP(), 0, lpwStr, -1, pstr, cchStr, NULL, NULL);
+			Assign(pstr);
+		}
+		else
+		{
+			Empty();
+		}
+		
 		return *this;
 	}
 
 	const CDuiString& CDuiString::operator+=(LPCWSTR lpwStr)
 	{
-		ASSERT(!::IsBadStringPtrW(lpwStr,-1));
-		int cchStr = ((int) wcslen(lpwStr) * 2) + 1;
-		LPSTR pstr = (LPSTR) _alloca(cchStr);
-		if( pstr != NULL ) ::WideCharToMultiByte(::GetACP(), 0, lpwStr, -1, pstr, cchStr, NULL, NULL);
-		Append(pstr);
+		if ( lpwStr )
+		{
+			ASSERT(!::IsBadStringPtrW(lpwStr,-1));
+			int cchStr = ((int) wcslen(lpwStr) * 2) + 1;
+			LPSTR pstr = (LPSTR) _alloca(cchStr);
+			if( pstr != NULL ) ::WideCharToMultiByte(::GetACP(), 0, lpwStr, -1, pstr, cchStr, NULL, NULL);
+			Append(pstr);
+		}
+		
 		return *this;
 	}
 
@@ -537,10 +567,15 @@ namespace DuiLib
 
 	CDuiString CDuiString::operator+(LPCTSTR lpStr) const
 	{
-		ASSERT(!::IsBadStringPtr(lpStr,-1));
-		CDuiString sTemp = *this;
-		sTemp.Append(lpStr);
-		return sTemp;
+		if ( lpStr )
+		{
+			ASSERT(!::IsBadStringPtr(lpStr,-1));
+			CDuiString sTemp = *this;
+			sTemp.Append(lpStr);
+			return sTemp;
+		}
+
+		return *this;
 	}
 
 	const CDuiString& CDuiString::operator+=(const CDuiString& src)
@@ -551,8 +586,12 @@ namespace DuiLib
 
 	const CDuiString& CDuiString::operator+=(LPCTSTR lpStr)
 	{      
-		ASSERT(!::IsBadStringPtr(lpStr,-1));
-		Append(lpStr);
+		if ( lpStr )
+		{
+			ASSERT(!::IsBadStringPtr(lpStr,-1));
+			Append(lpStr);
+		}
+		
 		return *this;
 	}
 
