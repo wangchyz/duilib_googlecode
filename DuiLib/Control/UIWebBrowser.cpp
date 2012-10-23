@@ -23,7 +23,6 @@ bool DuiLib::CWebBrowserUI::DoCreateControl()
 		return false;
 	GetManager()->AddTranslateAccelerator(this);
 	GetControl(IID_IWebBrowser2,(LPVOID*)&m_pWebBrowser2);
-	this->Navigate2(_T("about:black"));
 	if ( m_bAutoNavi && !m_sHomePage.IsEmpty())
 	{
 		this->Navigate2(m_sHomePage);
