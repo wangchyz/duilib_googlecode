@@ -56,7 +56,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfo( UINT iTInfo, LCID lcid, ITypeIn
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetIDsOfNames( REFIID riid, OLECHAR **rgszNames, UINT cNames, LCID lcid,DISPID *rgDispId )
 {
-	return DISP_E_UNKNOWNLCID;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LCID lcid,WORD wFlags, DISPPARAMS* pDispParams,VARIANT* pVarResult, EXCEPINFO* pExcepInfo,UINT* puArgErr )
@@ -319,9 +319,14 @@ LRESULT DuiLib::CWebBrowserUI::TranslateAccelerator( MSG *pMsg )
 {
 	if( m_pWebBrowser2 != NULL )
 	{
+		// 当前Web窗口不是焦点,不处理加速键
+		if(!CActiveXUI::IsFocused())
+			return S_FALSE;
+
 		IOleInPlaceActiveObject *pObj;
 		if (FAILED(m_pWebBrowser2->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
 			return S_FALSE;
+
 		return pObj->TranslateAccelerator(pMsg);
 	}
 	return E_NOTIMPL;
