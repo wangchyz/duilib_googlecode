@@ -22,6 +22,7 @@ namespace DuiLib
 	public:
 		LPCTSTR GetClass() const;
 		LPVOID	GetInterface(LPCTSTR pstrName);
+		void	DoEvent(TEventUI& event);
 		void	Invalidate();
 
 		bool	Add(CControlUI* _pTreeNodeUI);
@@ -52,6 +53,11 @@ namespace DuiLib
 		void	SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
 		CStdPtrArray			GetTreeNodes();
+
+		int			 GetNodeIndex();
+	private:
+		CTreeNodeUI* GetLastNode();
+		CTreeNodeUI* CalLocation(CTreeNodeUI* _pTreeNodeUI);
 	public:
 		CHorizontalLayoutUI*	GetTreeNodeHoriznotal() const {return pHoriz;};
 		CCheckBoxUI*			GetFolderButton() const {return pFolderButton;};
@@ -88,11 +94,13 @@ namespace DuiLib
 		virtual LPVOID	GetInterface(LPCTSTR pstrName);
 		virtual bool Add(CTreeNodeUI* pControl );
 		virtual long AddAt(CTreeNodeUI* pControl, int iIndex );
+		virtual bool AddAt(CTreeNodeUI* pControl,CTreeNodeUI* _IndexNode);
 		virtual bool Remove(CTreeNodeUI* pControl);
 		virtual bool RemoveAt(int iIndex);
 		virtual void RemoveAll();
 		virtual bool OnCheckBoxChanged(void* param);
 		virtual bool OnFolderChanged(void* param);
+		virtual bool OnDBClickItem(void* param);
 		virtual bool SetItemCheckBox(bool _Selected,CTreeNodeUI* _TreeNode = NULL);
 		virtual void SetItemExpand(bool _Expanded,CTreeNodeUI* _TreeNode = NULL);
 		virtual void Notify(TNotifyUI& msg);
@@ -100,10 +108,13 @@ namespace DuiLib
 		virtual bool GetVisibleFolderBtn();
 		virtual void SetVisibleCheckBtn(bool _IsVisibled);
 		virtual bool GetVisibleCheckBtn();
+		virtual void SetItemMinWidth(UINT _ItemMinWidth);
+		virtual UINT GetItemMinWidth();
 
 		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
-
+		
 	private:
+		UINT m_uItemMinWidth;
 		bool m_bVisibleFolderBtn;
 		bool m_bVisibleCheckBtn;
 	};
