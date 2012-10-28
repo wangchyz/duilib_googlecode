@@ -48,7 +48,6 @@ typedef struct tagTIMERINFO
     bool bKilled;
 } TIMERINFO;
 
-
 /////////////////////////////////////////////////////////////////////////////////////
 
 HPEN m_hUpdateRectPen = NULL;
@@ -88,6 +87,7 @@ m_bMouseTracking(false),
 m_bMouseCapture(false),
 m_bOffscreenPaint(true),
 m_bAlphaBackground(false),
+m_bUsedVirtualWnd(false),
 m_nOpacity(255),
 m_pParentResourcePM(NULL)
 {
@@ -1520,6 +1520,11 @@ void CPaintManagerUI::SendNotify(TNotifyUI& Msg, bool bAsync /*= false*/)
 {
     Msg.ptMouse = m_ptLastMousePos;
     Msg.dwTimestamp = ::GetTickCount();
+	if( m_bUsedVirtualWnd )
+	{
+		Msg.sVirtualWnd = Msg.pSender->GetVirtualWnd();
+	}
+
     if( !bAsync ) {
         // Send to all listeners
         if( Msg.pSender != NULL ) {
@@ -2250,6 +2255,11 @@ bool CPaintManagerUI::RemoveTranslateAccelerator(ITranslateAccelerator *pTransla
 		}
 	}
 	return false;
+}
+
+void CPaintManagerUI::UsedVirtualWnd(bool bUsed)
+{
+	m_bUsedVirtualWnd = bUsed;
 }
 
 } // namespace DuiLib

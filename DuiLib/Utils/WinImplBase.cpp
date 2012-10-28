@@ -6,9 +6,11 @@
 namespace DuiLib
 {
 
+//////////////////////////////////////////////////////////////////////////
+
 LPBYTE WindowImplBase::m_lpResourceZIPBuffer=NULL;
 
-DUI_BASE_BEGIN_MESSAGE_MAP(WindowImplBase)
+DUI_BEGIN_MESSAGE_MAP(WindowImplBase,CNotifyPump)
 	DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK,OnClick)
 DUI_END_MESSAGE_MAP()
 
@@ -365,33 +367,6 @@ LONG WindowImplBase::GetStyle()
 	return styleValue;
 }
 
-static const DUI_MSGMAP_ENTRY* DuiFindMessageEntry(const DUI_MSGMAP_ENTRY* lpEntry,TNotifyUI& msg )
-{
-	CDuiString sMsgType = msg.sType;
-	CDuiString sCtrlName = msg.pSender->GetName();
-
-	const DUI_MSGMAP_ENTRY* pMsgTypeEntry = NULL;
-	while (lpEntry->nSig != DuiSig_end)
-	{
-		if(lpEntry->sMsgType==sMsgType)
-		{
-			if(!lpEntry->sCtrlName.IsEmpty())
-			{
-				if(lpEntry->sCtrlName==sCtrlName)
-				{
-					return lpEntry;
-				}
-			}
-			else
-			{
-				pMsgTypeEntry = lpEntry;
-			}
-		}
-		lpEntry++;
-	}
-	return pMsgTypeEntry;
-}
-
 void WindowImplBase::OnClick(TNotifyUI& msg)
 {
 	CDuiString sCtrlName = msg.pSender->GetName();
@@ -420,44 +395,7 @@ void WindowImplBase::OnClick(TNotifyUI& msg)
 
 void WindowImplBase::Notify(TNotifyUI& msg)
 {
-	const DUI_MSGMAP* pMessageMap = NULL;
-	const DUI_MSGMAP_ENTRY* lpEntry = NULL;
-
-#ifndef UILIB_STATIC
-	for(pMessageMap = GetMessageMap(); pMessageMap!=NULL; pMessageMap = (*pMessageMap->pfnGetBaseMap)())
-#else
-	for(pMessageMap = GetMessageMap(); pMessageMap!=NULL; pMessageMap = pMessageMap->pBaseMap)
-#endif
-	{
-#ifndef UILIB_STATIC
-		ASSERT(pMessageMap != (*pMessageMap->pfnGetBaseMap)());
-#else
-		ASSERT(pMessageMap != pMessageMap->pBaseMap);
-#endif
-		if ((lpEntry = DuiFindMessageEntry(pMessageMap->lpEntries,msg)) != NULL)
-		{
-			goto LDispatch;
-		}
-	}
-	return;
-
-LDispatch:
-	union DuiMessageMapFunctions mmf;
-	mmf.pfn = lpEntry->pfn;
-
-	int nSig;
-	nSig = lpEntry->nSig;
-	switch (nSig)
-	{
-	default:
-		ASSERT(FALSE);
-		break;
-	case DuiSig_lwl:
-		break;
-	case DuiSig_vn:
-		(this->*mmf.pfn_Notify_vn)(msg);
-		break;
-	}
+	return CNotifyPump::NotifyPump(msg);
 }
 
 }

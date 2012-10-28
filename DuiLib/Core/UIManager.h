@@ -117,17 +117,6 @@ typedef struct tagTEventUI
     LPARAM lParam;
 } TEventUI;
 
-// Structure for notifications to the outside world
-typedef struct tagTNotifyUI 
-{
-    CDuiString sType;
-    CControlUI* pSender;
-    DWORD dwTimestamp;
-    POINT ptMouse;
-    WPARAM wParam;
-    LPARAM lParam;
-} TNotifyUI;
-
 // Structure for relative position to the parent
 typedef struct tagTRelativePosUI
 {
@@ -325,6 +314,7 @@ public:
 
     bool MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRes);
     bool PreMessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRes);
+	void UsedVirtualWnd(bool bUsed);
 
 private:
     static CControlUI* CALLBACK __FindControlFromNameHash(CControlUI* pThis, LPVOID pData);
@@ -370,6 +360,8 @@ private:
     bool m_bAlphaBackground;
     bool m_bMouseTracking;
     bool m_bMouseCapture;
+	bool m_bUsedVirtualWnd;
+
     //
     CStdPtrArray m_aNotifiers;
     CStdPtrArray m_aTimers;

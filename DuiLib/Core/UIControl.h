@@ -142,6 +142,10 @@ public:
 
     virtual void DoPostPaint(HDC hDC, const RECT& rcPaint);
 
+	//ÐéÄâ´°¿Ú²ÎÊý
+	void SetVirtualWnd(LPCTSTR pstrValue);
+	CDuiString GetVirtualWnd() const;
+
 public:
     CEventSource OnInit;
     CEventSource OnDestroy;
@@ -152,6 +156,7 @@ public:
 protected:
     CPaintManagerUI* m_pManager;
     CControlUI* m_pParent;
+	CDuiString m_sVirtualWnd;
     CDuiString m_sName;
     bool m_bUpdateNeeded;
     bool m_bMenuUsed;

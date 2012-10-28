@@ -442,6 +442,10 @@
 				RelativePath=".\UIlib.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Utils\WinImplBase.cpp"
+				>
+			</File>
 			<Filter
 				Name="Utils"
 				>
@@ -684,10 +688,6 @@
 				</File>
 				<File
 					RelativePath=".\Utils\WebBrowserEventHandler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Utils\WinImplBase.cpp"
 					>
 				</File>
 				<File

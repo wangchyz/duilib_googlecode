@@ -2,6 +2,152 @@
 #include "RichListWnd.h"
 
 
+//////////////////////////////////////////////////////////////////////////
+///
+
+
+DUI_BEGIN_MESSAGE_MAP(CPage1, CNotifyPump)
+	DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK,OnClick)
+	DUI_ON_MSGTYPE(DUI_MSGTYPE_SELECTCHANGED,OnSelectChanged)
+	DUI_ON_MSGTYPE(DUI_MSGTYPE_ITEMCLICK,OnItemClick)
+DUI_END_MESSAGE_MAP()
+
+CPage1::CPage1()
+{
+	m_pPaintManager = NULL;
+}
+
+void CPage1::SetPaintMagager(CPaintManagerUI* pPaintMgr)
+{
+	m_pPaintManager = pPaintMgr;
+}
+
+void CPage1::OnClick(TNotifyUI& msg)
+{
+	if(msg.pSender->GetName() == _T("down_ico"))
+	{                
+		CControlUI *find_ctrl =m_pPaintManager->FindSubControlByName(msg.pSender->GetParent()->GetParent(), _T("down_name"));
+
+		if(find_ctrl)
+		{
+			MessageBox(NULL, 
+				find_ctrl->GetText()+_T(" 演示未选中行中的按钮触发动作，依该按钮父结点的找到所属行listcontainer.."), 
+				_T("DUILIB DEMO"), MB_OK);   
+			((CLabelUI *)find_ctrl)->SetText(_T("由程序动态设置后的名称..."));
+		}
+		}
+	else if(msg.pSender->GetName() == _T("down_del"))
+	{
+		CListUI *down_list = 
+			static_cast<CListUI*>(m_pPaintManager->FindControl(_T("down_list_tab")));
+		if(!down_list)
+			return;
+
+		down_list->RemoveAt(down_list->GetCurSel());                   
+	}
+	else if(msg.pSender->GetName() == _T("down_new"))
+	{
+		CListUI *down_list = static_cast<CListUI*>(m_pPaintManager->FindControl(_T("down_list_tab")));
+		if(!down_list)
+			return;
+
+		CListContainerElementUI *new_node = new CListContainerElementUI;
+		new_node->ApplyAttributeList(_T("height=\"45\""));
+
+		CHorizontalLayoutUI *new_h_lay = new CHorizontalLayoutUI;
+		new_h_lay->ApplyAttributeList(_T("float=\"false\" ")\
+			_T("childpadding=\"10\" inset=\"3,5,3,5\""));
+
+		CButtonUI *new_btn_1 = new CButtonUI;
+		new_btn_1->ApplyAttributeList(
+			_T("name=\"down_ico\" float=\"false\" ")\
+			_T("bordersize=\"0\" width=\"32\" maxheight=\"26\" ")\
+			_T("bkimage=\"downlist_app.png\" ")\
+			_T("normalimage=\"file='downlist_run.png' dest='20,14,32,26'\""));
+
+		CVerticalLayoutUI *new_v_lay = new CVerticalLayoutUI;
+		new_h_lay->Add(new_btn_1);
+		new_h_lay->Add(new_v_lay);
+
+		CLabelUI *new_label = new CLabelUI;
+		new_label->ApplyAttributeList(_T("textcolor=\"#FFAAAAAA\" showhtml=\"true\""));
+		new_label->SetText(_T("new added item.exe"));
+		new_label->SetName(_T("down_name"));
+		CProgressUI *new_progress = new CProgressUI;
+		new_progress->SetMinValue(0);
+		new_progress->SetMaxValue(100);
+		new_progress->SetValue(1);
+		new_progress->SetMaxWidth(200);
+		new_progress->SetMaxHeight(7);
+		new_progress->SetForeImage(_T("progress_fore.png"));
+		new_progress->SetName(_T("down_progress"));
+		new_v_lay->Add(new_label);
+		new_v_lay->Add(new_progress);
+
+		CLabelUI *new_label2 = new CLabelUI;
+		CLabelUI *new_label3 = new CLabelUI;
+		CVerticalLayoutUI *new_v_lay2 = new CVerticalLayoutUI;
+		new_h_lay->Add(new_v_lay2);
+		new_v_lay2->Add(new_label2);
+		new_v_lay2->Add(new_label3);
+		new_label2->ApplyAttributeList(
+			_T("align=\"right\" text=\"\" textcolor=\"#FFAAAAAA\" showhtml=\"true\""));
+		new_label3->ApplyAttributeList(
+			_T("align=\"right\" text=\"0.00K/34.33M \" textcolor=\"#FFAAAAAA\" showhtml=\"true\""));
+
+		new_node->Add(new_h_lay);
+		down_list->Add(new_node);
+	}
+}
+
+void CPage1::OnSelectChanged( TNotifyUI &msg )
+{
+
+}
+
+void CPage1::OnItemClick( TNotifyUI &msg )
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+///
+
+DUI_BEGIN_MESSAGE_MAP(CPage2, CNotifyPump)
+	DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK,OnClick)
+	DUI_ON_MSGTYPE(DUI_MSGTYPE_SELECTCHANGED,OnSelectChanged)
+	DUI_ON_MSGTYPE(DUI_MSGTYPE_ITEMCLICK,OnItemClick)
+DUI_END_MESSAGE_MAP()
+
+
+CPage2::CPage2()
+{
+	m_pPaintManager = NULL;
+}
+
+void CPage2::SetPaintMagager(CPaintManagerUI* pPaintMgr)
+{
+	m_pPaintManager = pPaintMgr;
+}
+
+void CPage2::OnClick(TNotifyUI& msg)
+{
+
+}
+
+void CPage2::OnSelectChanged( TNotifyUI &msg )
+{
+
+}
+
+void CPage2::OnItemClick( TNotifyUI &msg )
+{
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+///
+
 DUI_BEGIN_MESSAGE_MAP(CRichListWnd, WindowImplBase)
 	DUI_ON_MSGTYPE(DUI_MSGTYPE_CLICK,OnClick)
 	DUI_ON_MSGTYPE(DUI_MSGTYPE_SELECTCHANGED,OnSelectChanged)
@@ -10,10 +156,17 @@ DUI_END_MESSAGE_MAP()
 
 CRichListWnd::CRichListWnd(void)
 {
+	m_Page1.SetPaintMagager(&m_PaintManager);
+	m_Page2.SetPaintMagager(&m_PaintManager);
+
+	AddVirtualWnd(_T("page1"),&m_Page1);
+	AddVirtualWnd(_T("page2"),&m_Page2);
 }
 
 CRichListWnd::~CRichListWnd(void)
 {
+	RemoveVirtualWnd(_T("page1"));
+	RemoveVirtualWnd(_T("page2"));
 }
 
 void CRichListWnd::OnFinalMessage( HWND hWnd)
@@ -75,82 +228,9 @@ void CRichListWnd::OnClick( TNotifyUI &msg )
 		SendMessage(WM_SYSCOMMAND, SC_RESTORE, 0);
 		return;
 	}
-	else if( msg.pSender->GetName() == _T("quitbtn") ) {
-		/*Close()*/PostQuitMessage(0); // 因为activex的原因，使用close可能会出现错误
-	}
-	else if(msg.pSender->GetName() == _T("down_ico"))
-	{                
-		CControlUI *find_ctrl =m_PaintManager.FindSubControlByName(msg.pSender->GetParent()->GetParent(), _T("down_name"));
-
-		if(find_ctrl)
-		{
-			MessageBox(NULL, 
-				find_ctrl->GetText()+_T(" 演示未选中行中的按钮触发动作，依该按钮父结点的找到所属行listcontainer.."), 
-				_T("DUILIB DEMO"), MB_OK);   
-			((CLabelUI *)find_ctrl)->SetText(_T("由程序动态设置后的名称..."));
-		}
-	}
-	else if(msg.pSender->GetName() == _T("down_del"))
+	else if( msg.pSender->GetName() == _T("quitbtn") ) 
 	{
-		CListUI *down_list = 
-			static_cast<CListUI*>(m_PaintManager.FindControl(_T("down_list_tab")));
-		if(!down_list)
-			return;
-
-		down_list->RemoveAt(down_list->GetCurSel());                   
-	}
-	else if(msg.pSender->GetName() == _T("down_new"))
-	{
-		CListUI *down_list = static_cast<CListUI*>(m_PaintManager.FindControl(_T("down_list_tab")));
-		if(!down_list)
-			return;
-
-		CListContainerElementUI *new_node = new CListContainerElementUI;
-		new_node->ApplyAttributeList(_T("height=\"45\""));
-
-		CHorizontalLayoutUI *new_h_lay = new CHorizontalLayoutUI;
-		new_h_lay->ApplyAttributeList(_T("float=\"false\" ")\
-			_T("childpadding=\"10\" inset=\"3,5,3,5\""));
-
-		CButtonUI *new_btn_1 = new CButtonUI;
-		new_btn_1->ApplyAttributeList(
-			_T("name=\"down_ico\" float=\"false\" ")\
-			_T("bordersize=\"0\" width=\"32\" maxheight=\"26\" ")\
-			_T("bkimage=\"downlist_app.png\" ")\
-			_T("normalimage=\"file='downlist_run.png' dest='20,14,32,26'\""));
-
-		CVerticalLayoutUI *new_v_lay = new CVerticalLayoutUI;
-		new_h_lay->Add(new_btn_1);
-		new_h_lay->Add(new_v_lay);
-
-		CLabelUI *new_label = new CLabelUI;
-		new_label->ApplyAttributeList(_T("textcolor=\"#FFAAAAAA\" showhtml=\"true\""));
-		new_label->SetText(_T("new added item.exe"));
-		new_label->SetName(_T("down_name"));
-		CProgressUI *new_progress = new CProgressUI;
-		new_progress->SetMinValue(0);
-		new_progress->SetMaxValue(100);
-		new_progress->SetValue(1);
-		new_progress->SetMaxWidth(200);
-		new_progress->SetMaxHeight(7);
-		new_progress->SetForeImage(_T("progress_fore.png"));
-		new_progress->SetName(_T("down_progress"));
-		new_v_lay->Add(new_label);
-		new_v_lay->Add(new_progress);
-
-		CLabelUI *new_label2 = new CLabelUI;
-		CLabelUI *new_label3 = new CLabelUI;
-		CVerticalLayoutUI *new_v_lay2 = new CVerticalLayoutUI;
-		new_h_lay->Add(new_v_lay2);
-		new_v_lay2->Add(new_label2);
-		new_v_lay2->Add(new_label3);
-		new_label2->ApplyAttributeList(
-			_T("align=\"right\" text=\"\" textcolor=\"#FFAAAAAA\" showhtml=\"true\""));
-		new_label3->ApplyAttributeList(
-			_T("align=\"right\" text=\"0.00K/34.33M \" textcolor=\"#FFAAAAAA\" showhtml=\"true\""));
-
-		new_node->Add(new_h_lay);
-		down_list->Add(new_node);
+		PostQuitMessage(0); // 因为activex的原因，使用close可能会出现错误
 	}
 }
 
