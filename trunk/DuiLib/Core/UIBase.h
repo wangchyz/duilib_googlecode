@@ -46,6 +46,18 @@ LPCTSTR UILIB_API DUI__TraceMsg(UINT uMsg);
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
+class UILIB_API CNotifyPump
+{
+public:
+	bool AddVirtualWnd(CDuiString strName,CNotifyPump* pObject);
+	bool RemoveVirtualWnd(CDuiString strName);
+	void NotifyPump(TNotifyUI& msg);
+	bool LoopDispatch(TNotifyUI& msg);
+	DUI_DECLARE_MESSAGE_MAP()
+private:
+	CStdStringPtrMap m_VirtualWndMap;
+};
+
 class UILIB_API CWindowWnd
 {
 public:

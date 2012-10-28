@@ -16,6 +16,7 @@ namespace DuiLib
 
 	class UILIB_API WindowImplBase
 		: public CWindowWnd
+		, public CNotifyPump
 		, public INotifyUI
 		, public IMessageFilterUI
 		, public IDialogBuilderCallback

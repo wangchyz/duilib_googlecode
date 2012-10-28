@@ -683,6 +683,31 @@ void CControlUI::DoEvent(TEventUI& event)
     if( m_pParent != NULL ) m_pParent->DoEvent(event);
 }
 
+
+void CControlUI::SetVirtualWnd(LPCTSTR pstrValue)
+{
+	m_sVirtualWnd = pstrValue;
+	m_pManager->UsedVirtualWnd(true);
+}
+
+CDuiString CControlUI::GetVirtualWnd() const
+{
+	CDuiString str;
+	if( !m_sVirtualWnd.IsEmpty() ){
+		str = m_sVirtualWnd;
+	}
+	else{
+		CControlUI* pParent = GetParent();
+		if( pParent != NULL){
+			str = pParent->GetVirtualWnd();
+		}
+		else{
+			str = _T("");
+		}
+	}
+	return str;
+}
+
 void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 {
     if( _tcscmp(pstrName, _T("pos")) == 0 ) {
@@ -775,6 +800,7 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
     else if( _tcscmp(pstrName, _T("float")) == 0 ) SetFloat(_tcscmp(pstrValue, _T("true")) == 0);
     else if( _tcscmp(pstrName, _T("shortcut")) == 0 ) SetShortcut(pstrValue[0]);
     else if( _tcscmp(pstrName, _T("menu")) == 0 ) SetContextMenuUsed(_tcscmp(pstrValue, _T("true")) == 0);
+	else if( _tcscmp(pstrName, _T("virtualwnd")) == 0 ) SetVirtualWnd(pstrValue);
 }
 
 CControlUI* CControlUI::ApplyAttributeList(LPCTSTR pstrList)

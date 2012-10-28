@@ -83,7 +83,7 @@ namespace DuiLib
 		CStdPtrArray			mTreeNodes;
 	};
 
-	class UILIB_API CTreeViewUI : public CListUI,public INotifyUI
+	class UILIB_API CTreeViewUI : public CListUI, public INotifyUI
 	{
 	public:
 		CTreeViewUI(void);

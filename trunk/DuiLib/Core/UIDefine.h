@@ -12,15 +12,28 @@ enum DuiSig
 	DuiSig_vn,      // void (TNotifyUI)
 };
 
-class CDuiString;
-class WindowImplBase;
-typedef void (WindowImplBase::*DUI_PMSG)(TNotifyUI& msg);  //指针类型
+class CControlUI;
+
+// Structure for notifications to the outside world
+typedef struct tagTNotifyUI 
+{
+	CDuiString sType;
+	CDuiString sVirtualWnd;
+	CControlUI* pSender;
+	DWORD dwTimestamp;
+	POINT ptMouse;
+	WPARAM wParam;
+	LPARAM lParam;
+} TNotifyUI;
+
+class CNotifyPump;
+typedef void (CNotifyPump::*DUI_PMSG)(TNotifyUI& msg);  //指针类型
 
 union DuiMessageMapFunctions
 {
 	DUI_PMSG pfn;   // generic member function pointer
-	LRESULT (WindowImplBase::*pfn_Notify_lwl)(WPARAM, LPARAM);
-	void (WindowImplBase::*pfn_Notify_vn)(TNotifyUI&);
+	LRESULT (CNotifyPump::*pfn_Notify_lwl)(WPARAM, LPARAM);
+	void (CNotifyPump::*pfn_Notify_vn)(TNotifyUI&);
 };
 
 //定义所有消息类型
