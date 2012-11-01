@@ -52,8 +52,9 @@ namespace DuiLib
 
 		void	SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
-		CStdPtrArray			GetTreeNodes();
+		CStdPtrArray GetTreeNodes();
 
+		int			 GetTreeIndex();
 		int			 GetNodeIndex();
 	private:
 		CTreeNodeUI* GetLastNode();
@@ -68,7 +69,6 @@ namespace DuiLib
 	private:
 		long	m_iTreeLavel;
 		bool	m_bIsVisable;
-		bool	m_bIsHasChild;
 		bool	m_bIsCheckBox;
 
 		CTreeViewUI*			pTreeView;
@@ -83,7 +83,7 @@ namespace DuiLib
 		CStdPtrArray			mTreeNodes;
 	};
 
-	class UILIB_API CTreeViewUI : public CListUI, public INotifyUI
+	class UILIB_API CTreeViewUI : public CListUI,public INotifyUI
 	{
 	public:
 		CTreeViewUI(void);
