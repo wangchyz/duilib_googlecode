@@ -127,6 +127,8 @@ STDMETHODIMP DuiLib::CWebBrowserUI::QueryInterface( REFIID riid, LPVOID *ppvObje
 		*ppvObject = static_cast<IDispatch*>(this);
 	else if( riid == IID_IServiceProvider)
 		*ppvObject = static_cast<IServiceProvider*>(this);
+	else if (riid == IID_IOleCommandTarget)
+		*ppvObject = static_cast<IOleCommandTarget*>(this);
 
 	if( *ppvObject != NULL )
 		AddRef();
@@ -185,6 +187,16 @@ void DuiLib::CWebBrowserUI::NavigateError( IDispatch *pDisp,VARIANT * &url,VARIA
 
 void DuiLib::CWebBrowserUI::NavigateComplete2( IDispatch *pDisp,VARIANT *&url )
 {
+	CComPtr<IDispatch> spDoc;   
+	m_pWebBrowser2->get_Document(&spDoc);   
+
+	if (spDoc)
+	{   
+		CComQIPtr<ICustomDoc, &IID_ICustomDoc> spCustomDoc(spDoc);   
+		if (spCustomDoc)   
+			spCustomDoc->SetUIHandler(this);   
+	}
+
 	if (m_pWebBrowserEventHandler)
 	{
 		m_pWebBrowserEventHandler->NavigateComplete2(pDisp,url);
@@ -481,16 +493,6 @@ HRESULT DuiLib::CWebBrowserUI::RegisterEventHandler( BOOL inAdvise )
 	if (FAILED(hr))
 		return hr;
 
-	CComPtr<IDispatch> spDoc;   
-	pWebBrowser->get_Document(&spDoc);   
-
-	if (spDoc)
-	{   
-		CComQIPtr<ICustomDoc, &IID_ICustomDoc> spCustomDoc(spDoc);   
-		if (spCustomDoc)   
-			spCustomDoc->SetUIHandler(this);   
-	}
-
 	if (inAdvise)
 	{
 		hr = pCP->Advise((IDispatch*)this, &m_dwCookie);
@@ -580,4 +582,97 @@ IDispatch* DuiLib::CWebBrowserUI::GetHtmlWindow()
 	pHtmlDoc2->Release();
 
 	return pHtmlWindown;
+}
+
+IWebBrowser2* DuiLib::CWebBrowserUI::GetWebBrowser2( void )
+{
+	return m_pWebBrowser2;
+}
+
+HRESULT STDMETHODCALLTYPE DuiLib::CWebBrowserUI::QueryStatus( __RPC__in_opt const GUID *pguidCmdGroup, ULONG cCmds, __RPC__inout_ecount_full(cCmds ) OLECMD prgCmds[ ], __RPC__inout_opt OLECMDTEXT *pCmdText )
+{
+	HRESULT hr = S_OK;
+	return hr;
+}
+
+HRESULT STDMETHODCALLTYPE DuiLib::CWebBrowserUI::Exec( __RPC__in_opt const GUID *pguidCmdGroup, DWORD nCmdID, DWORD nCmdexecopt, __RPC__in_opt VARIANT *pvaIn, __RPC__inout_opt VARIANT *pvaOut )
+{
+	HRESULT hr = S_OK;
+
+	if (pguidCmdGroup && IsEqualGUID(*pguidCmdGroup, CGID_DocHostCommandHandler))
+	{
+
+		switch (nCmdID) 
+		{
+
+		case OLECMDID_SHOWSCRIPTERROR:
+			{
+				IHTMLDocument2*             pDoc = NULL;
+				IHTMLWindow2*               pWindow = NULL;
+				IHTMLEventObj*              pEventObj = NULL;
+				BSTR                        rgwszNames[5] = 
+				{ 
+					SysAllocString(L"errorLine"),
+					SysAllocString(L"errorCharacter"),
+					SysAllocString(L"errorCode"),
+					SysAllocString(L"errorMessage"),
+					SysAllocString(L"errorUrl")
+				};
+				DISPID                      rgDispIDs[5];
+				VARIANT                     rgvaEventInfo[5];
+				DISPPARAMS                  params;
+				BOOL                        fContinueRunningScripts = true;
+				int                         i;
+
+				params.cArgs = 0;
+				params.cNamedArgs = 0;
+
+				// Get the document that is currently being viewed.
+				hr = pvaIn->punkVal->QueryInterface(IID_IHTMLDocument2, (void **) &pDoc);    
+				// Get document.parentWindow.
+				hr = pDoc->get_parentWindow(&pWindow);
+				pDoc->Release();
+				// Get the window.event object.
+				hr = pWindow->get_event(&pEventObj);
+				// Get the error info from the window.event object.
+				for (i = 0; i < 5; i++) 
+				{  
+					// Get the property's dispID.
+					hr = pEventObj->GetIDsOfNames(IID_NULL, &rgwszNames[i], 1, 
+						LOCALE_SYSTEM_DEFAULT, &rgDispIDs[i]);
+					// Get the value of the property.
+					hr = pEventObj->Invoke(rgDispIDs[i], IID_NULL,
+						LOCALE_SYSTEM_DEFAULT,
+						DISPATCH_PROPERTYGET, &params, &rgvaEventInfo[i],
+						NULL, NULL);
+					SysFreeString(rgwszNames[i]);
+				}
+
+				// At this point, you would normally alert the user with 
+				// the information about the error, which is now contained
+				// in rgvaEventInfo[]. Or, you could just exit silently.
+
+				(*pvaOut).vt = VT_BOOL;
+				if (fContinueRunningScripts)
+				{
+					// Continue running scripts on the page.
+					(*pvaOut).boolVal = VARIANT_TRUE;
+				}
+				else
+				{
+					// Stop running scripts on the page.
+					(*pvaOut).boolVal = VARIANT_FALSE;   
+				} 
+				break;
+			}
+		default:
+			hr = OLECMDERR_E_NOTSUPPORTED;
+			break;
+		}
+	}
+	else
+	{
+		hr = OLECMDERR_E_UNKNOWNGROUP;
+	}
+	return (hr);
 }
