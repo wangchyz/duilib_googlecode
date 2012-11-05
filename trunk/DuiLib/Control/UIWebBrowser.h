@@ -31,6 +31,8 @@ namespace DuiLib
 		void Navigate2(LPCTSTR lpszUrl);
 		void Refresh();
 		void Refresh2(int Level);
+		void GoBack();
+		void GoForward();
 		void NavigateHomePage();
 		void NavigateUrl(LPCTSTR lpszUrl);
 		virtual bool DoCreateControl();
