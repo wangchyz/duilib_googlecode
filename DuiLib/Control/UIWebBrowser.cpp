@@ -46,7 +46,7 @@ DuiLib::CWebBrowserUI::~CWebBrowserUI()
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfoCount( UINT *iTInfo )
 {
 	*iTInfo = 0;
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetTypeInfo( UINT iTInfo, LCID lcid, ITypeInfo **ppTInfo )
@@ -112,9 +112,9 @@ STDMETHODIMP DuiLib::CWebBrowserUI::Invoke( DISPID dispIdMember, REFIID riid, LC
 // 		}
 // 		break;
 	default:
-		return E_NOTIMPL;
+		return DISP_E_MEMBERNOTFOUND;
 	}
-	return DISP_E_MEMBERNOTFOUND;
+	return S_OK;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::QueryInterface( REFIID riid, LPVOID *ppvObject )
@@ -166,6 +166,20 @@ void DuiLib::CWebBrowserUI::Refresh()
 	if (m_pWebBrowser2)
 	{
 		m_pWebBrowser2->Refresh();
+	}
+}
+void DuiLib::CWebBrowserUI::GoBack()
+{
+	if (m_pWebBrowser2)
+	{
+		m_pWebBrowser2->GoBack();
+	}
+}
+void DuiLib::CWebBrowserUI::GoForward()
+{
+	if (m_pWebBrowser2)
+	{
+		m_pWebBrowser2->GoForward();
 	}
 }
 /// DWebBrowserEvents2
@@ -243,7 +257,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::ShowContextMenu( DWORD dwID, POINT* pptPosit
 	{
 		return m_pWebBrowserEventHandler->ShowContextMenu(dwID,pptPosition,pCommandTarget,pDispatchObjectHit);
 	}
-	return E_NOTIMPL;
+	return S_FALSE;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetHostInfo( DOCHOSTUIINFO* pInfo )
@@ -252,7 +266,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetHostInfo( DOCHOSTUIINFO* pInfo )
 	{
 		return m_pWebBrowserEventHandler->GetHostInfo(pInfo);
 	}
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::ShowUI( DWORD dwID, IOleInPlaceActiveObject* pActiveObject, IOleCommandTarget* pCommandTarget, IOleInPlaceFrame* pFrame, IOleInPlaceUIWindow* pDoc )
@@ -288,7 +302,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::EnableModeless( BOOL fEnable )
 	{
 		return m_pWebBrowserEventHandler->EnableModeless(fEnable);
 	}
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::OnDocWindowActivate( BOOL fActivate )
@@ -297,7 +311,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::OnDocWindowActivate( BOOL fActivate )
 	{
 		return m_pWebBrowserEventHandler->OnDocWindowActivate(fActivate);
 	}
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::OnFrameWindowActivate( BOOL fActivate )
@@ -306,7 +320,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::OnFrameWindowActivate( BOOL fActivate )
 	{
 		return m_pWebBrowserEventHandler->OnFrameWindowActivate(fActivate);
 	}
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::ResizeBorder( LPCRECT prcBorder, IOleInPlaceUIWindow* pUIWindow, BOOL fFrameWindow )
@@ -315,7 +329,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::ResizeBorder( LPCRECT prcBorder, IOleInPlace
 	{
 		return m_pWebBrowserEventHandler->ResizeBorder(prcBorder,pUIWindow,fFrameWindow);
 	}
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::TranslateAccelerator( LPMSG lpMsg, const GUID* pguidCmdGroup, DWORD nCmdID )
@@ -324,24 +338,42 @@ STDMETHODIMP DuiLib::CWebBrowserUI::TranslateAccelerator( LPMSG lpMsg, const GUI
 	{
 		return m_pWebBrowserEventHandler->TranslateAccelerator(lpMsg,pguidCmdGroup,nCmdID);
 	}
-	return S_OK;
+	return S_FALSE;
 }
 
 LRESULT DuiLib::CWebBrowserUI::TranslateAccelerator( MSG *pMsg )
 {
-	if( m_pWebBrowser2 != NULL )
-	{
-		// 当前Web窗口不是焦点,不处理加速键
-		if(!CActiveXUI::IsFocused())
-			return S_FALSE;
+    if(pMsg->message < WM_KEYFIRST || pMsg->message > WM_KEYLAST)
+        return S_FALSE;
 
-		IOleInPlaceActiveObject *pObj;
-		if (FAILED(m_pWebBrowser2->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
-			return S_FALSE;
+	if( m_pWebBrowser2 == NULL )
+        return E_NOTIMPL;
 
-		return pObj->TranslateAccelerator(pMsg);
-	}
-	return E_NOTIMPL;
+    // 当前Web窗口不是焦点,不处理加速键
+    BOOL bIsChild = FALSE;
+    HWND hTempWnd = NULL;
+    HWND hWndFocus = ::GetFocus();
+
+    hTempWnd = hWndFocus;
+    while(hTempWnd != NULL)
+    {
+        if(hTempWnd == m_hwndHost)
+        {
+            bIsChild = TRUE;
+            break;
+        }
+        hTempWnd = ::GetParent(hTempWnd);
+    }
+    if(!bIsChild)
+        return S_FALSE;
+
+	IOleInPlaceActiveObject *pObj;
+	if (FAILED(m_pWebBrowser2->QueryInterface(IID_IOleInPlaceActiveObject, (LPVOID *)&pObj)))
+		return S_FALSE;
+
+    HRESULT hResult = pObj->TranslateAccelerator(pMsg);
+    pObj->Release();
+    return hResult;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetOptionKeyPath( LPOLESTR* pchKey, DWORD dwReserved )
@@ -350,7 +382,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetOptionKeyPath( LPOLESTR* pchKey, DWORD dw
 	{
 		return m_pWebBrowserEventHandler->GetOptionKeyPath(pchKey,dwReserved);
 	}
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetDropTarget( IDropTarget* pDropTarget, IDropTarget** ppDropTarget )
@@ -359,7 +391,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetDropTarget( IDropTarget* pDropTarget, IDr
 	{
 		return m_pWebBrowserEventHandler->GetDropTarget(pDropTarget,ppDropTarget);
 	}
-	return E_NOTIMPL;	// 使用系统拖拽
+	return S_FALSE;	// 使用系统拖拽
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::GetExternal( IDispatch** ppDispatch )
@@ -368,7 +400,7 @@ STDMETHODIMP DuiLib::CWebBrowserUI::GetExternal( IDispatch** ppDispatch )
 	{
 		return m_pWebBrowserEventHandler->GetExternal(ppDispatch);
 	}
-	return S_OK;
+	return S_FALSE;
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::TranslateUrl( DWORD dwTranslate, OLECHAR* pchURLIn, OLECHAR** ppchURLOut )
@@ -377,7 +409,11 @@ STDMETHODIMP DuiLib::CWebBrowserUI::TranslateUrl( DWORD dwTranslate, OLECHAR* pc
 	{
 		return m_pWebBrowserEventHandler->TranslateUrl(dwTranslate,pchURLIn,ppchURLOut);
 	}
-	return S_OK;
+    else
+    {
+        *ppchURLOut = 0;
+        return E_NOTIMPL;
+    }
 }
 
 STDMETHODIMP DuiLib::CWebBrowserUI::FilterDataObject( IDataObject* pDO, IDataObject** ppDORet )
@@ -386,7 +422,11 @@ STDMETHODIMP DuiLib::CWebBrowserUI::FilterDataObject( IDataObject* pDO, IDataObj
 	{
 		return m_pWebBrowserEventHandler->FilterDataObject(pDO,ppDORet);
 	}
-	return S_OK;
+    else
+    {
+        *ppDORet = 0;
+        return E_NOTIMPL;
+    }
 }
 
 void DuiLib::CWebBrowserUI::SetWebBrowserEventHandler( CWebBrowserEventHandler* pEventHandler )
@@ -563,10 +603,9 @@ IDispatch* DuiLib::CWebBrowserUI::GetHtmlWindow()
 	if (FAILED(hr))
 		return NULL;
 
-	IHTMLDocument2 *pHtmlDoc2 = NULL;
-	hr=pDp->QueryInterface(IID_IHTMLDocument2,(void**)&pHtmlDoc2);
+    CComQIPtr<IHTMLDocument2> pHtmlDoc2 = pDp;
 
-	if (FAILED(hr))
+	if (pHtmlDoc2 == NULL)
 		return NULL;
 
 	hr=pHtmlDoc2->get_parentWindow(&_pHtmlWnd2);
@@ -579,8 +618,6 @@ IDispatch* DuiLib::CWebBrowserUI::GetHtmlWindow()
 	if (FAILED(hr))
 		return NULL;
 
-	pHtmlDoc2->Release();
-
 	return pHtmlWindown;
 }
 
@@ -591,7 +628,7 @@ IWebBrowser2* DuiLib::CWebBrowserUI::GetWebBrowser2( void )
 
 HRESULT STDMETHODCALLTYPE DuiLib::CWebBrowserUI::QueryStatus( __RPC__in_opt const GUID *pguidCmdGroup, ULONG cCmds, __RPC__inout_ecount_full(cCmds ) OLECMD prgCmds[ ], __RPC__inout_opt OLECMDTEXT *pCmdText )
 {
-	HRESULT hr = S_OK;
+	HRESULT hr = OLECMDERR_E_NOTSUPPORTED;
 	return hr;
 }
 
