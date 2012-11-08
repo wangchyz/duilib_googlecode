@@ -867,7 +867,7 @@ LPCTSTR CActiveXUI::GetClass() const
 
 LPVOID CActiveXUI::GetInterface(LPCTSTR pstrName)
 {
-	if( _tcscmp(pstrName, _T("ActiveX")) == 0 ) return static_cast<CActiveXUI*>(this);
+	if( _tcscmp(pstrName, DUI_CTR_ACTIVEX) == 0 ) return static_cast<CActiveXUI*>(this);
 	return CControlUI::GetInterface(pstrName);
 }
 
@@ -1111,7 +1111,7 @@ bool CActiveXUI::DoCreateControl()
     if( FAILED(Hr) ) Hr = m_pUnk->QueryInterface(IID_IViewObject, (LPVOID*) &m_pControl->m_pViewObject);
     // Activate and done...
     m_pUnk->SetHostNames(OLESTR("UIActiveX"), NULL);
-    if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, _T("showactivex"), 0, 0, false);
+    if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, DUI_MSGTYPE_SHOWACTIVEX, 0, 0, false);
     if( (dwMiscStatus & OLEMISC_INVISIBLEATRUNTIME) == 0 ) {
         Hr = m_pUnk->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pOleClientSite, 0, m_pManager->GetPaintWindow(), &m_rcItem);
         //::RedrawWindow(m_pManager->GetPaintWindow(), &m_rcItem, NULL, RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE | RDW_INTERNALPAINT | RDW_FRAME);

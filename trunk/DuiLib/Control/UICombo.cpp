@@ -232,7 +232,7 @@ LPCTSTR CComboUI::GetClass() const
 
 LPVOID CComboUI::GetInterface(LPCTSTR pstrName)
 {
-	if( _tcscmp(pstrName, _T("Combo")) == 0 ) return static_cast<CComboUI*>(this);
+	if( _tcscmp(pstrName, DUI_CTR_COMBO) == 0 ) return static_cast<CComboUI*>(this);
     if( _tcscmp(pstrName, _T("IListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
@@ -273,7 +273,7 @@ bool CComboUI::SelectItem(int iIndex, bool bTakeFocus)
     m_iCurSel = iIndex;
     if( m_pWindow != NULL || bTakeFocus ) pControl->SetFocus();
     pListItem->Select(true);
-    if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("itemselect"), m_iCurSel, iOldSel);
+    if( m_pManager != NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMSELECT, m_iCurSel, iOldSel);
     Invalidate();
 
     return true;
@@ -489,7 +489,7 @@ bool CComboUI::Activate()
     m_pWindow = new CComboWnd();
     ASSERT(m_pWindow);
     m_pWindow->Init(this);
-    if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("dropdown"));
+    if( m_pManager != NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_DROPDOWN);
     Invalidate();
     return true;
 }

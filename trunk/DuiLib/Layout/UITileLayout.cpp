@@ -15,7 +15,7 @@ namespace DuiLib
 
 	LPVOID CTileLayoutUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("TileLayout")) == 0 ) return static_cast<CTileLayoutUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_TILELAYOUT) == 0 ) return static_cast<CTileLayoutUI*>(this);
 		return CContainerUI::GetInterface(pstrName);
 	}
 

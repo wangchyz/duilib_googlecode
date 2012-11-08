@@ -21,7 +21,7 @@ namespace DuiLib
 
 	LPVOID CScrollBarUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("ScrollBar")) == 0 ) return static_cast<CScrollBarUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_SCROLLBAR) == 0 ) return static_cast<CScrollBarUI*>(this);
 		return CControlUI::GetInterface(pstrName);
 	}
 
@@ -594,7 +594,7 @@ namespace DuiLib
 					}
 				}
 			}
-			if( m_pManager != NULL && m_pOwner == NULL ) m_pManager->SendNotify(this, _T("scroll"));
+			if( m_pManager != NULL && m_pOwner == NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_SCROLL);
 			return;
 		}
 		if( event.Type == UIEVENT_BUTTONUP )
@@ -714,7 +714,7 @@ namespace DuiLib
 					}
 				}
 			}
-			if( m_pManager != NULL && m_pOwner == NULL ) m_pManager->SendNotify(this, _T("scroll"));
+			if( m_pManager != NULL && m_pOwner == NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_SCROLL);
 			return;
 		}
 		if( event.Type == UIEVENT_MOUSEENTER )

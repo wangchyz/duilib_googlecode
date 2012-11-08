@@ -22,7 +22,7 @@ namespace DuiLib
 
 	LPVOID CSliderUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("Slider")) == 0 ) return static_cast<CSliderUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_SLIDER) == 0 ) return static_cast<CSliderUI*>(this);
 		return CProgressUI::GetInterface(pstrName);
 	}
 
@@ -129,7 +129,7 @@ namespace DuiLib
 				else if( event.ptMouse.y <= m_rcItem.top + m_szThumb.cy / 2  ) m_nValue = m_nMax;
 				else m_nValue = m_nMin + (m_nMax - m_nMin) * (m_rcItem.bottom - event.ptMouse.y - m_szThumb.cy / 2 ) / (m_rcItem.bottom - m_rcItem.top - m_szThumb.cy);
 			}
-			m_pManager->SendNotify(this, _T("valuechanged"));
+			m_pManager->SendNotify(this, DUI_MSGTYPE_VALUECHANGED);
 			Invalidate();
 			return;
 		}
@@ -142,11 +142,11 @@ namespace DuiLib
 			switch( LOWORD(event.wParam) ) {
 		case SB_LINEUP:
 			SetValue(GetValue() + GetChangeStep());
-			m_pManager->SendNotify(this, _T("valuechanged"));
+			m_pManager->SendNotify(this, DUI_MSGTYPE_VALUECHANGED);
 			return;
 		case SB_LINEDOWN:
 			SetValue(GetValue() - GetChangeStep());
-			m_pManager->SendNotify(this, _T("valuechanged"));
+			m_pManager->SendNotify(this, DUI_MSGTYPE_VALUECHANGED);
 			return;
 			}
 		}
