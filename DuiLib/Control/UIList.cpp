@@ -45,7 +45,7 @@ UINT CListUI::GetControlFlags() const
 
 LPVOID CListUI::GetInterface(LPCTSTR pstrName)
 {
-	if( _tcscmp(pstrName, _T("List")) == 0 ) return static_cast<CListUI*>(this);
+	if( _tcscmp(pstrName, DUI_CTR_LIST) == 0 ) return static_cast<CListUI*>(this);
     if( _tcscmp(pstrName, _T("IList")) == 0 ) return static_cast<IListUI*>(this);
     if( _tcscmp(pstrName, _T("IListOwner")) == 0 ) return static_cast<IListOwnerUI*>(this);
     return CVerticalLayoutUI::GetInterface(pstrName);
@@ -374,7 +374,7 @@ bool CListUI::SelectItem(int iIndex, bool bTakeFocus)
     EnsureVisible(m_iCurSel);
     if( bTakeFocus ) pControl->SetFocus();
     if( m_pManager != NULL ) {
-        m_pManager->SendNotify(this, _T("itemselect"), m_iCurSel, iOldSel);
+        m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMSELECT, m_iCurSel, iOldSel);
     }
 
     return true;
@@ -1082,7 +1082,7 @@ LPCTSTR CListHeaderUI::GetClass() const
 
 LPVOID CListHeaderUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("ListHeader")) == 0 ) return this;
+    if( _tcscmp(pstrName, DUI_CTR_LISTHEADER) == 0 ) return this;
     return CHorizontalLayoutUI::GetInterface(pstrName);
 }
 
@@ -1123,7 +1123,7 @@ LPCTSTR CListHeaderItemUI::GetClass() const
 
 LPVOID CListHeaderItemUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("ListHeaderItem")) == 0 ) return this;
+    if( _tcscmp(pstrName, DUI_CTR_LISTHEADERITEM) == 0 ) return this;
     return CControlUI::GetInterface(pstrName);
 }
 
@@ -1347,7 +1347,7 @@ void CListHeaderItemUI::DoEvent(TEventUI& event)
         }
         else {
             m_uButtonState |= UISTATE_PUSHED;
-            m_pManager->SendNotify(this, _T("headerclick"));
+            m_pManager->SendNotify(this, DUI_MSGTYPE_HEADERCLICK);
             Invalidate();
         }
         return;
@@ -1508,8 +1508,8 @@ UINT CListElementUI::GetControlFlags() const
 
 LPVOID CListElementUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("ListItem")) == 0 ) return static_cast<IListItemUI*>(this);
-	if( _tcscmp(pstrName, _T("ListElement")) == 0 ) return static_cast<CListElementUI*>(this);
+    if( _tcscmp(pstrName, DUI_CTR_LISTITEM) == 0 ) return static_cast<IListItemUI*>(this);
+	if( _tcscmp(pstrName, DUI_CTR_LISTELEMENT) == 0 ) return static_cast<CListElementUI*>(this);
     return CControlUI::GetInterface(pstrName);
 }
 
@@ -1602,7 +1602,7 @@ void CListElementUI::Invalidate()
 bool CListElementUI::Activate()
 {
     if( !CControlUI::Activate() ) return false;
-    if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("itemactivate"));
+    if( m_pManager != NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMACTIVATE);
     return true;
 }
 
@@ -1742,7 +1742,7 @@ LPCTSTR CListLabelElementUI::GetClass() const
 
 LPVOID CListLabelElementUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("ListLabelElement")) == 0 ) return static_cast<CListLabelElementUI*>(this);
+    if( _tcscmp(pstrName, DUI_CTR_LISTLABELELEMENT) == 0 ) return static_cast<CListLabelElementUI*>(this);
     return CListElementUI::GetInterface(pstrName);
 }
 
@@ -1757,7 +1757,7 @@ void CListLabelElementUI::DoEvent(TEventUI& event)
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_RBUTTONDOWN )
     {
         if( IsEnabled() ) {
-            m_pManager->SendNotify(this, _T("itemclick"));
+            m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMCLICK);
             Select();
             Invalidate();
         }
@@ -1881,7 +1881,7 @@ LPCTSTR CListTextElementUI::GetClass() const
 
 LPVOID CListTextElementUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("ListTextElement")) == 0 ) return static_cast<CListTextElementUI*>(this);
+    if( _tcscmp(pstrName, DUI_CTR_LISTTEXTELEMENT) == 0 ) return static_cast<CListTextElementUI*>(this);
     return CListLabelElementUI::GetInterface(pstrName);
 }
 
@@ -1946,7 +1946,7 @@ void CListTextElementUI::DoEvent(TEventUI& event)
     if( event.Type == UIEVENT_BUTTONUP && IsEnabled() ) {
         for( int i = 0; i < m_nLinks; i++ ) {
             if( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
-                m_pManager->SendNotify(this, _T("link"), i);
+                m_pManager->SendNotify(this, DUI_MSGTYPE_LINK, i);
                 return;
             }
         }
@@ -2060,8 +2060,8 @@ UINT CListContainerElementUI::GetControlFlags() const
 
 LPVOID CListContainerElementUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("ListItem")) == 0 ) return static_cast<IListItemUI*>(this);
-	if( _tcscmp(pstrName, _T("ListContainerElement")) == 0 ) return static_cast<CListContainerElementUI*>(this);
+    if( _tcscmp(pstrName, DUI_CTR_LISTITEM) == 0 ) return static_cast<IListItemUI*>(this);
+	if( _tcscmp(pstrName, DUI_CTR_LISTCONTAINERELEMENT) == 0 ) return static_cast<CListContainerElementUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
 
@@ -2154,7 +2154,7 @@ void CListContainerElementUI::Invalidate()
 bool CListContainerElementUI::Activate()
 {
     if( !CContainerUI::Activate() ) return false;
-    if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("itemactivate"));
+    if( m_pManager != NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMACTIVATE);
     return true;
 }
 
@@ -2211,7 +2211,7 @@ void CListContainerElementUI::DoEvent(TEventUI& event)
     if( event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_RBUTTONDOWN )
     {
         if( IsEnabled() ){
-            m_pManager->SendNotify(this, _T("itemclick"));
+            m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMCLICK);
             Select();
             Invalidate();
         }

@@ -35,7 +35,7 @@ namespace DuiLib
 	LPVOID CContainerUI::GetInterface(LPCTSTR pstrName)
 	{
 		if( _tcscmp(pstrName, _T("IContainer")) == 0 ) return static_cast<IContainerUI*>(this);
-		else if( _tcscmp(pstrName, _T("Container")) == 0 ) return static_cast<CContainerUI*>(this);
+		else if( _tcscmp(pstrName, DUI_CTR_CONTAINER) == 0 ) return static_cast<CContainerUI*>(this);
 		return CControlUI::GetInterface(pstrName);
 	}
 

@@ -114,7 +114,7 @@ namespace DuiLib
 		// 		}
 		//	}
 		//	else if( uMsg == WM_KEYDOWN && TCHAR(wParam) == VK_RETURN ) {
-		// 		m_pOwner->GetManager()->SendNotify(m_pOwner, _T("return"));
+		// 		m_pOwner->GetManager()->SendNotify(m_pOwner, DUI_MSGTYPE_RETURN);
 		//	}
 		// 		else if( uMsg == OCM__BASE + WM_CTLCOLOREDIT  || uMsg == OCM__BASE + WM_CTLCOLORSTATIC ) {
 		// 			if( m_pOwner->GetNativeEditBkColor() == 0xFFFFFFFF ) return NULL;
@@ -156,7 +156,7 @@ namespace DuiLib
 	// 	if( pstr == NULL ) return 0;
 	// 	::GetWindowText(m_hWnd, pstr, cchLen);
 	// 	m_pOwner->m_sText = pstr;
-	// 	m_pOwner->GetManager()->SendNotify(m_pOwner, _T("textchanged"));
+	// 	m_pOwner->GetManager()->SendNotify(m_pOwner, DUI_MSGTYPE_TEXTCHANGED);
 	// 	return 0;
 	// }
 
@@ -179,7 +179,7 @@ namespace DuiLib
 
 	LPVOID CDateTimeUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("DateTime")) == 0 ) return static_cast<CDateTimeUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_DATETIME) == 0 ) return static_cast<CDateTimeUI*>(this);
 		return CLabelUI::GetInterface(pstrName);
 	}
 

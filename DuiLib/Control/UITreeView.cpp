@@ -80,7 +80,7 @@ namespace DuiLib
 	//************************************
 	LPVOID CTreeNodeUI::GetInterface( LPCTSTR pstrName )
 	{
-		if( _tcscmp(pstrName, _T("TreeNode")) == 0 )
+		if( _tcscmp(pstrName, DUI_CTR_TREENODE) == 0 )
 			return static_cast<CTreeNodeUI*>(this);
 		return CListContainerElementUI::GetInterface(pstrName);
 	}
@@ -96,7 +96,7 @@ namespace DuiLib
 		if( event.Type == UIEVENT_DBLCLICK )
 		{
 			if( IsEnabled() ) {
-				m_pManager->SendNotify(this, _T("itemdbclick"));
+				m_pManager->SendNotify(this, DUI_MSGTYPE_ITEMDBCLICK);
 				Invalidate();
 			}
 			return;
@@ -603,7 +603,7 @@ namespace DuiLib
 	//************************************
 	LPVOID CTreeViewUI::GetInterface( LPCTSTR pstrName )
 	{
-		if( _tcscmp(pstrName, _T("TreeView")) == 0 ) return static_cast<CTreeViewUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_TREEVIEW) == 0 ) return static_cast<CTreeViewUI*>(this);
 		return CListUI::GetInterface(pstrName);
 	}
 

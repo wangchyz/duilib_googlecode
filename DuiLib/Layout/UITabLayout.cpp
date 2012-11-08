@@ -14,7 +14,7 @@ namespace DuiLib
 
 	LPVOID CTabLayoutUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("TabLayout")) == 0 ) return static_cast<CTabLayoutUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_TABLAYOUT) == 0 ) return static_cast<CTabLayoutUI*>(this);
 		return CContainerUI::GetInterface(pstrName);
 	}
 
@@ -109,7 +109,7 @@ namespace DuiLib
 
 		if( m_pManager != NULL ) {
 			m_pManager->SetNextTabControl();
-			m_pManager->SendNotify(this, _T("tabselect"), m_iCurSel, iOldSel);
+			m_pManager->SendNotify(this, DUI_MSGTYPE_TABSELECT, m_iCurSel, iOldSel);
 		}
 		return true;
 	}

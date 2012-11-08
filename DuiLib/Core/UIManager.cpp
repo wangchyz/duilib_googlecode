@@ -633,7 +633,7 @@ bool CPaintManagerUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LR
                     // to submit swipes/animations.
                     if( m_bFirstLayout ) {
                         m_bFirstLayout = false;
-                        SendNotify(m_pRoot, _T("windowinit"),  0, 0, false);
+                        SendNotify(m_pRoot, DUI_MSGTYPE_WINDOWINIT,  0, 0, false);
                     }
                 }
             }
@@ -1254,7 +1254,7 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
         event.pSender = pControl;
         event.dwTimestamp = ::GetTickCount();
         m_pFocus->Event(event);
-        SendNotify(m_pFocus, _T("killfocus"));
+        SendNotify(m_pFocus, DUI_MSGTYPE_KILLFOCUS);
         m_pFocus = NULL;
     }
     if( pControl == NULL ) return;
@@ -1270,7 +1270,7 @@ void CPaintManagerUI::SetFocus(CControlUI* pControl)
         event.pSender = pControl;
         event.dwTimestamp = ::GetTickCount();
         m_pFocus->Event(event);
-        SendNotify(m_pFocus, _T("setfocus"));
+        SendNotify(m_pFocus, DUI_MSGTYPE_SETFOCUS);
     }
 }
 
@@ -1284,7 +1284,7 @@ void CPaintManagerUI::SetFocusNeeded(CControlUI* pControl)
         event.pSender = pControl;
         event.dwTimestamp = ::GetTickCount();
         m_pFocus->Event(event);
-        SendNotify(m_pFocus, _T("killfocus"));
+        SendNotify(m_pFocus, DUI_MSGTYPE_KILLFOCUS);
         m_pFocus = NULL;
     }
     FINDTABINFO info = { 0 };

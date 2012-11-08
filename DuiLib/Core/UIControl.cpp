@@ -55,7 +55,7 @@ void CControlUI::SetName(LPCTSTR pstrName)
 
 LPVOID CControlUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("Control")) == 0 ) return this;
+    if( _tcscmp(pstrName, DUI_CTR_CONTROL) == 0 ) return this;
     return NULL;
 }
 
@@ -670,13 +670,13 @@ void CControlUI::DoEvent(TEventUI& event)
     }
     if( event.Type == UIEVENT_TIMER )
     {
-        m_pManager->SendNotify(this, _T("timer"), event.wParam, event.lParam);
+        m_pManager->SendNotify(this, DUI_MSGTYPE_TIMER, event.wParam, event.lParam);
         return;
     }
     if( event.Type == UIEVENT_CONTEXTMENU )
     {
         if( IsContextMenuUsed() ) {
-            m_pManager->SendNotify(this, _T("menu"), event.wParam, event.lParam);
+            m_pManager->SendNotify(this, DUI_MSGTYPE_MENU, event.wParam, event.lParam);
             return;
         }
     }

@@ -19,7 +19,7 @@ namespace DuiLib
 
 	LPVOID COptionUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("Option")) == 0 ) return static_cast<COptionUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_OPTION) == 0 ) return static_cast<COptionUI*>(this);
 		return CButtonUI::GetInterface(pstrName);
 	}
 
@@ -80,11 +80,11 @@ namespace DuiLib
 							pControl->Selected(false);
 						}
 					}
-					m_pManager->SendNotify(this, _T("selectchanged"));
+					m_pManager->SendNotify(this, DUI_MSGTYPE_SELECTCHANGED);
 				}
 			}
 			else {
-				m_pManager->SendNotify(this, _T("selectchanged"));
+				m_pManager->SendNotify(this, DUI_MSGTYPE_SELECTCHANGED);
 			}
 		}
 

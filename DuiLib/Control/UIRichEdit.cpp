@@ -1043,7 +1043,7 @@ LPCTSTR CRichEditUI::GetClass() const
 
 LPVOID CRichEditUI::GetInterface(LPCTSTR pstrName)
 {
-    if( _tcscmp(pstrName, _T("RichEdit")) == 0 ) return static_cast<CRichEditUI*>(this);
+    if( _tcscmp(pstrName, DUI_CTR_RICHEDIT) == 0 ) return static_cast<CRichEditUI*>(this);
     return CContainerUI::GetInterface(pstrName);
 }
 
@@ -1655,7 +1655,7 @@ HRESULT CRichEditUI::TxSendMessage(UINT msg, WPARAM wparam, LPARAM lparam, LRESU
     if( m_pTwh ) {
         if( msg == WM_KEYDOWN && TCHAR(wparam) == VK_RETURN ) {
             if( !m_bWantReturn || (::GetKeyState(VK_CONTROL) < 0 && !m_bWantCtrlReturn) ) {
-                if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, _T("return"));
+                if( m_pManager != NULL ) m_pManager->SendNotify((CControlUI*)this, DUI_MSGTYPE_RETURN);
                 return S_OK;
             }
         }

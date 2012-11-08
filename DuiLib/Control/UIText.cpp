@@ -22,7 +22,7 @@ namespace DuiLib
 
 	LPVOID CTextUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("Text")) == 0 ) return static_cast<CTextUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_TEXT) == 0 ) return static_cast<CTextUI*>(this);
 		return CLabelUI::GetInterface(pstrName);
 	}
 
@@ -65,7 +65,7 @@ namespace DuiLib
 		if( event.Type == UIEVENT_BUTTONUP && IsEnabled() ) {
 			for( int i = 0; i < m_nLinks; i++ ) {
 				if( ::PtInRect(&m_rcLinks[i], event.ptMouse) ) {
-					m_pManager->SendNotify(this, _T("link"), i);
+					m_pManager->SendNotify(this, DUI_MSGTYPE_LINK, i);
 					return;
 				}
 			}

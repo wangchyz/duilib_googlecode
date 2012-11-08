@@ -20,7 +20,7 @@ namespace DuiLib
 
 	LPVOID CButtonUI::GetInterface(LPCTSTR pstrName)
 	{
-		if( _tcscmp(pstrName, _T("Button")) == 0 ) return static_cast<CButtonUI*>(this);
+		if( _tcscmp(pstrName, DUI_CTR_BUTTON) == 0 ) return static_cast<CButtonUI*>(this);
 		return CLabelUI::GetInterface(pstrName);
 	}
 
@@ -83,7 +83,7 @@ namespace DuiLib
 		if( event.Type == UIEVENT_CONTEXTMENU )
 		{
 			if( IsContextMenuUsed() ) {
-				m_pManager->SendNotify(this, _T("menu"), event.wParam, event.lParam);
+				m_pManager->SendNotify(this, DUI_MSGTYPE_MENU, event.wParam, event.lParam);
 			}
 			return;
 		}
@@ -113,7 +113,7 @@ namespace DuiLib
 	bool CButtonUI::Activate()
 	{
 		if( !CControlUI::Activate() ) return false;
-		if( m_pManager != NULL ) m_pManager->SendNotify(this, _T("click"));
+		if( m_pManager != NULL ) m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
 		return true;
 	}
 
