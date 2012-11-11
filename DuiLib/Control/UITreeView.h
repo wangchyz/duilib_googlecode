@@ -24,6 +24,7 @@ namespace DuiLib
 		LPVOID	GetInterface(LPCTSTR pstrName);
 		void	DoEvent(TEventUI& event);
 		void	Invalidate();
+		bool	Select(bool bSelect = true);
 
 		bool	Add(CControlUI* _pTreeNodeUI);
 		bool	AddAt(CControlUI* pControl, int iIndex);
@@ -49,6 +50,14 @@ namespace DuiLib
 		bool	GetVisibleFolderBtn();
 		void	SetVisibleCheckBtn(bool _IsVisibled);
 		bool	GetVisibleCheckBtn();
+		void	SetItemTextColor(DWORD _dwItemTextColor);
+		DWORD	GetItemTextColor() const;
+		void	SetItemHotTextColor(DWORD _dwItemHotTextColor);
+		DWORD	GetItemHotTextColor() const;
+		void	SetSelItemTextColor(DWORD _dwSelItemTextColor);
+		DWORD	GetSelItemTextColor() const;
+		void	SetSelItemHotTextColor(DWORD _dwSelHotItemTextColor);
+		DWORD	GetSelItemHotTextColor() const;
 
 		void	SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
@@ -56,6 +65,7 @@ namespace DuiLib
 
 		int			 GetTreeIndex();
 		int			 GetNodeIndex();
+
 	private:
 		CTreeNodeUI* GetLastNode();
 		CTreeNodeUI* CalLocation(CTreeNodeUI* _pTreeNodeUI);
@@ -70,6 +80,10 @@ namespace DuiLib
 		long	m_iTreeLavel;
 		bool	m_bIsVisable;
 		bool	m_bIsCheckBox;
+		DWORD	m_dwItemTextColor;
+		DWORD	m_dwItemHotTextColor;
+		DWORD	m_dwSelItemTextColor;
+		DWORD	m_dwSelItemHotTextColor;
 
 		CTreeViewUI*			pTreeView;
 		CHorizontalLayoutUI*	pHoriz;
@@ -110,9 +124,12 @@ namespace DuiLib
 		virtual bool GetVisibleCheckBtn();
 		virtual void SetItemMinWidth(UINT _ItemMinWidth);
 		virtual UINT GetItemMinWidth();
-
-		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+		virtual void SetItemTextColor(DWORD _dwItemTextColor);
+		virtual void SetItemHotTextColor(DWORD _dwItemHotTextColor);
+		virtual void SetSelItemTextColor(DWORD _dwSelItemTextColor);
+		virtual void SetSelItemHotTextColor(DWORD _dwSelHotItemTextColor);
 		
+		virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	private:
 		UINT m_uItemMinWidth;
 		bool m_bVisibleFolderBtn;
