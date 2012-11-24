@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)bin\"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="..\bin\"
+			IntermediateDirectory=".\Debug"
 			ConfigurationType="1"
 			CharacterSet="2"
 			>
@@ -378,15 +378,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Resource.h"
-				>
-			</File>
-			<File
 				RelativePath=".\_Nv_Http_Download.h"
 				>
 			</File>
 			<File
 				RelativePath=".\MainDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Resource.h"
 				>
 			</File>
 			<File

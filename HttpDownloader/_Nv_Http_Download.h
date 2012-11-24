@@ -45,6 +45,7 @@ using std::sort;
 #define		Run_Mode_2								TRUE
 //返回状态
 #define		Http_Return_206							206
+#define		Http_Return_200							200
 
 //线程退出
 #define		Thread_download_Out						0x110
@@ -124,6 +125,7 @@ public:
 
 	//引用数据
 	int		*nCallByteCnt_;
+	__int64	*n64CallByteCnt_;
 
 	//记录url
 	string		strUrl_;
@@ -172,11 +174,26 @@ public:
 	BOOL	stop_Task				(VOID);
 	
 	//获取文件大小
-	__int64	NvGetFileSize	(
+	__int64	get_UrlFileSizeAndFileName(
 		__in	CONST CHAR *strUrl,
 		OUT CHAR *strFileName, 
-		__in	BOOL bCoolie, 
 		__in	CONST CHAR *strCoolie
+		);
+
+	//测试是否支持多线程
+	INT		Detece_ThreadMode		( 
+		__in CONST CHAR *strUrl, 
+		__in __int64 dwMinPos, 
+		__in __int64 dwMaxPos, 
+		__in CONST CHAR *strCoolie 
+		);
+
+	//单线程下载
+	__int64 SinglethreadDwondLoad	( 
+		__in CONST CHAR *strDownloadUrl, 
+		__in CONST CHAR *strSaveFilePath, 
+		__out __int64 *n64CallCnt, 
+		__in CONST CHAR *strCoolie
 		);
 
 protected:
@@ -206,7 +223,6 @@ private:
 	//测试返回值
 	DWORD	GetHttpReturnData	(
 		__in	CONST CHAR	*strUrl, 
-		__in	CONST CHAR	*strFileSavePath, 
 		__in	__int64 dwMinPos, 
 		__in	__int64 dwMaxPos, 
 		__in	CONST CHAR	*strCoolie
@@ -217,10 +233,7 @@ private:
 	//停止下载
 	VOID	stop_Download			(VOID);
 	__int64 get_Download_Byte_Cnt	(VOID);
-	//__int64 get_Download_X		(VOID);
-	//BOOL	get_Task_Yes			(VOID);
 	VOID	set_Coolie				(__in CONST CHAR *strCoolie);
-	
 };
 
 
@@ -244,6 +257,7 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	//对象
 	CRITICAL_SECTION chitical_section_;
+	CRITICAL_SECTION chitical_section_Add;
 
 	BOOL		bCoolie_;
 	string		strCoolie_;
@@ -301,6 +315,13 @@ public:
 	//下载任务管理器已经退出
 	BOOL		bDownloadTaskCmd_;
 
+	//单线程下载
+	_Nv_Download_Task				*Nv_One_Download_Task_;
+	//标记是单线程下载
+	BOOL							bThreadMode_;
+	//单线程下载的计数器
+	__int64							n64ThreadOneCnt_;
+
 public:
 	//////////////////////////////////////////////////////////////////////////
 	//函数
@@ -335,9 +356,14 @@ public:
 	//获取线程管理器是否已经退出
 	BOOL	get_DownloadTaskCmdOut	(VOID);
 	//供外部显示进度代码判断是否可以停止显示进度
-	BOOL	get_StopPrintf(VOID);
+	BOOL	get_StopPrintf			(VOID);
 	//是否可以销毁该类
-	BOOL	detect_DownlaodIsClose(VOID);
+	BOOL	detect_DownlaodIsClose	(VOID);
+	//单线程函数
+	VOID	detect_vtThreadOne_Task	(VOID);
+	//检查是多线程下载还是单线程下载
+	BOOL	deetct_ThreadMode		(VOID);
+	
 	
 	//获取工作线程状态
 	VOID	get_ThreadTaskData(
@@ -348,6 +374,14 @@ public:
 
 	//任务
 	BOOL	thread_Task( 
+		__in CONST CHAR *strDownloadUrl, 
+		__in CONST CHAR *strSaveFilePath, 
+		__in CONST CHAR *strCoolie, 
+		__in BOOL bModeFalg  = Run_Mode_2
+		);
+
+	//单线程任务
+	BOOL thread_OneTask( 
 		__in CONST CHAR *strDownloadUrl, 
 		__in CONST CHAR *strSaveFilePath, 
 		__in CONST CHAR *strCoolie, 
@@ -365,7 +399,7 @@ public:
 protected:
 private:
 	//分配任务
-	BOOL call_AssignTasks		(__in __int64 &n641, __in __int64 &n642, __in __int64 &n643);
+	BOOL	call_AssignTasks		(__in __int64 &n641, __in __int64 &n642, __in __int64 &n643);
 	//停止检查下载任务
 	VOID	stop_DetectTask		(VOID);
 	//停止线程下载任务
@@ -388,5 +422,4 @@ private:
 		__in CONST CHAR *strSaveFilePath, 
 		__in CONST CHAR *strCoolie 
 		);
-	
 };
