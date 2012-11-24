@@ -20,3 +20,20 @@
 			</VerticalLayout>
 		</VerticalLayout>
 	</Window>
+
+
+
+
+						<ListContainerElement height="60">
+						<VerticalLayout height="60" >
+							<Button name="ico"  float="true" pos="5,10,0,0"   width="48" height="38" tooltip="图标.." bkimage="file='exe_file.png'"/>
+							<Text   name="file" float="true" pos="55,15,0,0" width="300" height="20" tooltip="文件名.." text="QQ2012.exe" font="0" textcolor="#ffffffff"/>
+							<Text   name="print" float="true" pos="55,35,0,0" width="300" height="20" tooltip="进度提示.." text="53.23MB - 511KBs, 还有1分33秒.." font="0" textcolor="#ffddd333"/>
+							<Text   name="jdtbk" float="true" pos="300,15,0,0" width="210" height="5" bkimage="file='progress_back.png'"/>
+							<Progress name="jdt" float="true" pos="300,15,0,0" width="210" height="5" foreimage="file='progress_fore.png'" min="0" max="100" value="50"/>
+							<Button name="stop" float="true" pos="400,25,0,0" width="30" height="30" tooltip="暂停下载.." normalimage="file='stop.png'"/>
+							<Button name="down" float="true" pos="440,25,0,0" width="30" height="30" tooltip="开始下载.." normalimage="file='go.png'" />
+							<Button name="open" float="true" pos="480,25,0,0" width="30" height="30" tooltip="打开文件.." normalimage="file='ok.png'"/>
+							<Button name="dele" float="true" pos="515,5,0,0" width="20" height="20" tooltip="删除.." normalimage="file='close.png'"/>
+						</VerticalLayout>
+					</ListContainerElement>
