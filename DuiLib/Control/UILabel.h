@@ -6,6 +6,8 @@
 #include <GdiPlus.h>
 #pragma comment( lib, "GdiPlus.lib" )
 using namespace Gdiplus;
+class UILIB_API Gdiplus::RectF;
+struct UILIB_API Gdiplus::GdiplusStartupInput;
 
 namespace DuiLib
 {
