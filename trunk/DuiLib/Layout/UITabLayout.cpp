@@ -67,7 +67,10 @@ namespace DuiLib
 		if( m_iCurSel == index)
 		{
 			if( GetCount() > 0 )
-				GetItemAt(0)->SetVisible(true);
+			{
+				m_iCurSel=0;
+				GetItemAt(m_iCurSel)->SetVisible(true);
+			}
 			else
 				m_iCurSel=-1;
 			NeedParentUpdate();
