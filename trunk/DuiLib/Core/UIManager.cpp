@@ -2193,18 +2193,16 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 	// tabbing and shortcut key-combos. We'll look for all messages for
 	// each window and any child control attached.
 	UINT uStyle = GetWindowStyle(pMsg->hwnd);
+	LRESULT lRes = 0;	
 	UINT uChildRes = uStyle & WS_CHILD;	
-	LRESULT lRes = 0;
-	if (uChildRes != 0)
+	if (uChildRes != 0)//×Ó´°¿Ú
 	{
-		HWND hWndParent = ::GetParent(pMsg->hwnd);
-
-		for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) 
+		HWND hTempParent = ::GetParent(pMsg->hwnd);
+		while(hTempParent)
 		{
-			CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);        
-			HWND hTempParent = hWndParent;
-			while(hTempParent)
+			for( int i = 0; i < ms_aPreMessages.GetSize(); i++ ) 
 			{
+				CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(ms_aPreMessages[i]);
 				if(pMsg->hwnd == pT->GetPaintWindow() || hTempParent == pT->GetPaintWindow())
 				{
 					if (pT->TranslateAccelerator(pMsg))
@@ -2215,15 +2213,15 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 
 					return false;
 				}
-				hTempParent = GetParent(hTempParent);
 			}
+			hTempParent = GetParent(hTempParent);
 		}
 	}
 	else
 	{
-		for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) 
+		for( int i = 0; i < ms_aPreMessages.GetSize(); i++ ) 
 		{
-			CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
+			CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(ms_aPreMessages[i]);
 			if(pMsg->hwnd == pT->GetPaintWindow())
 			{
 				if (pT->TranslateAccelerator(pMsg))
