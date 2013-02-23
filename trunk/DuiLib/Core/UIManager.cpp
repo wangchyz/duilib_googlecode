@@ -2200,9 +2200,9 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 		HWND hTempParent = ::GetParent(pMsg->hwnd);
 		while(hTempParent)
 		{
-			for( int i = 0; i < ms_aPreMessages.GetSize(); i++ ) 
+			for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) 
 			{
-				CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(ms_aPreMessages[i]);
+				CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
 				if(pMsg->hwnd == pT->GetPaintWindow() || hTempParent == pT->GetPaintWindow())
 				{
 					if (pT->TranslateAccelerator(pMsg))
@@ -2219,9 +2219,9 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 	}
 	else
 	{
-		for( int i = 0; i < ms_aPreMessages.GetSize(); i++ ) 
+		for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) 
 		{
-			CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(ms_aPreMessages[i]);
+			CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
 			if(pMsg->hwnd == pT->GetPaintWindow())
 			{
 				if (pT->TranslateAccelerator(pMsg))
