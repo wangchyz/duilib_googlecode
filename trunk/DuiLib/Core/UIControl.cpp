@@ -789,7 +789,11 @@ void CControlUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue)
 	else if( _tcscmp(pstrName, _T("bordersize")) == 0 ) {
 		CDuiString nValue = pstrValue;
 		if(nValue.Find(',') < 0)
+		{
 			SetBorderSize(_ttoi(pstrValue));
+			RECT rcPadding = {0};
+			SetBorderSize(rcPadding);
+		}
 		else
 		{
 			RECT rcPadding = { 0 };
