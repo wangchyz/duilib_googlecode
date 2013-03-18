@@ -98,6 +98,8 @@ public:
     // 鼠标提示
     virtual CDuiString GetToolTip() const;
     virtual void SetToolTip(LPCTSTR pstrText);
+	virtual void SetToolTipWidth(int nWidth);
+	virtual int	  GetToolTipWidth(void);	// 多行ToolTip单行最长宽度
 
     // 快捷键
     virtual TCHAR GetShortcut() const;
@@ -206,6 +208,7 @@ protected:
     bool m_bColorHSL;
     int m_nBorderSize;
 	int m_nBorderStyle;
+	int m_nTooltipWidth;
     SIZE m_cxyBorderRound;
     RECT m_rcPaint;
 	RECT m_rcBorderSize;

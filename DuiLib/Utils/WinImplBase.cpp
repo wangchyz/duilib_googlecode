@@ -138,8 +138,8 @@ LRESULT WindowImplBase::OnGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam,
 	LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
 	lpMMI->ptMaxPosition.x	= rcWork.left;
 	lpMMI->ptMaxPosition.y	= rcWork.top;
-	lpMMI->ptMaxSize.x		= rcWork.right;
-	lpMMI->ptMaxSize.y		= rcWork.bottom;
+	lpMMI->ptMaxSize.x		= rcWork.GetWidth();
+	lpMMI->ptMaxSize.y		= rcWork.GetHeight();
 
 	bHandled = FALSE;
 	return 0;

@@ -1937,4 +1937,16 @@ HBITMAP CRenderEngine::GenerateBitmap(CPaintManagerUI* pManager, CControlUI* pCo
     return hBitmap;
 }
 
+SIZE CRenderEngine::GetTextSize( HDC hDC, CPaintManagerUI* pManager , LPCTSTR pstrText, int iFont, UINT uStyle )
+{
+	SIZE size = {0,0};
+	ASSERT(::GetObjectType(hDC)==OBJ_DC || ::GetObjectType(hDC)==OBJ_MEMDC);
+	if( pstrText == NULL || pManager == NULL ) return size;
+	::SetBkMode(hDC, TRANSPARENT);
+	HFONT hOldFont = (HFONT)::SelectObject(hDC, pManager->GetFont(iFont));
+	GetTextExtentPoint32(hDC, pstrText, _tcslen(pstrText) , &size);
+	::SelectObject(hDC, hOldFont);
+	return size;
+}
+
 } // namespace DuiLib
