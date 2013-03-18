@@ -23,7 +23,8 @@ m_dwBackColor3(0),
 m_dwBorderColor(0),
 m_dwFocusBorderColor(0),
 m_bColorHSL(false),
-m_nBorderSize(0)
+m_nBorderSize(0),
+m_nTooltipWidth(300)
 {
     m_cXY.cx = m_cXY.cy = 0;
     m_cxyFixed.cx = m_cxyFixed.cy = 0;
@@ -452,9 +453,42 @@ CDuiString CControlUI::GetToolTip() const
 
 void CControlUI::SetToolTip(LPCTSTR pstrText)
 {
-    m_sToolTip = pstrText;
+	LPTSTR pstrTextHead=(LPTSTR)pstrText;
+	TCHAR strTemp[255];
+
+	TCHAR* pTemp=strTemp;
+	while( *pstrText != _T('\0') )
+	{
+		if (pstrText[0]==_T('\\') && 
+			(pstrText[1]!=NULL && pstrText[1]==_T('n'))
+			)
+		{
+			*pTemp=_T('\n');
+			pTemp++;
+			pstrText+=2;
+		}
+		else
+		{
+			*pTemp=pstrText[0];
+			pTemp++;
+			pstrText++;
+		}
+	}
+	*pTemp=NULL;
+	_tcscpy(pstrTextHead, strTemp);
+
+	m_sToolTip = pstrTextHead;
 }
 
+void CControlUI::SetToolTipWidth( int nWidth )
+{
+	m_nTooltipWidth=nWidth;
+}
+
+int CControlUI::GetToolTipWidth( void )
+{
+	return m_nTooltipWidth;
+}
 
 TCHAR CControlUI::GetShortcut() const
 {
