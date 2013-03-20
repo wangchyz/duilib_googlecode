@@ -24,6 +24,7 @@ m_dwBorderColor(0),
 m_dwFocusBorderColor(0),
 m_bColorHSL(false),
 m_nBorderSize(0),
+m_nBorderStyle(PS_SOLID),
 m_nTooltipWidth(300)
 {
     m_cXY.cx = m_cXY.cy = 0;
@@ -32,9 +33,10 @@ m_nTooltipWidth(300)
     m_cxyMax.cx = m_cxyMax.cy = 9999;
     m_cxyBorderRound.cx = m_cxyBorderRound.cy = 0;
 
-    ::ZeroMemory(&m_rcPadding, sizeof(m_rcPadding));
+    ::ZeroMemory(&m_rcPadding, sizeof(RECT));
     ::ZeroMemory(&m_rcItem, sizeof(RECT));
     ::ZeroMemory(&m_rcPaint, sizeof(RECT));
+	::ZeroMemory(&m_rcBorderSize,sizeof(RECT));
     ::ZeroMemory(&m_tRelativePos, sizeof(TRelativePosUI));
 }
 
