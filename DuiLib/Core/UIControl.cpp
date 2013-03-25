@@ -455,31 +455,9 @@ CDuiString CControlUI::GetToolTip() const
 
 void CControlUI::SetToolTip(LPCTSTR pstrText)
 {
-	LPTSTR pstrTextHead=(LPTSTR)pstrText;
-	TCHAR strTemp[255];
-
-	TCHAR* pTemp=strTemp;
-	while( *pstrText != _T('\0') )
-	{
-		if (pstrText[0]==_T('\\') && 
-			(pstrText[1]!=NULL && pstrText[1]==_T('n'))
-			)
-		{
-			*pTemp=_T('\n');
-			pTemp++;
-			pstrText+=2;
-		}
-		else
-		{
-			*pTemp=pstrText[0];
-			pTemp++;
-			pstrText++;
-		}
-	}
-	*pTemp=NULL;
-	_tcscpy(pstrTextHead, strTemp);
-
-	m_sToolTip = pstrTextHead;
+	CDuiString strTemp(pstrText);
+	strTemp.Replace(_T("<n>"),_T("\r\n"));
+	m_sToolTip=strTemp;
 }
 
 void CControlUI::SetToolTipWidth( int nWidth )

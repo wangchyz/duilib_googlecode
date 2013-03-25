@@ -37,7 +37,14 @@ namespace DuiLib
 		UINT uStyle = WS_CHILD | ES_AUTOHSCROLL;
 		if( m_pOwner->IsPasswordMode() ) uStyle |= ES_PASSWORD;
 		Create(m_pOwner->GetManager()->GetPaintWindow(), NULL, uStyle, 0, rcPos);
-		SetWindowFont(m_hWnd, m_pOwner->GetManager()->GetFontInfo(m_pOwner->GetFont())->hFont, TRUE);
+		HFONT hFont=NULL;
+		int iFontIndex=m_pOwner->GetFont();
+		if (iFontIndex!=-1)
+			hFont=m_pOwner->GetManager()->GetFont(iFontIndex);
+		if (hFont==NULL)
+			hFont=m_pOwner->GetManager()->GetDefaultFontInfo()->hFont;
+
+		SetWindowFont(m_hWnd, hFont, TRUE);
 		Edit_LimitText(m_hWnd, m_pOwner->GetMaxChar());
 		if( m_pOwner->IsPasswordMode() ) Edit_SetPasswordChar(m_hWnd, m_pOwner->GetPasswordChar());
 		Edit_SetText(m_hWnd, m_pOwner->GetText());
