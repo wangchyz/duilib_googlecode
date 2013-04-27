@@ -101,6 +101,7 @@ protected:
     HWND m_hWnd;
     WNDPROC m_OldWndProc;
     bool m_bSubclassed;
+	CDuiRect m_RestoreRect;
 };
 
 } // namespace DuiLib
