@@ -323,10 +323,22 @@ void CWindowWnd::CenterWindow()
     ::GetWindowRect(m_hWnd, &rcDlg);
     RECT rcArea = { 0 };
     RECT rcCenter = { 0 };
+	HWND hWnd=*this;
     HWND hWndParent = ::GetParent(m_hWnd);
     HWND hWndCenter = ::GetWindowOwner(m_hWnd);
-    ::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rcArea, NULL);
-    if( hWndCenter == NULL ) rcCenter = rcArea; else ::GetWindowRect(hWndCenter, &rcCenter);
+	if (hWndCenter!=NULL)
+		hWnd=hWndCenter;
+
+	// 处理多显示器模式下屏幕居中
+	MONITORINFO oMonitor = {};
+	oMonitor.cbSize = sizeof(oMonitor);
+	::GetMonitorInfo(::MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST), &oMonitor);
+	rcArea = oMonitor.rcWork;
+
+    if( hWndCenter == NULL )
+		rcCenter = rcArea;
+	else
+		::GetWindowRect(hWndCenter, &rcCenter);
 
     int DlgWidth = rcDlg.right - rcDlg.left;
     int DlgHeight = rcDlg.bottom - rcDlg.top;
@@ -478,6 +490,28 @@ LRESULT CWindowWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CWindowWnd::OnFinalMessage(HWND /*hWnd*/)
 {
+}
+
+void CWindowWnd::FullScreen()
+{
+	::GetClientRect(m_hWnd,&m_RestoreRect);
+	CDuiPoint point;
+	::ClientToScreen(m_hWnd,&point);
+	m_RestoreRect.left=point.x;
+	m_RestoreRect.top=point.y;
+	m_RestoreRect.right+=point.x;
+	m_RestoreRect.bottom+=point.y;
+	MONITORINFO oMonitor = {};
+	oMonitor.cbSize = sizeof(oMonitor);
+	::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTONEAREST), &oMonitor);
+	CDuiRect rcWork = oMonitor.rcWork;
+
+	::SetWindowPos( m_hWnd, NULL, rcWork.left, rcWork.top, rcWork.GetWidth(), rcWork.GetHeight(), SWP_SHOWWINDOW | SWP_NOZORDER );
+}
+
+void CWindowWnd::RestoreScreen()
+{
+	::SetWindowPos( m_hWnd, NULL, m_RestoreRect.left, m_RestoreRect.top, m_RestoreRect.GetWidth(), m_RestoreRect.GetHeight(), SWP_SHOWWINDOW | SWP_NOZORDER );
 }
 
 } // namespace DuiLib
