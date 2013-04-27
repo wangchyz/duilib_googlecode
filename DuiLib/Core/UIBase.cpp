@@ -495,7 +495,7 @@ void CWindowWnd::OnFinalMessage(HWND /*hWnd*/)
 void CWindowWnd::FullScreen()
 {
 	::GetClientRect(m_hWnd,&m_RestoreRect);
-	CDuiPoint point;
+	CPoint point;
 	::ClientToScreen(m_hWnd,&point);
 	m_RestoreRect.left=point.x;
 	m_RestoreRect.top=point.y;
