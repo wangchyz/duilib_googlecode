@@ -847,6 +847,12 @@ CScrollBarUI* CListUI::GetHorizontalScrollBar() const
     return m_pList->GetHorizontalScrollBar();
 }
 
+BOOL CListUI::SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData)
+{
+	if (!m_pList)
+		return FALSE;
+	return m_pList->SortItems(pfnCompare, dwData);	
+}
 /////////////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -855,6 +861,48 @@ CScrollBarUI* CListUI::GetHorizontalScrollBar() const
 CListBodyUI::CListBodyUI(CListUI* pOwner) : m_pOwner(pOwner)
 {
     ASSERT(m_pOwner);
+}
+
+BOOL CListBodyUI::SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData)
+{
+	if (!pfnCompare)
+		return FALSE;
+	m_pCompareFunc = pfnCompare;
+	CControlUI **pData = (CControlUI **)m_items.GetData();
+	qsort_s(m_items.GetData(), m_items.GetSize(), sizeof(CControlUI*), CListBodyUI::ItemComareFunc, this);	
+	IListItemUI *pItem = NULL;
+	for (int i = 0; i < m_items.GetSize(); ++i)
+	{
+		pItem = (IListItemUI*)(static_cast<CControlUI*>(m_items[i])->GetInterface(TEXT("ListItem")));
+		if (pItem)
+		{
+			pItem->SetIndex(i);
+			pItem->Select(false);
+		}
+	}
+	m_pOwner->SelectItem(-1);
+	if (m_pManager)
+	{
+		SetPos(GetPos());
+		Invalidate();
+	}
+
+	return TRUE;
+}
+
+int __cdecl CListBodyUI::ItemComareFunc(void *pvlocale, const void *item1, const void *item2)
+{
+	CListBodyUI *pThis = (CListBodyUI*)pvlocale;
+	if (!pThis || !item1 || !item2)
+		return 0;
+	return pThis->ItemComareFunc(item1, item2);
+}
+
+int __cdecl CListBodyUI::ItemComareFunc(const void *item1, const void *item2)
+{
+	CControlUI *pControl1 = *(CControlUI**)item1;
+	CControlUI *pControl2 = *(CControlUI**)item2;
+	return m_pCompareFunc((UINT_PTR)pControl1, (UINT_PTR)pControl2, m_compareData);
 }
 
 void CListBodyUI::SetScrollPos(SIZE szPos)
