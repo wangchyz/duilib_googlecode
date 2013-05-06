@@ -9,6 +9,8 @@ namespace DuiLib {
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
+typedef int (CALLBACK *PULVCompareFunc)(UINT_PTR, UINT_PTR, UINT_PTR);
+
 class CListHeaderUI;
 
 #define UILIST_MAX_COLUMNS 32
@@ -187,7 +189,7 @@ public:
     void EnableScrollBar(bool bEnableVertical = true, bool bEnableHorizontal = false);
     virtual CScrollBarUI* GetVerticalScrollBar() const;
     virtual CScrollBarUI* GetHorizontalScrollBar() const;
-
+    BOOL SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData);
 protected:
     bool m_bScrollSelect;
     int m_iCurSel;
@@ -201,6 +203,7 @@ protected:
 /////////////////////////////////////////////////////////////////////////////////////
 //
 
+
 class UILIB_API CListBodyUI : public CVerticalLayoutUI
 {
 public:
@@ -209,9 +212,14 @@ public:
     void SetScrollPos(SIZE szPos);
     void SetPos(RECT rc);
     void DoEvent(TEventUI& event);
-
+    BOOL SortItems(PULVCompareFunc pfnCompare, UINT_PTR dwData);
+protected:
+	static int __cdecl ItemComareFunc(void *pvlocale, const void *item1, const void *item2);
+	int __cdecl ItemComareFunc(const void *item1, const void *item2);
 protected:
     CListUI* m_pOwner;
+	PULVCompareFunc m_pCompareFunc;
+	UINT_PTR m_compareData;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////
