@@ -96,8 +96,34 @@ LRESULT WindowImplBase::OnNcActivate(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lPar
 	return (wParam == 0) ? TRUE : FALSE;
 }
 
-LRESULT WindowImplBase::OnNcCalcSize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
+LRESULT WindowImplBase::OnNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	LPRECT pRect=NULL;
+
+	if ( wParam == TRUE)
+	{
+		LPNCCALCSIZE_PARAMS pParam = (LPNCCALCSIZE_PARAMS)lParam;
+		pRect=&pParam->rgrc[0];
+	}
+	else
+	{
+		pRect=(LPRECT)lParam;
+	}
+
+	if ( ::IsZoomed(m_hWnd))
+	{	// 最大化时，计算当前显示器最适合宽高度
+		MONITORINFO oMonitor = {};
+		oMonitor.cbSize = sizeof(oMonitor);
+		::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTONEAREST), &oMonitor);
+		CDuiRect rcWork = oMonitor.rcWork;
+		CDuiRect rcMonitor = oMonitor.rcMonitor;
+		rcWork.Offset(-oMonitor.rcMonitor.left, -oMonitor.rcMonitor.top);
+
+		pRect->right = pRect->left + rcWork.GetWidth();
+		pRect->bottom = pRect->top + rcWork.GetHeight();
+		return WVR_REDRAW;
+	}
+
 	return 0;
 }
 
@@ -113,6 +139,26 @@ LRESULT WindowImplBase::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 
 	RECT rcClient;
 	::GetClientRect(*this, &rcClient);
+	
+	if( !::IsZoomed(*this) )
+	{
+		RECT rcSizeBox = m_PaintManager.GetSizeBox();
+		if( pt.y < rcClient.top + rcSizeBox.top )
+		{
+			if( pt.x < rcClient.left + rcSizeBox.left ) return HTTOPLEFT;
+			if( pt.x > rcClient.right - rcSizeBox.right ) return HTTOPRIGHT;
+			return HTTOP;
+		}
+		else if( pt.y > rcClient.bottom - rcSizeBox.bottom )
+		{
+			if( pt.x < rcClient.left + rcSizeBox.left ) return HTBOTTOMLEFT;
+			if( pt.x > rcClient.right - rcSizeBox.right ) return HTBOTTOMRIGHT;
+			return HTBOTTOM;
+		}
+
+		if( pt.x < rcClient.left + rcSizeBox.left ) return HTLEFT;
+		if( pt.x > rcClient.right - rcSizeBox.right ) return HTRIGHT;
+	}
 
 	RECT rcCaption = m_PaintManager.GetCaptionRect();
 	if( pt.x >= rcClient.left + rcCaption.left && pt.x < rcClient.right - rcCaption.right \
@@ -129,17 +175,24 @@ LRESULT WindowImplBase::OnNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 
 LRESULT WindowImplBase::OnGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+	LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
+
 	MONITORINFO oMonitor = {};
 	oMonitor.cbSize = sizeof(oMonitor);
-	::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTOPRIMARY), &oMonitor);
+	::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTONEAREST), &oMonitor);
 	CDuiRect rcWork = oMonitor.rcWork;
+	CDuiRect rcMonitor = oMonitor.rcMonitor;
 	rcWork.Offset(-oMonitor.rcMonitor.left, -oMonitor.rcMonitor.top);
 
-	LPMINMAXINFO lpMMI = (LPMINMAXINFO) lParam;
+	// 计算最大化时，正确的原点坐标
 	lpMMI->ptMaxPosition.x	= rcWork.left;
 	lpMMI->ptMaxPosition.y	= rcWork.top;
-	lpMMI->ptMaxSize.x		= rcWork.GetWidth();
-	lpMMI->ptMaxSize.y		= rcWork.GetHeight();
+
+	lpMMI->ptMaxTrackSize.x =rcWork.GetWidth();
+	lpMMI->ptMaxTrackSize.y =rcWork.GetHeight();
+
+	lpMMI->ptMinTrackSize.x =m_PaintManager.GetMinInfo().cx;
+	lpMMI->ptMinTrackSize.y =m_PaintManager.GetMinInfo().cy;
 
 	bHandled = FALSE;
 	return 0;

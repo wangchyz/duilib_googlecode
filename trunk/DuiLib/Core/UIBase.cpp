@@ -492,26 +492,4 @@ void CWindowWnd::OnFinalMessage(HWND /*hWnd*/)
 {
 }
 
-void CWindowWnd::FullScreen()
-{
-	::GetClientRect(m_hWnd,&m_RestoreRect);
-	CPoint point;
-	::ClientToScreen(m_hWnd,&point);
-	m_RestoreRect.left=point.x;
-	m_RestoreRect.top=point.y;
-	m_RestoreRect.right+=point.x;
-	m_RestoreRect.bottom+=point.y;
-	MONITORINFO oMonitor = {};
-	oMonitor.cbSize = sizeof(oMonitor);
-	::GetMonitorInfo(::MonitorFromWindow(*this, MONITOR_DEFAULTTONEAREST), &oMonitor);
-	CDuiRect rcWork = oMonitor.rcWork;
-
-	::SetWindowPos( m_hWnd, NULL, rcWork.left, rcWork.top, rcWork.GetWidth(), rcWork.GetHeight(), SWP_SHOWWINDOW | SWP_NOZORDER );
-}
-
-void CWindowWnd::RestoreScreen()
-{
-	::SetWindowPos( m_hWnd, NULL, m_RestoreRect.left, m_RestoreRect.top, m_RestoreRect.GetWidth(), m_RestoreRect.GetHeight(), SWP_SHOWWINDOW | SWP_NOZORDER );
-}
-
 } // namespace DuiLib

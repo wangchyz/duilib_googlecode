@@ -78,8 +78,6 @@ public:
     UINT ShowModal();
     void Close(UINT nRet = IDOK);
     void CenterWindow();	// 居中，支持扩展屏幕
-	void FullScreen();		// 全屏，支持扩展屏幕
-	void RestoreScreen();	// 全屏后恢复
     void SetIcon(UINT nRes);
 
     LRESULT SendMessage(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0L);
@@ -101,7 +99,6 @@ protected:
     HWND m_hWnd;
     WNDPROC m_OldWndProc;
     bool m_bSubclassed;
-	CDuiRect m_RestoreRect;
 };
 
 } // namespace DuiLib
