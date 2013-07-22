@@ -707,15 +707,17 @@ namespace DuiLib
 
 	int CDuiString::Format(LPCTSTR pstrFormat, ...)
 	{
-		CDuiString sFormat = pstrFormat;
-		// Do ordinary printf replacements
-		// NOTE: Documented max-length of wvsprintf() is 1024
-		TCHAR szBuffer[1025] = { 0 };
+		LPTSTR szSprintf = NULL;
 		va_list argList;
+        int nLen;
 		va_start(argList, pstrFormat);
-		int iRet = ::wvsprintf(szBuffer, sFormat, argList);
+        nLen = ::_vsntprintf(NULL, 0, pstrFormat, argList);
+        szSprintf = (TCHAR*)malloc((nLen + 1) * sizeof(TCHAR));
+        ZeroMemory(szSprintf, (nLen + 1) * sizeof(TCHAR));
+		int iRet = ::_vsntprintf(szSprintf, nLen + 1, pstrFormat, argList);
 		va_end(argList);
-		Assign(szBuffer);
+		Assign(szSprintf);
+        free(szSprintf);
 		return iRet;
 	}
 

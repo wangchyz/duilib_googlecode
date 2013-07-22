@@ -1640,7 +1640,7 @@ void CPaintManagerUI::SetDefaultFont(LPCTSTR pStrFontName, int nSize, bool bBold
 {
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
-    _tcscpy(lf.lfFaceName, pStrFontName);
+    _tcsncpy(lf.lfFaceName, pStrFontName, LF_FACESIZE);
     lf.lfCharSet = DEFAULT_CHARSET;
     lf.lfHeight = -nSize;
     if( bBold ) lf.lfWeight += FW_BOLD;
@@ -1673,7 +1673,7 @@ HFONT CPaintManagerUI::AddFont(LPCTSTR pStrFontName, int nSize, bool bBold, bool
 {
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
-    _tcscpy(lf.lfFaceName, pStrFontName);
+    _tcsncpy(lf.lfFaceName, pStrFontName, LF_FACESIZE);
     lf.lfCharSet = DEFAULT_CHARSET;
     lf.lfHeight = -nSize;
     if( bBold ) lf.lfWeight += FW_BOLD;
@@ -1709,7 +1709,7 @@ HFONT CPaintManagerUI::AddFontAt(int index, LPCTSTR pStrFontName, int nSize, boo
 {
     LOGFONT lf = { 0 };
     ::GetObject(::GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &lf);
-    _tcscpy(lf.lfFaceName, pStrFontName);
+    _tcsncpy(lf.lfFaceName, pStrFontName, LF_FACESIZE);
     lf.lfCharSet = DEFAULT_CHARSET;
     lf.lfHeight = -nSize;
     if( bBold ) lf.lfWeight += FW_BOLD;
