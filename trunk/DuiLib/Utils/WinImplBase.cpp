@@ -269,9 +269,12 @@ LRESULT WindowImplBase::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	m_PaintManager.AddPreMessageFilter(this);
 
 	CDialogBuilder builder;
-	CDuiString strResourcePath=m_PaintManager.GetInstancePath();
-	strResourcePath+=GetSkinFolder().GetData();
-	m_PaintManager.SetResourcePath(strResourcePath.GetData());
+	if (m_PaintManager.GetResourcePath().IsEmpty())
+	{	// 允许更灵活的资源路径定义
+		CDuiString strResourcePath=m_PaintManager.GetInstancePath();
+		strResourcePath+=GetSkinFolder().GetData();
+		m_PaintManager.SetResourcePath(strResourcePath.GetData());
+	}
 
 	switch(GetResourceType())
 	{
