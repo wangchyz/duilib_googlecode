@@ -1024,8 +1024,14 @@ void CTxtWinHost::SetParaFormat(PARAFORMAT2 &p)
 
 CRichEditUI::CRichEditUI() : m_pTwh(NULL), m_bVScrollBarFixing(false), m_bWantTab(true), m_bWantReturn(true), 
     m_bWantCtrlReturn(true), m_bRich(true), m_bReadOnly(false), m_bWordWrap(false), m_dwTextColor(0), m_iFont(-1), 
-    m_iLimitText(cInitTextMax), m_lTwhStyle(ES_MULTILINE), m_bInited(false)
+    m_iLimitText(cInitTextMax), m_lTwhStyle(ES_MULTILINE), m_bInited(false), m_chLeadByte(0)
 {
+
+#ifndef _UNICODE
+	m_fAccumulateDBC =true;
+#else
+	m_fAccumulateDBC= false;
+#endif
 }
 
 CRichEditUI::~CRichEditUI()
@@ -2126,6 +2132,27 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
     if( !IsMouseEnabled() && uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST ) return 0;
     if( uMsg == WM_MOUSEWHEEL && (LOWORD(wParam) & MK_CONTROL) == 0 ) return 0;
 
+	if (uMsg == WM_IME_COMPOSITION)
+	{
+		// 解决微软输入法位置异常的问题
+		HIMC hIMC = ImmGetContext(GetManager()->GetPaintWindow());
+		if (hIMC) 
+		{
+			// Set composition window position near caret position
+			POINT point;
+			GetCaretPos(&point);
+
+			COMPOSITIONFORM Composition;
+			Composition.dwStyle = CFS_POINT;
+			Composition.ptCurrentPos.x = point.x;
+			Composition.ptCurrentPos.y = point.y;
+			ImmSetCompositionWindow(hIMC, &Composition);
+
+			ImmReleaseContext(GetManager()->GetPaintWindow(),hIMC);
+		}
+		return 0;
+	}
+
     bool bWasHandled = true;
     if( (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST) || uMsg == WM_SETCURSOR ) {
         if( !m_pTwh->IsCaptured() ) {
@@ -2187,6 +2214,51 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
             return 0;
         }
     }
+
+	if(WM_CHAR == uMsg)
+	{
+#ifndef _UNICODE
+		// check if we are waiting for 2 consecutive WM_CHAR messages
+		if ( IsAccumulateDBCMode() )
+		{
+			if ( (GetKeyState(VK_KANA) & 0x1) )
+			{
+				// turn off accumulate mode
+				SetAccumulateDBCMode ( false );
+				m_chLeadByte = 0;
+			}
+			else
+			{
+				if ( !m_chLeadByte )
+				{
+					// This is the first WM_CHAR message, 
+					// accumulate it if this is a LeadByte.  Otherwise, fall thru to
+					// regular WM_CHAR processing.
+					if ( IsDBCSLeadByte ( (WORD)wParam ) )
+					{
+						// save the Lead Byte and don't process this message
+						m_chLeadByte = (WORD)wParam << 8 ;
+
+						//TCHAR a = (WORD)wParam << 8 ;
+						return 0;
+					}
+				}
+				else
+				{
+					// This is the second WM_CHAR message,
+					// combine the current byte with previous byte.
+					// This DBC will be handled as WM_IME_CHAR.
+					wParam |= m_chLeadByte;
+					uMsg = WM_IME_CHAR;
+
+					// setup to accumulate more WM_CHAR
+					m_chLeadByte = 0; 
+				}
+			}
+		}
+#endif
+	}
+
     LRESULT lResult = 0;
     HRESULT Hr = TxSendMessage(uMsg, wParam, lParam, &lResult);
     if( Hr == S_OK ) bHandled = bWasHandled;
@@ -2196,6 +2268,16 @@ LRESULT CRichEditUI::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, boo
         if( m_pTwh->IsCaptured() ) bHandled = bWasHandled;
     }
     return lResult;
+}
+
+void CRichEditUI::SetAccumulateDBCMode( bool bDBCMode )
+{
+	m_fAccumulateDBC = bDBCMode;
+}
+
+bool CRichEditUI::IsAccumulateDBCMode()
+{
+	return m_fAccumulateDBC;
 }
 
 
