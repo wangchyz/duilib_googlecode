@@ -484,10 +484,6 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath=".\flash10a.tlh"
-				>
-			</File>
-			<File
 				RelativePath="StdAfx.h"
 				>
 			</File>

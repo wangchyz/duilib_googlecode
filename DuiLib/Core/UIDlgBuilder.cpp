@@ -336,7 +336,7 @@ CControlUI* CDialogBuilder::_Parse(CMarkupNode* pRoot, CControlUI* pParent, CPai
             case 5:
                 if( _tcscmp(pstrClass, DUI_CTR_COMBO) == 0 )                  pControl = new CComboUI;
                 else if( _tcscmp(pstrClass, DUI_CTR_LABEL) == 0 )             pControl = new CLabelUI;
-				//else if( _tcscmp(pstrClass, DUI_CTR_FLASH) == 0 )             pControl = new CFlashUI;
+				else if( _tcscmp(pstrClass, DUI_CTR_FLASH) == 0 )             pControl = new CFlashUI;
                 break;
             case 6:
                 if( _tcscmp(pstrClass, DUI_CTR_BUTTON) == 0 )                 pControl = new CButtonUI;

@@ -7,8 +7,9 @@
 			<Button name="closebtn" width="42" maxheight="18" tooltip="点击这里直接退出游戏" normalimage="file='frame_btn_close_normal.bmp' mask='#FFFF00FF'" hotimage="file='frame_btn_close_hot.bmp' mask='#FFFF00FF'" pushedimage="file='frame_btn_close_down.bmp' mask='#FFFF00FF'"/>
 		</HorizontalLayout>
 		<Container>
+			<!--<Flash name="flashUI" />-->
 			<Button name="closebtn2" float="true" pos="240, 200, 282, 218" normalimage="file='frame_btn_close_normal.bmp' mask='#FFFF00FF'" hotimage="file='frame_btn_close_hot.bmp' mask='#FFFF00FF'" pushedimage="file='frame_btn_close_down.bmp' mask='#FFFF00FF'"/>
-			<ActiveX name="flash" clsid="{D27CDB6E-AE6D-11CF-96B8-444553540000}" mouse="false"/>
+			<ActiveX name="flashActiveX" clsid="{D27CDB6E-AE6D-11CF-96B8-444553540000}" mouse="false"/>
 		</Container>
     </VerticalLayout>
 </Window>
